@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en">
   <id>https://misken.github.io/</id>
   <title>Bits of analytics</title>
-  <updated>2022-04-02T22:03:21.605587+00:00</updated>
+  <updated>2022-04-02T22:28:51.640148+00:00</updated>
   <link href="https://misken.github.io/"/>
   <link href="https://misken.github.io/blog/atom.xml" rel="self"/>
   <generator uri="https://ablog.readthedocs.org/" version="0.10.23">ABlog</generator>
@@ -14,11 +14,11 @@
       <name>misken</name>
     </author>
     <content type="html">&lt;div class="ablog-post-excerpt docutils container"&gt;
-&lt;p&gt;Excel is widely used for building and using models of business problems to explore the impact of various model inputs on key outputs. Built in “what if?” tools such as Excel Data Tables and Goal Seek are well known to power spreadsheet modelers. How might we do similar modeling and analysis using Python?&lt;/p&gt;
+&lt;p&gt;Build spreadsheet type models using Python.&lt;/p&gt;
 &lt;/div&gt;
 </content>
     <link href="https://misken.github.io/blog/what_if_1_model_datatable/" rel="alternate"/>
-    <summary>Excel is widely used for building and using models of business problems to explore the impact of various model inputs on key outputs. Built in “what if?” tools such as Excel Data Tables and Goal Seek are well known to power spreadsheet modelers. How might we do similar modeling and analysis using Python?</summary>
+    <summary>Build spreadsheet type models using Python.</summary>
     <category term="python" label="python"/>
     <category term="excel" label="excel"/>
     <published>2021-02-12T00:00:00-05:00</published>
