@@ -2,10 +2,80 @@
 <feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en">
   <id>https://misken.github.io/</id>
   <title>Bits of analytics</title>
-  <updated>2022-04-02T21:33:11.733965+00:00</updated>
+  <updated>2022-04-02T22:03:21.605587+00:00</updated>
   <link href="https://misken.github.io/"/>
   <link href="https://misken.github.io/blog/atom.xml" rel="self"/>
   <generator uri="https://ablog.readthedocs.org/" version="0.10.23">ABlog</generator>
+  <entry>
+    <id>https://misken.github.io/blog/what_if_1_model_datatable/</id>
+    <title>Excel “what if?” analysis with Python - Part 1: Models and Data Tables</title>
+    <updated>2021-02-12T00:00:00-05:00</updated>
+    <author>
+      <name>misken</name>
+    </author>
+    <content type="html">&lt;div class="ablog-post-excerpt docutils container"&gt;
+&lt;p&gt;Excel is widely used for building and using models of business problems to explore the impact of various model inputs on key outputs. Built in “what if?” tools such as Excel Data Tables and Goal Seek are well known to power spreadsheet modelers. How might we do similar modeling and analysis using Python?&lt;/p&gt;
+&lt;/div&gt;
+</content>
+    <link href="https://misken.github.io/blog/what_if_1_model_datatable/" rel="alternate"/>
+    <summary>Excel is widely used for building and using models of business problems to explore the impact of various model inputs on key outputs. Built in “what if?” tools such as Excel Data Tables and Goal Seek are well known to power spreadsheet modelers. How might we do similar modeling and analysis using Python?</summary>
+    <category term="python" label="python"/>
+    <category term="excel" label="excel"/>
+    <published>2021-02-12T00:00:00-05:00</published>
+  </entry>
+  <entry>
+    <id>https://misken.github.io/blog/what_if_2_goalseek/</id>
+    <title>Excel “what if?” analysis with Python - Part 2: Goal seek</title>
+    <updated>2021-02-13T00:00:00-05:00</updated>
+    <author>
+      <name>misken</name>
+    </author>
+    <content type="html">&lt;div class="ablog-post-excerpt docutils container"&gt;
+&lt;p&gt;This is the second installment of a multi-part series on using Python for typical Excel modeling tasks. In the &lt;a class="reference external" href="http://hselab.org/excel-to-python-1-models-datatables.html"&gt;first part&lt;/a&gt; we developed an object oriented version of a simple Excel model along with a &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;data_table&lt;/span&gt;&lt;/code&gt; function for doing sensitivity analysis that is a generalization of Excel’s Data Table tool. The Python version allows an arbitrary number of input and output variables.&lt;/p&gt;
+&lt;/div&gt;
+</content>
+    <link href="https://misken.github.io/blog/what_if_2_goalseek/" rel="alternate"/>
+    <summary>This is the second installment of a multi-part series on using Python for typical Excel modeling tasks. In the first part we developed an object oriented version of a simple Excel model along with a data_table function for doing sensitivity analysis that is a generalization of Excel’s Data Table tool. The Python version allows an arbitrary number of input and output variables.</summary>
+    <category term="python" label="python"/>
+    <category term="excel" label="excel"/>
+    <published>2021-02-13T00:00:00-05:00</published>
+  </entry>
+  <entry>
+    <id>https://misken.github.io/blog/what_if_3_simulation/</id>
+    <title>Excel “what if?” analysis with Python - Part 3: Simulation</title>
+    <updated>2021-02-21T00:00:00-05:00</updated>
+    <author>
+      <name>misken</name>
+    </author>
+    <content type="html">&lt;div class="ablog-post-excerpt docutils container"&gt;
+&lt;p&gt;In the &lt;a class="reference external" href="http://hselab.org/excel-to-python-1-models-datatables.html"&gt;first part of this series&lt;/a&gt;, I introduced the general idea of exploring using Python for typical spreadsheet modeling activities. We built both object-oriented (OO) and non-OO versions of a basic business model (the Bookstore Model - it’s repeated below for convenience) and learned a few things about doing OOP in Python. Then we designed and created a &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;data_table&lt;/span&gt;&lt;/code&gt; function to do sensitivity analysis much like Excel’s Data
+Table tool (though our Python version can handle an arbitrary number of both input and output variables). In &lt;a class="reference external" href="http://hselab.org/excel-to-python-2-goalseek.html"&gt;part 2 we created a goal_seek function&lt;/a&gt; that is reminiscent of Excel’s Goal Seek tool.&lt;/p&gt;
+&lt;/div&gt;
+</content>
+    <link href="https://misken.github.io/blog/what_if_3_simulation/" rel="alternate"/>
+    <summary>In the first part of this series, I introduced the general idea of exploring using Python for typical spreadsheet modeling activities. We built both object-oriented (OO) and non-OO versions of a basic business model (the Bookstore Model - it’s repeated below for convenience) and learned a few things about doing OOP in Python. Then we designed and created a data_table function to do sensitivity analysis much like Excel’s Data
+Table tool (though our Python version can handle an arbitrary number of both input and output variables). In part 2 we created a goal_seek function that is reminiscent of Excel’s Goal Seek tool.</summary>
+    <category term="python" label="python"/>
+    <category term="excel" label="excel"/>
+    <published>2021-02-21T00:00:00-05:00</published>
+  </entry>
+  <entry>
+    <id>https://misken.github.io/blog/what_if_4_project_packaging/</id>
+    <title>Excel “what if?” analysis with Python - Part 4: Project structure and packaging</title>
+    <updated>2021-03-11T00:00:00-05:00</updated>
+    <author>
+      <name>misken</name>
+    </author>
+    <content type="html">&lt;div class="ablog-post-excerpt docutils container"&gt;
+&lt;p&gt;Time to create a proper project structure and turn our growing collection of code into a Python package.&lt;/p&gt;
+&lt;/div&gt;
+</content>
+    <link href="https://misken.github.io/blog/what_if_4_project_packaging/" rel="alternate"/>
+    <summary>Time to create a proper project structure and turn our growing collection of code into a Python package.</summary>
+    <category term="python" label="python"/>
+    <category term="excel" label="excel"/>
+    <published>2021-03-11T00:00:00-05:00</published>
+  </entry>
   <entry>
     <id>https://misken.github.io/blog/pip_with_conda_local_dev/</id>
     <title>Using pip with conda for local development projects</title>

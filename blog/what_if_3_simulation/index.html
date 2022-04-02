@@ -1,0 +1,1789 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>Excel “what if?” analysis with Python - Part 3: Simulation &#8212; misken 0,1,0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css" />
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <link rel="author" title="About these documents" href="../../about/" />
+    <link rel="index" title="Index" href="../../genindex/" />
+    <link rel="search" title="Search" href="../../search/" /> 
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+ 
+<link
+  rel="alternate"
+  type="application/atom+xml"
+  href="../../blog/atom.xml"
+  title="Bits of analytics"
+/>
+ 
+<style type="text/css">
+  ul.ablog-archive {
+    list-style: none;
+    overflow: auto;
+    margin-left: 0px;
+  }
+  ul.ablog-archive li {
+    float: left;
+    margin-right: 5px;
+    font-size: 80%;
+  }
+  ul.postlist a {
+    font-style: italic;
+  }
+  ul.postlist-style-disc {
+    list-style-type: disc;
+  }
+  ul.postlist-style-none {
+    list-style-type: none;
+  }
+  ul.postlist-style-circle {
+    list-style-type: circle;
+  }
+</style>
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+             
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt *,
+div.nbinput.container div.input_area pre,
+div.nboutput.container div.output_area pre,
+div.nbinput.container div.input_area .highlight,
+div.nboutput.container div.output_area .highlight {
+    border: none;
+    padding: 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+div.nbinput.container > div[class*=highlight],
+div.nboutput.container > div[class*=highlight] {
+    margin: 0;
+}
+
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt * {
+    background: none;
+}
+
+div.nboutput.container div.output_area .highlight,
+div.nboutput.container div.output_area pre {
+    background: unset;
+}
+
+div.nboutput.container div.output_area div.highlight {
+    color: unset;  /* override Pygments text color */
+}
+
+/* avoid gaps between output lines */
+div.nboutput.container div[class*=highlight] pre {
+    line-height: normal;
+}
+
+/* input/output containers */
+div.nbinput.container,
+div.nboutput.container {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+    width: 100%;
+}
+@media (max-width: 540px) {
+    div.nbinput.container,
+    div.nboutput.container {
+        flex-direction: column;
+    }
+}
+
+/* input container */
+div.nbinput.container {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast.container {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput.container div.prompt pre {
+    color: #307FC1;
+}
+
+/* output prompt */
+div.nboutput.container div.prompt pre {
+    color: #BF5B3D;
+}
+
+/* all prompts */
+div.nbinput.container div.prompt,
+div.nboutput.container div.prompt {
+    width: 4.5ex;
+    padding-top: 5px;
+    position: relative;
+    user-select: none;
+}
+
+div.nbinput.container div.prompt > div,
+div.nboutput.container div.prompt > div {
+    position: absolute;
+    right: 0;
+    margin-right: 0.3ex;
+}
+
+@media (max-width: 540px) {
+    div.nbinput.container div.prompt,
+    div.nboutput.container div.prompt {
+        width: unset;
+        text-align: left;
+        padding: 0.4em;
+    }
+    div.nboutput.container div.prompt.empty {
+        padding: 0;
+    }
+
+    div.nbinput.container div.prompt > div,
+    div.nboutput.container div.prompt > div {
+        position: unset;
+    }
+}
+
+/* disable scrollbars on prompts */
+div.nbinput.container div.prompt pre,
+div.nboutput.container div.prompt pre {
+    overflow: hidden;
+}
+
+/* input/output area */
+div.nbinput.container div.input_area,
+div.nboutput.container div.output_area {
+    -webkit-flex: 1;
+    flex: 1;
+    overflow: auto;
+}
+@media (max-width: 540px) {
+    div.nbinput.container div.input_area,
+    div.nboutput.container div.output_area {
+        width: 100%;
+    }
+}
+
+/* input area */
+div.nbinput.container div.input_area {
+    border: 1px solid #e0e0e0;
+    border-radius: 2px;
+    /*background: #f5f5f5;*/
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput.container div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.imgmath center alignment in output cells */
+div.nboutput.container div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput.container div.output_area.stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-default-inverse-fg { color: #FFFFFF; }
+.ansi-default-inverse-bg { background-color: #000000; }
+
+.ansi-bold { font-weight: bold; }
+.ansi-underline { text-decoration: underline; }
+
+
+div.nbinput.container div.input_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight].math,
+div.nboutput.container div.output_area.rendered_html,
+div.nboutput.container div.output_area > div.output_javascript,
+div.nboutput.container div.output_area:not(.rendered_html) > img{
+    padding: 5px;
+    margin: 0;
+}
+
+/* fix copybtn overflow problem in chromium (needed for 'sphinx_copybutton') */
+div.nbinput.container div.input_area > div[class^='highlight'],
+div.nboutput.container div.output_area > div[class^='highlight']{
+    overflow-y: hidden;
+}
+
+/* hide copybtn icon on prompts (needed for 'sphinx_copybutton') */
+.prompt .copybtn {
+    display: none;
+}
+
+/* Some additional styling taken form the Jupyter notebook CSS */
+div.rendered_html table {
+  border: none;
+  border-collapse: collapse;
+  border-spacing: 0;
+  color: black;
+  font-size: 12px;
+  table-layout: fixed;
+}
+div.rendered_html thead {
+  border-bottom: 1px solid black;
+  vertical-align: bottom;
+}
+div.rendered_html tr,
+div.rendered_html th,
+div.rendered_html td {
+  text-align: right;
+  vertical-align: middle;
+  padding: 0.5em 0.5em;
+  line-height: normal;
+  white-space: normal;
+  max-width: none;
+  border: none;
+}
+div.rendered_html th {
+  font-weight: bold;
+}
+div.rendered_html tbody tr:nth-child(odd) {
+  background: #f5f5f5;
+}
+div.rendered_html tbody tr:hover {
+  background: rgba(66, 165, 245, 0.2);
+}
+</style>
+<section id="Excel-“what-if?”-analysis-with-Python---Part-3:-Simulation">
+<h1>Excel “what if?” analysis with Python - Part 3: Simulation<a class="headerlink" href="#Excel-“what-if?”-analysis-with-Python---Part-3:-Simulation" title="Permalink to this headline">¶</a></h1>
+<p>In the <a class="reference external" href="http://hselab.org/excel-to-python-1-models-datatables.html">first part of this series</a>, I introduced the general idea of exploring using Python for typical spreadsheet modeling activities. We built both object-oriented (OO) and non-OO versions of a basic business model (the Bookstore Model - it’s repeated below for convenience) and learned a few things about doing OOP in Python. Then we designed and created a <code class="docutils literal notranslate"><span class="pre">data_table</span></code> function to do sensitivity analysis much like Excel’s Data
+Table tool (though our Python version can handle an arbitrary number of both input and output variables). In <a class="reference external" href="http://hselab.org/excel-to-python-2-goalseek.html">part 2 we created a goal_seek function</a> that is reminiscent of Excel’s Goal Seek tool.</p>
+<p>Now it’s time to add Monte-Carlo simulation capabilities to our little library of functions. We’ll stick with the same example. We are getting to the point where it would be convenient to package up our <code class="docutils literal notranslate"><span class="pre">BookstoreModel</span></code> class along with the <code class="docutils literal notranslate"><span class="pre">data_table</span></code> and <code class="docutils literal notranslate"><span class="pre">goal_seek</span></code> functions so that we could import them and use them here. I’ll hold off on that until the next installment. For now, I’ve just included the code. In the spirit of consistency with the first two posts, we’ll once again look
+at both OO and non-OO approaches to this problem.</p>
+<p>You can also read and download the <a class="reference external" href="https://github.com/misken/whatif_modeling_oo">notebook based tutorial from GitHub</a>.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">sklearn.model_selection._search</span> <span class="kn">import</span> <span class="n">ParameterGrid</span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+<span class="kn">import</span> <span class="nn">copy</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%</span><span class="k">matplotlib</span> inline
+</pre></div>
+</div>
+</div>
+<section id="Bookstore-model">
+<h2>Bookstore model<a class="headerlink" href="#Bookstore-model" title="Permalink to this headline">¶</a></h2>
+<p>This example is based on one in the <a class="reference external" href="https://host.kelley.iu.edu/albrightbooks/">spreadsheet modeling textbook(s) I’ve used in my classes since 2001</a>. I started out using Practical Management Science by Winston and Albright and switched to their Business Analytics: Data Analysis and Decision Making (Albright and Winston) around 2013ish. In both books, they introduce the “Walton Bookstore” problem in the chapter on Monte-Carlo simulation. Here’s the basic problem (with a few modifications):</p>
+<ul class="simple">
+<li><p>we have to place an order for a perishable product (e.g. a calendar),</p></li>
+<li><p>there’s a known unit cost for each one ordered,</p></li>
+<li><p>we have a known selling price,</p></li>
+<li><p>demand is uncertain but we can model it with some simple probability distribution,</p></li>
+<li><p>for each unsold item, we can get a partial refund of our unit cost,</p></li>
+<li><p>we need to select the order quantity for our one order for the year; orders can only be in multiples of 25.</p></li>
+</ul>
+</section>
+<section id="A-non-OO-approach-to-Monte-Carlo-simulation">
+<h2>A non-OO approach to Monte-Carlo simulation<a class="headerlink" href="#A-non-OO-approach-to-Monte-Carlo-simulation" title="Permalink to this headline">¶</a></h2>
+<p>Let’s start by repeating our basic non-OO model code for setting inputs and computing profit.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Set all of our base input values except demand</span>
+<span class="n">unit_cost</span> <span class="o">=</span> <span class="mf">7.50</span>
+<span class="n">selling_price</span> <span class="o">=</span> <span class="mf">10.00</span>
+<span class="n">unit_refund</span> <span class="o">=</span> <span class="mf">2.50</span>
+<span class="n">order_quantity</span> <span class="o">=</span> <span class="mi">200</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">bookstore_profit</span><span class="p">(</span><span class="n">unit_cost</span><span class="p">,</span> <span class="n">selling_price</span><span class="p">,</span> <span class="n">unit_refund</span><span class="p">,</span> <span class="n">order_quantity</span><span class="p">,</span> <span class="n">demand</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Compute profit in bookstore model</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">order_cost</span> <span class="o">=</span> <span class="n">unit_cost</span> <span class="o">*</span> <span class="n">order_quantity</span>
+    <span class="n">sales_revenue</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">minimum</span><span class="p">(</span><span class="n">order_quantity</span><span class="p">,</span> <span class="n">demand</span><span class="p">)</span> <span class="o">*</span> <span class="n">selling_price</span>
+    <span class="n">refund_revenue</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">order_quantity</span> <span class="o">-</span> <span class="n">demand</span><span class="p">)</span> <span class="o">*</span> <span class="n">unit_refund</span>
+    <span class="n">profit</span> <span class="o">=</span> <span class="n">sales_revenue</span> <span class="o">+</span> <span class="n">refund_revenue</span> <span class="o">-</span> <span class="n">order_cost</span>
+    <span class="k">return</span> <span class="n">profit</span>
+</pre></div>
+</div>
+</div>
+<section id="Generating-random-demand-values">
+<h3>Generating random demand values<a class="headerlink" href="#Generating-random-demand-values" title="Permalink to this headline">¶</a></h3>
+<p>Assume we’ve used historical data to estimate the mean and standard deviation of demand. Furthermore, let’s pretend that a histogram revealed a relatively normal looking distribution.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Demand parameters</span>
+<span class="n">demand_mean</span> <span class="o">=</span> <span class="mi">193</span>
+<span class="n">demand_sd</span> <span class="o">=</span> <span class="mi">40</span>
+</pre></div>
+</div>
+</div>
+<p>We can generate a vector of random demand realizations and then feed that vector to our <code class="docutils literal notranslate"><span class="pre">compute_profit</span></code> function. The result will be a vector of profits with the same number of elements as in our demand vector. Then we can analyze the results using descriptive statistics and plotting.</p>
+<p>Recently, numpy has updated their random variable generation routines. The details are at <a class="reference external" href="https://numpy.org/doc/stable/reference/random/index.html">https://numpy.org/doc/stable/reference/random/index.html</a>.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">scipy.stats</span></code> module contains a large number of probability distributions and each has numerous functions for calculating things such as pdf or CDF values, quantiles, and various moments. You can see the details at <a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/stats.html">https://docs.scipy.org/doc/scipy/reference/stats.html</a>.</p>
+<p>Let’s assume we want to model demand with a normal distribution. We already initialized variables <code class="docutils literal notranslate"><span class="pre">demand_mean</span></code> and <code class="docutils literal notranslate"><span class="pre">demand_sd</span></code> with the mean and standard deviation of demand.</p>
+<p>The plan:</p>
+<ul class="simple">
+<li><p>import random number generation function from numpy,</p></li>
+<li><p>initialize a random number generator object,</p></li>
+<li><p>use numpy’s <code class="docutils literal notranslate"><span class="pre">normal</span></code> function to generate normally distributed random variates (we’ll do 1000),</p></li>
+<li><p>compute basic summary stats for the generated random variates,</p></li>
+<li><p>create a histogram of the generated random variates to make sure they look normal (they will),</p></li>
+<li><p>use <code class="docutils literal notranslate"><span class="pre">scipy.stats.norm</span></code> to create a normal distribution object,</p></li>
+<li><p>use that normal distribution object to overlay a normal density curve on our histogram.</p></li>
+</ul>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Demand mean = </span><span class="si">{</span><span class="n">demand_mean</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Demand sd = </span><span class="si">{</span><span class="n">demand_sd</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Demand mean = 193
+Demand sd = 40
+</pre></div></div>
+</div>
+<p>Before we launch into this, let’s consider something that modelers often do with uncertain quantities - they simply replace them with their mean. As a benchmark, let’s see what we’d estimate profit to be if we simply used the value of <code class="docutils literal notranslate"><span class="pre">demand_mean</span></code>. Remember this number.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">deterministic_profit</span> <span class="o">=</span> <span class="n">bookstore_profit</span><span class="p">(</span><span class="n">unit_cost</span><span class="p">,</span> <span class="n">selling_price</span><span class="p">,</span> <span class="n">unit_refund</span><span class="p">,</span> <span class="n">order_quantity</span><span class="p">,</span> <span class="n">demand_mean</span><span class="p">)</span>
+<span class="n">deterministic_profit</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+447.5
+</pre></div></div>
+</div>
+<p>First we need to import the default random number generator and create a random generator variable. I’ll use 4470 as the seed. This generator generates numbers uniformly between 0 and 1, which can be used to generate random variates from whatever distribution we choose.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">numpy.random</span> <span class="kn">import</span> <span class="n">default_rng</span>
+<span class="n">rg</span> <span class="o">=</span> <span class="n">default_rng</span><span class="p">(</span><span class="mi">4470</span><span class="p">)</span>
+<span class="n">rg</span><span class="o">.</span><span class="n">random</span><span class="p">()</span> <span class="c1"># Generate one just to see it work</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+0.45855804438027437
+</pre></div></div>
+</div>
+<p>Generate 1000 random variates from a normal distribution with our given mean and standard deviation.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">demand_sim</span> <span class="o">=</span> <span class="n">rg</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">demand_mean</span><span class="p">,</span> <span class="n">demand_sd</span><span class="p">,</span> <span class="mi">1000</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>Obviously we are generating variates from a continuous distribution.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">demand_sim</span><span class="p">[:</span><span class="mi">10</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+array([217.03616307, 133.37168121, 231.54405167, 215.05711803,
+       183.66669223, 268.28497816, 255.99191635, 188.58125604,
+       164.62174798, 170.1384389 ])
+</pre></div></div>
+</div>
+<p>If we want integer valued demands, we can simply round the values.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">demand_sim</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">around</span><span class="p">(</span><span class="n">rg</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">demand_mean</span><span class="p">,</span> <span class="n">demand_sd</span><span class="p">,</span> <span class="mi">1000</span><span class="p">))</span>
+<span class="n">demand_sim</span><span class="p">[:</span><span class="mi">10</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+array([218., 203., 186., 203., 215., 151., 255., 176., 223., 252.])
+</pre></div></div>
+</div>
+<p>Before plotting the histogram, let’s compute basic summary stats for our vector of random demands.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Mean demand = </span><span class="si">{</span><span class="n">demand_sim</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">, Std dev demand = </span><span class="si">{</span><span class="n">demand_sim</span><span class="o">.</span><span class="n">std</span><span class="p">()</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Mean demand = 192.056, Std dev demand = 40.170
+</pre></div></div>
+</div>
+<p>Now use SciPy to create a normal random variable instance with the mean and standard deviation based on <code class="docutils literal notranslate"><span class="pre">demand_mean</span></code> and <code class="docutils literal notranslate"><span class="pre">demand_sd</span></code>. Note the data type. Then we’ll be able to use its built in <code class="docutils literal notranslate"><span class="pre">pdf</span></code> method to plot its density and its <code class="docutils literal notranslate"><span class="pre">ppf</span></code> method to get percentiles to use for our x-axis limits.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">scipy.stats</span> <span class="kn">import</span> <span class="n">norm</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">rv_normal</span> <span class="o">=</span> <span class="n">norm</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="n">demand_mean</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="n">demand_sd</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">rv_normal</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;class &#39;scipy.stats._distn_infrastructure.rv_frozen&#39;&gt;
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Demand histogram&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Demand&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;Density&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">demand_sim</span><span class="p">,</span> <span class="n">density</span><span class="o">=</span><span class="kc">True</span><span class="p">);</span>
+
+<span class="n">x_normal</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">rv_normal</span><span class="o">.</span><span class="n">ppf</span><span class="p">(</span><span class="mf">0.0001</span><span class="p">),</span>
+                <span class="n">rv_normal</span><span class="o">.</span><span class="n">ppf</span><span class="p">(</span><span class="mf">0.999</span><span class="p">),</span> <span class="mi">500</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x_normal</span><span class="p">,</span> <span class="n">rv_normal</span><span class="o">.</span><span class="n">pdf</span><span class="p">(</span><span class="n">x_normal</span><span class="p">),</span>
+       <span class="s1">&#39;r-&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.6</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Normal pdf&#39;</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/blog_what_if_3_simulation_29_0.png" src="../../_images/blog_what_if_3_simulation_29_0.png" />
+</div>
+</div>
+</section>
+<section id="Running-the-simulation">
+<h3>Running the simulation<a class="headerlink" href="#Running-the-simulation" title="Permalink to this headline">¶</a></h3>
+<p>Now that we can generate random demands, we can simulate by simply passing in the vector of random demands to the <code class="docutils literal notranslate"><span class="pre">compute_profit</span></code> function - all the other model inputs are held fixed at their current values. Let’s remind ourselves of these values.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">message</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;unit_cost: </span><span class="si">{</span><span class="n">unit_cost</span><span class="si">}</span><span class="s2"> </span><span class="se">\n</span><span class="s2">&quot;</span> \
+          <span class="sa">f</span><span class="s2">&quot;selling_price: </span><span class="si">{</span><span class="n">selling_price</span><span class="si">}</span><span class="s2"> </span><span class="se">\n</span><span class="s2">&quot;</span> \
+          <span class="sa">f</span><span class="s2">&quot;unit_refund: </span><span class="si">{</span><span class="n">unit_refund</span><span class="si">}</span><span class="s2"> </span><span class="se">\n</span><span class="s2">&quot;</span> \
+          <span class="sa">f</span><span class="s2">&quot;order_quantity: </span><span class="si">{</span><span class="n">order_quantity</span><span class="si">}</span><span class="s2">&quot;</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+unit_cost: 7.5
+selling_price: 10.0
+unit_refund: 2.5
+order_quantity: 200
+</pre></div></div>
+</div>
+<p>We use a list comprehension to evaluate profit for each demand realization. This is exactly the same way we did <a class="reference external" href="https://render.githubusercontent.com/view/ipynb?color_mode=light&amp;commit=f4199a94329d315b7c821c0768b6b35f96cc5ad9&amp;enc_url=68747470733a2f2f7261772e67697468756275736572636f6e74656e742e636f6d2f6d69736b656e2f6161702f663431393961393433323964333135623763383231633037363862366233356639366363356164392f62617369635f6d6f64656c696e675f6f6f2f776861745f69665f315f6d6f64656c5f646174617461626c652e6970796e62&amp;nwo=misken%2Faap&amp;path=basic_modeling_oo%2Fwhat_if_1_model_datatable.ipynb&amp;repository_id=333156463&amp;repository_type=Repository#Sensitivity-analysis-analogous-to-a-1-way-Data-Table">the non-OO 1-way data table in the first part of this
+series</a>.
+Let’s wrap the resulting list with the pandas <code class="docutils literal notranslate"><span class="pre">Series</span></code> constructor so that we can use some of pandas built in analysis tools such as the <code class="docutils literal notranslate"><span class="pre">describe</span></code> method.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">profit_sim</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">([(</span><span class="n">bookstore_profit</span><span class="p">(</span><span class="n">unit_cost</span><span class="p">,</span> <span class="n">selling_price</span><span class="p">,</span> <span class="n">unit_refund</span><span class="p">,</span> <span class="n">order_quantity</span><span class="p">,</span> <span class="n">d</span><span class="p">))</span>
+               <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">demand_sim</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Analyzing-the-simulation-results">
+<h3>Analyzing the simulation results<a class="headerlink" href="#Analyzing-the-simulation-results" title="Permalink to this headline">¶</a></h3>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">profit_sim</span><span class="o">.</span><span class="n">describe</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+count    1000.000000
+mean      347.832500
+std       190.630397
+min      -617.500000
+25%       243.125000
+50%       432.500000
+75%       500.000000
+max       500.000000
+dtype: float64
+</pre></div></div>
+</div>
+<p>The <a class="reference external" href="http://flawofaverages.com/">Flaw of Averages</a> shows up here (compare mean of simulation output to the profit we got by replacing demand with mean demand).</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Deterministic profit = </span><span class="si">{</span><span class="n">deterministic_profit</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Simulation profit = </span><span class="si">{</span><span class="n">profit_sim</span><span class="o">.</span><span class="n">describe</span><span class="p">()[</span><span class="s1">&#39;mean&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Deterministic profit = 447.5
+Simulation profit = 347.8325
+</pre></div></div>
+</div>
+<p>By ignoring uncertainty, we were wildly optimistic as to what our mean profit would be.</p>
+<p><strong>QUESTION</strong> Why do you think these numbers are so different?</p>
+<p>Let’s look at the histogram of profit based on the simulation model to shed some light on this.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Profit histogram&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Profit&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;Num observations&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">600</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">profit_sim</span><span class="p">,</span> <span class="n">density</span><span class="o">=</span><span class="kc">False</span><span class="p">);</span>
+<br/></pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/blog_what_if_3_simulation_40_0.png" src="../../_images/blog_what_if_3_simulation_40_0.png" />
+</div>
+</div>
+<p>While <code class="docutils literal notranslate"><span class="pre">demand</span></code> was normally distributed, the resulting profit distribution is definitely <strong>not</strong> normally distributed. I’m sure you’ve figured out why this histogram has the shape it does and how this relates to the Flaw of Averages.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">scipy.stats</span></code> library can be used to answer typical questions about the distribution of profit.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">scipy</span> <span class="kn">import</span> <span class="n">stats</span>
+</pre></div>
+</div>
+</div>
+<p>What’s the chance we have a negative profit?</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">stats</span><span class="o">.</span><span class="n">percentileofscore</span><span class="p">(</span><span class="n">profit_sim</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">/</span> <span class="mf">100.0</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+0.063
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[23]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Probability profit is between -200, 200</span>
+<span class="nb">print</span><span class="p">((</span><span class="n">stats</span><span class="o">.</span><span class="n">percentileofscore</span><span class="p">(</span><span class="n">profit_sim</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span> <span class="o">-</span> <span class="n">stats</span><span class="o">.</span><span class="n">percentileofscore</span><span class="p">(</span><span class="n">profit_sim</span><span class="p">,</span> <span class="o">-</span><span class="mi">200</span><span class="p">))</span> <span class="o">/</span> <span class="mf">100.0</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+0.1895
+</pre></div></div>
+</div>
+<p>We can create an empirical cumulative distribution function for <code class="docutils literal notranslate"><span class="pre">profit_sim</span></code> and then use it to customize plots.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[24]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">profit_cdf</span> <span class="o">=</span> <span class="n">stats</span><span class="o">.</span><span class="n">cumfreq</span><span class="p">(</span><span class="n">profit_sim</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[25]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">x</span> <span class="o">=</span> <span class="n">profit_cdf</span><span class="o">.</span><span class="n">lowerlimit</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">profit_cdf</span><span class="o">.</span><span class="n">binsize</span> <span class="o">*</span> <span class="n">profit_cdf</span><span class="o">.</span><span class="n">cumcount</span><span class="o">.</span><span class="n">size</span><span class="p">,</span>
+                                 <span class="n">profit_cdf</span><span class="o">.</span><span class="n">cumcount</span><span class="o">.</span><span class="n">size</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[26]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+<span class="n">ax1</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">ax2</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">profit_sim</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="mi">25</span><span class="p">)</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Histogram of simulated profit&#39;</span><span class="p">)</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Profit&#39;</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">profit_cdf</span><span class="o">.</span><span class="n">cumcount</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="n">profit_cdf</span><span class="o">.</span><span class="n">binsize</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Cumulative histogram of simulated profit&#39;</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Profit&#39;</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">([</span><span class="n">x</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">x</span><span class="o">.</span><span class="n">max</span><span class="p">()])</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[26]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+(-679.5833333333334, 562.0833333333329)
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/blog_what_if_3_simulation_49_1.png" src="../../_images/blog_what_if_3_simulation_49_1.png" />
+</div>
+</div>
+</section>
+<section id="Multiple-Uncertain-Inputs">
+<h3>Multiple Uncertain Inputs<a class="headerlink" href="#Multiple-Uncertain-Inputs" title="Permalink to this headline">¶</a></h3>
+<p>Again, note how we used a list comprehension to evaluate profit for each demand realization. If we have multiple random inputs we <strong>cannot</strong> use multiple <code class="docutils literal notranslate"><span class="pre">for</span></code> statements as we don’t want the cross product of the random number vectors. Instead we’d need to <code class="docutils literal notranslate"><span class="pre">zip</span></code> them up into tuples. Here’s a simple example of tuple zipping.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[27]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">alpha</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span>
+<span class="n">beta</span> <span class="o">=</span> <span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">30</span><span class="p">]</span>
+
+<span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">alpha</span><span class="p">,</span> <span class="n">beta</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+(1, 10)
+(2, 20)
+(3, 30)
+</pre></div></div>
+</div>
+<p>Assume we have some uncertainty around both the <code class="docutils literal notranslate"><span class="pre">unit_cost</span></code> and <code class="docutils literal notranslate"><span class="pre">unit_refund</span></code> values. Let’s model our uncertainty with uniform distributions:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">unit_cost</span></code> <span class="math notranslate nohighlight">\(\sim U(7.00, 8.00)\)</span></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">unit_refund</span></code> <span class="math notranslate nohighlight">\(\sim U(2.00, 3.00)\)</span></p></li>
+</ul>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[28]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">unit_cost_sim</span> <span class="o">=</span> <span class="n">rg</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="mf">7.0</span><span class="p">,</span> <span class="mf">8.0</span><span class="p">,</span> <span class="mi">1000</span><span class="p">)</span>
+<span class="n">unit_refund_sim</span> <span class="o">=</span> <span class="n">rg</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="mf">2.0</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">,</span> <span class="mi">1000</span><span class="p">)</span>
+
+<span class="n">rv_uniform</span> <span class="o">=</span> <span class="n">stats</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="mf">7.0</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[29]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Unit Cost histogram&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Unit Cost&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;Density&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">unit_cost_sim</span><span class="p">,</span> <span class="n">density</span><span class="o">=</span><span class="kc">True</span><span class="p">);</span>
+
+<span class="n">x_uniform</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">7.0</span><span class="p">,</span> <span class="mf">8.0</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x_uniform</span><span class="p">,</span> <span class="n">rv_uniform</span><span class="o">.</span><span class="n">pdf</span><span class="p">(</span><span class="n">x_uniform</span><span class="p">),</span>
+       <span class="s1">&#39;r-&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.6</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Uniform pdf&#39;</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/blog_what_if_3_simulation_54_0.png" src="../../_images/blog_what_if_3_simulation_54_0.png" />
+</div>
+</div>
+<p>Let’s zip the three random vectors into tuples.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[30]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">random_inputs</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span><span class="n">demand_sim</span><span class="p">,</span> <span class="n">unit_cost_sim</span><span class="p">,</span> <span class="n">unit_refund_sim</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[31]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">profit_sim_2</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">([(</span><span class="n">bookstore_profit</span><span class="p">(</span><span class="n">uc</span><span class="p">,</span> <span class="n">selling_price</span><span class="p">,</span> <span class="n">uf</span><span class="p">,</span> <span class="n">order_quantity</span><span class="p">,</span> <span class="n">d</span><span class="p">))</span>
+               <span class="k">for</span> <span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">uc</span><span class="p">,</span> <span class="n">uf</span><span class="p">)</span> <span class="ow">in</span> <span class="n">random_inputs</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[32]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Profit histogram for three uncertain inputs&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Profit&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;Num observations&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">600</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">profit_sim_2</span><span class="p">,</span> <span class="n">density</span><span class="o">=</span><span class="kc">False</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/blog_what_if_3_simulation_58_0.png" src="../../_images/blog_what_if_3_simulation_58_0.png" />
+</div>
+</div>
+<p>The additional uncertainty has made the distribution somewhat less extreme in the right tail (it’s still highly skewed).</p>
+</section>
+<section id="Multiple-scenarios:-profit-vs-order-quantity">
+<h3>Multiple scenarios: profit vs order quantity<a class="headerlink" href="#Multiple-scenarios:-profit-vs-order-quantity" title="Permalink to this headline">¶</a></h3>
+<p>In addition to random inputs, we often have other inputs we want to vary over a defined range - i.e. scenarios. Just as we did Part 1 of this series with data tables, we can use a list comprehension to iterate over the scenarios.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[33]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create array of order quantities (the scenarios)</span>
+<span class="n">order_quantity_range</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">400</span><span class="p">,</span> <span class="mi">25</span><span class="p">)</span>
+
+<span class="c1"># Create simulation data table</span>
+<span class="n">sim_table_1</span> <span class="o">=</span> <span class="p">[(</span><span class="n">oq</span><span class="p">,</span> <span class="n">bookstore_profit</span><span class="p">(</span><span class="n">unit_cost</span><span class="p">,</span> <span class="n">selling_price</span><span class="p">,</span> <span class="n">unit_refund</span><span class="p">,</span> <span class="n">oq</span><span class="p">,</span> <span class="n">d</span><span class="p">))</span>
+                    <span class="k">for</span> <span class="n">oq</span> <span class="ow">in</span> <span class="n">order_quantity_range</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">demand_sim</span><span class="p">]</span>
+
+<span class="c1"># Convert to dataframe</span>
+<span class="n">stbl_1_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">sim_table_1</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;OrderQuantity&#39;</span><span class="p">,</span> <span class="s1">&#39;Profit&#39;</span><span class="p">])</span>
+
+<span class="c1"># Plot the results</span>
+<span class="n">profit_histo_g</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">FacetGrid</span><span class="p">(</span><span class="n">stbl_1_df</span><span class="p">,</span> <span class="n">col</span><span class="o">=</span><span class="s2">&quot;OrderQuantity&quot;</span><span class="p">,</span> <span class="n">sharey</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">col_wrap</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">profit_histo_g</span> <span class="o">=</span> <span class="n">profit_histo_g</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">plt</span><span class="o">.</span><span class="n">hist</span><span class="p">,</span> <span class="s2">&quot;Profit&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/blog_what_if_3_simulation_61_0.png" src="../../_images/blog_what_if_3_simulation_61_0.png" />
+</div>
+</div>
+<p>Another way to compare the profit distributions across order quantities is to use boxplots.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[34]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">profit_box_g</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">boxplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s2">&quot;OrderQuantity&quot;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s2">&quot;Profit&quot;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">stbl_1_df</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/blog_what_if_3_simulation_63_0.png" src="../../_images/blog_what_if_3_simulation_63_0.png" />
+</div>
+</div>
+</section>
+</section>
+<section id="Repeat-simulation-using-OO-approach">
+<h2>Repeat simulation using OO approach<a class="headerlink" href="#Repeat-simulation-using-OO-approach" title="Permalink to this headline">¶</a></h2>
+<p>Just as we leveraged our non-OO data table approach for simulation, let’s do the same for the OO version. We should be able to use scikit-learn’s <code class="docutils literal notranslate"><span class="pre">ParameterGrid</span></code> function for optional scenario generation (think RiskSimTable if you’ve used &#64;Risk). We don’t want to use <code class="docutils literal notranslate"><span class="pre">ParameterGrid</span></code> for the random inputs as we don’t want all combinations of them - we just want to evaluate one replication per row. We’ll use the same random vectors that we created above. The basic initial design of our
+<code class="docutils literal notranslate"><span class="pre">simulate</span></code> function will be based on the following:</p>
+<ul class="simple">
+<li><p>The first argument will be a model object (i.e. something like the <code class="docutils literal notranslate"><span class="pre">BookstoreModel</span></code> model) that contains an <code class="docutils literal notranslate"><span class="pre">update</span></code> method. Soon, we should add an abstract <code class="docutils literal notranslate"><span class="pre">Model</span></code> class from which specific models such as the <code class="docutils literal notranslate"><span class="pre">BookstoreModel</span></code> class can be created. The abstract class will contain the <code class="docutils literal notranslate"><span class="pre">update</span></code> method.</p></li>
+<li><p>The random inputs will be passed in as a dictionary whose keys are the input variables being modeled as random and who values are an iterable representing the draws from some probability distribution. Structurally, this is similar to how inputs are specified in the <code class="docutils literal notranslate"><span class="pre">data_table</span></code> function.</p></li>
+<li><p>We can optionally pass in a dictionary of scenario inputs. This is exactly like the <code class="docutils literal notranslate"><span class="pre">data_table</span></code> variable input.</p>
+<ul>
+<li><p>If no scenario input dictionary is passed in, a single simulation scenario is run using the current input values in the model object,</p></li>
+<li><p>If a scenario input dictionary is passed in, then a simulation scenario is run for every combination of parameters in the dictionary. Again, this is just like we do in the <code class="docutils literal notranslate"><span class="pre">data_table</span></code> function.</p></li>
+</ul>
+</li>
+<li><p>The output will be a set of dictionaries containing dataframes of simulation output as well standard summary stats and plots.</p></li>
+</ul>
+<p>In Parts 1 and 2 of this series we created the <code class="docutils literal notranslate"><span class="pre">BookstoreModel</span></code> class as well as <code class="docutils literal notranslate"><span class="pre">data_table</span></code> and <code class="docutils literal notranslate"><span class="pre">goal_seek</span></code> functions. Instead of repeating those definitions here, I’ve moved their code into <strong>whatif.py</strong> and we can just import it.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[35]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">whatif</span> <span class="kn">import</span> <span class="n">BookstoreModel</span>
+</pre></div>
+</div>
+</div>
+<p>Let’s reset our base input values and then create a new <code class="docutils literal notranslate"><span class="pre">BookstoreModel</span></code> object with these property values.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[36]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">unit_cost</span> <span class="o">=</span> <span class="mf">7.50</span>
+<span class="n">selling_price</span> <span class="o">=</span> <span class="mf">10.00</span>
+<span class="n">unit_refund</span> <span class="o">=</span> <span class="mf">2.50</span>
+
+<span class="n">order_quantity</span> <span class="o">=</span> <span class="mi">200</span>
+
+<span class="n">demand_mean</span> <span class="o">=</span> <span class="mi">193</span>
+<span class="n">demand_sd</span> <span class="o">=</span> <span class="mi">40</span>
+
+<span class="n">demand</span> <span class="o">=</span> <span class="n">demand_mean</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[37]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">model2</span> <span class="o">=</span> <span class="n">BookstoreModel</span><span class="p">(</span><span class="n">unit_cost</span><span class="o">=</span><span class="n">unit_cost</span><span class="p">,</span>
+                        <span class="n">selling_price</span><span class="o">=</span><span class="n">selling_price</span><span class="p">,</span>
+                        <span class="n">unit_refund</span><span class="o">=</span><span class="n">unit_refund</span><span class="p">,</span>
+                        <span class="n">order_quantity</span><span class="o">=</span><span class="n">order_quantity</span><span class="p">,</span>
+                        <span class="n">demand</span><span class="o">=</span><span class="n">demand</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>Again, we will model three of our inputs, <code class="docutils literal notranslate"><span class="pre">demand</span></code>, <code class="docutils literal notranslate"><span class="pre">unit_cost</span></code>, and <code class="docutils literal notranslate"><span class="pre">unit_refund</span></code> as random variables. All three were creatd earlier in the notebook, but here they are again. Let’s just do 100 scenarios to reduce the number of output rows for viewing.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[38]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">num_reps</span> <span class="o">=</span> <span class="mi">100</span>
+<span class="n">demand_sim</span> <span class="o">=</span> <span class="n">rg</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">demand_mean</span><span class="p">,</span> <span class="n">demand_sd</span><span class="p">,</span> <span class="n">num_reps</span><span class="p">)</span>
+<span class="n">unit_cost_sim</span> <span class="o">=</span> <span class="n">rg</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="mf">7.0</span><span class="p">,</span> <span class="mf">8.0</span><span class="p">,</span> <span class="n">num_reps</span><span class="p">)</span>
+<span class="n">unit_refund_sim</span> <span class="o">=</span> <span class="n">rg</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="mf">2.0</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">,</span> <span class="n">num_reps</span><span class="p">)</span>
+
+<span class="n">random_inputs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;demand&#39;</span><span class="p">:</span> <span class="n">demand_sim</span><span class="p">,</span>
+                <span class="s1">&#39;unit_cost&#39;</span><span class="p">:</span> <span class="n">unit_cost_sim</span><span class="p">,</span>
+                <span class="s1">&#39;unit_refund&#39;</span><span class="p">:</span> <span class="n">unit_refund_sim</span><span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<p>It’s also perfectly fine to not pre-generate the random variates. If we decide to specify the inputs in this way (next cell), then our <code class="docutils literal notranslate"><span class="pre">simulate</span></code> function should include a boolean input that specifies whether the raw simulated input values should be saved and returned as part of its output.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[39]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">random_inputs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;demand&#39;</span><span class="p">:</span> <span class="n">rg</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">demand_mean</span><span class="p">,</span> <span class="n">demand_sd</span><span class="p">,</span> <span class="n">num_reps</span><span class="p">),</span>
+                <span class="s1">&#39;unit_cost&#39;</span><span class="p">:</span> <span class="n">rg</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="mf">7.0</span><span class="p">,</span> <span class="mf">8.0</span><span class="p">,</span> <span class="n">num_reps</span><span class="p">),</span>
+                <span class="s1">&#39;unit_refund&#39;</span><span class="p">:</span> <span class="n">rg</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="mf">2.0</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">,</span> <span class="n">num_reps</span><span class="p">)}</span>
+</pre></div>
+</div>
+</div>
+<p>For the scenario inputs, we’ll use the range of order quantity values used in the <code class="docutils literal notranslate"><span class="pre">data_table</span></code> examples.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[40]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">scenario_inputs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;order_quantity&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">70</span><span class="p">,</span> <span class="mi">321</span><span class="p">,</span> <span class="mi">50</span><span class="p">)}</span>
+<span class="nb">list</span><span class="p">(</span><span class="n">ParameterGrid</span><span class="p">(</span><span class="n">scenario_inputs</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[40]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[{&#39;order_quantity&#39;: 70},
+ {&#39;order_quantity&#39;: 120},
+ {&#39;order_quantity&#39;: 170},
+ {&#39;order_quantity&#39;: 220},
+ {&#39;order_quantity&#39;: 270},
+ {&#39;order_quantity&#39;: 320}]
+</pre></div></div>
+</div>
+<p>We’ll stick with <code class="docutils literal notranslate"><span class="pre">profit</span></code> as the only output variable for now.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[41]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sim_outputs</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;profit&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<p>Here’s my first version of a <code class="docutils literal notranslate"><span class="pre">simulate</span></code> function.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[42]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">simulate</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">random_inputs</span><span class="p">,</span> <span class="n">outputs</span><span class="p">,</span> <span class="n">scenario_inputs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">keep_random_inputs</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Simulate model for one or more scenarios</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    model : object</span>
+<span class="sd">        User defined object containing the appropriate methods and properties for computing outputs from inputs</span>
+<span class="sd">    random_intputs : dict of str to sequence of random variates</span>
+<span class="sd">        Keys are stochastic input variable names and values are sequence of $n$ random variates, where $n$ is the number of simulation replications</span>
+<span class="sd">    outputs : list of str</span>
+<span class="sd">        List of output variable names</span>
+<span class="sd">    scenario_inputs : optional (default is None), dict of str to sequence</span>
+<span class="sd">        Keys are deterministic input variable names and values are sequence of values for each scenario for this variable. Is consumed by</span>
+<span class="sd">        scikit-learn ParameterGrid() function. See https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.ParameterGrid.html</span>
+<span class="sd">    keep_random_inputs : optional (default is False), boolean</span>
+<span class="sd">        If True, all the random input variates are included in the results dataframe</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    results_df : pandas DataFrame</span>
+<span class="sd">        Values of all outputs for each simulation replication. If `scenario_inputs` is not None, then this is also for every combination of scenario inputs</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="c1"># Clone the model</span>
+    <span class="n">model_clone</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
+
+    <span class="c1"># Update clone with random_inputs</span>
+    <span class="n">model_clone</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">random_inputs</span><span class="p">)</span>
+
+    <span class="c1"># Store raw simulation input values if desired</span>
+    <span class="k">if</span> <span class="n">keep_random_inputs</span><span class="p">:</span>
+        <span class="n">scenario_base_vals</span> <span class="o">=</span> <span class="nb">vars</span><span class="p">(</span><span class="n">model_clone</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">scenario_base_vals</span> <span class="o">=</span> <span class="nb">vars</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
+
+    <span class="c1"># Initialize output counters and containers</span>
+    <span class="n">scenario_num</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">scenario_results</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="c1"># Check if multiple scenarios</span>
+    <span class="k">if</span> <span class="n">scenario_inputs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># Create parameter grid for scenario inputs</span>
+        <span class="n">sim_param_grid</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">ParameterGrid</span><span class="p">(</span><span class="n">scenario_inputs</span><span class="p">))</span>
+
+        <span class="c1"># Scenario loop</span>
+        <span class="k">for</span> <span class="n">params</span> <span class="ow">in</span> <span class="n">sim_param_grid</span><span class="p">:</span>
+            <span class="n">model_clone</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+            <span class="c1"># Initialize scenario related outputs</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="n">scenario_vals</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+            <span class="n">result</span><span class="p">[</span><span class="s1">&#39;scenario_base_vals&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">scenario_base_vals</span>
+            <span class="n">result</span><span class="p">[</span><span class="s1">&#39;scenario_num&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">scenario_num</span>
+            <span class="n">result</span><span class="p">[</span><span class="s1">&#39;scenario_vals&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">scenario_vals</span>
+            <span class="n">raw_output</span> <span class="o">=</span> <span class="p">{}</span>
+
+            <span class="c1"># Output measure loop</span>
+            <span class="k">for</span> <span class="n">output_name</span> <span class="ow">in</span> <span class="n">outputs</span><span class="p">:</span>
+                <span class="n">output_array</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">model_clone</span><span class="p">,</span> <span class="n">output_name</span><span class="p">)()</span>
+                <span class="n">raw_output</span><span class="p">[</span><span class="n">output_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">output_array</span>
+
+            <span class="c1"># Gather results for this scenario</span>
+            <span class="n">result</span><span class="p">[</span><span class="s1">&#39;output&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">raw_output</span>
+            <span class="n">scenario_results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+            <span class="n">scenario_num</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="k">return</span> <span class="n">scenario_results</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># Similar logic to above, but only a single scenario</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="n">result</span><span class="p">[</span><span class="s1">&#39;scenario_base_vals&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">scenario_base_vals</span>
+        <span class="n">result</span><span class="p">[</span><span class="s1">&#39;scenario_num&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">scenario_num</span>
+        <span class="n">result</span><span class="p">[</span><span class="s1">&#39;scenario_vals&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="n">raw_output</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">output_name</span> <span class="ow">in</span> <span class="n">outputs</span><span class="p">:</span>
+            <span class="n">output_array</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">model_clone</span><span class="p">,</span> <span class="n">output_name</span><span class="p">)()</span>
+            <span class="n">raw_output</span><span class="p">[</span><span class="n">output_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">output_array</span>
+
+        <span class="n">result</span><span class="p">[</span><span class="s1">&#39;output&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">raw_output</span>
+        <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">results</span>
+</pre></div>
+</div>
+</div>
+<p>Let’s run the simulation.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[43]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">model2_results</span> <span class="o">=</span> <span class="n">simulate</span><span class="p">(</span><span class="n">model2</span><span class="p">,</span> <span class="n">random_inputs</span><span class="p">,</span> <span class="n">sim_outputs</span><span class="p">,</span> <span class="n">scenario_inputs</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>The output (for now) is a list of dictionaries. Each dictionary corresponds to one scenario (in this case, one value of <code class="docutils literal notranslate"><span class="pre">order_quantity</span></code>. Let’s pluck out one scenario near the middle of the order quantity values and explore the outputs.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[44]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">which_scenario</span> <span class="o">=</span> <span class="mi">4</span>
+
+<span class="c1"># What are the keys in the output dictionaries</span>
+<span class="n">model2_results</span><span class="p">[</span><span class="n">which_scenario</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[44]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+dict_keys([&#39;scenario_base_vals&#39;, &#39;scenario_num&#39;, &#39;scenario_vals&#39;, &#39;output&#39;])
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[45]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">model2_results</span><span class="p">[</span><span class="n">which_scenario</span><span class="p">][</span><span class="s1">&#39;scenario_vals&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[45]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+{&#39;order_quantity&#39;: 270}
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[46]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">scenario</span> <span class="ow">in</span> <span class="n">model2_results</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">scenario</span><span class="p">[</span><span class="s1">&#39;scenario_num&#39;</span><span class="p">],</span> <span class="n">scenario</span><span class="p">[</span><span class="s1">&#39;scenario_vals&#39;</span><span class="p">],</span> <span class="n">scenario</span><span class="p">[</span><span class="s1">&#39;output&#39;</span><span class="p">][</span><span class="s1">&#39;profit&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+0 {&#39;order_quantity&#39;: 70} 176.0191921065434
+1 {&#39;order_quantity&#39;: 120} 299.6121899248544
+2 {&#39;order_quantity&#39;: 170} 381.3838755407154
+3 {&#39;order_quantity&#39;: 220} 287.56197705166164
+4 {&#39;order_quantity&#39;: 270} 17.00942728215051
+5 {&#39;order_quantity&#39;: 320} -306.2002083301332
+</pre></div></div>
+</div>
+<p>Let’s take a look at an entry from one of the scenario dictionaries.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[47]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">model2_results</span><span class="p">[</span><span class="n">which_scenario</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[47]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+{&#39;scenario_base_vals&#39;: {&#39;unit_cost&#39;: 7.5,
+  &#39;selling_price&#39;: 10.0,
+  &#39;unit_refund&#39;: 2.5,
+  &#39;order_quantity&#39;: 200,
+  &#39;demand&#39;: 193},
+ &#39;scenario_num&#39;: 4,
+ &#39;scenario_vals&#39;: {&#39;order_quantity&#39;: 270},
+ &#39;output&#39;: {&#39;profit&#39;: array([  94.07848039,   10.29745358,  235.96489009, -436.72652984,
+         -226.9675955 ,  601.45820208,  293.64935644, -425.72328478,
+         -390.00020874,  -15.59715502,  306.2150294 , -329.35451825,
+          661.32783105,  -36.51672742,  230.13464279, -323.27742095,
+          505.40223752,  337.80405457, -119.90157877,  132.33787233,
+         -901.24678476,  390.99625756, -255.71597319,  461.87713384,
+         -313.95088686,  210.3540985 ,  366.73915719,  243.41026106,
+          646.59828596, -137.23342344, -171.73200896,  181.77906894,
+          142.5739788 ,  114.81682308,   28.4746822 ,   45.60270247,
+         -438.76329113, -212.90798302,  -34.84212884,  -29.78550324,
+          265.03280914,  220.44086959, -224.92077887, -559.73996413,
+          684.40416776,  519.65848137,  483.70855004, -502.66943395,
+         -157.95695122,  581.86172322,   21.63677824,   34.13716094,
+         -189.3820352 ,  -21.7908457 ,   64.30107072, -754.19756385,
+          142.77595237,  395.56677694, -350.41850917, -426.46940612,
+          118.88087006,  214.55339188,  -92.55406086,  121.01250136,
+          -82.47241949, -254.37175642, -292.10614549,  369.40002614,
+          258.36381197,   70.47743792,  191.73247923, -142.21122732,
+         -362.21145521,  438.48568471,  507.46163446,  133.84719243,
+         -232.25685544,  388.80888517,  228.887753  , -309.37641263,
+          177.4884349 ,  180.43407225, -359.01194377,  482.4031242 ,
+         -242.64898564,  580.1099699 , -236.14094472, -421.32776301,
+         -252.41477677,  762.57930743, -293.51728502, -559.60535181,
+         -251.50967301,  -38.58166773, -370.77754468, -383.69639033,
+           42.64023432,  195.50770653, -309.42618891,   56.45870938])}}
+</pre></div></div>
+</div>
+<p>Let’s write a gather results function to turn results object into analysis ready DataFrame.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[48]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">get_sim_results_df</span><span class="p">(</span><span class="n">results</span><span class="p">):</span>
+
+    <span class="n">dfs</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">results</span><span class="p">:</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">r</span><span class="p">[</span><span class="s1">&#39;output&#39;</span><span class="p">])</span>
+        <span class="n">df</span><span class="p">[</span><span class="s1">&#39;scenario_num&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">r</span><span class="p">[</span><span class="s1">&#39;scenario_num&#39;</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">r</span><span class="p">[</span><span class="s1">&#39;scenario_vals&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">df</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
+
+        <span class="n">dfs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+
+    <span class="n">results_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">dfs</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">results_df</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[49]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">model2_results_df</span> <span class="o">=</span> <span class="n">get_sim_results_df</span><span class="p">(</span><span class="n">model2_results</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[50]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">model2_results_df</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[50]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>profit</th>
+      <th>scenario_num</th>
+      <th>order_quantity</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>170.275117</td>
+      <td>0</td>
+      <td>70</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>164.192202</td>
+      <td>0</td>
+      <td>70</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>167.876925</td>
+      <td>0</td>
+      <td>70</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>160.018106</td>
+      <td>0</td>
+      <td>70</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>181.568184</td>
+      <td>0</td>
+      <td>70</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>95</th>
+      <td>-732.460739</td>
+      <td>5</td>
+      <td>320</td>
+    </tr>
+    <tr>
+      <th>96</th>
+      <td>-306.229201</td>
+      <td>5</td>
+      <td>320</td>
+    </tr>
+    <tr>
+      <th>97</th>
+      <td>-106.301086</td>
+      <td>5</td>
+      <td>320</td>
+    </tr>
+    <tr>
+      <th>98</th>
+      <td>-644.780031</td>
+      <td>5</td>
+      <td>320</td>
+    </tr>
+    <tr>
+      <th>99</th>
+      <td>-246.836081</td>
+      <td>5</td>
+      <td>320</td>
+    </tr>
+  </tbody>
+</table>
+<p>600 rows × 3 columns</p>
+</div></div>
+</div>
+<p>Now it’s easy to do plots like the following:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[51]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sns</span><span class="o">.</span><span class="n">boxplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s2">&quot;order_quantity&quot;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s2">&quot;profit&quot;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">model2_results_df</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/blog_what_if_3_simulation_92_0.png" src="../../_images/blog_what_if_3_simulation_92_0.png" />
+</div>
+</div>
+<p>… or this:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[52]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">profit_histo_g2</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">FacetGrid</span><span class="p">(</span><span class="n">model2_results_df</span><span class="p">,</span> <span class="n">col</span><span class="o">=</span><span class="s1">&#39;order_quantity&#39;</span><span class="p">,</span> <span class="n">sharey</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">col_wrap</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">profit_histo_g2</span> <span class="o">=</span> <span class="n">profit_histo_g2</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">plt</span><span class="o">.</span><span class="n">hist</span><span class="p">,</span> <span class="s2">&quot;profit&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/blog_what_if_3_simulation_94_0.png" src="../../_images/blog_what_if_3_simulation_94_0.png" />
+</div>
+</div>
+<p>… and statistical summaries like this:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[53]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">model2_results_df</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s1">&#39;scenario_num&#39;</span><span class="p">])[</span><span class="s1">&#39;profit&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">describe</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[53]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>count</th>
+      <th>mean</th>
+      <th>std</th>
+      <th>min</th>
+      <th>25%</th>
+      <th>50%</th>
+      <th>75%</th>
+      <th>max</th>
+    </tr>
+    <tr>
+      <th>scenario_num</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>100.0</td>
+      <td>176.019192</td>
+      <td>19.141648</td>
+      <td>141.097517</td>
+      <td>162.634144</td>
+      <td>174.243792</td>
+      <td>191.941489</td>
+      <td>209.399164</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>100.0</td>
+      <td>299.612190</td>
+      <td>38.534079</td>
+      <td>106.971360</td>
+      <td>278.066820</td>
+      <td>298.703644</td>
+      <td>329.042553</td>
+      <td>358.969995</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>100.0</td>
+      <td>381.383876</td>
+      <td>115.621643</td>
+      <td>-229.101355</td>
+      <td>357.531065</td>
+      <td>406.647547</td>
+      <td>456.672025</td>
+      <td>506.665625</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>100.0</td>
+      <td>287.561977</td>
+      <td>272.662324</td>
+      <td>-565.174070</td>
+      <td>69.842998</td>
+      <td>358.567460</td>
+      <td>526.428417</td>
+      <td>654.114823</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>100.0</td>
+      <td>17.009427</td>
+      <td>345.595096</td>
+      <td>-901.246785</td>
+      <td>-252.904022</td>
+      <td>31.305922</td>
+      <td>237.826233</td>
+      <td>762.579307</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>100.0</td>
+      <td>-306.200208</td>
+      <td>351.137452</td>
+      <td>-1237.319500</td>
+      <td>-585.551638</td>
+      <td>-302.533435</td>
+      <td>-71.989753</td>
+      <td>465.705377</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<p>Lot’s more to do, but let’s stop here for this post. The basic design seems ok and we can build on this in future installments.</p>
+</section>
+<section id="Wrap-up-and-next-steps">
+<h2>Wrap up and next steps<a class="headerlink" href="#Wrap-up-and-next-steps" title="Permalink to this headline">¶</a></h2>
+<p>We have added a basic <code class="docutils literal notranslate"><span class="pre">simulate</span></code> function to our <code class="docutils literal notranslate"><span class="pre">data_table</span></code> and <code class="docutils literal notranslate"><span class="pre">goal_seek</span></code> functions. Python is proving to be quite nice for doing Excel-style “what if?” analysis.</p>
+<p>In Part 4 of this series, we’ll make some improvements and do some clean-up on our classes and functions. We’ll move everything into a single <strong>whatif.py</strong> module and learn how to create a Python package to make it easy to use and share our new functions. We’ll try out our package on a new model and sketch out some ideas for future enhancements to the package. It’s important we also start creating some basic documentation and a user guide.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
+</section>
+</section>
+
+<div class="section">
+    
+
+<div class="section">
+  <span style="float: left">
+     Previous:
+    
+    <a href="../what_if_2_goalseek/">
+       Excel “what if?” analysis with Python - Part 2: Goal seek
+    </a>
+    
+  </span>
+  <span>&nbsp;</span>
+  <span style="float: right">
+     Next: 
+    <a href="../what_if_4_project_packaging/">
+      Excel “what if?” analysis with Python - Part 4: Project structure and packaging 
+    </a>
+    
+  </span>
+</div>
+  
+</div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../">misken</a></h1>
+
+
+
+
+
+
+
+
+  
+<h2>
+   
+  21 February 2021 
+</h2>
+
+<ul>
+   
+<li id="author">
+  <span
+    >Author:</span
+  >
+   
+  <a href="../author/misken/">misken</a>  
+</li>
+    
+<li id="tags">
+  <span
+    >Tags: </span
+  >
+   
+  <a href="../tag/python/">python</a>   
+  <a href="../tag/excel/">excel</a>  
+</li>
+ 
+</ul>
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../about/">About misken</a></li>
+</ul>
+
+
+<h3>
+  <a href="../">Recent Posts</a>
+</h3>
+<ul>
+   
+  <li>
+    <a href="../hello_world/"
+      >02 April - Hello world from ablog blogging with JupyterLab</a
+    >
+  </li>
+  
+  <li>
+    <a href="../first-post/"
+      >01 April - First Post at new blogging site</a
+    >
+  </li>
+  
+  <li>
+    <a href="../use_jupyter_conda_envs/"
+      >31 March - Using different conda environments with Jupyter Lab</a
+    >
+  </li>
+  
+  <li>
+    <a href="../pip_with_conda_local_dev/"
+      >15 March - Using pip with conda for local development projects</a
+    >
+  </li>
+  
+  <li>
+    <a href="../what_if_4_project_packaging/"
+      >11 March - Excel “what if?” analysis with Python - Part 4: Project structure and packaging</a
+    >
+  </li>
+  
+</ul>
+
+<h3><a href="../tag/">Tags</a></h3>
+<style type="text/css">
+  ul.ablog-cloud {
+    list-style: none;
+    overflow: auto;
+  }
+  ul.ablog-cloud li {
+    float: left;
+    height: 20pt;
+    line-height: 18pt;
+    margin-right: 5px;
+  }
+  ul.ablog-cloud a {
+    text-decoration: none;
+    vertical-align: middle;
+  }
+  li.ablog-cloud-1 {
+    font-size: 80%;
+  }
+  li.ablog-cloud-2 {
+    font-size: 95%;
+  }
+  li.ablog-cloud-3 {
+    font-size: 110%;
+  }
+  li.ablog-cloud-4 {
+    font-size: 125%;
+  }
+  li.ablog-cloud-5 {
+    font-size: 140%;
+  }
+</style>
+<ul class="ablog-cloud">
+   
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/ablog/">ablog</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-2">
+    <a href="../tag/conda/">conda</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-4">
+    <a href="../tag/excel/">excel</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-2">
+    <a href="../tag/jupyter/">jupyter</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-5">
+    <a href="../tag/python/">python</a>
+  </li>
+   
+</ul>
+
+<h3>
+  <a href="../archive/">Archives</a>
+</h3>
+<ul>
+   
+  <li>
+    <a href="../2022/">2022 (4)</a>
+  </li>
+    
+  <li>
+    <a href="../2021/">2021 (4)</a>
+  </li>
+   
+</ul>
+
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search/" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2022, misken.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.3.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../../_sources/blog/what_if_3_simulation.ipynb.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

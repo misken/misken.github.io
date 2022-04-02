@@ -1,0 +1,1755 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>Excel “what if?” analysis with Python - Part 2: Goal seek &#8212; misken 0,1,0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css" />
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <link rel="author" title="About these documents" href="../../about/" />
+    <link rel="index" title="Index" href="../../genindex/" />
+    <link rel="search" title="Search" href="../../search/" /> 
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+ 
+<link
+  rel="alternate"
+  type="application/atom+xml"
+  href="../../blog/atom.xml"
+  title="Bits of analytics"
+/>
+ 
+<style type="text/css">
+  ul.ablog-archive {
+    list-style: none;
+    overflow: auto;
+    margin-left: 0px;
+  }
+  ul.ablog-archive li {
+    float: left;
+    margin-right: 5px;
+    font-size: 80%;
+  }
+  ul.postlist a {
+    font-style: italic;
+  }
+  ul.postlist-style-disc {
+    list-style-type: disc;
+  }
+  ul.postlist-style-none {
+    list-style-type: none;
+  }
+  ul.postlist-style-circle {
+    list-style-type: circle;
+  }
+</style>
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+             
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt *,
+div.nbinput.container div.input_area pre,
+div.nboutput.container div.output_area pre,
+div.nbinput.container div.input_area .highlight,
+div.nboutput.container div.output_area .highlight {
+    border: none;
+    padding: 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+div.nbinput.container > div[class*=highlight],
+div.nboutput.container > div[class*=highlight] {
+    margin: 0;
+}
+
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt * {
+    background: none;
+}
+
+div.nboutput.container div.output_area .highlight,
+div.nboutput.container div.output_area pre {
+    background: unset;
+}
+
+div.nboutput.container div.output_area div.highlight {
+    color: unset;  /* override Pygments text color */
+}
+
+/* avoid gaps between output lines */
+div.nboutput.container div[class*=highlight] pre {
+    line-height: normal;
+}
+
+/* input/output containers */
+div.nbinput.container,
+div.nboutput.container {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+    width: 100%;
+}
+@media (max-width: 540px) {
+    div.nbinput.container,
+    div.nboutput.container {
+        flex-direction: column;
+    }
+}
+
+/* input container */
+div.nbinput.container {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast.container {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput.container div.prompt pre {
+    color: #307FC1;
+}
+
+/* output prompt */
+div.nboutput.container div.prompt pre {
+    color: #BF5B3D;
+}
+
+/* all prompts */
+div.nbinput.container div.prompt,
+div.nboutput.container div.prompt {
+    width: 4.5ex;
+    padding-top: 5px;
+    position: relative;
+    user-select: none;
+}
+
+div.nbinput.container div.prompt > div,
+div.nboutput.container div.prompt > div {
+    position: absolute;
+    right: 0;
+    margin-right: 0.3ex;
+}
+
+@media (max-width: 540px) {
+    div.nbinput.container div.prompt,
+    div.nboutput.container div.prompt {
+        width: unset;
+        text-align: left;
+        padding: 0.4em;
+    }
+    div.nboutput.container div.prompt.empty {
+        padding: 0;
+    }
+
+    div.nbinput.container div.prompt > div,
+    div.nboutput.container div.prompt > div {
+        position: unset;
+    }
+}
+
+/* disable scrollbars on prompts */
+div.nbinput.container div.prompt pre,
+div.nboutput.container div.prompt pre {
+    overflow: hidden;
+}
+
+/* input/output area */
+div.nbinput.container div.input_area,
+div.nboutput.container div.output_area {
+    -webkit-flex: 1;
+    flex: 1;
+    overflow: auto;
+}
+@media (max-width: 540px) {
+    div.nbinput.container div.input_area,
+    div.nboutput.container div.output_area {
+        width: 100%;
+    }
+}
+
+/* input area */
+div.nbinput.container div.input_area {
+    border: 1px solid #e0e0e0;
+    border-radius: 2px;
+    /*background: #f5f5f5;*/
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput.container div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.imgmath center alignment in output cells */
+div.nboutput.container div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput.container div.output_area.stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-default-inverse-fg { color: #FFFFFF; }
+.ansi-default-inverse-bg { background-color: #000000; }
+
+.ansi-bold { font-weight: bold; }
+.ansi-underline { text-decoration: underline; }
+
+
+div.nbinput.container div.input_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight].math,
+div.nboutput.container div.output_area.rendered_html,
+div.nboutput.container div.output_area > div.output_javascript,
+div.nboutput.container div.output_area:not(.rendered_html) > img{
+    padding: 5px;
+    margin: 0;
+}
+
+/* fix copybtn overflow problem in chromium (needed for 'sphinx_copybutton') */
+div.nbinput.container div.input_area > div[class^='highlight'],
+div.nboutput.container div.output_area > div[class^='highlight']{
+    overflow-y: hidden;
+}
+
+/* hide copybtn icon on prompts (needed for 'sphinx_copybutton') */
+.prompt .copybtn {
+    display: none;
+}
+
+/* Some additional styling taken form the Jupyter notebook CSS */
+div.rendered_html table {
+  border: none;
+  border-collapse: collapse;
+  border-spacing: 0;
+  color: black;
+  font-size: 12px;
+  table-layout: fixed;
+}
+div.rendered_html thead {
+  border-bottom: 1px solid black;
+  vertical-align: bottom;
+}
+div.rendered_html tr,
+div.rendered_html th,
+div.rendered_html td {
+  text-align: right;
+  vertical-align: middle;
+  padding: 0.5em 0.5em;
+  line-height: normal;
+  white-space: normal;
+  max-width: none;
+  border: none;
+}
+div.rendered_html th {
+  font-weight: bold;
+}
+div.rendered_html tbody tr:nth-child(odd) {
+  background: #f5f5f5;
+}
+div.rendered_html tbody tr:hover {
+  background: rgba(66, 165, 245, 0.2);
+}
+</style>
+<section id="Excel-“what-if?”-analysis-with-Python---Part-2:-Goal-seek">
+<h1>Excel “what if?” analysis with Python - Part 2: Goal seek<a class="headerlink" href="#Excel-“what-if?”-analysis-with-Python---Part-2:-Goal-seek" title="Permalink to this headline">¶</a></h1>
+<p>This is the second installment of a multi-part series on using Python for typical Excel modeling tasks. In the <a class="reference external" href="http://hselab.org/excel-to-python-1-models-datatables.html">first part</a> we developed an object oriented version of a simple Excel model along with a <code class="docutils literal notranslate"><span class="pre">data_table</span></code> function for doing sensitivity analysis that is a generalization of Excel’s Data Table tool. The Python version allows an arbitrary number of input and output variables.</p>
+<p>In this second part, we design and implement a <code class="docutils literal notranslate"><span class="pre">goal_seek</span></code> function for doing things like break even analysis. Along the way we once again explore some of Python’s more advanced features. This entire series is aimed at those who might have a strong Excel based background but only a basic familiarity with Python programming and are looking to add to their Python knowledge.</p>
+<p>You can also read and download the <a class="reference external" href="https://github.com/misken/whatif_modeling_oo">notebook based tutorial from GitHub</a>.</p>
+<p>In this notebook, we’ll learn a bit about root finding as well as things like SciPy, partial function freezing, and function wrapping with lambda functions. When we are done, we’ll have a <code class="docutils literal notranslate"><span class="pre">goal_seek</span></code> function to complement our <code class="docutils literal notranslate"><span class="pre">data_table</span></code> function. Then in the third installment of the series, we’ll take on Monte-Carlo simulation. Each post is based on a Jupyter notebook which can be downloaded.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">sklearn.model_selection._search</span> <span class="kn">import</span> <span class="n">ParameterGrid</span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+<span class="kn">import</span> <span class="nn">copy</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%</span><span class="k">matplotlib</span> inline
+</pre></div>
+</div>
+</div>
+<section id="Bookstore-model">
+<h2>Bookstore model<a class="headerlink" href="#Bookstore-model" title="Permalink to this headline">¶</a></h2>
+<p>For convenience, I’ll describe the base model we are using throughout this series of Jupyter notebook based posts. This example is based on <a class="reference external" href="https://host.kelley.iu.edu/albrightbooks/">one in the spreadsheet modeling textbook(s) I’ve used in my classes since 2001</a>. I started out using Practical Management Science by Winston and Albright and switched to their Business Analytics: Data Analysis and Decision Making (Albright and Winston) around 2013ish. In both books, they introduce the “Walton
+Bookstore” problem in the chapter on Monte-Carlo simulation. Here’s the basic problem (with a few modifications):</p>
+<ul class="simple">
+<li><p>we have to place an order for a perishable product (e.g. a calendar)</p></li>
+<li><p>there’s a known unit cost for each one ordered</p></li>
+<li><p>we have a known selling price</p></li>
+<li><p>demand is uncertain but we can model it with some simple probability distribution</p></li>
+<li><p>for each unsold item, we can get a partial refund of our unit cost</p></li>
+<li><p>we need to select the order quantity for our one order for the year; orders can only be in multiples of 25</p></li>
+</ul>
+</section>
+<section id="Goal-Seek">
+<h2>Goal Seek<a class="headerlink" href="#Goal-Seek" title="Permalink to this headline">¶</a></h2>
+<p>In addition to the type of sensitivity analysis enabled by the <code class="docutils literal notranslate"><span class="pre">data_table</span></code> function we created in the <a class="reference external" href="http://hselab.org/excel-to-python-1-models-datatables.html">first post in this series</a>, another typical Excel analytical task is to use Goal Seek to find, say, the break even level of demand. At its core, Goal Seek is just a root finder. So, in the Python world, it feels like the optimization routines in SciPy might be useful. Let’s start with the non-OO version of our Bookstore Model</p>
+<section id="Attempt-at-non-OO-version-of-Goal-Seek">
+<h3>Attempt at non-OO version of Goal Seek<a class="headerlink" href="#Attempt-at-non-OO-version-of-Goal-Seek" title="Permalink to this headline">¶</a></h3>
+<p>This got tricky but led down all kinds of interesting side paths having to do with partial function freezing, lambda functions, currying, function signatures and more. Let’s initialize our base input values.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Set all of our base input values</span>
+<span class="n">unit_cost</span> <span class="o">=</span> <span class="mf">7.50</span>
+<span class="n">selling_price</span> <span class="o">=</span> <span class="mf">10.00</span>
+<span class="n">unit_refund</span> <span class="o">=</span> <span class="mf">2.50</span>
+
+<span class="n">demand</span> <span class="o">=</span> <span class="mi">193</span>
+
+<span class="n">order_quantity</span> <span class="o">=</span> <span class="mi">250</span>
+</pre></div>
+</div>
+</div>
+<p>Back in the first post in this series, we then created a function that took all of our base inputs as input arguments and returned a value for profit.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">bookstore_profit</span><span class="p">(</span><span class="n">unit_cost</span><span class="p">,</span> <span class="n">selling_price</span><span class="p">,</span> <span class="n">unit_refund</span><span class="p">,</span> <span class="n">order_quantity</span><span class="p">,</span> <span class="n">demand</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Compute profit in bookstore model</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">order_cost</span> <span class="o">=</span> <span class="n">unit_cost</span> <span class="o">*</span> <span class="n">order_quantity</span>
+    <span class="n">sales_revenue</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">minimum</span><span class="p">(</span><span class="n">order_quantity</span><span class="p">,</span> <span class="n">demand</span><span class="p">)</span> <span class="o">*</span> <span class="n">selling_price</span>
+    <span class="n">refund_revenue</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">order_quantity</span> <span class="o">-</span> <span class="n">demand</span><span class="p">)</span>
+    <span class="n">profit</span> <span class="o">=</span> <span class="n">sales_revenue</span> <span class="o">+</span> <span class="n">refund_revenue</span> <span class="o">-</span> <span class="n">order_cost</span>
+    <span class="k">return</span> <span class="n">profit</span>
+</pre></div>
+</div>
+</div>
+<p>Let’s try it out.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">bookstore_profit</span><span class="p">(</span><span class="n">unit_cost</span><span class="p">,</span> <span class="n">selling_price</span><span class="p">,</span> <span class="n">unit_refund</span><span class="p">,</span> <span class="n">order_quantity</span><span class="p">,</span> <span class="n">demand</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+112.0
+</pre></div></div>
+</div>
+</section>
+</section>
+<section id="A-bit-about-root-finding-using-a-simpler-example">
+<h2>A bit about root finding using a simpler example<a class="headerlink" href="#A-bit-about-root-finding-using-a-simpler-example" title="Permalink to this headline">¶</a></h2>
+<p>Now let’s try to find the break even value for demand; i.e. the level of demand that leads to a profit of zero. As mentioned above, this is a root finding problem - finding where the profit function crosses the x-axis. The <a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/optimize.html">SciPy package has various root finding and optimization functions</a>.</p>
+<p>Reading that page, we eventually get down to the root finding section and find the main function, <a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.root_scalar.html#scipy.optimize.root_scalar">root_scalar</a>. Before trying to use this this function for our bookstore model, let’s consider a simpler example - a quadratic function.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">simple_function</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;x^2 - 3x - 5&#39;&#39;&#39;</span>
+    <span class="k">return</span> <span class="n">x</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">-</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">x</span> <span class="o">-</span> <span class="mi">5</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">simple_function</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+-7
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">simple_function</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+65
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">left_bracket</span> <span class="o">=</span> <span class="o">-</span><span class="mi">2</span>
+<span class="n">right_bracket</span> <span class="o">=</span> <span class="mi">10</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">left_bracket</span><span class="p">,</span> <span class="n">right_bracket</span><span class="p">)</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">simple_function</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;x&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;y = simple_function(x)&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">hlines</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">left_bracket</span><span class="p">,</span> <span class="n">right_bracket</span><span class="p">,</span> <span class="n">linestyles</span><span class="o">=</span><span class="s1">&#39;dotted&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/blog_what_if_2_goalseek_19_0.png" src="../../_images/blog_what_if_2_goalseek_19_0.png" />
+</div>
+</div>
+<p>To use <code class="docutils literal notranslate"><span class="pre">scipy.optimize.root_scalar</span></code> to find the value of <code class="docutils literal notranslate"><span class="pre">x</span></code> where <code class="docutils literal notranslate"><span class="pre">simple_function(x)</span></code> is equal to zero, we call the <code class="docutils literal notranslate"><span class="pre">root_scalar</span></code> and pass in the following input arguments:</p>
+<ul class="simple">
+<li><p>the function - in our case, this is <code class="docutils literal notranslate"><span class="pre">simple_function</span></code></p></li>
+<li><p>the root finding method - we’ll use <code class="docutils literal notranslate"><span class="pre">bisect</span></code> as it’s simple, converges, and doesn’t require any derivative information. See <a class="reference external" href="https://www.youtube.com/watch?v=BuwjGi8J5iA">https://www.youtube.com/watch?v=BuwjGi8J5iA</a> for an explanation of how bisection search works and how it can be easily implemented in Python.</p></li>
+<li><p>a bracket (required for some methods) - if we can define a range <code class="docutils literal notranslate"><span class="pre">[a,</span> <span class="pre">b]</span></code> within which we know the root occurs such that <span class="math notranslate nohighlight">\(f(a)\)</span> and <span class="math notranslate nohighlight">\(f(b)\)</span> have different signs, we can supply it. For example, in our <code class="docutils literal notranslate"><span class="pre">simple_function</span></code> example, we know it must cross zero somewhere between [-2, 0] and then again betwen [0, 10]. As you can imagine such a bracket will help immensely when there are multiple roots and lessen the effect of the initial guess. However, finding a range that brackets the
+root in a way that the sign changes at the endpoints of the bracket may be quite a difficult task.</p></li>
+<li><p>an initial guess (optional) - many root finding algorithms will perform better if we are able to give a reasonable guess as to where the root might be.</p></li>
+</ul>
+<p>If you’ve ever used Excel’s Goal Seek tool, you may have stumbled on behaviors that are related to the list and plot above.</p>
+<ul class="simple">
+<li><p>Goal Seek doesn’t allow you to tell it a whole lot in terms of how it attempts to find roots. We don’t get to specify the method and we don’t get to bracket the root. But, …</p></li>
+<li><p>Goal Seek does use the current cell value of the <em>Changing Cell</em> as an initial guess</p></li>
+<li><p>If our spreadsheet model does have multiple roots, the root returned by Goal Seek will depend on our initial guess.</p></li>
+</ul>
+<p>For example, here are the results of using Goal Seek to drive <code class="docutils literal notranslate"><span class="pre">simple_function(x)</span></code> to 0 with different initial guesses. Note that the function is minimized at <span class="math notranslate nohighlight">\(x=1.5\)</span>.</p>
+<img alt="image.png" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIEAAAChCAYAAADgDNxmAAAGxklEQVR4nO2da3KsIBQGZ10siPW4GjfjYk5+qBM5PAQHH2B3VapuriiILZLxC/kIvJ7P3Q2A+0ECQAJAAhAkAEGCm5hkMB/5fKyMp1YziPl85GMGmRLF+pdg7Yjlywyp7rgKJLiOtRPs3NWjnUWwp/Z8DkhQlWkw7h0+2u/367bvRV+2fUosWPfZfn07dRTrbDPiDDRq3/9RyJdgFdRv31o2Ukdqu5JgrUOPhs1L8H8hrIzrv9VJf/tUjQy7LOXnTtMXbluvbLYvF2EaxHxl0fuq7zfiztXa5ULGZIkcR2/fSrAKGRgVOpBAvDtuvcY/SzBa586aR5bwhfvfHp53zG0x4Ysbu0Ch9i5l7Viw3ZhlXhR+/PQhwXZY3nTkKSPBcvzgBVdiOEP8JyGBV1bJEfiyY8Z2NSnuWoL1guhnb2xOkP0TgteJm+dtYiSwo193ciQInIsZpv327m3fPA7GtY8CN0D7EjiTH/WcDv50oCdWqUObRHl3/qEvrLvv2q6wBNNgghNbf94RaUNse7Bv/PNpXgI95E/a+Mh8IfPoavavOjw53Lr7WmsTI4Ga4TuN3GlDarv+ETEy92hegjPxRo7SOUUjIEGUwHP7yOcMDYAESQJDbWcCiCABCBKAIAEIEoAgAQgSgCABCBKAvESC1Hv+O+qIlnXec7gvevSb0v/PrHSyKJwvSGUsO5dg/sTPDKMM5iwJSupIlFUBlvn7zYugzUsfJ9yySBD+IHMU67376PAtYh7TiRIcqcMvOw1Gvd1TF9DZfXsxExJMgxjvjSMSPKSOQNntnT//h9jYq2+nbDqI+p85jLcPCW6pI1zWjZgZMcE7PF2P+6hQx41Ez7uRwJ046aRNHQnq1ZFTNjwSjDZ+Mf393GPEklLdSJCmjZHAwXs85AggznzBn2eE60WCU+tYntfemL7XnvWnCPXLKgEBRhuYAzhxMj8Op5vTuQSh/F1tGVJ1aAkSZVO/MxmLltvR36ZE0bH3F08MIQUSABIAEoAgAQgSgCABCBKAIAEIEoAgAUirEqjP2eO/I7qTv6vaJDKGF6LesOlsnkMqf1e7PWQMr8N7z57qhCskcOsiY3gBuUGJ7bbYEFu5ZWQMr8KXYD7R/GfxWUvJkjG8jLKRQJO4u3LrJmP4AIrmBIrIxKgOZAwvRN0hoefjd93CRP6uOmQMr8X5nGDbCarTd/J3dSBjCB2ABIAEgAQgSACCBCBIAIIEIEgAggQgSADycAlK1x8M/gXQRG7vrraSMcziwPqDo5WPsWK35VO5vVvaSsbwALnv6NeOcMsX5fYua2u4LBnDKHkdOw1mGQJV+ZLc3kVtjZYlYxgjo2Md2/3yebm9i9q6U5aMYZC9jtVDYV5ih4yhu0fjEoSTOlHrT5kY5ra1sCwZw5WS3F6s/IrO7d3ZVjKGGZTk9raozk3l9m5pKxlDeChIAEgASACCBCBIAIIEIEgAggQgSACCBCANS5CX6au/jmEwx1jSvptyhKl2NyhBSaav8hJ2oRxjSfvuyhHutLtBCVZy3t/XlCCcYyxp3z05wv12v0KCGpHzaI6xpH035Ahz2t25BGqPo+sY7uQYS9p3aY4ws92vkuBYxrA0x1hS7swcYX673yXBoXUMC3OMJe07NUc4ZLe7MwmuWMdQ19tGjrCzkaAg03fKOoZ7EjwzR9iZBFAbJAAkACQAQQIQJABBAhAkAEECECQAQQKQh0tQK0dYuh5iCjKGl1ErR3hgPcRks8gY3kCtHOGRAEqsHjKGF1MrR/i7BGQMb6NWjvBHCcgY3kmtHOEvEpAxvJlaOcJfJCBjeDO1coQ1JoaxY5ExPIlaOcLUcY5CxhA6BAkACQAJQJAABAlAkAAECUCQAAQJQJAApFEJ4lk8r+Tr1zFM/xm/mfYkSGbxvMIvX8dwFLs55mjDN0F7EmiS6xCxjqFbVNc/074EyT94yTqGm1LRvwvZuARlYZHXrWM4b9idDzUtQflqZG9axzDQoshN0KwEh5aje9U6hkELguffoATxLB7rGIqbMZwGMZt29TMSpLJ4rGOojps3MW5PAqgOEgASABKAIAEIEoAgAQgSgCABCBKAIAHISyRwc3bHgyUiLWQM/fPbO//uJYhFqg7xxIxh6piSd/6dS5DI8BXzzIxh+ph559+3BEtHGhMZRosO9dCMYeqYmefftwR6qIwu6rTDwzOG0WNmnv8LJNjeJUdWMXt6xjCxLfP8+5bAy9QdXxzzqRnD5DEzz79vCfRJ6+GxxjHvzhhmHHPv/DuXQLxc3++/jfSwjGHqmJnn378EsAsSABIAEoAgAYjIH6li7Z6c2R32AAAAAElFTkSuQmCC" />
+<p>Let’s try a few different root finding functions available in SciPy.</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">fsolve</span></code> - this appears to be a legacy function but doesn’t require us to bracket the root such that <span class="math notranslate nohighlight">\(f(a)\)</span> and <span class="math notranslate nohighlight">\(f(b)\)</span> have different signs. Of course, the root it returns will likely be impacted by the initial guess (just as Goal Seek is).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">root_scalar</span></code> - this is a newer, more general, function for which we can specify specifics such as the root finding algorithm. Most of the methods require a root bracket.</p></li>
+</ul>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">scipy.optimize</span> <span class="kn">import</span> <span class="n">root_scalar</span>
+<span class="kn">from</span> <span class="nn">scipy.optimize</span> <span class="kn">import</span> <span class="n">fsolve</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># fsolve - very similar to Goal Seek</span>
+<span class="n">init_values</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">1.49</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">,</span> <span class="mf">1.51</span><span class="p">,</span> <span class="mf">2.5</span><span class="p">,</span> <span class="mi">6</span><span class="p">]</span>
+
+<span class="p">[(</span><span class="n">x</span><span class="p">,</span> <span class="n">fsolve</span><span class="p">(</span><span class="n">simple_function</span><span class="p">,</span> <span class="n">x</span><span class="p">))</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">init_values</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[(-1, array([-1.1925824])),
+ (0.5, array([-1.1925824])),
+ (1.49, array([-1.1925824])),
+ (1.5, array([4.1925824])),
+ (1.51, array([4.1925824])),
+ (2.5, array([4.1925824])),
+ (6, array([4.1925824]))]
+</pre></div></div>
+</div>
+<p>Now let’s try <code class="docutils literal notranslate"><span class="pre">root_scalar</span></code>.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Left root</span>
+<span class="n">init_values_1</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">]</span>
+<span class="p">[(</span><span class="n">x</span><span class="p">,</span> <span class="n">root_scalar</span><span class="p">(</span><span class="n">simple_function</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;bisect&#39;</span><span class="p">,</span> <span class="n">bracket</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">x1</span><span class="o">=</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">root</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">init_values_1</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[(-1, -1.1925824035661208),
+ (-0.5, -1.1925824035661208),
+ (0.0, -1.1925824035661208)]
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Right root</span>
+<span class="n">init_values_2</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">10</span><span class="p">]</span>
+<span class="p">[(</span><span class="n">x</span><span class="p">,</span> <span class="n">root_scalar</span><span class="p">(</span><span class="n">simple_function</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;bisect&#39;</span><span class="p">,</span> <span class="n">bracket</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">],</span> <span class="n">x1</span><span class="o">=</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">root</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">init_values_2</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[(0.0, 4.192582403567258),
+ (0.5, 4.192582403567258),
+ (1, 4.192582403567258),
+ (4, 4.192582403567258),
+ (10, 4.192582403567258)]
+</pre></div></div>
+</div>
+<p>Great. In this contrived case in which we can easily write a function to compute the derivative of <code class="docutils literal notranslate"><span class="pre">simple_function</span></code>, we could use Newton’s method instead of bisection search (or others) that require bracketing. Sometimes, just bracketing the root might be really hard. Of course, then the initial guess will matter a lot and we should be able to duplicate Goal Seek’s behavior. In real spreadsheet life, we probably don’t have a closed form solution for the derivative, though we could likely
+approximate it pretty well as long as it wasn’t super jumpy.</p>
+<p>Check out <a class="reference external" href="http://www.math.pitt.edu/~troy/math2070/lab_04.html">http://www.math.pitt.edu/~troy/math2070/lab_04.html</a> if you want to play around in Python with different root finding algorithms.</p>
+<p>Anyway, let’s give Newton’s a go.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">simple_function_prime</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Derivative of x^2 - 3x - 5&#39;&#39;&#39;</span>
+    <span class="k">return</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">x</span> <span class="o">-</span> <span class="mi">3</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">init_values</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">1.49</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">,</span> <span class="mf">1.51</span><span class="p">,</span> <span class="mf">2.5</span><span class="p">,</span> <span class="mi">6</span><span class="p">]</span>
+
+<span class="p">[(</span><span class="n">x</span><span class="p">,</span> <span class="n">root_scalar</span><span class="p">(</span><span class="n">simple_function</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;newton&#39;</span><span class="p">,</span> <span class="n">fprime</span><span class="o">=</span><span class="n">simple_function_prime</span><span class="p">,</span> <span class="n">x0</span><span class="o">=</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">root</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">init_values</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+/home/mark/anaconda3/envs/datasci/lib/python3.8/site-packages/scipy/optimize/zeros.py:295: RuntimeWarning: Derivative was zero.
+  warnings.warn(msg, RuntimeWarning)
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[(-1, -1.192582403567252),
+ (0.5, -1.1925824035672519),
+ (1.49, -1.192582403567252),
+ (1.5, 1.5),
+ (1.51, 4.192582403567251),
+ (2.5, 4.192582403567252),
+ (6, 4.192582403567252)]
+</pre></div></div>
+</div>
+<p>Notice that with Newton’s Method, we got the same behavior as Goal Seek, except for when we used an initial guess of 1.5. Of course, this is the point at which <code class="docutils literal notranslate"><span class="pre">simple_function</span></code> is minimized and the derivative is 0. We get a warning about that and instead of arbitrarily going in one direction or the other, <code class="docutils literal notranslate"><span class="pre">root_scalar</span></code> just bailed and gave us back our original guess. These root finding functions actually <a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.RootResults.html#scipy.optimize.RootResults">return much more info than just the
+root</a>.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">root_scalar</span><span class="p">(</span><span class="n">simple_function</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;newton&#39;</span><span class="p">,</span> <span class="n">fprime</span><span class="o">=</span><span class="n">simple_function_prime</span><span class="p">,</span> <span class="n">x0</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+      converged: True
+           flag: &#39;converged&#39;
+ function_calls: 14
+     iterations: 7
+           root: -1.192582403567252
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">root_scalar</span><span class="p">(</span><span class="n">simple_function</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;newton&#39;</span><span class="p">,</span> <span class="n">fprime</span><span class="o">=</span><span class="n">simple_function_prime</span><span class="p">,</span> <span class="n">x0</span><span class="o">=</span><span class="mf">1.5</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+      converged: False
+           flag: &#39;convergence error&#39;
+ function_calls: 2
+     iterations: 1
+           root: 1.5
+</pre></div></div>
+</div>
+<p>Try out different methods and you’ll see that some take longer than others to converge. Bisection search is <a class="reference external" href="https://www.youtube.com/watch?v=MlP_W-obuNg&amp;t=138s">known to be slow but safe</a>.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">root_scalar</span><span class="p">(</span><span class="n">simple_function</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;bisect&#39;</span><span class="p">,</span> <span class="n">bracket</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">],</span> <span class="n">x1</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+      converged: True
+           flag: &#39;converged&#39;
+ function_calls: 45
+     iterations: 43
+           root: 4.192582403567258
+</pre></div></div>
+</div>
+</section>
+<section id="Back-to-the-Bookstore-Model-and-partial-functions">
+<h2>Back to the Bookstore Model and partial functions<a class="headerlink" href="#Back-to-the-Bookstore-Model-and-partial-functions" title="Permalink to this headline">¶</a></h2>
+<p>You may have already been wondering how exactly we might use SciPy’s root finding functions with our <code class="docutils literal notranslate"><span class="pre">bookstore_profit</span></code> function since it doesn’t just have one input argument, it’s got five. How do we tell <code class="docutils literal notranslate"><span class="pre">root_scalar</span></code> which one of the inputs (e.g. demand) is the one we want to search over and that we want all the other arguments to remain fixed at specific values? This is a job for something known as a <a class="reference external" href="https://www.learnpython.org/en/Partial_functions">partial function</a>. The idea is to
+create a new function object that is based on an existing function, but with some of the function’s inputs set to fixed values. To create partial functions, we need to use the <code class="docutils literal notranslate"><span class="pre">partial</span></code> function from the <code class="docutils literal notranslate"><span class="pre">functools</span></code> library. Unfortunately, while this initially seemed easy, we quickly ran into problems. Before describing those, let’s cheat and consider an easier case. Instead of <code class="docutils literal notranslate"><span class="pre">demand</span></code> being the input we want to vary (i.e. Goal Seek’s <em>changing cell</em>), let’s use <code class="docutils literal notranslate"><span class="pre">unit_cost</span></code>. You’ll
+notice that <code class="docutils literal notranslate"><span class="pre">unit_cost</span></code> is the first input argument to <code class="docutils literal notranslate"><span class="pre">bookstore_profit</span></code> and this might give you an idea of why things get difficult when we want to do this for <code class="docutils literal notranslate"><span class="pre">demand</span></code>.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">selling_price</span> <span class="o">=</span> <span class="mf">10.00</span>
+<span class="n">unit_refund</span> <span class="o">=</span> <span class="mf">2.50</span>
+<span class="n">order_quantity</span> <span class="o">=</span> <span class="mi">200</span>
+<span class="n">demand</span> <span class="o">=</span> <span class="mi">193</span>
+
+<span class="c1"># Create the partial function in which all but the first arg to bookstore_profit are frozen</span>
+<span class="n">profit_unit_cost</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span><span class="n">bookstore_profit</span><span class="p">,</span> <span class="n">selling_price</span><span class="o">=</span><span class="n">selling_price</span><span class="p">,</span>
+                   <span class="n">unit_refund</span><span class="o">=</span><span class="n">unit_refund</span><span class="p">,</span> <span class="n">demand</span><span class="o">=</span><span class="n">demand</span><span class="p">,</span> <span class="n">order_quantity</span><span class="o">=</span><span class="n">order_quantity</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">type</span><span class="p">(</span><span class="n">profit_unit_cost</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+functools.partial
+</pre></div></div>
+</div>
+<p>Let’s just make sure it works and then we’ll try some goal seeking. We know that for the inputs above and a unit cost of $7.50, we should get a profit of 437.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">profit_unit_cost</span><span class="p">(</span><span class="mf">7.50</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+437.0
+</pre></div></div>
+</div>
+<p>Let’s try to find a positive root. First let’s bracket it. If we have really low unit cost, we should have have a big positive profit. If we have a high unit cost, we should lose money.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[23]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">profit_unit_cost</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[23]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+1737.0
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[24]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">profit_unit_cost</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[24]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+-63.0
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[25]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">root_scalar</span><span class="p">(</span><span class="n">profit_unit_cost</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;bisect&#39;</span><span class="p">,</span> <span class="n">bracket</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">],</span> <span class="n">x1</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[25]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+      converged: True
+           flag: &#39;converged&#39;
+ function_calls: 45
+     iterations: 43
+           root: 9.685000000000286
+</pre></div></div>
+</div>
+<p>Terrific. But what happens if we try to do this to find the break even demand level?</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[26]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Set all of our base input values</span>
+<span class="n">unit_cost</span> <span class="o">=</span> <span class="mf">7.50</span>
+<span class="n">selling_price</span> <span class="o">=</span> <span class="mf">10.00</span>
+<span class="n">unit_refund</span> <span class="o">=</span> <span class="mf">2.50</span>
+<span class="n">order_quantity</span> <span class="o">=</span> <span class="mi">200</span>
+</pre></div>
+</div>
+</div>
+<p>Create a new partial function. Watch what happens when we try to use it.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[27]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">profit_demand</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span><span class="n">bookstore_profit</span><span class="p">,</span> <span class="n">unit_cost</span><span class="o">=</span><span class="n">unit_cost</span><span class="p">,</span> <span class="n">selling_price</span><span class="o">=</span><span class="n">selling_price</span><span class="p">,</span>
+                   <span class="n">unit_refund</span><span class="o">=</span><span class="n">unit_refund</span><span class="p">,</span> <span class="n">order_quantity</span><span class="o">=</span><span class="n">order_quantity</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>print(profit_demand(193))
+
+---------------------------------------------------------------------------
+TypeError                                 Traceback (most recent call last)
+&lt;ipython-input-70-babba58828f2&gt; in &lt;module&gt;
+----&gt; 1 print(profit_demand(193))
+
+TypeError: bookstore_profit() got multiple values for argument &#39;unit_cost&#39;
+</pre></div>
+</div>
+<p>What happened? Our new partial function takes a single positional argument. Since <code class="docutils literal notranslate"><span class="pre">unit_cost</span></code> is the first argument in our original function definition, it wants to assign the 193 to <code class="docutils literal notranslate"><span class="pre">unit_cost</span></code>. Then, when we also supply the <code class="docutils literal notranslate"><span class="pre">unit_cost=unit_cost</span></code> named argument, Python complains because <code class="docutils literal notranslate"><span class="pre">unit_cost</span></code> already has a value. We didn’t get the error when we goal seeked for <code class="docutils literal notranslate"><span class="pre">unit_cost</span></code> because it’s the first argument in the original function. The bigger issue is that we don’t know which of
+our five input arguments the user might want to use for goal seeking. In essence, we need to wrap our original function in another function that does nothing but move the goal seek variable into the first position of the function’s argument list. Feels like a job for a lambda function. See <a class="reference external" href="https://stackoverflow.com/questions/51583924/python-typeerror-multiple-arguments-with-functools-partial">https://stackoverflow.com/questions/51583924/python-typeerror-multiple-arguments-with-functools-partial</a> for a good discussion of this issue and a lambda function based solution (in the comments).</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[28]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">profit_demand_2</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span><span class="k">lambda</span> <span class="n">d</span><span class="p">,</span> <span class="n">uc</span><span class="p">,</span> <span class="n">sp</span><span class="p">,</span> <span class="n">uf</span><span class="p">,</span> <span class="n">oq</span><span class="p">:</span> <span class="n">bookstore_profit</span><span class="p">(</span><span class="n">uc</span><span class="p">,</span> <span class="n">sp</span><span class="p">,</span> <span class="n">uf</span><span class="p">,</span> <span class="n">oq</span><span class="p">,</span> <span class="n">d</span><span class="p">),</span>
+                          <span class="n">uc</span><span class="o">=</span><span class="n">unit_cost</span><span class="p">,</span> <span class="n">sp</span><span class="o">=</span><span class="n">selling_price</span><span class="p">,</span>
+                          <span class="n">uf</span><span class="o">=</span><span class="n">unit_refund</span><span class="p">,</span>
+                          <span class="n">oq</span><span class="o">=</span><span class="n">order_quantity</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[29]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">profit_demand_2</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+-1300.0
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[30]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">profit_demand_2</span><span class="p">(</span><span class="mi">193</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+437.0
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[31]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">root_scalar</span><span class="p">(</span><span class="n">profit_demand_2</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;bisect&#39;</span><span class="p">,</span> <span class="n">bracket</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">193</span><span class="p">],</span> <span class="n">x1</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[31]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+      converged: True
+           flag: &#39;converged&#39;
+ function_calls: 49
+     iterations: 47
+           root: 144.4444444444448
+</pre></div></div>
+</div>
+<p>Yep, this matches what I found with Excel’s Goal Seek tool. Unfortunately, this is not a very satisfying solution since we custom crafted a lambda function to alter the <em>function signature</em> of <code class="docutils literal notranslate"><span class="pre">bookstore_profit</span></code> specifically to work for the <code class="docutils literal notranslate"><span class="pre">demand</span></code> input. But, what if we want a different input variable, such as <code class="docutils literal notranslate"><span class="pre">selling_price</span></code>, to be the subject of our goal seek (the changing cell in Excel terminology)?</p>
+<p>This StackOverflow question, solution and comment, hit the nail right on the head.</p>
+<p><a class="reference external" href="https://stackoverflow.com/questions/37052253/choose-which-variable-to-solve-for-python-root-finding-using-fsolve">https://stackoverflow.com/questions/37052253/choose-which-variable-to-solve-for-python-root-finding-using-fsolve</a></p>
+<section id="And-down-the-rabbit-hole-we-go?">
+<h3>And down the rabbit hole we go?<a class="headerlink" href="#And-down-the-rabbit-hole-we-go?" title="Permalink to this headline">¶</a></h3>
+<p>Ok, for a given variable for which to goal seek, we can write a partial lambda function to pass into a root finding finding function such as <code class="docutils literal notranslate"><span class="pre">root_scalar</span></code>. But, how can we create a function that creates the partial lambda function and that takes as input the base <code class="docutils literal notranslate"><span class="pre">bookstore_profit</span></code> function and the name of the keyword argument representing the decision variable (the changing cell in Goal seek)? This led to an interesting journey through things like:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://stackoverflow.com/questions/14261474/how-do-i-write-a-function-that-returns-another-function">https://stackoverflow.com/questions/14261474/how-do-i-write-a-function-that-returns-another-function</a></p></li>
+<li><p><a class="reference external" href="https://en.wikipedia.org/wiki/Currying">https://en.wikipedia.org/wiki/Currying</a></p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">inspect</span></code> module for digging into the guts of Python function objects to look at things like function signatures and even the source code of a function (<code class="docutils literal notranslate"><span class="pre">inspect.getsourcelines()</span></code>).</p></li>
+<li><p>Signature objects are important and powerful for function meta-programming.</p>
+<ul>
+<li><p><a class="reference external" href="https://www.python.org/dev/peps/pep-0362/">https://www.python.org/dev/peps/pep-0362/</a></p></li>
+</ul>
+</li>
+</ul>
+<p>However, ultimately, I gave up early since I was pretty much already sold on using an OO approach to this general Excel modeling in Python endeavor. Since, the <code class="docutils literal notranslate"><span class="pre">profit</span></code> method of our <code class="docutils literal notranslate"><span class="pre">BookstoreModel</span></code> class doesn’t require any inputs other than <code class="docutils literal notranslate"><span class="pre">self</span></code>, this problem goes away. I’m sure some Python wizard knows how to solve this problem, but for now, let’s go back to the OO approach. If I come up with something good on this lambda function creator, I’ll do a follow up post.</p>
+</section>
+<section id="Goal-Seeking-with-the-OO-BookstoreModel">
+<h3>Goal Seeking with the OO BookstoreModel<a class="headerlink" href="#Goal-Seeking-with-the-OO-BookstoreModel" title="Permalink to this headline">¶</a></h3>
+<p>Back in the first post of the series, we created a <code class="docutils literal notranslate"><span class="pre">BookstoreModel</span></code> class which contained methods for computing profit and other output measures, updating input parameters, and some other useful tasks. Here’s the class we ended up with:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[32]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">BookstoreModel</span><span class="p">():</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">unit_cost</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">selling_price</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">unit_refund</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                 <span class="n">order_quantity</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">demand</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">unit_cost</span> <span class="o">=</span> <span class="n">unit_cost</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">selling_price</span> <span class="o">=</span> <span class="n">selling_price</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">unit_refund</span> <span class="o">=</span> <span class="n">unit_refund</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">order_quantity</span> <span class="o">=</span> <span class="n">order_quantity</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">demand</span> <span class="o">=</span> <span class="n">demand</span>
+
+
+    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">param_dict</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Update parameter values</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">param_dict</span><span class="p">:</span>
+            <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">param_dict</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
+
+    <span class="k">def</span> <span class="nf">order_cost</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">unit_cost</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">order_quantity</span>
+
+    <span class="k">def</span> <span class="nf">sales_revenue</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">minimum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">order_quantity</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">demand</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">selling_price</span>
+
+    <span class="k">def</span> <span class="nf">refund_revenue</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">order_quantity</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">demand</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">unit_refund</span>
+
+    <span class="k">def</span> <span class="nf">total_revenue</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">sales_revenue</span><span class="p">()</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">refund_revenue</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">profit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Compute profit in bookstore model</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">profit</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sales_revenue</span><span class="p">()</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">refund_revenue</span><span class="p">()</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">order_cost</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">profit</span>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Print dictionary of object attributes but don&#39;t include an underscore as first char</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">({</span><span class="n">key</span><span class="p">:</span> <span class="n">val</span> <span class="k">for</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">vars</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">key</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;_&#39;</span><span class="p">})</span>
+</pre></div>
+</div>
+</div>
+<p>In the first post we also created a <code class="docutils literal notranslate"><span class="pre">data_table</span></code> function that takes a <code class="docutils literal notranslate"><span class="pre">BookstoreModel</span></code> object as input along with input variable ranges and a list of desired outputs to implement the equivalent of general Excel Data Table function which allows an arbitrary number of both inputs and outputs. Recall that in Excel we can either do a 1-way Data Table with any number of outputs or a 2-way table with a single output.</p>
+<p>Here’s that function and quick recap of its use.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[33]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">data_table</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">scenario_inputs</span><span class="p">,</span> <span class="n">outputs</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Create n-inputs by m-outputs data table.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    model : object</span>
+<span class="sd">        User defined object containing the appropriate methods and properties for computing outputs from inputs</span>
+<span class="sd">    scenario_inputs : dict of str to sequence</span>
+<span class="sd">        Keys are input variable names and values are sequence of values for each scenario for this variable. Is consumed by</span>
+<span class="sd">        scikit-learn ParameterGrid() function. See https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.ParameterGrid.html</span>
+<span class="sd">    outputs : list of str</span>
+<span class="sd">        List of output variable names</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    results_df : pandas DataFrame</span>
+<span class="sd">        Contains values of all outputs for every combination of scenario inputs</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="c1"># Clone the model using deepcopy</span>
+    <span class="n">model_clone</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
+
+    <span class="c1"># Create parameter grid</span>
+    <span class="n">dt_param_grid</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">ParameterGrid</span><span class="p">(</span><span class="n">scenario_inputs</span><span class="p">))</span>
+
+    <span class="c1"># Create the table as a list of dictionaries</span>
+    <span class="n">results</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="c1"># Loop over the scenarios</span>
+    <span class="k">for</span> <span class="n">params</span> <span class="ow">in</span> <span class="n">dt_param_grid</span><span class="p">:</span>
+        <span class="c1"># Update the model clone with scenario specific values</span>
+        <span class="n">model_clone</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+        <span class="c1"># Create a result dictionary based on a copy of the scenario inputs</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+        <span class="c1"># Loop over the list of requested outputs</span>
+        <span class="k">for</span> <span class="n">output</span> <span class="ow">in</span> <span class="n">outputs</span><span class="p">:</span>
+            <span class="c1"># Compute the output.</span>
+            <span class="n">out_val</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">model_clone</span><span class="p">,</span> <span class="n">output</span><span class="p">)()</span>
+            <span class="c1"># Add the output to the result dictionary</span>
+            <span class="n">result</span><span class="p">[</span><span class="n">output</span><span class="p">]</span> <span class="o">=</span> <span class="n">out_val</span>
+
+        <span class="c1"># Append the result dictionary to the results list</span>
+        <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+
+    <span class="c1"># Convert the results list (of dictionaries) to a pandas DataFrame and return it</span>
+    <span class="n">results_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">results_df</span>
+</pre></div>
+</div>
+</div>
+<p>Okay, let’s try it out.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[34]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create a dictionary of base input values</span>
+
+<span class="n">base_inputs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;unit_cost&#39;</span><span class="p">:</span> <span class="mf">7.5</span><span class="p">,</span>
+               <span class="s1">&#39;selling_price&#39;</span><span class="p">:</span> <span class="mf">10.0</span><span class="p">,</span>
+               <span class="s1">&#39;unit_refund&#39;</span><span class="p">:</span> <span class="mf">2.5</span><span class="p">,</span>
+               <span class="s1">&#39;order_quantity&#39;</span><span class="p">:</span> <span class="mi">200</span><span class="p">,</span>
+               <span class="s1">&#39;demand&#39;</span><span class="p">:</span> <span class="mi">193</span><span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[35]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create a new model with default input values (0&#39;s)</span>
+<span class="n">model_6</span> <span class="o">=</span> <span class="n">BookstoreModel</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">model_6</span><span class="p">)</span>
+<span class="n">model_6</span><span class="o">.</span><span class="n">profit</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+{&#39;unit_cost&#39;: 0, &#39;selling_price&#39;: 0, &#39;unit_refund&#39;: 0, &#39;order_quantity&#39;: 0, &#39;demand&#39;: 0}
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[35]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+0
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[36]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Update model with base inputs</span>
+<span class="n">model_6</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">base_inputs</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">model_6</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+{&#39;unit_cost&#39;: 7.5, &#39;selling_price&#39;: 10.0, &#39;unit_refund&#39;: 2.5, &#39;order_quantity&#39;: 200, &#39;demand&#39;: 193}
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[37]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Specify input ranges for scenarios (dictionary)</span>
+<span class="n">dt_param_ranges</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;demand&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">70</span><span class="p">,</span> <span class="mi">321</span><span class="p">,</span> <span class="mi">25</span><span class="p">),</span>
+                   <span class="s1">&#39;order_quantity&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">70</span><span class="p">,</span> <span class="mi">321</span><span class="p">,</span> <span class="mi">50</span><span class="p">)}</span>
+
+<span class="c1"># Specify desired outputs (list)</span>
+<span class="n">outputs</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;profit&#39;</span><span class="p">,</span> <span class="s1">&#39;order_cost&#39;</span><span class="p">]</span>
+
+<span class="c1"># Use data_table function</span>
+<span class="n">m6_dt1_df</span> <span class="o">=</span> <span class="n">data_table</span><span class="p">(</span><span class="n">model_6</span><span class="p">,</span> <span class="n">dt_param_ranges</span><span class="p">,</span> <span class="n">outputs</span><span class="p">)</span>
+<span class="n">m6_dt1_df</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[37]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>demand</th>
+      <th>order_quantity</th>
+      <th>profit</th>
+      <th>order_cost</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>70</td>
+      <td>70</td>
+      <td>175.0</td>
+      <td>525.0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>70</td>
+      <td>120</td>
+      <td>-75.0</td>
+      <td>900.0</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>70</td>
+      <td>170</td>
+      <td>-325.0</td>
+      <td>1275.0</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>70</td>
+      <td>220</td>
+      <td>-575.0</td>
+      <td>1650.0</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>70</td>
+      <td>270</td>
+      <td>-825.0</td>
+      <td>2025.0</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>61</th>
+      <td>320</td>
+      <td>120</td>
+      <td>300.0</td>
+      <td>900.0</td>
+    </tr>
+    <tr>
+      <th>62</th>
+      <td>320</td>
+      <td>170</td>
+      <td>425.0</td>
+      <td>1275.0</td>
+    </tr>
+    <tr>
+      <th>63</th>
+      <td>320</td>
+      <td>220</td>
+      <td>550.0</td>
+      <td>1650.0</td>
+    </tr>
+    <tr>
+      <th>64</th>
+      <td>320</td>
+      <td>270</td>
+      <td>675.0</td>
+      <td>2025.0</td>
+    </tr>
+    <tr>
+      <th>65</th>
+      <td>320</td>
+      <td>320</td>
+      <td>800.0</td>
+      <td>2400.0</td>
+    </tr>
+  </tbody>
+</table>
+<p>66 rows × 4 columns</p>
+</div></div>
+</div>
+<p>Let’s plot the results using Seaborn.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[38]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">profit_dt_g</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">FacetGrid</span><span class="p">(</span><span class="n">m6_dt1_df</span><span class="p">,</span> <span class="n">col</span><span class="o">=</span><span class="s2">&quot;order_quantity&quot;</span><span class="p">,</span> <span class="n">sharey</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">col_wrap</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">profit_dt_g</span> <span class="o">=</span> <span class="n">profit_dt_g</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">,</span> <span class="s2">&quot;demand&quot;</span><span class="p">,</span> <span class="s2">&quot;profit&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/blog_what_if_2_goalseek_66_0.png" src="../../_images/blog_what_if_2_goalseek_66_0.png" />
+</div>
+</div>
+</section>
+</section>
+<section id="Adding-a-goal_seek-function">
+<h2>Adding a <code class="docutils literal notranslate"><span class="pre">goal_seek</span></code> function<a class="headerlink" href="#Adding-a-goal_seek-function" title="Permalink to this headline">¶</a></h2>
+<p>As seen earlier in this notebook, there were a bunch of issues that popped up in trying to use SciPy’s root finding functions with the non-OO model. For the OO model, it felt like I’d end up with similar problems in trying to write some sort of generic wrapper that would create functions to pass into things like <code class="docutils literal notranslate"><span class="pre">root_scalar</span></code>. Instead, I decided to simply bypass SciPy and write my own root finder that I could tailor to our goal seeking problem. When I say “write”, I mean find a good
+implementation that someone has already done and tweak it.</p>
+<p>For example, <a class="reference external" href="https://github.com/patrickwalls/mathematical-python/">https://github.com/patrickwalls/mathematical-python/</a> has nice implementations of various root finding methods. It was a pretty simple matter to adapt the <a class="reference external" href="https://github.com/patrickwalls/mathematical-python/blob/master/roots-optimization/bisection.ipynb">bisection function he wrote in this notebook</a> to use in my <code class="docutils literal notranslate"><span class="pre">goal_seek</span></code> function.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[39]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">goal_seek</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">obj_fn</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">by_changing</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">N</span><span class="o">=</span><span class="mi">100</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Approximate solution of f(x)=0 on interval [a,b] by bisection method.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    model : object</span>
+<span class="sd">        User defined object containing the appropriate methods and properties for doing the desired goal seek</span>
+<span class="sd">    obj_fn : function</span>
+<span class="sd">        The function for which we are trying to approximate a solution f(x)=target.</span>
+<span class="sd">    target : float</span>
+<span class="sd">        The goal</span>
+<span class="sd">    by_changing : string</span>
+<span class="sd">        Name of the input variable in model</span>
+<span class="sd">    a,b : numbers</span>
+<span class="sd">        The interval in which to search for a solution. The function returns</span>
+<span class="sd">        None if (f(a) - target) * (f(b) - target) &gt;= 0 since a solution is not guaranteed.</span>
+<span class="sd">    N : (positive) integer</span>
+<span class="sd">        The number of iterations to implement.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    x_N : number</span>
+<span class="sd">        The midpoint of the Nth interval computed by the bisection method. The</span>
+<span class="sd">        initial interval [a_0,b_0] is given by [a,b]. If f(m_n) - target == 0 for some</span>
+<span class="sd">        midpoint m_n = (a_n + b_n)/2, then the function returns this solution.</span>
+<span class="sd">        If all signs of values f(a_n), f(b_n) and f(m_n) are the same at any</span>
+<span class="sd">        iteration, the bisection method fails and return None.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="c1"># TODO: Checking of inputs and outputs</span>
+
+    <span class="c1"># Clone the model</span>
+    <span class="n">model_clone</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
+
+    <span class="c1"># The following bisection search is a direct adaptation of</span>
+    <span class="c1"># https://www.math.ubc.ca/~pwalls/math-python/roots-optimization/bisection/</span>
+    <span class="c1"># The changes include needing to use an object method instead of a global function</span>
+    <span class="c1"># and the inclusion of a non-zero target value.</span>
+
+    <span class="nb">setattr</span><span class="p">(</span><span class="n">model_clone</span><span class="p">,</span> <span class="n">by_changing</span><span class="p">,</span> <span class="n">a</span><span class="p">)</span>
+    <span class="n">f_a_0</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">model_clone</span><span class="p">,</span> <span class="n">obj_fn</span><span class="p">)()</span>
+    <span class="nb">setattr</span><span class="p">(</span><span class="n">model_clone</span><span class="p">,</span> <span class="n">by_changing</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+    <span class="n">f_b_0</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">model_clone</span><span class="p">,</span> <span class="n">obj_fn</span><span class="p">)()</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">f_a_0</span> <span class="o">-</span> <span class="n">target</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">f_b_0</span> <span class="o">-</span> <span class="n">target</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="c1"># print(&quot;Bisection method fails.&quot;)</span>
+        <span class="k">return</span> <span class="kc">None</span>
+
+    <span class="c1"># Initialize the end points</span>
+    <span class="n">a_n</span> <span class="o">=</span> <span class="n">a</span>
+    <span class="n">b_n</span> <span class="o">=</span> <span class="n">b</span>
+    <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">N</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+        <span class="c1"># Compute the midpoint</span>
+        <span class="n">m_n</span> <span class="o">=</span> <span class="p">(</span><span class="n">a_n</span> <span class="o">+</span> <span class="n">b_n</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span>
+
+        <span class="c1"># Function value at midpoint</span>
+        <span class="nb">setattr</span><span class="p">(</span><span class="n">model_clone</span><span class="p">,</span> <span class="n">by_changing</span><span class="p">,</span> <span class="n">m_n</span><span class="p">)</span>
+        <span class="n">f_m_n</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">model_clone</span><span class="p">,</span> <span class="n">obj_fn</span><span class="p">)()</span>
+
+        <span class="c1"># Function value at a_n</span>
+        <span class="nb">setattr</span><span class="p">(</span><span class="n">model_clone</span><span class="p">,</span> <span class="n">by_changing</span><span class="p">,</span> <span class="n">a_n</span><span class="p">)</span>
+        <span class="n">f_a_n</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">model_clone</span><span class="p">,</span> <span class="n">obj_fn</span><span class="p">)()</span>
+
+        <span class="c1"># Function value at b_n</span>
+        <span class="nb">setattr</span><span class="p">(</span><span class="n">model_clone</span><span class="p">,</span> <span class="n">by_changing</span><span class="p">,</span> <span class="n">b_n</span><span class="p">)</span>
+        <span class="n">f_b_n</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">model_clone</span><span class="p">,</span> <span class="n">obj_fn</span><span class="p">)()</span>
+
+        <span class="c1"># Figure out which half the root is in, or if we hit it exactly, or if the search failed</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">f_a_n</span> <span class="o">-</span> <span class="n">target</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">f_m_n</span> <span class="o">-</span> <span class="n">target</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">a_n</span> <span class="o">=</span> <span class="n">a_n</span>
+            <span class="n">b_n</span> <span class="o">=</span> <span class="n">m_n</span>
+        <span class="k">elif</span> <span class="p">(</span><span class="n">f_b_n</span> <span class="o">-</span> <span class="n">target</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">f_m_n</span> <span class="o">-</span> <span class="n">target</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">a_n</span> <span class="o">=</span> <span class="n">m_n</span>
+            <span class="n">b_n</span> <span class="o">=</span> <span class="n">b_n</span>
+        <span class="k">elif</span> <span class="n">f_m_n</span> <span class="o">==</span> <span class="n">target</span><span class="p">:</span>
+            <span class="c1">#print(&quot;Found exact solution.&quot;)</span>
+            <span class="k">return</span> <span class="n">m_n</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1">#print(&quot;Bisection method fails.&quot;)</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+    <span class="c1"># If we get here we hit iteration limit, return best solution found so far</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">a_n</span> <span class="o">+</span> <span class="n">b_n</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span>
+</pre></div>
+</div>
+</div>
+<p>Let’s give it a whirl to find break even demand for our standard set of inputs. We know the answer from earlier in this notebook.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[40]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">goal_seek</span><span class="p">(</span><span class="n">model_6</span><span class="p">,</span> <span class="s1">&#39;profit&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;demand&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1000</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[40]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+133.33333333333334
+</pre></div></div>
+</div>
+<p>Let’s end this post by putting it all together and creating a plot that shows total revenue, total cost, profit and the break even point as functions of demand.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[41]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Specify input ranges for scenarios (dictionary)</span>
+<span class="n">dt_param_ranges</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;demand&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">70</span><span class="p">,</span> <span class="mi">321</span><span class="p">,</span> <span class="mi">25</span><span class="p">)}</span>
+
+<span class="c1"># Specify desired outputs (list)</span>
+<span class="n">outputs</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;profit&#39;</span><span class="p">,</span> <span class="s1">&#39;order_cost&#39;</span><span class="p">,</span> <span class="s1">&#39;total_revenue&#39;</span><span class="p">]</span>
+
+<span class="c1"># Use data_table function to create dataframe</span>
+<span class="n">m6_dt2_df</span> <span class="o">=</span> <span class="n">data_table</span><span class="p">(</span><span class="n">model_6</span><span class="p">,</span> <span class="n">dt_param_ranges</span><span class="p">,</span> <span class="n">outputs</span><span class="p">)</span>
+
+<span class="c1"># Use goal_seek to compute break even demand</span>
+<span class="n">break_even_demand</span> <span class="o">=</span> <span class="n">goal_seek</span><span class="p">(</span><span class="n">model_6</span><span class="p">,</span> <span class="s1">&#39;profit&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;demand&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1000</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[42]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">m6_dt2_df</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[42]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>demand</th>
+      <th>profit</th>
+      <th>order_cost</th>
+      <th>total_revenue</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>70</td>
+      <td>-475.0</td>
+      <td>1500.0</td>
+      <td>1025.0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>95</td>
+      <td>-287.5</td>
+      <td>1500.0</td>
+      <td>1212.5</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>120</td>
+      <td>-100.0</td>
+      <td>1500.0</td>
+      <td>1400.0</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>145</td>
+      <td>87.5</td>
+      <td>1500.0</td>
+      <td>1587.5</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>170</td>
+      <td>275.0</td>
+      <td>1500.0</td>
+      <td>1775.0</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>195</td>
+      <td>462.5</td>
+      <td>1500.0</td>
+      <td>1962.5</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>220</td>
+      <td>500.0</td>
+      <td>1500.0</td>
+      <td>2000.0</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>245</td>
+      <td>500.0</td>
+      <td>1500.0</td>
+      <td>2000.0</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>270</td>
+      <td>500.0</td>
+      <td>1500.0</td>
+      <td>2000.0</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>295</td>
+      <td>500.0</td>
+      <td>1500.0</td>
+      <td>2000.0</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>320</td>
+      <td>500.0</td>
+      <td>1500.0</td>
+      <td>2000.0</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[43]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">use</span><span class="p">(</span><span class="s1">&#39;ggplot&#39;</span><span class="p">)</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+<span class="n">demand</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">m6_dt2_df</span><span class="p">[</span><span class="s1">&#39;demand&#39;</span><span class="p">])</span>
+<span class="n">cost</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">m6_dt2_df</span><span class="p">[</span><span class="s1">&#39;order_cost&#39;</span><span class="p">])</span>
+<span class="n">revenue</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">m6_dt2_df</span><span class="p">[</span><span class="s1">&#39;total_revenue&#39;</span><span class="p">])</span>
+<span class="n">profit</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">m6_dt2_df</span><span class="p">[</span><span class="s1">&#39;profit&#39;</span><span class="p">])</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">demand</span><span class="p">,</span> <span class="n">cost</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Total cost&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">demand</span><span class="p">,</span> <span class="n">revenue</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Total revenue&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">demand</span><span class="p">,</span> <span class="n">profit</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Profit&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s1">&#39;Break even analysis for bookstore model&#39;</span><span class="p">,</span> <span class="n">xlabel</span><span class="o">=</span><span class="s1">&#39;Demand&#39;</span><span class="p">,</span> <span class="n">ylabel</span><span class="o">=</span><span class="s1">&#39;$&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">hlines</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">70</span><span class="p">,</span> <span class="mi">320</span><span class="p">,</span> <span class="n">linestyles</span><span class="o">=</span><span class="s1">&#39;dotted&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">vlines</span><span class="p">(</span><span class="n">break_even_demand</span><span class="p">,</span> <span class="o">-</span><span class="mi">750</span><span class="p">,</span> <span class="mi">2000</span><span class="p">,</span> <span class="n">linestyles</span><span class="o">=</span><span class="s1">&#39;dotted&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s1">&#39;lower right&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/blog_what_if_2_goalseek_74_0.png" src="../../_images/blog_what_if_2_goalseek_74_0.png" />
+</div>
+</div>
+<section id="Wrap-up-and-next-steps">
+<h3>Wrap up and next steps<a class="headerlink" href="#Wrap-up-and-next-steps" title="Permalink to this headline">¶</a></h3>
+<p>We have added a <code class="docutils literal notranslate"><span class="pre">goal_seek</span></code> function to our small but growing list of functions for doing Excelish things in Python. Yes, we can certainly improve our <code class="docutils literal notranslate"><span class="pre">goal_seek</span></code> implementation with better root finding algorithms, but this is good enough for now.</p>
+<p>Along the way, hopefully you learned some new Python things, I know I did.</p>
+<p>In the next installment of this series, we’ll take on Monte-Carlo simulation.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
+</section>
+</section>
+</section>
+
+<div class="section">
+    
+
+<div class="section">
+  <span style="float: left">
+     Previous:
+    
+    <a href="../what_if_1_model_datatable/">
+       Excel “what if?” analysis with Python - Part 1: Models and Data Tables
+    </a>
+    
+  </span>
+  <span>&nbsp;</span>
+  <span style="float: right">
+     Next: 
+    <a href="../what_if_3_simulation/">
+      Excel “what if?” analysis with Python - Part 3: Simulation 
+    </a>
+    
+  </span>
+</div>
+  
+</div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../">misken</a></h1>
+
+
+
+
+
+
+
+
+  
+<h2>
+   
+  13 February 2021 
+</h2>
+
+<ul>
+   
+<li id="author">
+  <span
+    >Author:</span
+  >
+   
+  <a href="../author/misken/">misken</a>  
+</li>
+    
+<li id="tags">
+  <span
+    >Tags: </span
+  >
+   
+  <a href="../tag/python/">python</a>   
+  <a href="../tag/excel/">excel</a>  
+</li>
+ 
+</ul>
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../about/">About misken</a></li>
+</ul>
+
+
+<h3>
+  <a href="../">Recent Posts</a>
+</h3>
+<ul>
+   
+  <li>
+    <a href="../hello_world/"
+      >02 April - Hello world from ablog blogging with JupyterLab</a
+    >
+  </li>
+  
+  <li>
+    <a href="../first-post/"
+      >01 April - First Post at new blogging site</a
+    >
+  </li>
+  
+  <li>
+    <a href="../use_jupyter_conda_envs/"
+      >31 March - Using different conda environments with Jupyter Lab</a
+    >
+  </li>
+  
+  <li>
+    <a href="../pip_with_conda_local_dev/"
+      >15 March - Using pip with conda for local development projects</a
+    >
+  </li>
+  
+  <li>
+    <a href="../what_if_4_project_packaging/"
+      >11 March - Excel “what if?” analysis with Python - Part 4: Project structure and packaging</a
+    >
+  </li>
+  
+</ul>
+
+<h3><a href="../tag/">Tags</a></h3>
+<style type="text/css">
+  ul.ablog-cloud {
+    list-style: none;
+    overflow: auto;
+  }
+  ul.ablog-cloud li {
+    float: left;
+    height: 20pt;
+    line-height: 18pt;
+    margin-right: 5px;
+  }
+  ul.ablog-cloud a {
+    text-decoration: none;
+    vertical-align: middle;
+  }
+  li.ablog-cloud-1 {
+    font-size: 80%;
+  }
+  li.ablog-cloud-2 {
+    font-size: 95%;
+  }
+  li.ablog-cloud-3 {
+    font-size: 110%;
+  }
+  li.ablog-cloud-4 {
+    font-size: 125%;
+  }
+  li.ablog-cloud-5 {
+    font-size: 140%;
+  }
+</style>
+<ul class="ablog-cloud">
+   
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/ablog/">ablog</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-2">
+    <a href="../tag/conda/">conda</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-4">
+    <a href="../tag/excel/">excel</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-2">
+    <a href="../tag/jupyter/">jupyter</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-5">
+    <a href="../tag/python/">python</a>
+  </li>
+   
+</ul>
+
+<h3>
+  <a href="../archive/">Archives</a>
+</h3>
+<ul>
+   
+  <li>
+    <a href="../2022/">2022 (4)</a>
+  </li>
+    
+  <li>
+    <a href="../2021/">2021 (4)</a>
+  </li>
+   
+</ul>
+
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search/" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2022, misken.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.3.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../../_sources/blog/what_if_2_goalseek.ipynb.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
