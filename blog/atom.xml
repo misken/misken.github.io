@@ -1,0 +1,75 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en">
+  <id>https://misken.github.io/</id>
+  <title>Bits of analytics</title>
+  <updated>2022-04-02T21:33:11.733965+00:00</updated>
+  <link href="https://misken.github.io/"/>
+  <link href="https://misken.github.io/blog/atom.xml" rel="self"/>
+  <generator uri="https://ablog.readthedocs.org/" version="0.10.23">ABlog</generator>
+  <entry>
+    <id>https://misken.github.io/blog/pip_with_conda_local_dev/</id>
+    <title>Using pip with conda for local development projects</title>
+    <updated>2022-03-15T00:00:00-04:00</updated>
+    <author>
+      <name>misken</name>
+    </author>
+    <content type="html">&lt;div class="ablog-post-excerpt docutils container"&gt;
+&lt;p&gt;Use the right pip when installing into conda envs&lt;/p&gt;
+&lt;/div&gt;
+</content>
+    <link href="https://misken.github.io/blog/pip_with_conda_local_dev/" rel="alternate"/>
+    <summary>Use the right pip when installing into conda envs</summary>
+    <category term="python" label="python"/>
+    <category term="conda" label="conda"/>
+    <published>2022-03-15T00:00:00-04:00</published>
+  </entry>
+  <entry>
+    <id>https://misken.github.io/blog/use_jupyter_conda_envs/</id>
+    <title>Using different conda environments with Jupyter Lab</title>
+    <updated>2022-03-31T00:00:00-04:00</updated>
+    <author>
+      <name>misken</name>
+    </author>
+    <content type="html">&lt;div class="ablog-post-excerpt docutils container"&gt;
+&lt;p&gt;Run Jupyter lab from base and toggle between conda envs&lt;/p&gt;
+&lt;/div&gt;
+</content>
+    <link href="https://misken.github.io/blog/use_jupyter_conda_envs/" rel="alternate"/>
+    <summary>Run Jupyter lab from base and toggle between conda envs</summary>
+    <category term="jupyter" label="jupyter"/>
+    <category term="conda" label="conda"/>
+    <published>2022-03-31T00:00:00-04:00</published>
+  </entry>
+  <entry>
+    <id>https://misken.github.io/blog/first-post/</id>
+    <title>First Post at new blogging site</title>
+    <updated>2022-04-01T00:00:00-04:00</updated>
+    <author>
+      <name>misken</name>
+    </author>
+    <content type="html">&lt;div class="ablog-post-excerpt docutils container"&gt;
+&lt;p&gt;hselab.org has moved&lt;/p&gt;
+&lt;/div&gt;
+</content>
+    <link href="https://misken.github.io/blog/first-post/" rel="alternate"/>
+    <summary>hselab.org has moved</summary>
+    <published>2022-04-01T00:00:00-04:00</published>
+  </entry>
+  <entry>
+    <id>https://misken.github.io/blog/hello_world/</id>
+    <title>Hello world from ablog blogging with JupyterLab</title>
+    <updated>2022-04-02T00:00:00-04:00</updated>
+    <author>
+      <name>misken</name>
+    </author>
+    <content type="html">&lt;div class="ablog-post-excerpt docutils container"&gt;
+&lt;p&gt;Hello world, this is a markdown cell in a Jupyter notebook I’m using to test blogging from notebooks using the &lt;a class="reference external" href="https://ablog.readthedocs.io/en/latest/"&gt;ablog&lt;/a&gt; package.&lt;/p&gt;
+&lt;/div&gt;
+</content>
+    <link href="https://misken.github.io/blog/hello_world/" rel="alternate"/>
+    <summary>Hello world, this is a markdown cell in a Jupyter notebook I’m using to test blogging from notebooks using the ablog package.</summary>
+    <category term="jupyter" label="jupyter"/>
+    <category term="ablog" label="ablog"/>
+    <published>2022-04-02T00:00:00-04:00</published>
+  </entry>
+</feed>
