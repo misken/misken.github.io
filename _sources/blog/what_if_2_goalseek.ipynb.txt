@@ -16,7 +16,9 @@
    "source": [
     ".. post:: Feb 13, 2021\n",
     "   :author: misken\n",
-    "   :tags: python, excel"
+    "   :tags: python, excel\n",
+    "   \n",
+    "   Implement a spreadsheet type goal-seek function in Python."
    ]
   },
   {
