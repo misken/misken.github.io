@@ -1,0 +1,439 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>Using pip with conda for local development projects &#8212; bitsofanalytics 0,1,0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css" />
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <link rel="author" title="About these documents" href="../../about/" />
+    <link rel="index" title="Index" href="../../genindex/" />
+    <link rel="search" title="Search" href="../../search/" /> 
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+ 
+<link
+  rel="alternate"
+  type="application/atom+xml"
+  href="../../blog/atom.xml"
+  title="Bits of analytics"
+/>
+ 
+<style type="text/css">
+  ul.ablog-archive {
+    list-style: none;
+    overflow: auto;
+    margin-left: 0px;
+  }
+  ul.ablog-archive li {
+    float: left;
+    margin-right: 5px;
+    font-size: 80%;
+  }
+  ul.postlist a {
+    font-style: italic;
+  }
+  ul.postlist-style-disc {
+    list-style-type: disc;
+  }
+  ul.postlist-style-none {
+    list-style-type: none;
+  }
+  ul.postlist-style-circle {
+    list-style-type: circle;
+  }
+</style>
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+             <p>Use the right pip when installing into conda envs</p>
+<section id="using-pip-with-conda-for-local-development-projects">
+<h1>Using pip with conda for local development projects<a class="headerlink" href="#using-pip-with-conda-for-local-development-projects" title="Permalink to this headline">¶</a></h1>
+<p>I’ve wasted so much time on this issue over the last few years that I finally decided to better
+document a process for doing it correctly.</p>
+<p><strong>tldr:</strong> How to use pip to install your own local Python modules in a conda virtual environment:</p>
+<ul class="simple">
+<li><p>Create your conda environment and make sure you install pip using conda</p></li>
+<li><p>Activate your conda environment</p></li>
+<li><p>When pip installing a local Python project (either in “editable mode” or not) you need to make sure that you are using the pip that is part of your conda env and NOT the pip that’s in your base conda env nor the pip that is in your system Python.</p></li>
+<li><p>While supposedly running pip from a conda env <em>should</em> use the pip installed in that env, it is <strong>not</strong> necessarily true.</p></li>
+<li><p>To ensure you run the correct pip, include the path to the pip executable inside your conda env.</p></li>
+<li><p>To make this easier you can create an alias or shell function to call the correct pip without typing a long path.</p></li>
+<li><p>Ideally, avoid doing additional conda installs into this env after doing any pip installs. If needed, better to recreate the env, include the new conda installs, and then redo the pip installs.</p></li>
+</ul>
+<p>Key resources include:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://www.anaconda.com/blog/using-pip-in-a-conda-environment">Using pip in a conda environment (from Anaconda blog)</a></p></li>
+<li><p><a class="reference external" href="https://stackoverflow.com/questions/41060382/using-pip-to-install-packages-to-anaconda-environment">Using Pip to install packages to Anaconda Environment (SO post)</a></p></li>
+</ul>
+<section id="background">
+<h2>Background<a class="headerlink" href="#background" title="Permalink to this headline">¶</a></h2>
+<p>Here’s the scenario. You do scientific computing in Python and as part of your work you end up
+developing some useful little library - let’s call it <code class="docutils literal notranslate"><span class="pre">qng.py</span></code>. Yes, it’s a library of queueing related
+functions. You might not have it in good enough shape to release
+into the wild via PyPI but you find yourself using it quite a bit and are tired of (and embarassed by) copying the
+<code class="docutils literal notranslate"><span class="pre">qng.py</span></code> file into multiple projects that use it. So, you create a proper Python project structure so that you
+can create a deployable package. Here’s a simplified version of the actual project structure:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">├── docs</span>
+<span class="go">├── LICENSE</span>
+<span class="go">├── README.md</span>
+<span class="go">├── .gitignore</span>
+<span class="go">├── setup.py</span>
+<span class="go">├── src</span>
+<span class="go">│   ├── qng</span>
+<span class="go">│   │   ├── __init__.py</span>
+<span class="go">│   │   └── qng.py</span>
+<span class="go">├── tests</span>
+<span class="go">│   ├── test_ipython.py</span>
+<span class="go">│   └── test_qng.py</span>
+</pre></div>
+</div>
+<p>To create my project folder structure I use a simple <a class="reference external" href="https://drivendata.github.io/cookiecutter-data-science/">cookiecutter template</a> that I’ve adapted for my projects.</p>
+<p>Here’s what my <code class="docutils literal notranslate"><span class="pre">__init__.py</span></code> file looks like:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">qng</span> <span class="kn">import</span> <span class="n">qng</span>
+</pre></div>
+</div>
+<p>Doing this will allow to do my imports as <code class="docutils literal notranslate"><span class="pre">from</span> <span class="pre">qng</span> <span class="pre">import</span> <span class="pre">qng</span></code> so that within my code
+I can do things like calling <code class="docutils literal notranslate"><span class="pre">qng.&lt;some</span> <span class="pre">function&gt;(&lt;some</span> <span class="pre">args&gt;)</span></code>.</p>
+</section>
+<section id="my-conda-virtual-environment">
+<h2>My conda virtual environment<a class="headerlink" href="#my-conda-virtual-environment" title="Permalink to this headline">¶</a></h2>
+<p>I’ve got a standard conda virtual environment called <code class="docutils literal notranslate"><span class="pre">analytics</span></code> containing a bunch of the standard packages I use such as
+numpy, pandas, scikit-learn, simpy and a number of others. Here’s what my YAML file looks like:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">name: analytics</span>
+<span class="go">channels:</span>
+<span class="go">  - defaults</span>
+<span class="go">  - conda-forge</span>
+<span class="go">dependencies:</span>
+<span class="go">  - numpy</span>
+<span class="go">  - pandas</span>
+<span class="go">  - scipy</span>
+<span class="go">  - scikit-learn</span>
+<span class="go">  - matplotlib</span>
+<span class="go">  - seaborn</span>
+<span class="go">  - ipykernel</span>
+<span class="go">  - simpy</span>
+<span class="go">  - networkx</span>
+<span class="go">  - statsmodels</span>
+<span class="go">  - cookiecutter</span>
+<span class="go">  - pyyaml</span>
+<span class="go">  - pytest</span>
+<span class="go">  - pip</span>
+</pre></div>
+</div>
+<p><strong>Notice that I’m using conda to install pip.</strong></p>
+</section>
+<section id="the-problem">
+<h2>The problem<a class="headerlink" href="#the-problem" title="Permalink to this headline">¶</a></h2>
+<p>Now I want to install my <code class="docutils literal notranslate"><span class="pre">qng</span></code> module into my <code class="docutils literal notranslate"><span class="pre">analytics</span></code> virtual environment. I need
+to use <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">-e</span> <span class="pre">.</span></code> from my main <code class="docutils literal notranslate"><span class="pre">qng</span></code> project folder to do this.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>For a while there was a <code class="docutils literal notranslate"><span class="pre">conda</span> <span class="pre">develop</span></code> command which worked like <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">-e</span> <span class="pre">.</span></code> (install in “editable mode”) but
+this seems to have been (or planned to be) deprecated.
+This <a class="reference external" href="https://stackoverflow.com/questions/49474575/how-to-install-my-own-python-module-package-via-conda-and-watch-its-changes">SO post</a>
+and <a class="reference external" href="https://github.com/conda/conda-build/issues/4251">linked Github issue</a> discusses the reasons for deprecating <code class="docutils literal notranslate"><span class="pre">conda</span> <span class="pre">develop</span></code>.</p>
+</div>
+<p>Let’s confirm that
+pip is indeed installed in my <code class="docutils literal notranslate"><span class="pre">analytics</span></code> conda env:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp gp-VirtualEnv">(analytics)</span> <span class="gp">user:~$ </span>conda list <span class="p">|</span> grep <span class="s1">&#39;pip&#39;</span>
+
+<span class="go">pip                       21.2.4                   pypi_0    pypi</span>
+
+<span class="gp gp-VirtualEnv">(analytics)</span> <span class="gp">user:~$ </span>which pip
+<span class="go">/home/user/anaconda3/envs/analytics/bin/pip</span>
+</pre></div>
+</div>
+<p>But, if I do the following:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">cd ~/Documents/dev/qng</span>
+<span class="go">pip install -e .</span>
+</pre></div>
+</div>
+<p>the <code class="docutils literal notranslate"><span class="pre">qng</span></code> package does <strong>NOT</strong> get installed in the <code class="docutils literal notranslate"><span class="pre">analytics</span></code> env, but ends up getting installed
+in the Anaconda base environment.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp gp-VirtualEnv">(analytics)</span> <span class="gp">user:~$ </span>deactivate
+<span class="gp gp-VirtualEnv">(base)</span> <span class="gp">user:~$ </span>conda list <span class="p">|</span> grep <span class="s1">&#39;qn&#39;</span>
+<span class="go">qng                       0.1.0                     dev_0    &lt;develop&gt;</span>
+</pre></div>
+</div>
+<p>I then confirmed that <code class="docutils literal notranslate"><span class="pre">qng</span></code> gets installed as <code class="docutils literal notranslate"><span class="pre">/home/user/anaconda3/lib/python3.8/site-packages/qng.egg-link</span></code>. This
+egg-link file contains:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">/home/user/Documents/dev/qng/src</span>
+<span class="go">../</span>
+</pre></div>
+</div>
+<p>But, if I explicitly use <code class="docutils literal notranslate"><span class="pre">pip</span></code> in the analytics environment, then qng gets installed in that environment:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp gp-VirtualEnv">(analytics)</span> <span class="gp">user:~/Documents/development/qng$ </span>~/anaconda3/envs/analytics/bin/pip install -e .
+<span class="go">Obtaining file:///home/user/Documents/development/qng</span>
+<span class="go">Installing collected packages: qng</span>
+<span class="go">  Running setup.py develop for qng</span>
+<span class="go">Successfully installed qng-0.1.0</span>
+<span class="gp gp-VirtualEnv">(analytics)</span> <span class="gp">user:~/Documents/development/qng$ </span>conda list <span class="p">|</span> grep <span class="s1">&#39;qn&#39;</span>
+<span class="go">qng                       0.1.0                     dev_0    &lt;develop&gt;</span>
+</pre></div>
+</div>
+<p>Furthermore, I launched Jupyter Lab from the <code class="docutils literal notranslate"><span class="pre">analytics</span></code> env and was able to import and use the <code class="docutils literal notranslate"><span class="pre">qng</span></code> library:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">qng</span> <span class="kn">import</span> <span class="n">qng</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">qng</span><span class="o">.</span><span class="n">erlangb</span><span class="p">(</span><span class="mf">5.0</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+
+<span class="mf">0.19184725888636506</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">erlangb</span></code> function returns the probability of loss in an $M/G/c/c$ queueing system - see <a class="reference external" href="https://en.wikipedia.org/wiki/Erlang_(unit)#Erlang_B_formula">Erlang B formula</a></p>
+</div>
+<p>Of course, it’s a pain to type <code class="docutils literal notranslate"><span class="pre">~/anaconda3/envs/analytics/bin/pip</span> <span class="pre">install</span> <span class="pre">-e</span> <span class="pre">.</span></code> and easy to forget to include the path.
+So, I created a few aliases to use <code class="docutils literal notranslate"><span class="pre">pip</span></code> from whichever Anaconda env is activated. Here’s the lines I
+added to my <code class="docutils literal notranslate"><span class="pre">.bash_aliases</span></code> file.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">alias cpip=&#39;&quot;$CONDA_PREFIX&quot;/bin/pip&#39;</span>
+<span class="go">alias cpipdot=&#39;&quot;$CONDA_PREFIX&quot;/bin/pip install --use-feature=in-tree-build .&#39;</span>
+<span class="go">alias cpipedot=&#39;&quot;$CONDA_PREFIX&quot;/bin/pip install -e .&#39;</span>
+</pre></div>
+</div>
+<p>Notice the use of the environment variable <code class="docutils literal notranslate"><span class="pre">$CONDA_PREFIX</span></code>. It gets set automatically whenever a
+conda env is activated. This makes the aliases usable from any conda env. If the <code class="docutils literal notranslate"><span class="pre">analytics</span></code>
+env is activated, then <code class="docutils literal notranslate"><span class="pre">$CONDA_PREFIX=/home/user/anaconda3/envs/analytics</span></code></p>
+<p>Then, if I want to <code class="docutils literal notranslate"><span class="pre">pip</span></code> install some package from PyPI, I just do <code class="docutils literal notranslate"><span class="pre">cpip</span> <span class="pre">&lt;package-to-install&gt;</span></code>.</p>
+<p>To do an install of a local package, I can just do <code class="docutils literal notranslate"><span class="pre">cpipdot</span></code> for a regular install and <code class="docutils literal notranslate"><span class="pre">cpipedot</span></code> for an editable install.</p>
+<p>BTW, this same issue of the system <code class="docutils literal notranslate"><span class="pre">pip</span></code> getting used by default (even if run from an active conda environment prompt)
+also applies to running python (i.e. which <code class="docutils literal notranslate"><span class="pre">python.exe</span></code> file gets used) from the command line! I need to do /home/user/anaconda3/envs/analytics/bin/python if
+I want to get an IDLE prompt within the active conda environment.</p>
+<p>Supposedly the Anaconda folks are working on this general issue. For now, this seems to work.</p>
+</section>
+<section id="ps-notes-about-non-editable-local-installs-and-eggs">
+<h2>PS - Notes about non-editable local installs and eggs<a class="headerlink" href="#ps-notes-about-non-editable-local-installs-and-eggs" title="Permalink to this headline">¶</a></h2>
+<p>In the <code class="docutils literal notranslate"><span class="pre">cpipdot</span></code> alias we are doing a <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">--use-feature=in-tree-build</span> <span class="pre">.</span></code> command. I’m using
+the <code class="docutils literal notranslate"><span class="pre">--use-feature=in-tree-build</span></code> option due to a deprecation warning I got when I tried a standard
+<code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">.</span></code> command. This is just confirming that the install will still work correctly when
+<code class="docutils literal notranslate"><span class="pre">pip</span></code> changes to <em>in-tree builds</em> (i.e. not using an “out of tree” temporary folder) - see <a class="reference external" href="https://github.com/pypa/pip/issues/7555">https://github.com/pypa/pip/issues/7555</a>.</p>
+<p>Anyway, after installing in this manner, I just wanted to confirm and document where the local package ends up
+getting installed. As expected, we got a <code class="docutils literal notranslate"><span class="pre">qng</span></code> folder containing source code in
+<code class="docutils literal notranslate"><span class="pre">/home/user/anaconda3/envs/analytics/lib/python3.10/site-packages/</span></code>. I also confirmed that after installing
+in this way, I could successfully use the <code class="docutils literal notranslate"><span class="pre">qng</span></code> module from Jupyter Lab launched from the <code class="docutils literal notranslate"><span class="pre">analytics</span></code> env.</p>
+<p>I did also notice that I had a <code class="docutils literal notranslate"><span class="pre">qng.egg-info</span></code> folder in my <code class="docutils literal notranslate"><span class="pre">qng/src</span></code> folder:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp gp-VirtualEnv">(base)</span> <span class="gp">user:~/Documents/development/qng/src/qng.egg-info$ </span>ls
+<span class="go">dependency_links.txt  PKG-INFO  SOURCES.txt  top_level.txt</span>
+</pre></div>
+</div>
+<p>Was this residue from the -e build? Actually, it seems that this folder gets created whether I install my package in
+editable or non-editable model. I knew that eggs were similar to Java JAR files and were simply compressed archives
+used to distribute code bundles. Eggs appear to be somewhat obsolete and superceded by wheels and at least
+for non-editable installs, nothing bad seems to happen if I delete the <code class="docutils literal notranslate"><span class="pre">qng.egg-info</span></code> folder. A few good
+resources on eggs (and pip and conda) include:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://stackoverflow.com/questions/2051192/what-is-a-python-egg">What is a Python egg?</a></p></li>
+<li><p><a class="reference external" href="https://stackoverflow.com/questions/20994716/what-is-the-difference-between-pip-and-conda/68897551#68897551">What is the difference between pip and conda?</a></p></li>
+</ul>
+</section>
+</section>
+
+<div class="section">
+    
+
+<div class="section">
+  <span style="float: left">
+    
+  </span>
+  <span>&nbsp;</span>
+  <span style="float: right">
+     Next: 
+    <a href="../use_jupyter_conda_envs/">
+      Using different conda environments with Jupyter Lab 
+    </a>
+    
+  </span>
+</div>
+  
+</div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../">bitsofanalytics</a></h1>
+
+
+
+
+
+
+
+
+  
+<h2>
+   
+  15 March 2022 
+</h2>
+
+<ul>
+   
+<li id="author">
+  <span
+    >Author:</span
+  >
+   
+  <a href="../author/misken/">misken</a>  
+</li>
+    
+<li id="tags">
+  <span
+    >Tags: </span
+  >
+   
+  <a href="../tag/python/">python</a>   
+  <a href="../tag/conda/">conda</a>  
+</li>
+ 
+</ul>
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../about/">About misken</a></li>
+</ul>
+
+
+<h3>
+  <a href="../">Recent Posts</a>
+</h3>
+<ul>
+   
+  <li>
+    <a href="../../.doctrees/nbsphinx/blog/hello_world/"
+      >02 April - Hello world from ablog blogging with JupyterLab</a
+    >
+  </li>
+  
+  <li>
+    <a href="../hello_world/"
+      >02 April - Hello world from ablog blogging with JupyterLab</a
+    >
+  </li>
+  
+  <li>
+    <a href="../first-post/"
+      >01 April - First Post at new blogging site</a
+    >
+  </li>
+  
+  <li>
+    <a href="../use_jupyter_conda_envs/"
+      >31 March - Using different conda environments with Jupyter Lab</a
+    >
+  </li>
+  
+</ul>
+
+<h3><a href="../tag/">Tags</a></h3>
+<style type="text/css">
+  ul.ablog-cloud {
+    list-style: none;
+    overflow: auto;
+  }
+  ul.ablog-cloud li {
+    float: left;
+    height: 20pt;
+    line-height: 18pt;
+    margin-right: 5px;
+  }
+  ul.ablog-cloud a {
+    text-decoration: none;
+    vertical-align: middle;
+  }
+  li.ablog-cloud-1 {
+    font-size: 80%;
+  }
+  li.ablog-cloud-2 {
+    font-size: 95%;
+  }
+  li.ablog-cloud-3 {
+    font-size: 110%;
+  }
+  li.ablog-cloud-4 {
+    font-size: 125%;
+  }
+  li.ablog-cloud-5 {
+    font-size: 140%;
+  }
+</style>
+<ul class="ablog-cloud">
+   
+  <li class="ablog-cloud ablog-cloud-3">
+    <a href="../tag/ablog/">ablog</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-3">
+    <a href="../tag/conda/">conda</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-5">
+    <a href="../tag/jupyter/">jupyter</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/python/">python</a>
+  </li>
+   
+</ul>
+
+<h3>
+  <a href="../archive/">Archives</a>
+</h3>
+<ul>
+   
+  <li>
+    <a href="../2022/">2022 (5)</a>
+  </li>
+   
+</ul>
+
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search/" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2022, misken.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.3.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../../_sources/blog/pip_with_conda_local_dev.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
