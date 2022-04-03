@@ -1,0 +1,383 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>Building coursewebs with Sphinx &#8212; misken 0,1,0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css" />
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <link rel="author" title="About these documents" href="../../about/" />
+    <link rel="index" title="Index" href="../../genindex/" />
+    <link rel="search" title="Search" href="../../search/" /> 
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+ 
+<link
+  rel="alternate"
+  type="application/atom+xml"
+  href="../../blog/atom.xml"
+  title="Bits of analytics"
+/>
+ 
+<style type="text/css">
+  ul.ablog-archive {
+    list-style: none;
+    overflow: auto;
+    margin-left: 0px;
+  }
+  ul.ablog-archive li {
+    float: left;
+    margin-right: 5px;
+    font-size: 80%;
+  }
+  ul.postlist a {
+    font-style: italic;
+  }
+  ul.postlist-style-disc {
+    list-style-type: disc;
+  }
+  ul.postlist-style-none {
+    list-style-type: none;
+  }
+  ul.postlist-style-circle {
+    list-style-type: circle;
+  }
+</style>
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+             <p>Create course websites with Sphinx.</p>
+<section id="building-coursewebs-with-sphinx">
+<h1>Building coursewebs with Sphinx<a class="headerlink" href="#building-coursewebs-with-sphinx" title="Permalink to this headline">¶</a></h1>
+<p>At my institution we use <a class="reference external" href="https://moodle.org/">Moodle</a> as our LMS (Learning Management System). I’m a longtime Moodle user and am quite happy with it. However, I’m also a big proponent of open educational resources and this is where Moodle (or any LMS) can present a challenge. I definitely want all of the interactions and activities between me and my students such as quizzes, forums, and assignments, to be behind the secure Moodle wall. However, for much of my course content (in the form of explanatory text, screencasts and a menagerie of files), I want a publicly accessible course website to facilitate sharing of curricular materials. In the past, I have experimented with running my own instance of Moodle (hosted on this hselab.org site) that had open guest access, but found it to be a pain to maintain. I didn’t want to have to worry about Moodle upgrades, security issues, and the fact that the material within this Moodle still wasn’t that easily findable or accessible. That suggested that creating my own <a class="reference external" href="https://dev.to/gtanyware/what-is-a-static-website-4k3o">static courseweb</a> might be the way to go. For this to work, I wanted a few things:</p>
+<ul class="simple">
+<li><p>easy to create and edit pages using a text editor,</p></li>
+<li><p>easy to create a well structured website with built in navigation and search,</p></li>
+<li><p>easy to update and publish,</p></li>
+<li><p>free and open source.</p></li>
+</ul>
+<p>As a regular Python user (and documentation reader) and <a class="reference external" href="https://docs.getpelican.com/en/stable/">pelican</a> blogger, I was already familiar with <a class="reference external" href="https://www.sphinx-doc.org/en/master/">Sphinx</a> and <a class="reference external" href="https://docutils.sourceforge.io/rst.html">restructured text</a>. As I had seen in the <a class="reference external" href="https://www.sphinx-doc.org/en/master/examples.html">Sphinx docs examples page</a>, people use Sphinx for all kinds of things beyond just writing documentation. It clearly hits all the items I listed above.</p>
+<section id="creating-the-sites">
+<h2>Creating the sites<a class="headerlink" href="#creating-the-sites" title="Permalink to this headline">¶</a></h2>
+<p>I just followed the <a class="reference external" href="https://www.sphinx-doc.org/en/master/usage/quickstart.html">Sphinx Getting Started tutorial</a> to create my skeleton sites
+and then created content pages in a text editor (Geany on Linux, Notepad++ on Windows).</p>
+<p>Sphinx makes it easy to create a structured and hierarchical site. Here’s what my
+<em>index.rst</em> file looks like for one of my courses, <a class="reference external" href="http://www.sba.oakland.edu/faculty/isken/courses/mis5470_f20/index.html">Practical Computing for Data Analytics</a>:</p>
+<div class="highlight-rest notranslate"><div class="highlight"><pre><span></span><span class="p">..</span> <span class="ow">toctree</span><span class="p">::</span>
+   <span class="nc">:maxdepth:</span> 2
+   <span class="nc">:caption:</span> Course outline:
+
+   course_logistics
+   foundation
+   data_science_r
+   data_science_python
+   additional_topics
+</pre></div>
+</div>
+<p>and here’s what one of the section level table of contents files (<em>data_science_r.rst</em>) looks like:</p>
+<div class="highlight-rest notranslate"><div class="highlight"><pre><span></span><span class="p">..</span> <span class="ow">toctree</span><span class="p">::</span>
+   <span class="nc">:maxdepth:</span> 1
+   <span class="nc">:caption:</span> Intro to data science with R
+
+   r_intro
+   git_intro
+   eda_r
+   data_wrangling_r
+   modeling1_mlr_r
+   modeling2_class_r
+</pre></div>
+</div>
+<p>You can view the source of any page. Here’s the <a class="reference external" href="http://www.sba.oakland.edu/faculty/isken/courses/mis5470_f20/_sources/eda_r.rst.txt">eda_r.rst page</a>.</p>
+<p>You can find links to my complete course websites for the past few years at <a class="reference external" href="http://www.sba.oakland.edu/faculty/isken/pages/teaching.html">my teaching page</a>.</p>
+</section>
+<section id="version-control">
+<h2>Version control<a class="headerlink" href="#version-control" title="Permalink to this headline">¶</a></h2>
+<p>Since the coursewebs are just a bunch of text files and images, it’s easy to put them under version control with git. Each course gets its own GitHub repo. For now, these are private repos but I’ll be
+creating a public one as soon as I get some housekeeping done on it.</p>
+</section>
+<section id="hosting-and-publishing">
+<h2>Hosting and publishing<a class="headerlink" href="#hosting-and-publishing" title="Permalink to this headline">¶</a></h2>
+<p>Since these coursewebs are just static websites (basically a bunch of html, css, images, and client-side JavaScript files), they can be uploaded to any web server. The whole publishing process boils down to</p>
+<ul class="simple">
+<li><p>running <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">html</span></code> to generate the static pages using Sphinx</p></li>
+<li><p>uploading the resulting <code class="docutils literal notranslate"><span class="pre">html</span></code> folder contents (including subfolders) to the desired folder on your web server.</p></li>
+</ul>
+<p>Since Sphinx is cross-platform, I’ve used this same approach with Linux and Windows. I just write simple bash scripts or Windows batch files to do the file coping to the server. I use the Anaconda Python distribution on all of my machines.</p>
+</section>
+<section id="but-i-thought-sphinx-was-for-writing-documentation">
+<h2>But I thought Sphinx was for writing documentation<a class="headerlink" href="#but-i-thought-sphinx-was-for-writing-documentation" title="Permalink to this headline">¶</a></h2>
+<p>It is, but it works quite nicely for things like course websites. Restructured text is easy to learn , quite powerful and extendable via <a class="reference external" href="https://docutils.sourceforge.io/docs/user/rst/quickref.html#directives">directives</a>. You get niceties like navigation and site search with very little effort. It all just works. You can change the way things look through <a class="reference external" href="https://sphinx-themes.org/">Sphinx themes</a>.</p>
+</section>
+<section id="some-advantages-from-a-teaching-perspective">
+<h2>Some advantages from a teaching perspective<a class="headerlink" href="#some-advantages-from-a-teaching-perspective" title="Permalink to this headline">¶</a></h2>
+<p>The biggest advantage to me is that it is super easy to make changes to my courseweb. Edits are done using any text editor and the publish and post process is quick and easy. Making large scale changes in LMS GUI editors can be painful.</p>
+<p>Porting courses from one semester to the next is as easy as cloning the desired GitHub repo and modifying things for the next semester (creating a new remote repo for the new course).</p>
+<p>As mentioned at the start of this post, using something like Sphinx makes it very easy to share my course materials with a wide audience. One specific use case is for when I teach multiple sections of the same course. Each section has its own “course” in our LMS, but both can share the content via my public Sphinx based coursewebs. Anything that is specific to a certain section of the course goes into that course’s Moodle page. The only stuff that goes in the public coursewebs is content that I want to share with anyone.</p>
+<p>Another common sharing scenario is when we get students expressing interest in our business analytics courses. I can direct them to my course websites and tell them they can see exactly what is covered and how it’s done. This is quite helpful for them when making decisions about courses and programs of study.</p>
+<p>Students (and their friends and co-workers) can use the sites long after they’ve graduated. In this way, the coursewebs act not only as a resource but as a marketing / advertising tool for our courses.</p>
+<p>Other faculty can easily use content or ideas from my coursewebs. They are licensed under an <a class="reference external" href="https://opensource.org/licenses/MIT">MIT License</a>.</p>
+<p>The only real “cost” is that students have to deal with two different websites:</p>
+<ul class="simple">
+<li><p>the LMS for quizzes, assignments, forums and other stuff that needs to be behind the LMS wall</p></li>
+<li><p>the public courseweb with almost all of the course content</p></li>
+</ul>
+<p>I’ve been using this approach for about five years and have had no complaints. Both sites are well structured and I teach analytics - students can handle two websites.</p>
+</section>
+</section>
+
+<div class="section">
+    
+
+<div class="section">
+  <span style="float: left">
+     Previous:
+    
+    <a href="../hillmaker_020_released/">
+       Hillmaker updates
+    </a>
+    
+  </span>
+  <span>&nbsp;</span>
+  <span style="float: right">
+     Next: 
+    <a href="../what_if_1_model_datatable/">
+      Excel “what if?” analysis with Python - Part 1: Models and Data Tables 
+    </a>
+    
+  </span>
+</div>
+  
+</div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../">misken</a></h1>
+
+
+
+
+
+
+
+
+  
+<h2>
+   
+  15 September 2020 
+</h2>
+
+<ul>
+   
+<li id="author">
+  <span
+    >Author:</span
+  >
+   
+  <a href="../author/misken/">misken</a>  
+</li>
+    
+<li id="tags">
+  <span
+    >Tags: </span
+  >
+   
+  <a href="../tag/python/">python</a>   
+  <a href="../tag/sphinx/">sphinx</a>  
+</li>
+ 
+</ul>
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../about/">About misken</a></li>
+</ul>
+
+
+<h3>
+  <a href="../">Recent Posts</a>
+</h3>
+<ul>
+   
+  <li>
+    <a href="../hello_world/"
+      >02 April - Hello world from ablog blogging with JupyterLab</a
+    >
+  </li>
+  
+  <li>
+    <a href="../first-post/"
+      >01 April - First Post at new blogging site</a
+    >
+  </li>
+  
+  <li>
+    <a href="../pip_with_conda_local_dev/"
+      >15 March - Using pip with conda for local development projects</a
+    >
+  </li>
+  
+  <li>
+    <a href="../what_if_4_project_packaging/"
+      >11 March - Excel “what if?” analysis with Python - Part 4: Project structure and packaging</a
+    >
+  </li>
+  
+  <li>
+    <a href="../what_if_3_simulation/"
+      >21 February - Excel “what if?” analysis with Python - Part 3: Simulation</a
+    >
+  </li>
+  
+</ul>
+
+<h3><a href="../tag/">Tags</a></h3>
+<style type="text/css">
+  ul.ablog-cloud {
+    list-style: none;
+    overflow: auto;
+  }
+  ul.ablog-cloud li {
+    float: left;
+    height: 20pt;
+    line-height: 18pt;
+    margin-right: 5px;
+  }
+  ul.ablog-cloud a {
+    text-decoration: none;
+    vertical-align: middle;
+  }
+  li.ablog-cloud-1 {
+    font-size: 80%;
+  }
+  li.ablog-cloud-2 {
+    font-size: 95%;
+  }
+  li.ablog-cloud-3 {
+    font-size: 110%;
+  }
+  li.ablog-cloud-4 {
+    font-size: 125%;
+  }
+  li.ablog-cloud-5 {
+    font-size: 140%;
+  }
+</style>
+<ul class="ablog-cloud">
+   
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/r/">R</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/ablog/">ablog</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/conda/">conda</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/ecology/">ecology</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-3">
+    <a href="../tag/excel/">excel</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/hillmaker/">hillmaker</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/jupyter/">jupyter</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/occupancy-analysis/">occupancy analysis</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-5">
+    <a href="../tag/python/">python</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/sphinx/">sphinx</a>
+  </li>
+   
+</ul>
+
+<h3>
+  <a href="../archive/">Archives</a>
+</h3>
+<ul>
+   
+  <li>
+    <a href="../2022/">2022 (3)</a>
+  </li>
+    
+  <li>
+    <a href="../2021/">2021 (4)</a>
+  </li>
+    
+  <li>
+    <a href="../2020/">2020 (2)</a>
+  </li>
+    
+  <li>
+    <a href="../2019/">2019 (1)</a>
+  </li>
+   
+</ul>
+
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search/" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2022, misken.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.3.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../../_sources/blog/sphinx_coursewebs.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

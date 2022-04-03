@@ -1,4 +1,4 @@
-.. post:: Mar 31, 2022
+.. post:: Apr 3, 2022
    :tags: jupyter, conda
    :author: misken
    
