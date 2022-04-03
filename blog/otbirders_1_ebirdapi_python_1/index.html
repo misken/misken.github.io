@@ -1,0 +1,703 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>Wednesday OT Birders - Using the ebird API, Python, and R to analyze data for our birding group &#8212; misken 0,1,0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css" />
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <link rel="author" title="About these documents" href="../../about/" />
+    <link rel="index" title="Index" href="../../genindex/" />
+    <link rel="search" title="Search" href="../../search/" /> 
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+ 
+<link
+  rel="alternate"
+  type="application/atom+xml"
+  href="../../blog/atom.xml"
+  title="Bits of analytics"
+/>
+ 
+<style type="text/css">
+  ul.ablog-archive {
+    list-style: none;
+    overflow: auto;
+    margin-left: 0px;
+  }
+  ul.ablog-archive li {
+    float: left;
+    margin-right: 5px;
+    font-size: 80%;
+  }
+  ul.postlist a {
+    font-style: italic;
+  }
+  ul.postlist-style-disc {
+    list-style-type: disc;
+  }
+  ul.postlist-style-none {
+    list-style-type: none;
+  }
+  ul.postlist-style-circle {
+    list-style-type: circle;
+  }
+</style>
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+             <section id="wednesday-ot-birders-using-the-ebird-api-python-and-r-to-analyze-data-for-our-birding-group">
+<h1>Wednesday OT Birders - Using the ebird API, Python, and R to analyze data for our birding group<a class="headerlink" href="#wednesday-ot-birders-using-the-ebird-api-python-and-r-to-analyze-data-for-our-birding-group" title="Permalink to this headline">¶</a></h1>
+<p>Using the eBird API from Python, we downloaded birding lists submitted by our Wednesday morning birding group. R was then used to create some basic plots showing the top species sighted each year. More analysis to follow.</p>
+<section id="the-wednesday-ot-birders">
+<h2>The Wednesday OT Birders<a class="headerlink" href="#the-wednesday-ot-birders" title="Permalink to this headline">¶</a></h2>
+<p>Since 2015, a small but growing group of birders has met each Wednesday
+morning to <a class="reference external" href="https://oaklandnaturalareas.com/volunteer-calendar/birding-walks/">bird one of the parks in Oakland Township</a>.
+We have a mix of birding experience, a shared love of nature and
+dedication to stewardship of natural areas. The founder of the group is
+a scientist/naturalist (PhD in biology/botany) and the <a class="reference external" href="http://www.oaklandtownship.org/boards_and_commissions/parks_and_recreation/stewardship.php">Natural Areas Manager for Oakland Township</a>. So, not only do we get to bird, we get to learn a ton
+about the flora of the area. Our group is also fortunate to have a gifted
+writer and photographer who blogs about our parks at the <a class="reference external" href="https://oaklandnaturalareas.com/">Natural Areas Notebook</a>.</p>
+<p>Since the group’s inception,
+our bird lists have been entered into <a class="reference external" href="https://ebird.org/home">eBird</a>,
+making it easy to answer those “Hey, have we ever seen a [insert random
+bird species] in this park?” queries. Now that we’ve got a few years
+of weekly data, it’s time for some birding analysis. In this first post,
+I’ll describe how I:</p>
+<ul class="simple">
+<li><p>used the eBird API (2.0) with Python from a Jupyter notebook to download data from our bird lists into a pandas dataframe and then exported to csv file,</p></li>
+<li><p>used R to clean up the data to make sure we were just using our Wednesday Birders
+lists for the analysis,</p></li>
+<li><p>used the R packages dplyr and ggplot2 to summarize and make plots of
+species counts by year.</p></li>
+</ul>
+</section>
+<section id="downloading-our-data-from-ebird">
+<h2>Downloading our data from eBird<a class="headerlink" href="#downloading-our-data-from-ebird" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference external" href="http://ebird.org/content/ebird/">eBird.org</a> is an extremely popular online site for entering bird sightings. It was started by the <a class="reference external" href="http://www.birds.cornell.edu">Cornell Lab of Ornithology</a> and the <a class="reference external" href="https://www.audubon.org/">National Audobon Society</a> and has revolutionized birding
+by making it easy for anyone to enter observational data into a shared
+database and to then access that database through simple to use interfaces
+within web browsers or mobile apps.</p>
+<p>Not only does eBird make it easy for you to enter sightings and manage your own lists of birds seen, it has a nice set of tools for exploring the massive amount of data it collects.</p>
+<ul class="simple">
+<li><p>Summary graphs and tables</p></li>
+<li><p>Search for recent sightings in “hotspots” or by any location</p></li>
+<li><p>Interactive species maps</p></li>
+<li><p>… and even more goodies</p></li>
+</ul>
+<p>You can <a class="reference external" href="https://ebird.org/downloadMyData">download your own data</a> or the <a class="reference external" href="https://ebird.org/data/download">whole dataset</a> through
+the eBird website. There is also an API that makes it
+easy to programmatically download a variety of detailed and summary data.
+The <a class="reference external" href="https://confluence.cornell.edu/display/CLOISAPI/eBird+API+1.1">eBird API 1.1</a> is still available but people are urged to migrate to the
+new <a class="reference external" href="https://documenter.getpostman.com/view/664302/ebird-api-20/2HTbHW">eBird API 2.0</a>.</p>
+<p>I’m going to use Python to do the
+data download. In order to use the eBird API 2.0 you need to <a class="reference external" href="https://ebird.org/ebird/api/keygen">obtain a free API key</a>.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>api_key = &#39;put_your_api_key_here&#39;
+</pre></div>
+</div>
+<p>The Wednesday Birders cycle through four different parks each month. I just manually
+grabbed the locIDs for these parks and stuffed them into a dictionary.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>hotspot_ids = {&#39;Bear Creek Nature Park&#39;:&#39;L2776037&#39;,
+               &#39;Cranberry Lake Park&#39;: &#39;L2776024&#39;,
+               &#39;Charles Ilsley Park&#39;: &#39;L2905470&#39;,
+               &#39;Draper Twin Lake Park&#39;: &#39;L1581963&#39;}
+</pre></div>
+</div>
+<p>We’ll need to use a few libraries.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>import pandas as pd
+import requests
+import time #used to put .5 second delay in API data call
+</pre></div>
+</div>
+<p>Set the date range for the download for 2015-01-01 through 2018-02-28.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>start_date = pd.Timestamp(&#39;20150101&#39;)
+end_date = pd.Timestamp(&#39;20180228&#39;)
+num_days = (end_date - start_date).days + 1
+rng = pd.date_range(start_date, periods=num_days, freq=&#39;D&#39;)
+</pre></div>
+</div>
+<p>Just a little bit of Python code needed to grab the data through a series
+of web API calls.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span># Base URL for eBird API 2.0
+url_base_obs = &#39;https://ebird.org/ws2.0/data/obs/&#39;
+
+# Create a list to hold the individual dictionaries of observations
+observations = []
+
+# Loop over the locations of interest and dates of interest
+for loc_id in loc_ids:
+    for d in rng:
+        time.sleep(0.5) # time delay
+        ymd = &#39;{}/{}/{}&#39;.format(d.year, d.month, d.day)
+        # Build the URL
+        url_obs = url_base_obs + loc_id + &#39;/historic/&#39; + ymd + \
+        &#39;?rank=mrec&amp;detail=full&amp;cat=species&amp;key=&#39; + api_key
+        print(url_obs)
+        # Get the observations for one location and date
+        obs = requests.get(url_obs)
+        # Append the new observations to the master list
+        observations.extend(obs.json())
+
+# Convert the list of dictionaries to a pandas dataframe        
+obs_df = pd.DataFrame(observations)
+# Check out the structure of the dataframe
+print(obs_df.info())
+# Check out the first few rows
+obs_df.head()
+# Export the dataframe to a csv file
+obs_df.to_csv(&quot;observations.csv&quot;, index=False)
+</pre></div>
+</div>
+</section>
+<section id="data-prep">
+<h2>Data prep<a class="headerlink" href="#data-prep" title="Permalink to this headline">¶</a></h2>
+<p>All of the data prep and analysis is done in R. We’ll need a few libraries:</p>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="nf">library</span><span class="p">(</span><span class="n">dplyr</span><span class="p">)</span>
+<span class="nf">library</span><span class="p">(</span><span class="n">ggplot2</span><span class="p">)</span>
+<span class="nf">library</span><span class="p">(</span><span class="n">lubridate</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Before diving into analysis and plots, a little data prep is needed:</p>
+<ul class="simple">
+<li><p>read CSV file into an R dataframe</p></li>
+<li><p>convert datetime fields to POSIXct</p></li>
+<li><p>include only the lists from our Wednesday morning walks</p></li>
+</ul>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="c1"># Read in the csv file</span>
+<span class="n">obs_raw</span> <span class="o">&lt;-</span> <span class="nf">read.csv</span><span class="p">(</span><span class="s">&quot;./data/observations.csv&quot;</span><span class="p">)</span>
+<span class="c1"># Convert date field to POSIXct</span>
+<span class="n">obs_raw</span><span class="o">$</span><span class="n">obsDt</span> <span class="o">&lt;-</span> <span class="nf">as.POSIXct</span><span class="p">(</span><span class="n">obs_raw</span><span class="o">$</span><span class="n">obsDt</span><span class="p">)</span>
+<span class="c1"># Create list of our birders who have entered &gt;= 1 list</span>
+<span class="n">list_authors</span> <span class="o">&lt;-</span> <span class="nf">c</span><span class="p">(</span><span class="s">&quot;VanderWeide&quot;</span><span class="p">,</span> <span class="s">&quot;Isken&quot;</span><span class="p">,</span> <span class="s">&quot;Kriebel&quot;</span><span class="p">)</span>
+<span class="c1"># Filter out lists not done on Wed by one of the list authors</span>
+<span class="n">obs_df</span> <span class="o">&lt;-</span> <span class="n">obs_raw</span> <span class="o">%&gt;%</span>
+  <span class="nf">filter</span><span class="p">(</span><span class="n">lastName</span> <span class="o">%in%</span> <span class="n">list_authors</span> <span class="o">&amp;</span> <span class="nf">wday</span><span class="p">(</span><span class="n">obsDt</span><span class="p">)</span> <span class="o">==</span> <span class="m">4</span><span class="p">)</span>
+<span class="c1"># Check out the first few rows</span>
+<span class="nf">head</span><span class="p">(</span><span class="n">obs_df</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">##   checklistId                comName countryCode   countryName firstName</span>
+<span class="c1">## 1     CL24105           Canada Goose          US United States  Benjamin</span>
+<span class="c1">## 2     CL24105         Turkey Vulture          US United States  Benjamin</span>
+<span class="c1">## 3     CL24105        Red-tailed Hawk          US United States  Benjamin</span>
+<span class="c1">## 4     CL24105         Sandhill Crane          US United States  Benjamin</span>
+<span class="c1">## 5     CL24105 Red-bellied Woodpecker          US United States  Benjamin</span>
+<span class="c1">## 6     CL24105       Downy Woodpecker          US United States  Benjamin</span>
+<span class="c1">##   hasComments hasRichMedia howMany    lastName      lat       lng    locID</span>
+<span class="c1">## 1       False        False       2 VanderWeide 42.78965 -83.10907 L2905470</span>
+<span class="c1">## 2       False        False       1 VanderWeide 42.78965 -83.10907 L2905470</span>
+<span class="c1">## 3       False        False       2 VanderWeide 42.78965 -83.10907 L2905470</span>
+<span class="c1">## 4       False        False       2 VanderWeide 42.78965 -83.10907 L2905470</span>
+<span class="c1">## 5       False        False       1 VanderWeide 42.78965 -83.10907 L2905470</span>
+<span class="c1">## 6       False        False       1 VanderWeide 42.78965 -83.10907 L2905470</span>
+<span class="c1">##      locId             locName locationPrivate      obsDt        obsId</span>
+<span class="c1">## 1 L2905470 Charles Ilsley Park           False 2015-03-18 OBS303938306</span>
+<span class="c1">## 2 L2905470 Charles Ilsley Park           False 2015-03-18 OBS303938307</span>
+<span class="c1">## 3 L2905470 Charles Ilsley Park           False 2015-03-18 OBS303938305</span>
+<span class="c1">## 4 L2905470 Charles Ilsley Park           False 2015-03-18 OBS303938302</span>
+<span class="c1">## 5 L2905470 Charles Ilsley Park           False 2015-03-18 OBS303938303</span>
+<span class="c1">## 6 L2905470 Charles Ilsley Park           False 2015-03-18 OBS303938301</span>
+<span class="c1">##   obsReviewed obsValid presenceNoted              sciName speciesCode</span>
+<span class="c1">## 1       False     True         False    Branta canadensis      cangoo</span>
+<span class="c1">## 2       False     True         False       Cathartes aura      turvul</span>
+<span class="c1">## 3       False     True         False    Buteo jamaicensis      rethaw</span>
+<span class="c1">## 4       False     True         False  Antigone canadensis      sancra</span>
+<span class="c1">## 5       False     True         False Melanerpes carolinus      rebwoo</span>
+<span class="c1">## 6       False     True         False   Picoides pubescens      dowwoo</span>
+<span class="c1">##       subId subnational1Code subnational1Name subnational2Code</span>
+<span class="c1">## 1 S22414352            US-MI         Michigan        US-MI-125</span>
+<span class="c1">## 2 S22414352            US-MI         Michigan        US-MI-125</span>
+<span class="c1">## 3 S22414352            US-MI         Michigan        US-MI-125</span>
+<span class="c1">## 4 S22414352            US-MI         Michigan        US-MI-125</span>
+<span class="c1">## 5 S22414352            US-MI         Michigan        US-MI-125</span>
+<span class="c1">## 6 S22414352            US-MI         Michigan        US-MI-125</span>
+<span class="c1">##   subnational2Name      userDisplayName</span>
+<span class="c1">## 1          Oakland Benjamin VanderWeide</span>
+<span class="c1">## 2          Oakland Benjamin VanderWeide</span>
+<span class="c1">## 3          Oakland Benjamin VanderWeide</span>
+<span class="c1">## 4          Oakland Benjamin VanderWeide</span>
+<span class="c1">## 5          Oakland Benjamin VanderWeide</span>
+<span class="c1">## 6          Oakland Benjamin VanderWeide</span>
+</pre></div>
+</div>
+</section>
+<section id="plots-of-species-counts">
+<h2>Plots of Species Counts<a class="headerlink" href="#plots-of-species-counts" title="Permalink to this headline">¶</a></h2>
+<p>How many birds of each species have we seen? How frequently are each species
+seen?</p>
+<p>Let’s start with simple bar charts:</p>
+<ul class="simple">
+<li><p>one bar per species, one year per graph,</p></li>
+<li><p>bar length is number of birds seen,</p></li>
+<li><p>color of bar is related to percentage of lists on which that species seen,</p></li>
+<li><p>number at end of bar is percentage of lists on which that species seen.</p></li>
+</ul>
+<p><img alt="2015" src="../../_images/top30_2015.png" />
+<img alt="2016" src="../../_images/top30_2016.png" />
+<img alt="2017" src="../../_images/top30_2017.png" /></p>
+<p>A few observations:</p>
+<ul class="simple">
+<li><p>Familiar year round friends such as Canada Goose, American Robin, Black-capped Chicadee, Blue Jay and American Goldfinch are sighted in large numbers and on most outings.</p></li>
+<li><p>Large flocks of European Starlings lead to them having a high number of sightings but appearing relatively infrequently in our lists.  In 2017, one big flock of Ring-necked Ducks gave them the title of most birds seen that year!</p></li>
+<li><p>The overall composition of the lists are pretty similar across the three
+years. However, overall numbers appear to be down in 2017. Turns out this is
+in spite of fact that we had more outings (lists) in 2017 (48) than in 2016 (39).
+This requires more investigation.</p></li>
+</ul>
+</section>
+<section id="creating-the-plots">
+<h2>Creating the plots<a class="headerlink" href="#creating-the-plots" title="Permalink to this headline">¶</a></h2>
+<p>The plots above are easy to create from a dataframe that looks like this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">##                    comName birding_year num_lists tot_birds totlists</span>
+<span class="c1">## 1         Ring-necked Duck         2017         2       302       48</span>
+<span class="c1">## 2           American Robin         2017        34       269       48</span>
+<span class="c1">## 3     Red-winged Blackbird         2017        27       232       48</span>
+<span class="c1">## 4        European Starling         2017        13       224       48</span>
+<span class="c1">## 5            Cedar Waxwing         2017        19       211       48</span>
+<span class="c1">## 6             Canada Goose         2017        23       200       48</span>
+<span class="c1">## 7   Black-capped Chickadee         2017        37       146       48</span>
+<span class="c1">## 8            American Crow         2017        40       138       48</span>
+<span class="c1">## 9       American Goldfinch         2017        32       135       48</span>
+<span class="c1">## 10                Blue Jay         2017        33       133       48</span>
+<span class="c1">## 11                 Mallard         2017        20       132       48</span>
+<span class="c1">## 12           Mourning Dove         2017        30       102       48</span>
+<span class="c1">## 13        Eastern Bluebird         2017        27        91       48</span>
+<span class="c1">## 14         Dark-eyed Junco         2017        12        85       48</span>
+<span class="c1">## 15        Northern Flicker         2017        31        84       48</span>
+<span class="c1">## 16       Northern Cardinal         2017        30        80       48</span>
+<span class="c1">## 17            Song Sparrow         2017        26        73       48</span>
+<span class="c1">## 18   American Tree Sparrow         2017         7        67       48</span>
+<span class="c1">## 19            Gray Catbird         2017        16        66       48</span>
+<span class="c1">## 20 White-breasted Nuthatch         2017        36        63       48</span>
+<span class="c1">## 21           Field Sparrow         2017        20        58       48</span>
+<span class="c1">## 22                 Redhead         2017         1        50       48</span>
+<span class="c1">## 23         Tufted Titmouse         2017        24        50       48</span>
+<span class="c1">## 24  Red-bellied Woodpecker         2017        32        47       48</span>
+<span class="c1">## 25    Brown-headed Cowbird         2017        12        42       48</span>
+<span class="c1">## 26            Barn Swallow         2017        12        41       48</span>
+<span class="c1">## 27              Bufflehead         2017         1        40       48</span>
+<span class="c1">## 28        Downy Woodpecker         2017        24        40       48</span>
+<span class="c1">## 29          Yellow Warbler         2017        13        34       48</span>
+<span class="c1">## 30     Common Yellowthroat         2017        12        31       48</span>
+<span class="c1">##      pctlists</span>
+<span class="c1">## 1  0.04166667</span>
+<span class="c1">## 2  0.70833333</span>
+<span class="c1">## 3  0.56250000</span>
+<span class="c1">## 4  0.27083333</span>
+<span class="c1">## 5  0.39583333</span>
+<span class="c1">## 6  0.47916667</span>
+<span class="c1">## 7  0.77083333</span>
+<span class="c1">## 8  0.83333333</span>
+<span class="c1">## 9  0.66666667</span>
+<span class="c1">## 10 0.68750000</span>
+<span class="c1">## 11 0.41666667</span>
+<span class="c1">## 12 0.62500000</span>
+<span class="c1">## 13 0.56250000</span>
+<span class="c1">## 14 0.25000000</span>
+<span class="c1">## 15 0.64583333</span>
+<span class="c1">## 16 0.62500000</span>
+<span class="c1">## 17 0.54166667</span>
+<span class="c1">## 18 0.14583333</span>
+<span class="c1">## 19 0.33333333</span>
+<span class="c1">## 20 0.75000000</span>
+<span class="c1">## 21 0.41666667</span>
+<span class="c1">## 22 0.02083333</span>
+<span class="c1">## 23 0.50000000</span>
+<span class="c1">## 24 0.66666667</span>
+<span class="c1">## 25 0.25000000</span>
+<span class="c1">## 26 0.25000000</span>
+<span class="c1">## 27 0.02083333</span>
+<span class="c1">## 28 0.50000000</span>
+<span class="c1">## 29 0.27083333</span>
+<span class="c1">## 30 0.25000000</span>
+</pre></div>
+</div>
+<p>The only real trickiness is getting the percentage of lists column computed.
+We can do it in a few steps using dplyr. For the example below I’ve just
+hard coded in 2017 as the year of interest. In reality, I embedded the code
+below in a function and passed the year of interest in.</p>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create num species by list dataframe</span>
+<span class="n">numsp_bylist</span> <span class="o">&lt;-</span> <span class="n">obs_df</span> <span class="o">%&gt;%</span>
+  <span class="nf">group_by</span><span class="p">(</span><span class="n">year</span><span class="o">=</span><span class="nf">year</span><span class="p">(</span><span class="n">obsDt</span><span class="p">),</span> <span class="n">obsDt</span><span class="p">,</span> <span class="n">subId</span><span class="p">,</span> <span class="n">lastName</span><span class="p">)</span> <span class="o">%&gt;%</span>
+  <span class="nf">count</span><span class="p">()</span> <span class="o">%&gt;%</span>
+  <span class="nf">arrange</span><span class="p">(</span><span class="n">year</span><span class="p">,</span> <span class="n">subId</span><span class="p">)</span>
+
+<span class="c1"># Using numsp_bylist, create num lists by date</span>
+<span class="n">numlists_bydt</span> <span class="o">&lt;-</span> <span class="n">numsp_bylist</span> <span class="o">%&gt;%</span>
+  <span class="nf">group_by</span><span class="p">(</span><span class="n">obsDt</span><span class="p">)</span> <span class="o">%&gt;%</span>
+  <span class="nf">summarise</span><span class="p">(</span>
+    <span class="n">numlists</span> <span class="o">=</span> <span class="nf">n</span><span class="p">()</span>
+  <span class="p">)</span> <span class="o">%&gt;%</span>
+  <span class="nf">filter</span><span class="p">(</span><span class="n">numlists</span> <span class="o">&gt;=</span> <span class="m">1</span><span class="p">)</span> <span class="o">%&gt;%</span>
+  <span class="nf">arrange</span><span class="p">(</span><span class="n">obsDt</span><span class="p">)</span>
+
+<span class="c1"># Usings numlists_bydt, create num lists by year</span>
+<span class="n">numlists_byyear</span> <span class="o">&lt;-</span> <span class="n">numlists_bydt</span> <span class="o">%&gt;%</span>
+  <span class="nf">group_by</span><span class="p">(</span><span class="n">birding_year</span><span class="o">=</span><span class="nf">year</span><span class="p">(</span><span class="n">obsDt</span><span class="p">))</span> <span class="o">%&gt;%</span>
+  <span class="nf">summarise</span><span class="p">(</span>
+    <span class="n">totlists</span> <span class="o">=</span> <span class="nf">sum</span><span class="p">(</span><span class="n">numlists</span><span class="p">)</span>
+  <span class="p">)</span>
+
+<span class="c1"># Now ready to compute species by year</span>
+<span class="n">species_byyear</span> <span class="o">&lt;-</span> <span class="n">obs_df</span> <span class="o">%&gt;%</span>
+  <span class="nf">group_by</span><span class="p">(</span><span class="n">comName</span><span class="p">,</span> <span class="n">birding_year</span><span class="o">=</span><span class="nf">year</span><span class="p">(</span><span class="n">obsDt</span><span class="p">))</span> <span class="o">%&gt;%</span>
+  <span class="nf">summarize</span><span class="p">(</span>
+    <span class="n">num_lists</span> <span class="o">=</span> <span class="nf">n</span><span class="p">(),</span>
+    <span class="n">tot_birds</span> <span class="o">=</span> <span class="nf">sum</span><span class="p">(</span><span class="n">howMany</span><span class="p">)</span>
+  <span class="p">)</span> <span class="o">%&gt;%</span>
+  <span class="nf">arrange</span><span class="p">(</span><span class="n">birding_year</span><span class="p">,</span> <span class="nf">desc</span><span class="p">(</span><span class="n">tot_birds</span><span class="p">))</span>
+
+<span class="c1"># Join to numlists_byyear so we can compute pct of lists each species</span>
+<span class="c1"># appeared in.</span>
+<span class="n">species_byyear</span> <span class="o">&lt;-</span> <span class="nf">left_join</span><span class="p">(</span><span class="n">species_byyear</span><span class="p">,</span> <span class="n">numlists_byyear</span><span class="p">,</span> <span class="n">by</span> <span class="o">=</span> <span class="s">&#39;birding_year&#39;</span><span class="p">)</span> 
+
+<span class="c1"># These would be passed in to function version of this code</span>
+<span class="n">bird_year</span> <span class="o">&lt;-</span> <span class="m">2017</span> 
+<span class="n">ntop</span> <span class="o">&lt;-</span> <span class="m">30</span>
+
+<span class="c1"># Compute the percentage of lists on which each species appeard</span>
+<span class="n">top_obs_byyear</span> <span class="o">&lt;-</span> <span class="n">species_byyear</span> <span class="o">%&gt;%</span>
+  <span class="nf">filter</span><span class="p">(</span><span class="n">birding_year</span> <span class="o">==</span> <span class="n">bird_year</span><span class="p">)</span> <span class="o">%&gt;%</span>
+  <span class="nf">mutate</span><span class="p">(</span><span class="n">pctlists</span> <span class="o">=</span> <span class="n">num_lists</span> <span class="o">/</span> <span class="n">totlists</span><span class="p">)</span> <span class="o">%&gt;%</span>
+  <span class="nf">arrange</span><span class="p">(</span><span class="nf">desc</span><span class="p">(</span><span class="n">tot_birds</span><span class="p">))</span> <span class="o">%&gt;%</span>
+  <span class="nf">head</span><span class="p">(</span><span class="n">ntop</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Finally we are ready to make the plot. For this post I’m cheating a bit by
+hard coding in a y-axis limit. In the function version, this can be passed in.</p>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="nf">ggplot</span><span class="p">(</span><span class="n">top_obs_byyear</span><span class="p">)</span> <span class="o">+</span> 
+    <span class="nf">geom_bar</span><span class="p">(</span><span class="nf">aes</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="nf">reorder</span><span class="p">(</span><span class="n">comName</span><span class="p">,</span> <span class="n">tot_birds</span><span class="p">),</span> 
+                 <span class="n">y</span><span class="o">=</span><span class="n">tot_birds</span><span class="p">,</span> <span class="n">fill</span><span class="o">=</span><span class="n">pctlists</span><span class="p">),</span> <span class="n">stat</span> <span class="o">=</span> <span class="s">&quot;identity&quot;</span><span class="p">)</span> <span class="o">+</span>
+                 <span class="nf">scale_fill_gradient</span><span class="p">(</span><span class="n">low</span><span class="o">=</span><span class="s">&#39;#05D9F6&#39;</span><span class="p">,</span> <span class="n">high</span><span class="o">=</span><span class="s">&#39;#5011D1&#39;</span><span class="p">)</span> <span class="o">+</span>
+                 <span class="nf">labs</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s">&quot;&quot;</span><span class="p">,</span> 
+                      <span class="n">y</span><span class="o">=</span><span class="s">&quot;Total number of birds sighted&quot;</span><span class="p">,</span> 
+                      <span class="n">fill</span><span class="o">=</span><span class="s">&quot;Pct of lists&quot;</span><span class="p">,</span>
+                      <span class="n">title</span> <span class="o">=</span> <span class="nf">paste0</span><span class="p">(</span><span class="s">&quot;Top 30 most sighted birds by Wednesday Birders in &quot;</span><span class="p">,</span> <span class="n">bird_year</span><span class="p">),</span>
+                      <span class="n">subtitle</span> <span class="o">=</span> <span class="s">&quot;(number at right of bar is % of lists on which the species appeared)&quot;</span><span class="p">)</span> <span class="o">+</span>
+                 <span class="nf">coord_flip</span><span class="p">()</span> <span class="o">+</span>
+    <span class="nf">geom_text</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">top_obs_byyear</span><span class="p">,</span>
+              <span class="nf">aes</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="nf">reorder</span><span class="p">(</span><span class="n">comName</span><span class="p">,</span><span class="n">tot_birds</span><span class="p">),</span>
+                  <span class="n">y</span><span class="o">=</span><span class="n">tot_birds</span><span class="p">,</span>
+                  <span class="n">label</span><span class="o">=</span><span class="nf">format</span><span class="p">(</span><span class="n">pctlists</span><span class="p">,</span> <span class="n">digits</span> <span class="o">=</span> <span class="m">1</span><span class="p">),</span>
+                  <span class="n">hjust</span><span class="o">=</span><span class="m">0</span>
+              <span class="p">),</span> <span class="n">size</span><span class="o">=</span><span class="m">3</span><span class="p">)</span> <span class="o">+</span> <span class="nf">ylim</span><span class="p">(</span><span class="m">0</span><span class="p">,</span><span class="m">550</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><img alt="center" src="../../_images/plot2017-1.png" /></p>
+</section>
+<section id="next-steps">
+<h2>Next steps<a class="headerlink" href="#next-steps" title="Permalink to this headline">¶</a></h2>
+<p>Now that we’ve got the raw data downloaded and cleaned up, we can do a bunch
+of exploratory analysis and our Wednesday morning birding group will know a
+little more about what we’ve been seeing.</p>
+</section>
+</section>
+
+<div class="section">
+    
+
+<div class="section">
+  <span style="float: left">
+     Previous:
+    
+    <a href="../datetime_exploring/">
+       Exploring dates and times in Python
+    </a>
+    
+  </span>
+  <span>&nbsp;</span>
+  <span style="float: right">
+     Next: 
+    <a href="../daily_averages_cycleshare/">
+      Computing daily averages from transaction data using pandas can be tricky - Part 1 
+    </a>
+    
+  </span>
+</div>
+  
+</div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../">misken</a></h1>
+
+
+
+
+
+
+
+
+  
+<h2>
+   
+  04 April 2016 
+</h2>
+
+<ul>
+   
+<li id="author">
+  <span
+    >Author:</span
+  >
+   
+  <a href="../author/misken/">misken</a>  
+</li>
+    
+<li id="tags">
+  <span
+    >Tags: </span
+  >
+   
+  <a href="../tag/r/">R</a>   
+  <a href="../tag/python/">python</a>   
+  <a href="../tag/birding/">birding</a>   
+  <a href="../tag/dplyr/">dplyr</a>   
+  <a href="../tag/ggplot2/">ggplot2</a>   
+  <a href="../tag/ebird/">ebird</a>  
+</li>
+ 
+</ul>
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../about/">About misken</a></li>
+</ul>
+
+
+<h3>
+  <a href="../">Recent Posts</a>
+</h3>
+<ul>
+   
+  <li>
+    <a href="../use_jupyter_conda_envs/"
+      >03 April - Using different conda environments with Jupyter Lab</a
+    >
+  </li>
+  
+  <li>
+    <a href="../hello_world/"
+      >02 April - Hello world from ablog blogging with JupyterLab</a
+    >
+  </li>
+  
+  <li>
+    <a href="../first-post/"
+      >01 April - First Post at new blogging site</a
+    >
+  </li>
+  
+  <li>
+    <a href="../pip_with_conda_local_dev/"
+      >15 March - Using pip with conda for local development projects</a
+    >
+  </li>
+  
+  <li>
+    <a href="../what_if_4_project_packaging/"
+      >11 March - Excel “what if?” analysis with Python - Part 4: Project structure and packaging</a
+    >
+  </li>
+  
+</ul>
+
+<h3><a href="../tag/">Tags</a></h3>
+<style type="text/css">
+  ul.ablog-cloud {
+    list-style: none;
+    overflow: auto;
+  }
+  ul.ablog-cloud li {
+    float: left;
+    height: 20pt;
+    line-height: 18pt;
+    margin-right: 5px;
+  }
+  ul.ablog-cloud a {
+    text-decoration: none;
+    vertical-align: middle;
+  }
+  li.ablog-cloud-1 {
+    font-size: 80%;
+  }
+  li.ablog-cloud-2 {
+    font-size: 95%;
+  }
+  li.ablog-cloud-3 {
+    font-size: 110%;
+  }
+  li.ablog-cloud-4 {
+    font-size: 125%;
+  }
+  li.ablog-cloud-5 {
+    font-size: 140%;
+  }
+</style>
+<ul class="ablog-cloud">
+   
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/github/">GitHub</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-2">
+    <a href="../tag/r/">R</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/ablog/">ablog</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/bikeshare/">bikeshare</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/birding/">birding</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/conda/">conda</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/datetime/">datetime</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/dplyr/">dplyr</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/ebird/">ebird</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/ecology/">ecology</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-2">
+    <a href="../tag/excel/">excel</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/ggplot2/">ggplot2</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/git/">git</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/hillmaker/">hillmaker</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-2">
+    <a href="../tag/jupyter/">jupyter</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/occupancy-analysis/">occupancy analysis</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/pandas/">pandas</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-5">
+    <a href="../tag/python/">python</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/sphinx/">sphinx</a>
+  </li>
+   
+</ul>
+
+<h3>
+  <a href="../archive/">Archives</a>
+</h3>
+<ul>
+   
+  <li>
+    <a href="../2022/">2022 (4)</a>
+  </li>
+    
+  <li>
+    <a href="../2021/">2021 (4)</a>
+  </li>
+    
+  <li>
+    <a href="../2020/">2020 (2)</a>
+  </li>
+    
+  <li>
+    <a href="../2019/">2019 (7)</a>
+  </li>
+    
+  <li>
+    <a href="../2018/">2018 (2)</a>
+  </li>
+    
+  <li>
+    <a href="../2016/">2016 (1)</a>
+  </li>
+    
+  <li>
+    <a href="../2014/">2014 (1)</a>
+  </li>
+   
+</ul>
+
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search/" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2022, misken.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.3.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../../_sources/blog/otbirders_1_ebirdapi_python_1.md.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

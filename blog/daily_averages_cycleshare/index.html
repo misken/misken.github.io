@@ -1,0 +1,2036 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>Computing daily averages from transaction data using pandas can be tricky - Part 1 &#8212; misken 0,1,0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css" />
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <link rel="author" title="About these documents" href="../../about/" />
+    <link rel="index" title="Index" href="../../genindex/" />
+    <link rel="search" title="Search" href="../../search/" /> 
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+ 
+<link
+  rel="alternate"
+  type="application/atom+xml"
+  href="../../blog/atom.xml"
+  title="Bits of analytics"
+/>
+ 
+<style type="text/css">
+  ul.ablog-archive {
+    list-style: none;
+    overflow: auto;
+    margin-left: 0px;
+  }
+  ul.ablog-archive li {
+    float: left;
+    margin-right: 5px;
+    font-size: 80%;
+  }
+  ul.postlist a {
+    font-style: italic;
+  }
+  ul.postlist-style-disc {
+    list-style-type: disc;
+  }
+  ul.postlist-style-none {
+    list-style-type: none;
+  }
+  ul.postlist-style-circle {
+    list-style-type: circle;
+  }
+</style>
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+             
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt *,
+div.nbinput.container div.input_area pre,
+div.nboutput.container div.output_area pre,
+div.nbinput.container div.input_area .highlight,
+div.nboutput.container div.output_area .highlight {
+    border: none;
+    padding: 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+div.nbinput.container > div[class*=highlight],
+div.nboutput.container > div[class*=highlight] {
+    margin: 0;
+}
+
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt * {
+    background: none;
+}
+
+div.nboutput.container div.output_area .highlight,
+div.nboutput.container div.output_area pre {
+    background: unset;
+}
+
+div.nboutput.container div.output_area div.highlight {
+    color: unset;  /* override Pygments text color */
+}
+
+/* avoid gaps between output lines */
+div.nboutput.container div[class*=highlight] pre {
+    line-height: normal;
+}
+
+/* input/output containers */
+div.nbinput.container,
+div.nboutput.container {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+    width: 100%;
+}
+@media (max-width: 540px) {
+    div.nbinput.container,
+    div.nboutput.container {
+        flex-direction: column;
+    }
+}
+
+/* input container */
+div.nbinput.container {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast.container {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput.container div.prompt pre {
+    color: #307FC1;
+}
+
+/* output prompt */
+div.nboutput.container div.prompt pre {
+    color: #BF5B3D;
+}
+
+/* all prompts */
+div.nbinput.container div.prompt,
+div.nboutput.container div.prompt {
+    width: 4.5ex;
+    padding-top: 5px;
+    position: relative;
+    user-select: none;
+}
+
+div.nbinput.container div.prompt > div,
+div.nboutput.container div.prompt > div {
+    position: absolute;
+    right: 0;
+    margin-right: 0.3ex;
+}
+
+@media (max-width: 540px) {
+    div.nbinput.container div.prompt,
+    div.nboutput.container div.prompt {
+        width: unset;
+        text-align: left;
+        padding: 0.4em;
+    }
+    div.nboutput.container div.prompt.empty {
+        padding: 0;
+    }
+
+    div.nbinput.container div.prompt > div,
+    div.nboutput.container div.prompt > div {
+        position: unset;
+    }
+}
+
+/* disable scrollbars on prompts */
+div.nbinput.container div.prompt pre,
+div.nboutput.container div.prompt pre {
+    overflow: hidden;
+}
+
+/* input/output area */
+div.nbinput.container div.input_area,
+div.nboutput.container div.output_area {
+    -webkit-flex: 1;
+    flex: 1;
+    overflow: auto;
+}
+@media (max-width: 540px) {
+    div.nbinput.container div.input_area,
+    div.nboutput.container div.output_area {
+        width: 100%;
+    }
+}
+
+/* input area */
+div.nbinput.container div.input_area {
+    border: 1px solid #e0e0e0;
+    border-radius: 2px;
+    /*background: #f5f5f5;*/
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput.container div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.imgmath center alignment in output cells */
+div.nboutput.container div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput.container div.output_area.stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-default-inverse-fg { color: #FFFFFF; }
+.ansi-default-inverse-bg { background-color: #000000; }
+
+.ansi-bold { font-weight: bold; }
+.ansi-underline { text-decoration: underline; }
+
+
+div.nbinput.container div.input_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight].math,
+div.nboutput.container div.output_area.rendered_html,
+div.nboutput.container div.output_area > div.output_javascript,
+div.nboutput.container div.output_area:not(.rendered_html) > img{
+    padding: 5px;
+    margin: 0;
+}
+
+/* fix copybtn overflow problem in chromium (needed for 'sphinx_copybutton') */
+div.nbinput.container div.input_area > div[class^='highlight'],
+div.nboutput.container div.output_area > div[class^='highlight']{
+    overflow-y: hidden;
+}
+
+/* hide copybtn icon on prompts (needed for 'sphinx_copybutton') */
+.prompt .copybtn {
+    display: none;
+}
+
+/* Some additional styling taken form the Jupyter notebook CSS */
+div.rendered_html table {
+  border: none;
+  border-collapse: collapse;
+  border-spacing: 0;
+  color: black;
+  font-size: 12px;
+  table-layout: fixed;
+}
+div.rendered_html thead {
+  border-bottom: 1px solid black;
+  vertical-align: bottom;
+}
+div.rendered_html tr,
+div.rendered_html th,
+div.rendered_html td {
+  text-align: right;
+  vertical-align: middle;
+  padding: 0.5em 0.5em;
+  line-height: normal;
+  white-space: normal;
+  max-width: none;
+  border: none;
+}
+div.rendered_html th {
+  font-weight: bold;
+}
+div.rendered_html tbody tr:nth-child(odd) {
+  background: #f5f5f5;
+}
+div.rendered_html tbody tr:hover {
+  background: rgba(66, 165, 245, 0.2);
+}
+</style>
+<section id="Computing-daily-averages-from-transaction-data-using-pandas-can-be-tricky---Part-1">
+<h1>Computing daily averages from transaction data using pandas can be tricky - Part 1<a class="headerlink" href="#Computing-daily-averages-from-transaction-data-using-pandas-can-be-tricky---Part-1" title="Permalink to this headline">¶</a></h1>
+<p>Our goal is to compute statistics such as the average number of bikes rented per day in the Pronto CycleShare dataset, both overall and for individual stations. Seems easy. We’ll see.</p>
+<p>Recently I watched an <a class="reference external" href="https://www.youtube.com/watch?v=DlgG0QdrqAU">interesting talk at PyCon 2018 on subtleties involved in computing time related averages</a> using pandas and SQL. While the talk raised some interesting points, it reminded me of another important “gotcha” related to computing such statistics.</p>
+<p>We’ll use the <code class="docutils literal notranslate"><span class="pre">trip.csv</span></code> datafile from the <a class="reference external" href="https://www.kaggle.com/pronto/cycle-share-dataset">Pronto Cycleshare Dataset</a>. You can get this notebook from <a class="reference external" href="https://github.com/misken/daily-averages">https://github.com/misken/daily-averages</a>.</p>
+<p>Our goal is to compute statistics such as the average number of bikes rented per day, both overall and for individual stations. Seems easy. We’ll see.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">trip</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;trip.csv&#39;</span><span class="p">,</span> <span class="n">parse_dates</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;starttime&#39;</span><span class="p">,</span> <span class="s1">&#39;stoptime&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">trip</span><span class="o">.</span><span class="n">info</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;class &#39;pandas.core.frame.DataFrame&#39;&gt;
+RangeIndex: 286857 entries, 0 to 286856
+Data columns (total 12 columns):
+trip_id              286857 non-null int64
+starttime            286857 non-null datetime64[ns]
+stoptime             286857 non-null datetime64[ns]
+bikeid               286857 non-null object
+tripduration         286857 non-null float64
+from_station_name    286857 non-null object
+to_station_name      286857 non-null object
+from_station_id      286857 non-null object
+to_station_id        286857 non-null object
+usertype             286857 non-null object
+gender               181557 non-null object
+birthyear            181553 non-null float64
+dtypes: datetime64[ns](2), float64(2), int64(1), object(7)
+memory usage: 26.3+ MB
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">trip</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>trip_id</th>
+      <th>starttime</th>
+      <th>stoptime</th>
+      <th>bikeid</th>
+      <th>tripduration</th>
+      <th>from_station_name</th>
+      <th>to_station_name</th>
+      <th>from_station_id</th>
+      <th>to_station_id</th>
+      <th>usertype</th>
+      <th>gender</th>
+      <th>birthyear</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>431</td>
+      <td>2014-10-13 10:31:00</td>
+      <td>2014-10-13 10:48:00</td>
+      <td>SEA00298</td>
+      <td>985.935</td>
+      <td>2nd Ave &amp; Spring St</td>
+      <td>Occidental Park / Occidental Ave S &amp; S Washing...</td>
+      <td>CBD-06</td>
+      <td>PS-04</td>
+      <td>Member</td>
+      <td>Male</td>
+      <td>1960.0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>432</td>
+      <td>2014-10-13 10:32:00</td>
+      <td>2014-10-13 10:48:00</td>
+      <td>SEA00195</td>
+      <td>926.375</td>
+      <td>2nd Ave &amp; Spring St</td>
+      <td>Occidental Park / Occidental Ave S &amp; S Washing...</td>
+      <td>CBD-06</td>
+      <td>PS-04</td>
+      <td>Member</td>
+      <td>Male</td>
+      <td>1970.0</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>433</td>
+      <td>2014-10-13 10:33:00</td>
+      <td>2014-10-13 10:48:00</td>
+      <td>SEA00486</td>
+      <td>883.831</td>
+      <td>2nd Ave &amp; Spring St</td>
+      <td>Occidental Park / Occidental Ave S &amp; S Washing...</td>
+      <td>CBD-06</td>
+      <td>PS-04</td>
+      <td>Member</td>
+      <td>Female</td>
+      <td>1988.0</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>434</td>
+      <td>2014-10-13 10:34:00</td>
+      <td>2014-10-13 10:48:00</td>
+      <td>SEA00333</td>
+      <td>865.937</td>
+      <td>2nd Ave &amp; Spring St</td>
+      <td>Occidental Park / Occidental Ave S &amp; S Washing...</td>
+      <td>CBD-06</td>
+      <td>PS-04</td>
+      <td>Member</td>
+      <td>Female</td>
+      <td>1977.0</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>435</td>
+      <td>2014-10-13 10:34:00</td>
+      <td>2014-10-13 10:49:00</td>
+      <td>SEA00202</td>
+      <td>923.923</td>
+      <td>2nd Ave &amp; Spring St</td>
+      <td>Occidental Park / Occidental Ave S &amp; S Washing...</td>
+      <td>CBD-06</td>
+      <td>PS-04</td>
+      <td>Member</td>
+      <td>Male</td>
+      <td>1971.0</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">trip</span><span class="o">.</span><span class="n">tail</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>trip_id</th>
+      <th>starttime</th>
+      <th>stoptime</th>
+      <th>bikeid</th>
+      <th>tripduration</th>
+      <th>from_station_name</th>
+      <th>to_station_name</th>
+      <th>from_station_id</th>
+      <th>to_station_id</th>
+      <th>usertype</th>
+      <th>gender</th>
+      <th>birthyear</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>286852</th>
+      <td>255241</td>
+      <td>2016-08-31 23:34:00</td>
+      <td>2016-08-31 23:45:00</td>
+      <td>SEA00201</td>
+      <td>679.532</td>
+      <td>Harvard Ave &amp; E Pine St</td>
+      <td>2nd Ave &amp; Spring St</td>
+      <td>CH-09</td>
+      <td>CBD-06</td>
+      <td>Short-Term Pass Holder</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>286853</th>
+      <td>255242</td>
+      <td>2016-08-31 23:48:00</td>
+      <td>2016-09-01 00:20:00</td>
+      <td>SEA00247</td>
+      <td>1965.418</td>
+      <td>Cal Anderson Park / 11th Ave &amp; Pine St</td>
+      <td>6th Ave S &amp; S King St</td>
+      <td>CH-08</td>
+      <td>ID-04</td>
+      <td>Short-Term Pass Holder</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>286854</th>
+      <td>255243</td>
+      <td>2016-08-31 23:47:00</td>
+      <td>2016-09-01 00:20:00</td>
+      <td>SEA00300</td>
+      <td>1951.173</td>
+      <td>Cal Anderson Park / 11th Ave &amp; Pine St</td>
+      <td>6th Ave S &amp; S King St</td>
+      <td>CH-08</td>
+      <td>ID-04</td>
+      <td>Short-Term Pass Holder</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>286855</th>
+      <td>255244</td>
+      <td>2016-08-31 23:49:00</td>
+      <td>2016-09-01 00:20:00</td>
+      <td>SEA00047</td>
+      <td>1883.299</td>
+      <td>Cal Anderson Park / 11th Ave &amp; Pine St</td>
+      <td>6th Ave S &amp; S King St</td>
+      <td>CH-08</td>
+      <td>ID-04</td>
+      <td>Short-Term Pass Holder</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>286856</th>
+      <td>255245</td>
+      <td>2016-08-31 23:49:00</td>
+      <td>2016-09-01 00:20:00</td>
+      <td>SEA00442</td>
+      <td>1896.031</td>
+      <td>Cal Anderson Park / 11th Ave &amp; Pine St</td>
+      <td>6th Ave S &amp; S King St</td>
+      <td>CH-08</td>
+      <td>ID-04</td>
+      <td>Short-Term Pass Holder</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+</section>
+<section id="What-is-the-average-number-of-bike-rentals-per-day?">
+<h1>What is the average number of bike rentals per day?<a class="headerlink" href="#What-is-the-average-number-of-bike-rentals-per-day?" title="Permalink to this headline">¶</a></h1>
+<p>Seems like a pretty simple and straightforward question. We’ve got one row for each bike rental - let’s call them trips.</p>
+<section id="A-first-attempt">
+<h2>A first attempt<a class="headerlink" href="#A-first-attempt" title="Permalink to this headline">¶</a></h2>
+<p>Let’s start by counting the number of trips per date and then we can simply do an average. Hmm, we don’t actually have a trip date field, we’ve got the detailed trip datetimes for when bike was checked out and when returned. Let’s add a trip date column.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">trip</span><span class="p">[</span><span class="s1">&#39;tripdate&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">trip</span><span class="p">[</span><span class="s1">&#39;starttime&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">date</span><span class="p">())</span>
+</pre></div>
+</div>
+</div>
+<p>Group by <code class="docutils literal notranslate"><span class="pre">tripdate</span></code> and count the records.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create a Group by object using tripdate</span>
+<span class="n">grp_date</span> <span class="o">=</span> <span class="n">trip</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;tripdate&#39;</span><span class="p">)</span>
+
+<span class="c1"># Compute number of trips by date and check out the result</span>
+<span class="n">trips_by_date</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">grp_date</span><span class="o">.</span><span class="n">size</span><span class="p">(),</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;num_trips&#39;</span><span class="p">])</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">trips_by_date</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+            num_trips
+tripdate
+2014-10-13        818
+2014-10-14        982
+2014-10-15        626
+2014-10-16        790
+2014-10-17        588
+2014-10-18        798
+2014-10-19       1332
+2014-10-20        778
+2014-10-21        714
+2014-10-22        282
+2014-10-23        676
+2014-10-24        860
+2014-10-25        432
+2014-10-26        504
+2014-10-27        734
+2014-10-28        470
+2014-10-29        880
+2014-10-30        454
+2014-10-31        452
+2014-11-01        876
+2014-11-02        662
+2014-11-03        474
+2014-11-04        770
+2014-11-05        592
+2014-11-06        512
+2014-11-07        690
+2014-11-08       1058
+2014-11-09        474
+2014-11-10        784
+2014-11-11        540
+...               ...
+2016-08-02        395
+2016-08-03        412
+2016-08-04        439
+2016-08-05        520
+2016-08-06        379
+2016-08-07        328
+2016-08-08        431
+2016-08-09        428
+2016-08-10        504
+2016-08-11        490
+2016-08-12        465
+2016-08-13        466
+2016-08-14        451
+2016-08-15        408
+2016-08-16        422
+2016-08-17        430
+2016-08-18        528
+2016-08-19        407
+2016-08-20        426
+2016-08-21        345
+2016-08-22        439
+2016-08-23        412
+2016-08-24        446
+2016-08-25        471
+2016-08-26        500
+2016-08-27        333
+2016-08-28        392
+2016-08-29        369
+2016-08-30        375
+2016-08-31        319
+
+[689 rows x 1 columns]
+</pre></div></div>
+</div>
+<p>Now, can’t we just compute an average of the <code class="docutils literal notranslate"><span class="pre">num_trips</span></code> column and that will be the average number of bike rentals per day?</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">mean_trips</span> <span class="o">=</span> <span class="n">trips_by_date</span><span class="p">[</span><span class="s1">&#39;num_trips&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+<span class="n">tot_tripdates</span> <span class="o">=</span> <span class="n">trips_by_date</span><span class="p">[</span><span class="s1">&#39;num_trips&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
+<span class="n">num_days</span> <span class="o">=</span> <span class="p">(</span><span class="n">trips_by_date</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">-</span> <span class="n">trips_by_date</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">min</span><span class="p">())</span><span class="o">.</span><span class="n">days</span> <span class="o">+</span> <span class="mi">1</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;The mean number of trips per day is </span><span class="si">{:.2f}</span><span class="s2">. The mean is based on </span><span class="si">{}</span><span class="s2"> tripdates.&quot;</span>
+      <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">mean_trips</span><span class="p">,</span> <span class="n">tot_tripdates</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;The beginning of the date range is </span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">trips_by_date</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">min</span><span class="p">()))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;The end of the date range is </span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">trips_by_date</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">max</span><span class="p">()))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;The are </span><span class="si">{}</span><span class="s2"> days in the date range.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">num_days</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+The mean number of trips per day is 416.34. The mean is based on 689 tripdates.
+The beginning of the date range is 2014-10-13.
+The end of the date range is 2016-08-31.
+The are 689 days in the date range.
+</pre></div></div>
+</div>
+<p>You scan the counts, look at the average, looks reasonable. And, yes, in this case, this is the correct average number of daily bike trips.</p>
+<p>Now, let’s change the question slightly.</p>
+<p><strong>What is the average number of daily trips that originate at Station CH-06?</strong></p>
+<p>Let’s use the same approach, but just consider trips where <code class="docutils literal notranslate"><span class="pre">from_station_id</span> <span class="pre">==</span> <span class="pre">'CH-06'</span></code>.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[121]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Group by tripdate in the trip dataframe</span>
+<span class="n">grp_date_CH06</span> <span class="o">=</span> <span class="n">trip</span><span class="p">[(</span><span class="n">trip</span><span class="o">.</span><span class="n">from_station_id</span> <span class="o">==</span> <span class="s1">&#39;CH-06&#39;</span><span class="p">)]</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s1">&#39;tripdate&#39;</span><span class="p">])</span>
+
+<span class="c1"># Compute number of trips by date and check out the result</span>
+<span class="n">trips_by_date_CH06</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">grp_date_CH06</span><span class="o">.</span><span class="n">size</span><span class="p">(),</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;num_trips&#39;</span><span class="p">])</span>
+
+<span class="c1"># Compute the average</span>
+<span class="n">mean_trips_CH06</span> <span class="o">=</span> <span class="n">trips_by_date_CH06</span><span class="p">[</span><span class="s1">&#39;num_trips&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+<span class="n">tot_tripdates_CH06</span> <span class="o">=</span> <span class="n">trips_by_date_CH06</span><span class="p">[</span><span class="s1">&#39;num_trips&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
+<span class="n">num_days_CH06</span> <span class="o">=</span> <span class="p">(</span><span class="n">trips_by_date_CH06</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">-</span> <span class="n">trips_by_date_CH06</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">min</span><span class="p">())</span><span class="o">.</span><span class="n">days</span> <span class="o">+</span> <span class="mi">1</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;The mean number of trips per day is </span><span class="si">{:.2f}</span><span class="s2">. The mean is based on </span><span class="si">{}</span><span class="s2"> tripdates.&quot;</span>
+      <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">mean_trips</span><span class="p">,</span> <span class="n">tot_tripdates_CH06</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;The beginning of the date range is </span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">trips_by_date_CH06</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">min</span><span class="p">()))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;The end of the date range is </span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">trips_by_date_CH06</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">max</span><span class="p">()))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;The are </span><span class="si">{}</span><span class="s2"> days in the date range.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">num_days_CH06</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+The mean number of trips per day is 416.34. The mean is based on 653 tripdates.
+The beginning of the date range is 2014-10-13.
+The end of the date range is 2016-08-31.
+The are 689 days in the date range.
+</pre></div></div>
+</div>
+<p>Notice that the mean uses a denominator of 653 even though there are 689 days in the date range of interest. What’s going on? I’m sure by now you’ve already figured out the issue - on a bunch of days (689 - 653 days to be exact), there were no bike trips out of Station CH-06. The <code class="docutils literal notranslate"><span class="pre">trips_by_date_CH06</span></code> dataframe has missing rows corresponding to these zero dates. By not including them, you will overestimate the average number of daily trips out of CH-06 (and underestimate measures of dispersion
+such as standard deviation). The denominator should have been 689, not 653. For low volume stations, this error could be quite substantial.</p>
+<section id="TAKE-AWAY-1:-You-must-account-for-“zero-days”-(i.e. dates-with-no-activity).">
+<h3>TAKE AWAY 1: You must account for “zero days” (i.e. dates with no activity).<a class="headerlink" href="#TAKE-AWAY-1:-You-must-account-for-“zero-days”-(i.e. dates-with-no-activity)." title="Permalink to this headline">¶</a></h3>
+<p>There’s another way that these zero days can affect the analysis. Let’s consider a different station. I’m going to create a small function in which we can pass in the station id and get the stats.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[96]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">get_daily_avg_trips_1</span><span class="p">(</span><span class="n">station_id</span><span class="p">):</span>
+    <span class="c1"># Group by tripdate in the trip dataframe</span>
+    <span class="n">grp_date</span> <span class="o">=</span> <span class="n">trip</span><span class="p">[(</span><span class="n">trip</span><span class="o">.</span><span class="n">from_station_id</span> <span class="o">==</span> <span class="n">station_id</span><span class="p">)]</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s1">&#39;tripdate&#39;</span><span class="p">])</span>
+
+    <span class="c1"># Compute number of trips by date and check out the result</span>
+    <span class="n">trips_by_date</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">grp_date</span><span class="o">.</span><span class="n">size</span><span class="p">(),</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;num_trips&#39;</span><span class="p">])</span>
+    <span class="n">trips_by_date</span><span class="p">[</span><span class="s1">&#39;weekday&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">trips_by_date</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">weekday</span><span class="p">())</span>
+
+    <span class="c1"># Compute the average</span>
+    <span class="n">mean_trips</span> <span class="o">=</span> <span class="n">trips_by_date</span><span class="p">[</span><span class="s1">&#39;num_trips&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+    <span class="n">tot_tripdates</span> <span class="o">=</span> <span class="n">trips_by_date</span><span class="p">[</span><span class="s1">&#39;num_trips&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
+    <span class="n">num_days</span> <span class="o">=</span> <span class="p">(</span><span class="n">trips_by_date</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">-</span> <span class="n">trips_by_date</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">min</span><span class="p">())</span><span class="o">.</span><span class="n">days</span> <span class="o">+</span> <span class="mi">1</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;The mean number of trips per day is </span><span class="si">{:.2f}</span><span class="s2">. The mean is based on </span><span class="si">{}</span><span class="s2"> tripdates.&quot;</span>
+          <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">mean_trips</span><span class="p">,</span> <span class="n">tot_tripdates</span><span class="p">))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;The beginning of the date range is </span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">trips_by_date</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">min</span><span class="p">()))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;The end of the date range is </span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">trips_by_date</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">max</span><span class="p">()))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;The are </span><span class="si">{}</span><span class="s2"> days in the date range.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">num_days</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">trips_by_date</span>
+</pre></div>
+</div>
+</div>
+<p>Let’s look at one of the low volume stations.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[97]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">trips_by_date_1</span> <span class="o">=</span> <span class="n">get_daily_avg_trips_1</span><span class="p">(</span><span class="s1">&#39;UW-01&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+The mean number of trips per day is 3.23. The mean is based on 233 tripdates.
+The beginning of the date range is 2014-10-14.
+The end of the date range is 2015-10-27.
+The are 379 days in the date range.
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[98]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">trips_by_date_1</span><span class="p">[</span><span class="s1">&#39;num_trips&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">describe</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[98]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+count    233.000000
+mean       3.227468
+std        2.221509
+min        1.000000
+25%        2.000000
+50%        2.000000
+75%        4.000000
+max       14.000000
+Name: num_trips, dtype: float64
+</pre></div></div>
+</div>
+<p>So, there were at least one trip out of UW-01 on 233 days between 2014-10-13 and 2016-08-31. But notice that there were only 379 days in the <code class="docutils literal notranslate"><span class="pre">trips_by_date</span></code> dataframe (compare the min and max dates with the previous examples). So, what should the denominator be for computing the average number of trips per day? Well, if our <em>analysis timeframe</em> is still 2014-10-13 to 2016-08-31, the denominator should be 689. Notice, that for UW-01, there were no trips after 2015-10-27. Likely, the station was
+closed at that time. The appropriate analysis timeframe depends on the context of the analysis. If we want to know the average trip volume during the period the station was open, then the denominator should be 379 (or, 380 if we interpret 2014-10-13 as being a date the station was open but had zero rides).</p>
+</section>
+<section id="TAKE-AWAY-2:-You-must-appropriately-specify-the-analysis-timeframe-and-not-simply-rely-on-using-earliest-and-latest-dates-seen-in-the-dataset.">
+<h3>TAKE AWAY 2: You must appropriately specify the analysis timeframe and not simply rely on using earliest and latest dates seen in the dataset.<a class="headerlink" href="#TAKE-AWAY-2:-You-must-appropriately-specify-the-analysis-timeframe-and-not-simply-rely-on-using-earliest-and-latest-dates-seen-in-the-dataset." title="Permalink to this headline">¶</a></h3>
+</section>
+</section>
+<section id="Accounting-for-zero-days-and-analysis-timeframe">
+<h2>Accounting for zero days and analysis timeframe<a class="headerlink" href="#Accounting-for-zero-days-and-analysis-timeframe" title="Permalink to this headline">¶</a></h2>
+<section id="Example-1---Full-dataset,-no-zero-days">
+<h3>Example 1 - Full dataset, no zero days<a class="headerlink" href="#Example-1---Full-dataset,-no-zero-days" title="Permalink to this headline">¶</a></h3>
+<p>To begin, let’s just compute the overall daily average number of bike trips for the time period 2014-10-13 and 2016-08-31. However, even though we know there was at least one trip on every date in that range, we won’t assume that to be true.</p>
+<p>Here’s the basic strategy we will use:</p>
+<ul class="simple">
+<li><p>Create a range of dates based on the start and end date of the time period of interest.</p></li>
+<li><p>Create an empty DataFrame using the range of dates as the index. For convenience, add weekday column based on date to facility day of week analysis.</p></li>
+<li><p>Let’s call this new DataFrame the “seeded” DataFrame</p></li>
+<li><p>Use groupby on the original trip DataFrame to compute number of trips by date and store result as DataFrame</p></li>
+<li><p>Merge the two DataFrames on their indexes (tripdate) but do a “left join”. Pandas <code class="docutils literal notranslate"><span class="pre">merge</span></code> function is perfect for this.</p></li>
+<li><p>If there are dates with no trips, they’ll have missing data in the new merged DataFrame.</p></li>
+<li><p>Update the missing values to 0 using the <code class="docutils literal notranslate"><span class="pre">fillna</span></code> function in pandas.</p></li>
+<li><p>Now you can compute overall mean number of trips per day. You could also compute means by day of week.</p></li>
+</ul>
+</section>
+<section id="Step-1:-Create-range-of-dates-based-on-analysis-timeframe">
+<h3>Step 1: Create range of dates based on analysis timeframe<a class="headerlink" href="#Step-1:-Create-range-of-dates-based-on-analysis-timeframe" title="Permalink to this headline">¶</a></h3>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[99]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create range of dates to use as an index</span>
+<span class="n">start</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">datetime</span><span class="p">(</span><span class="mi">2014</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">13</span><span class="p">)</span>
+<span class="n">end</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">datetime</span><span class="p">(</span><span class="mi">2016</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">31</span><span class="p">)</span>
+<span class="n">rng</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">date_range</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">)</span> <span class="c1"># pandas has handy date_range() function. It&#39;s very flexible and powerful.</span>
+<span class="n">rng</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[99]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+DatetimeIndex([&#39;2014-10-13&#39;, &#39;2014-10-14&#39;, &#39;2014-10-15&#39;, &#39;2014-10-16&#39;,
+               &#39;2014-10-17&#39;, &#39;2014-10-18&#39;, &#39;2014-10-19&#39;, &#39;2014-10-20&#39;,
+               &#39;2014-10-21&#39;, &#39;2014-10-22&#39;,
+               ...
+               &#39;2016-08-22&#39;, &#39;2016-08-23&#39;, &#39;2016-08-24&#39;, &#39;2016-08-25&#39;,
+               &#39;2016-08-26&#39;, &#39;2016-08-27&#39;, &#39;2016-08-28&#39;, &#39;2016-08-29&#39;,
+               &#39;2016-08-30&#39;, &#39;2016-08-31&#39;],
+              dtype=&#39;datetime64[ns]&#39;, length=689, freq=&#39;D&#39;)
+</pre></div></div>
+</div>
+</section>
+<section id="Step-2:-Create-an-empty-DataFrame-using-the-range-of-dates-as-the-index.">
+<h3>Step 2: Create an empty DataFrame using the range of dates as the index.<a class="headerlink" href="#Step-2:-Create-an-empty-DataFrame-using-the-range-of-dates-as-the-index." title="Permalink to this headline">¶</a></h3>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[100]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">trips_by_date_seeded</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="n">rng</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[101]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Add weekday column to new dataframe</span>
+<span class="n">trips_by_date_seeded</span><span class="p">[</span><span class="s1">&#39;weekday&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">trips_by_date_seeded</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">weekday</span><span class="p">())</span>
+<span class="n">trips_by_date_seeded</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[101]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>weekday</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>2014-10-13</th>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>2014-10-14</th>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>2014-10-15</th>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>2014-10-16</th>
+      <td>3</td>
+    </tr>
+    <tr>
+      <th>2014-10-17</th>
+      <td>4</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+</section>
+<section id="Step-3:-Use-groupby-on-the-original-trip-DataFrame-to-compute-number-of-trips-by-date">
+<h3>Step 3: Use groupby on the original trip DataFrame to compute number of trips by date<a class="headerlink" href="#Step-3:-Use-groupby-on-the-original-trip-DataFrame-to-compute-number-of-trips-by-date" title="Permalink to this headline">¶</a></h3>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[102]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create a Group by object using tripdate</span>
+<span class="n">grp_date</span> <span class="o">=</span> <span class="n">trip</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s1">&#39;tripdate&#39;</span><span class="p">])</span>
+
+<span class="c1"># Compute number of trips by date and check out the result</span>
+<span class="n">trips_by_date</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">grp_date</span><span class="o">.</span><span class="n">size</span><span class="p">(),</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;num_trips&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Step-4:-Merge-the-two-DataFrames-on-their-indexes-(tripdate)-but-do-a-“left-join”.">
+<h3>Step 4: Merge the two DataFrames on their indexes (tripdate) but do a “left join”.<a class="headerlink" href="#Step-4:-Merge-the-two-DataFrames-on-their-indexes-(tripdate)-but-do-a-“left-join”." title="Permalink to this headline">¶</a></h3>
+<p>Pandas <code class="docutils literal notranslate"><span class="pre">merge</span></code> function is perfect for this.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">left_index=True,</span> <span class="pre">right_index=True</span></code> are telling pandas to use those respective indexes as the joining columns. Check out the documentation for <code class="docutils literal notranslate"><span class="pre">merge()</span></code>.</p>
+<p><a class="reference external" href="http://pandas.pydata.org/pandas-docs/stable/merging.html#database-style-dataframe-joining-merging">http://pandas.pydata.org/pandas-docs/stable/merging.html#database-style-dataframe-joining-merging</a></p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[103]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Merge the two dataframes doing a left join (with seeded table on left)</span>
+<span class="n">trips_by_date_merged</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">trips_by_date_seeded</span><span class="p">,</span> <span class="n">trips_by_date</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s1">&#39;left&#39;</span><span class="p">,</span>
+      <span class="n">left_index</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">right_index</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">sort</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[104]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">trips_by_date_merged</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[104]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>weekday</th>
+      <th>num_trips</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>2014-10-13</th>
+      <td>0</td>
+      <td>818</td>
+    </tr>
+    <tr>
+      <th>2014-10-14</th>
+      <td>1</td>
+      <td>982</td>
+    </tr>
+    <tr>
+      <th>2014-10-15</th>
+      <td>2</td>
+      <td>626</td>
+    </tr>
+    <tr>
+      <th>2014-10-16</th>
+      <td>3</td>
+      <td>790</td>
+    </tr>
+    <tr>
+      <th>2014-10-17</th>
+      <td>4</td>
+      <td>588</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+</section>
+<section id="Step-5:-Replace-missing-values-with-zeroes-for-those-dates-with-no-trips">
+<h3>Step 5: Replace missing values with zeroes for those dates with no trips<a class="headerlink" href="#Step-5:-Replace-missing-values-with-zeroes-for-those-dates-with-no-trips" title="Permalink to this headline">¶</a></h3>
+<p>If there are dates with no trips, they’ll have missing data in the new merged DataFrame. Update the missing values to 0 using the <code class="docutils literal notranslate"><span class="pre">fillna</span></code> function in pandas.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[105]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Fill in any missing values with 0.</span>
+<span class="n">trips_by_date_merged</span><span class="p">[</span><span class="s1">&#39;num_trips&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">trips_by_date_merged</span><span class="p">[</span><span class="s1">&#39;num_trips&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Step-6:-Compute-statistics-of-interest">
+<h3>Step 6: Compute statistics of interest<a class="headerlink" href="#Step-6:-Compute-statistics-of-interest" title="Permalink to this headline">¶</a></h3>
+<p>Now we can safely compute means and other statistics of interest for the <code class="docutils literal notranslate"><span class="pre">num_trips</span></code> column.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[106]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">trips_by_date_merged</span><span class="p">[</span><span class="s1">&#39;num_trips&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">describe</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[106]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+count     689.000000
+mean      416.338171
+std       191.270584
+min        30.000000
+25%       272.000000
+50%       412.000000
+75%       547.000000
+max      1332.000000
+Name: num_trips, dtype: float64
+</pre></div></div>
+</div>
+<p>Of course, in this case the stats are the same as we’d have gotten just by doing the naive thing since we have no dates with zero trips.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[107]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">trips_by_date</span><span class="p">[</span><span class="s1">&#39;num_trips&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">describe</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[107]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+count     689.000000
+mean      416.338171
+std       191.270584
+min        30.000000
+25%       272.000000
+50%       412.000000
+75%       547.000000
+max      1332.000000
+Name: num_trips, dtype: float64
+</pre></div></div>
+</div>
+<p>Can even do by day of week.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[108]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">trips_by_date_merged</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s1">&#39;weekday&#39;</span><span class="p">])[</span><span class="s1">&#39;num_trips&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">describe</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[108]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>count</th>
+      <th>mean</th>
+      <th>std</th>
+      <th>min</th>
+      <th>25%</th>
+      <th>50%</th>
+      <th>75%</th>
+      <th>max</th>
+    </tr>
+    <tr>
+      <th>weekday</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>99.0</td>
+      <td>426.303030</td>
+      <td>175.566864</td>
+      <td>88.0</td>
+      <td>278.00</td>
+      <td>416.0</td>
+      <td>542.50</td>
+      <td>941.0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>99.0</td>
+      <td>433.191919</td>
+      <td>166.889776</td>
+      <td>150.0</td>
+      <td>317.50</td>
+      <td>422.0</td>
+      <td>562.00</td>
+      <td>982.0</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>99.0</td>
+      <td>433.747475</td>
+      <td>169.799001</td>
+      <td>118.0</td>
+      <td>300.00</td>
+      <td>412.0</td>
+      <td>577.50</td>
+      <td>880.0</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>98.0</td>
+      <td>448.428571</td>
+      <td>189.120100</td>
+      <td>96.0</td>
+      <td>300.50</td>
+      <td>437.5</td>
+      <td>567.75</td>
+      <td>1066.0</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>98.0</td>
+      <td>441.836735</td>
+      <td>179.083560</td>
+      <td>73.0</td>
+      <td>303.75</td>
+      <td>435.0</td>
+      <td>581.00</td>
+      <td>886.0</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>98.0</td>
+      <td>392.571429</td>
+      <td>228.069035</td>
+      <td>37.0</td>
+      <td>207.25</td>
+      <td>395.5</td>
+      <td>522.50</td>
+      <td>1058.0</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>98.0</td>
+      <td>337.836735</td>
+      <td>205.008156</td>
+      <td>30.0</td>
+      <td>160.00</td>
+      <td>346.5</td>
+      <td>460.50</td>
+      <td>1332.0</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+</section>
+<section id="Example-2---Average-number-of-rentals-per-day-at-individual-station">
+<h3>Example 2 - Average number of rentals per day at individual station<a class="headerlink" href="#Example-2---Average-number-of-rentals-per-day-at-individual-station" title="Permalink to this headline">¶</a></h3>
+<p>As we saw earlier, station CH-06 had 36 days in which there were no trips originating at this station. Againk we’ll create a small function to implement our strategy. Notice that the start and end dates for the analysis are input parameters to the function. Determining these dates is something that should be done before attempting to compute statistics. Again, the “right” analysis timeframe depends on the analysis being done.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[109]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">get_daily_avg_trips_2</span><span class="p">(</span><span class="n">station_id</span><span class="p">,</span> <span class="n">start_date</span><span class="p">,</span> <span class="n">end_date</span><span class="p">):</span>
+
+    <span class="c1"># Step 1: Create range of dates based on analysis timeframe</span>
+    <span class="n">rng</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">date_range</span><span class="p">(</span><span class="n">start_date</span><span class="p">,</span> <span class="n">end_date</span><span class="p">)</span>
+
+    <span class="c1"># Step 2: Create an empty DataFrame using the range of dates as the index.</span>
+    <span class="n">trips_by_date_seeded</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="n">rng</span><span class="p">)</span>
+    <span class="c1"># Add weekday column to new dataframe</span>
+    <span class="n">trips_by_date_seeded</span><span class="p">[</span><span class="s1">&#39;weekday&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">trips_by_date_seeded</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">weekday</span><span class="p">())</span>
+
+    <span class="c1"># Step 3: Use groupby on the original trip DataFrame to compute number of trips by date</span>
+    <span class="n">grp_date</span> <span class="o">=</span> <span class="n">trip</span><span class="p">[(</span><span class="n">trip</span><span class="o">.</span><span class="n">from_station_id</span> <span class="o">==</span> <span class="n">station_id</span><span class="p">)]</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s1">&#39;tripdate&#39;</span><span class="p">])</span>
+    <span class="c1"># Compute number of trips by date</span>
+    <span class="n">trips_by_date</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">grp_date</span><span class="o">.</span><span class="n">size</span><span class="p">(),</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;num_trips&#39;</span><span class="p">])</span>
+
+    <span class="c1"># Step 4: Merge the two DataFrames on their indexes (tripdate) but do a &quot;left join&quot;.</span>
+    <span class="n">trips_by_date_merged</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">trips_by_date_seeded</span><span class="p">,</span> <span class="n">trips_by_date</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s1">&#39;left&#39;</span><span class="p">,</span>
+      <span class="n">left_index</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">right_index</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">sort</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="c1"># Step 5: Replace missing values with zeroes for those dates with no trips</span>
+    <span class="n">trips_by_date_merged</span><span class="p">[</span><span class="s1">&#39;num_trips&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">trips_by_date_merged</span><span class="p">[</span><span class="s1">&#39;num_trips&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+
+    <span class="c1"># Compute the average</span>
+    <span class="n">mean_trips</span> <span class="o">=</span> <span class="n">trips_by_date_merged</span><span class="p">[</span><span class="s1">&#39;num_trips&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+    <span class="n">tot_tripdates</span> <span class="o">=</span> <span class="n">trips_by_date_merged</span><span class="p">[</span><span class="s1">&#39;num_trips&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
+    <span class="n">num_days</span> <span class="o">=</span> <span class="p">(</span><span class="n">trips_by_date_merged</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">-</span> <span class="n">trips_by_date_merged</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">min</span><span class="p">())</span><span class="o">.</span><span class="n">days</span> <span class="o">+</span> <span class="mi">1</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;The mean number of trips per day is </span><span class="si">{:.2f}</span><span class="s2">. The mean is based on </span><span class="si">{}</span><span class="s2"> tripdates.&quot;</span>
+          <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">mean_trips</span><span class="p">,</span> <span class="n">tot_tripdates</span><span class="p">))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;The beginning of the date range is </span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">trips_by_date_merged</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">min</span><span class="p">()))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;The end of the date range is </span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">trips_by_date_merged</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">max</span><span class="p">()))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;The are </span><span class="si">{}</span><span class="s2"> days in the date range.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">num_days</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">trips_by_date_merged</span>
+</pre></div>
+</div>
+</div>
+<p>Now let’s compute statistics using the naive approach (<code class="docutils literal notranslate"><span class="pre">get_daily_avg_trips_1</span></code>) and the approach which takes zero days and the analysis timeframe into account (<code class="docutils literal notranslate"><span class="pre">get_daily_avg_trips_2</span></code>). We’ll do it for Station CH-06.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[110]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">station</span> <span class="o">=</span> <span class="s1">&#39;CH-06&#39;</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[111]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">trips_by_date_1</span> <span class="o">=</span> <span class="n">get_daily_avg_trips_1</span><span class="p">(</span><span class="n">station</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+The mean number of trips per day is 5.88. The mean is based on 653 tripdates.
+The beginning of the date range is 2014-10-13.
+The end of the date range is 2016-08-31.
+The are 689 days in the date range.
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[112]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">start</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">datetime</span><span class="p">(</span><span class="mi">2014</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">13</span><span class="p">)</span>
+<span class="n">end</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">datetime</span><span class="p">(</span><span class="mi">2016</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">31</span><span class="p">)</span>
+<span class="n">trips_by_date_2</span> <span class="o">=</span> <span class="n">get_daily_avg_trips_2</span><span class="p">(</span><span class="n">station</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+The mean number of trips per day is 5.57. The mean is based on 689 tripdates.
+The beginning of the date range is 2014-10-13 00:00:00.
+The end of the date range is 2016-08-31 00:00:00.
+The are 689 days in the date range.
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[113]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">trips_by_date_1</span><span class="o">.</span><span class="n">num_trips</span><span class="o">.</span><span class="n">describe</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[113]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+count    653.000000
+mean       5.875957
+std        3.362768
+min        1.000000
+25%        4.000000
+50%        6.000000
+75%        8.000000
+max       26.000000
+Name: num_trips, dtype: float64
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[114]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">trips_by_date_2</span><span class="o">.</span><span class="n">num_trips</span><span class="o">.</span><span class="n">describe</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[114]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+count    689.000000
+mean       5.568940
+std        3.525442
+min        0.000000
+25%        3.000000
+50%        5.000000
+75%        8.000000
+max       26.000000
+Name: num_trips, dtype: float64
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[115]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">trips_by_date_1</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s1">&#39;weekday&#39;</span><span class="p">])[</span><span class="s1">&#39;num_trips&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">describe</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[115]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>count</th>
+      <th>mean</th>
+      <th>std</th>
+      <th>min</th>
+      <th>25%</th>
+      <th>50%</th>
+      <th>75%</th>
+      <th>max</th>
+    </tr>
+    <tr>
+      <th>weekday</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>97.0</td>
+      <td>6.051546</td>
+      <td>2.916802</td>
+      <td>1.0</td>
+      <td>4.0</td>
+      <td>6.0</td>
+      <td>8.00</td>
+      <td>16.0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>94.0</td>
+      <td>6.425532</td>
+      <td>3.450072</td>
+      <td>2.0</td>
+      <td>5.0</td>
+      <td>6.0</td>
+      <td>8.00</td>
+      <td>26.0</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>95.0</td>
+      <td>6.357895</td>
+      <td>2.828110</td>
+      <td>1.0</td>
+      <td>4.0</td>
+      <td>6.0</td>
+      <td>8.00</td>
+      <td>14.0</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>94.0</td>
+      <td>6.829787</td>
+      <td>3.157644</td>
+      <td>1.0</td>
+      <td>5.0</td>
+      <td>6.0</td>
+      <td>8.00</td>
+      <td>18.0</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>95.0</td>
+      <td>6.357895</td>
+      <td>3.401864</td>
+      <td>1.0</td>
+      <td>4.0</td>
+      <td>6.0</td>
+      <td>8.00</td>
+      <td>18.0</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>88.0</td>
+      <td>4.738636</td>
+      <td>3.621438</td>
+      <td>1.0</td>
+      <td>2.0</td>
+      <td>4.0</td>
+      <td>6.25</td>
+      <td>16.0</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>90.0</td>
+      <td>4.211111</td>
+      <td>3.380361</td>
+      <td>1.0</td>
+      <td>2.0</td>
+      <td>3.5</td>
+      <td>5.75</td>
+      <td>22.0</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[116]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">trips_by_date_2</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s1">&#39;weekday&#39;</span><span class="p">])[</span><span class="s1">&#39;num_trips&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">describe</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[116]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>count</th>
+      <th>mean</th>
+      <th>std</th>
+      <th>min</th>
+      <th>25%</th>
+      <th>50%</th>
+      <th>75%</th>
+      <th>max</th>
+    </tr>
+    <tr>
+      <th>weekday</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>99.0</td>
+      <td>5.929293</td>
+      <td>3.011043</td>
+      <td>0.0</td>
+      <td>4.0</td>
+      <td>6.0</td>
+      <td>8.0</td>
+      <td>16.0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>99.0</td>
+      <td>6.101010</td>
+      <td>3.646343</td>
+      <td>0.0</td>
+      <td>4.0</td>
+      <td>6.0</td>
+      <td>8.0</td>
+      <td>26.0</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>99.0</td>
+      <td>6.101010</td>
+      <td>3.042203</td>
+      <td>0.0</td>
+      <td>4.0</td>
+      <td>6.0</td>
+      <td>8.0</td>
+      <td>14.0</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>98.0</td>
+      <td>6.551020</td>
+      <td>3.377068</td>
+      <td>0.0</td>
+      <td>5.0</td>
+      <td>6.0</td>
+      <td>8.0</td>
+      <td>18.0</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>98.0</td>
+      <td>6.163265</td>
+      <td>3.525149</td>
+      <td>0.0</td>
+      <td>4.0</td>
+      <td>6.0</td>
+      <td>8.0</td>
+      <td>18.0</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>98.0</td>
+      <td>4.255102</td>
+      <td>3.720412</td>
+      <td>0.0</td>
+      <td>2.0</td>
+      <td>3.0</td>
+      <td>6.0</td>
+      <td>16.0</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>98.0</td>
+      <td>3.867347</td>
+      <td>3.439125</td>
+      <td>0.0</td>
+      <td>2.0</td>
+      <td>3.0</td>
+      <td>5.0</td>
+      <td>22.0</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<p>Just for fun, let’s plot the number of trips by date so we can actually see the zero days and see that the station appears to have been open for the entire analysis period. Such a plot would be part of the process of determining the analysis timeframe.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[119]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%</span><span class="k">matplotlib</span> inline
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[122]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">trips_by_date_2</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="s1">&#39;num_trips&#39;</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/blog_daily_averages_cycleshare_58_0.png" src="../../_images/blog_daily_averages_cycleshare_58_0.png" />
+</div>
+</div>
+<p>In this particular case, differences in computed stats, while not huge, are certainly present. Taking zero days into account along with carefully specifying the analysis period of interest are both important in computing temporal statistics such averages and percentiles of number of trips per day.</p>
+<p>In Part 2 of this post, we’ll extend this to cases in which we might want to group by an additional field (e.g. station_id) and see how this problem is just one part of the general problem of doing occupancy analysis based on transaction data. We’ll see how the <a class="reference external" href="https://github.com/misken/hillmaker">hillmaker</a> package can make these types of analyses easier.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
+</section>
+</section>
+</section>
+
+<div class="section">
+    
+
+<div class="section">
+  <span style="float: left">
+     Previous:
+    
+    <a href="../otbirders_1_ebirdapi_python_1/">
+       Wednesday OT Birders - Using the ebird API, Python, and R to analyze data for our birding group
+    </a>
+    
+  </span>
+  <span>&nbsp;</span>
+  <span style="float: right">
+     Next: 
+    <a href="../daily_averages_cycleshare_part2/">
+      Computing daily averages from transaction data - Part 2 (using pandas and some R magic) 
+    </a>
+    
+  </span>
+</div>
+  
+</div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../">misken</a></h1>
+
+
+
+
+
+
+
+
+  
+<h2>
+   
+  17 July 2018 
+</h2>
+
+<ul>
+   
+<li id="author">
+  <span
+    >Author:</span
+  >
+   
+  <a href="../author/misken/">misken</a>  
+</li>
+    
+<li id="tags">
+  <span
+    >Tags: </span
+  >
+   
+  <a href="../tag/python/">python</a>   
+  <a href="../tag/occupancy-analysis/">occupancy analysis</a>   
+  <a href="../tag/pandas/">pandas</a>  
+</li>
+ 
+</ul>
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../about/">About misken</a></li>
+</ul>
+
+
+<h3>
+  <a href="../">Recent Posts</a>
+</h3>
+<ul>
+   
+  <li>
+    <a href="../use_jupyter_conda_envs/"
+      >03 April - Using different conda environments with Jupyter Lab</a
+    >
+  </li>
+  
+  <li>
+    <a href="../hello_world/"
+      >02 April - Hello world from ablog blogging with JupyterLab</a
+    >
+  </li>
+  
+  <li>
+    <a href="../first-post/"
+      >01 April - First Post at new blogging site</a
+    >
+  </li>
+  
+  <li>
+    <a href="../pip_with_conda_local_dev/"
+      >15 March - Using pip with conda for local development projects</a
+    >
+  </li>
+  
+  <li>
+    <a href="../what_if_4_project_packaging/"
+      >11 March - Excel “what if?” analysis with Python - Part 4: Project structure and packaging</a
+    >
+  </li>
+  
+</ul>
+
+<h3><a href="../tag/">Tags</a></h3>
+<style type="text/css">
+  ul.ablog-cloud {
+    list-style: none;
+    overflow: auto;
+  }
+  ul.ablog-cloud li {
+    float: left;
+    height: 20pt;
+    line-height: 18pt;
+    margin-right: 5px;
+  }
+  ul.ablog-cloud a {
+    text-decoration: none;
+    vertical-align: middle;
+  }
+  li.ablog-cloud-1 {
+    font-size: 80%;
+  }
+  li.ablog-cloud-2 {
+    font-size: 95%;
+  }
+  li.ablog-cloud-3 {
+    font-size: 110%;
+  }
+  li.ablog-cloud-4 {
+    font-size: 125%;
+  }
+  li.ablog-cloud-5 {
+    font-size: 140%;
+  }
+</style>
+<ul class="ablog-cloud">
+   
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/github/">GitHub</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-2">
+    <a href="../tag/r/">R</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/ablog/">ablog</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/bikeshare/">bikeshare</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/birding/">birding</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/conda/">conda</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/datetime/">datetime</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/dplyr/">dplyr</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/ebird/">ebird</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/ecology/">ecology</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-2">
+    <a href="../tag/excel/">excel</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/ggplot2/">ggplot2</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/git/">git</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/hillmaker/">hillmaker</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-2">
+    <a href="../tag/jupyter/">jupyter</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/occupancy-analysis/">occupancy analysis</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/pandas/">pandas</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-5">
+    <a href="../tag/python/">python</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/sphinx/">sphinx</a>
+  </li>
+   
+</ul>
+
+<h3>
+  <a href="../archive/">Archives</a>
+</h3>
+<ul>
+   
+  <li>
+    <a href="../2022/">2022 (4)</a>
+  </li>
+    
+  <li>
+    <a href="../2021/">2021 (4)</a>
+  </li>
+    
+  <li>
+    <a href="../2020/">2020 (2)</a>
+  </li>
+    
+  <li>
+    <a href="../2019/">2019 (7)</a>
+  </li>
+    
+  <li>
+    <a href="../2018/">2018 (2)</a>
+  </li>
+    
+  <li>
+    <a href="../2016/">2016 (1)</a>
+  </li>
+    
+  <li>
+    <a href="../2014/">2014 (1)</a>
+  </li>
+   
+</ul>
+
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search/" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2022, misken.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.3.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../../_sources/blog/daily_averages_cycleshare.ipynb.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

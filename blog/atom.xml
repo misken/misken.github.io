@@ -2,10 +2,118 @@
 <feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en">
   <id>https://misken.github.io/</id>
   <title>Bits of analytics</title>
-  <updated>2022-04-03T03:17:22.351713+00:00</updated>
+  <updated>2022-04-03T14:48:41.951503+00:00</updated>
   <link href="https://misken.github.io/"/>
   <link href="https://misken.github.io/blog/atom.xml" rel="self"/>
   <generator uri="https://ablog.readthedocs.org/" version="0.10.23">ABlog</generator>
+  <entry>
+    <id>https://misken.github.io/blog/datetime_exploring/</id>
+    <title>Exploring dates and times in Python</title>
+    <updated>2014-06-25T00:00:00-04:00</updated>
+    <author>
+      <name>misken</name>
+    </author>
+    <content type="html">&lt;div class="ablog-post-excerpt docutils container"&gt;
+&lt;p&gt;Fun with dates and times in Python&lt;/p&gt;
+&lt;/div&gt;
+</content>
+    <link href="https://misken.github.io/blog/datetime_exploring/" rel="alternate"/>
+    <summary>Fun with dates and times in Python</summary>
+    <category term="python" label="python"/>
+    <category term="datetime" label="datetime"/>
+    <published>2014-06-25T00:00:00-04:00</published>
+  </entry>
+  <entry>
+    <id>https://misken.github.io/blog/otbirders_1_ebirdapi_python_1/</id>
+    <title>Wednesday OT Birders - Using the ebird API, Python, and R to analyze data for our birding group</title>
+    <updated>2016-04-04T00:00:00-04:00</updated>
+    <author>
+      <name>misken</name>
+    </author>
+    <content type="html">&lt;div class="ablog-post-excerpt docutils container"&gt;
+&lt;p&gt;Using the eBird API from Python, we downloaded birding lists submitted by our Wednesday morning birding group. R was then used to create some basic plots showing the top species sighted each year. More analysis to follow.&lt;/p&gt;
+&lt;/div&gt;
+</content>
+    <link href="https://misken.github.io/blog/otbirders_1_ebirdapi_python_1/" rel="alternate"/>
+    <summary>Using the eBird API from Python, we downloaded birding lists submitted by our Wednesday morning birding group. R was then used to create some basic plots showing the top species sighted each year. More analysis to follow.</summary>
+    <category term="R" label="R"/>
+    <category term="python" label="python"/>
+    <category term="birding" label="birding"/>
+    <category term="dplyr" label="dplyr"/>
+    <category term="ggplot2" label="ggplot2"/>
+    <category term="ebird" label="ebird"/>
+    <published>2016-04-04T00:00:00-04:00</published>
+  </entry>
+  <entry>
+    <id>https://misken.github.io/blog/daily_averages_cycleshare/</id>
+    <title>Computing daily averages from transaction data using pandas can be tricky - Part 1</title>
+    <updated>2018-07-17T00:00:00-04:00</updated>
+    <author>
+      <name>misken</name>
+    </author>
+    <content type="html">&lt;div class="ablog-post-excerpt docutils container"&gt;
+&lt;p&gt;Our goal is to compute statistics such as the average number of bikes rented per day in the Pronto CycleShare dataset, both overall and for individual stations. Seems easy. We’ll see.&lt;/p&gt;
+&lt;/div&gt;
+</content>
+    <link href="https://misken.github.io/blog/daily_averages_cycleshare/" rel="alternate"/>
+    <summary>Our goal is to compute statistics such as the average number of bikes rented per day in the Pronto CycleShare dataset, both overall and for individual stations. Seems easy. We’ll see.</summary>
+    <category term="python" label="python"/>
+    <category term="occupancyanalysis" label="occupancy analysis"/>
+    <category term="pandas" label="pandas"/>
+    <published>2018-07-17T00:00:00-04:00</published>
+  </entry>
+  <entry>
+    <id>https://misken.github.io/blog/daily_averages_cycleshare_part2/</id>
+    <title>Computing daily averages from transaction data - Part 2 (using pandas and some R magic)</title>
+    <updated>2018-07-18T00:00:00-04:00</updated>
+    <author>
+      <name>misken</name>
+    </author>
+    <content type="html">&lt;div class="ablog-post-excerpt docutils container"&gt;
+&lt;p&gt;In Part 2 of this post, we’ll extend this to cases in which we might want to group by an additional field (e.g. station_id for the bike share example) and see how this problem is just one part of the general problem of doing occupancy analysis based on transaction data.&lt;/p&gt;
+&lt;/div&gt;
+</content>
+    <link href="https://misken.github.io/blog/daily_averages_cycleshare_part2/" rel="alternate"/>
+    <summary>In Part 2 of this post, we’ll extend this to cases in which we might want to group by an additional field (e.g. station_id for the bike share example) and see how this problem is just one part of the general problem of doing occupancy analysis based on transaction data.</summary>
+    <category term="python" label="python"/>
+    <category term="occupancyanalysis" label="occupancy analysis"/>
+    <category term="pandas" label="pandas"/>
+    <published>2018-07-18T00:00:00-04:00</published>
+  </entry>
+  <entry>
+    <id>https://misken.github.io/blog/basic_usage_cycleshare/</id>
+    <title>Analyzing bike usage by time of day and day of week</title>
+    <updated>2019-01-01T00:00:00-05:00</updated>
+    <author>
+      <name>misken</name>
+    </author>
+    <content type="html">&lt;div class="ablog-post-excerpt docutils container"&gt;
+&lt;p&gt;Using hillmaker for datetime analysis of cycle share data&lt;/p&gt;
+&lt;/div&gt;
+</content>
+    <link href="https://misken.github.io/blog/basic_usage_cycleshare/" rel="alternate"/>
+    <summary>Using hillmaker for datetime analysis of cycle share data</summary>
+    <category term="jupyter" label="jupyter"/>
+    <category term="ablog" label="ablog"/>
+    <published>2019-01-01T00:00:00-05:00</published>
+  </entry>
+  <entry>
+    <id>https://misken.github.io/blog/logmetrics/</id>
+    <title>Firewood math and metrics</title>
+    <updated>2019-01-01T00:00:00-05:00</updated>
+    <author>
+      <name>misken</name>
+    </author>
+    <content type="html">&lt;div class="ablog-post-excerpt docutils container"&gt;
+&lt;p&gt;Firewood metrics and simulating firewood use&lt;/p&gt;
+&lt;/div&gt;
+</content>
+    <link href="https://misken.github.io/blog/logmetrics/" rel="alternate"/>
+    <summary>Firewood metrics and simulating firewood use</summary>
+    <category term="jupyter" label="jupyter"/>
+    <category term="ablog" label="ablog"/>
+    <published>2019-01-01T00:00:00-05:00</published>
+  </entry>
   <entry>
     <id>https://misken.github.io/blog/eda_post_balance_func_sfcs/</id>
     <title>Use R to explore station balance in bike share systems - and learn a little dplyr programming</title>
@@ -233,23 +341,6 @@
     <published>2022-04-01T00:00:00-04:00</published>
   </entry>
   <entry>
-    <id>https://misken.github.io/blog/datetime_exploring/</id>
-    <title>Exploring dates and times in Python</title>
-    <updated>2022-04-02T00:00:00-04:00</updated>
-    <author>
-      <name>misken</name>
-    </author>
-    <content type="html">&lt;div class="ablog-post-excerpt docutils container"&gt;
-&lt;p&gt;Fun with dates and times in Python&lt;/p&gt;
-&lt;/div&gt;
-</content>
-    <link href="https://misken.github.io/blog/datetime_exploring/" rel="alternate"/>
-    <summary>Fun with dates and times in Python</summary>
-    <category term="python" label="python"/>
-    <category term="datetime" label="datetime"/>
-    <published>2022-04-02T00:00:00-04:00</published>
-  </entry>
-  <entry>
     <id>https://misken.github.io/blog/hello_world/</id>
     <title>Hello world from ablog blogging with JupyterLab</title>
     <updated>2022-04-02T00:00:00-04:00</updated>
@@ -265,5 +356,22 @@
     <category term="jupyter" label="jupyter"/>
     <category term="ablog" label="ablog"/>
     <published>2022-04-02T00:00:00-04:00</published>
+  </entry>
+  <entry>
+    <id>https://misken.github.io/blog/use_jupyter_conda_envs/</id>
+    <title>Using different conda environments with Jupyter Lab</title>
+    <updated>2022-04-03T00:00:00-04:00</updated>
+    <author>
+      <name>misken</name>
+    </author>
+    <content type="html">&lt;div class="ablog-post-excerpt docutils container"&gt;
+&lt;p&gt;Run Jupyter lab from base and toggle between conda envs&lt;/p&gt;
+&lt;/div&gt;
+</content>
+    <link href="https://misken.github.io/blog/use_jupyter_conda_envs/" rel="alternate"/>
+    <summary>Run Jupyter lab from base and toggle between conda envs</summary>
+    <category term="jupyter" label="jupyter"/>
+    <category term="conda" label="conda"/>
+    <published>2022-04-03T00:00:00-04:00</published>
   </entry>
 </feed>
