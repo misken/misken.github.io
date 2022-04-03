@@ -1,0 +1,679 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>Wednesday Birders - 2018 stats and historical analysis using R &#8212; misken 0,1,0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css" />
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <link rel="author" title="About these documents" href="../../about/" />
+    <link rel="index" title="Index" href="../../genindex/" />
+    <link rel="search" title="Search" href="../../search/" /> 
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+ 
+<link
+  rel="alternate"
+  type="application/atom+xml"
+  href="../../blog/atom.xml"
+  title="Bits of analytics"
+/>
+ 
+<style type="text/css">
+  ul.ablog-archive {
+    list-style: none;
+    overflow: auto;
+    margin-left: 0px;
+  }
+  ul.ablog-archive li {
+    float: left;
+    margin-right: 5px;
+    font-size: 80%;
+  }
+  ul.postlist a {
+    font-style: italic;
+  }
+  ul.postlist-style-disc {
+    list-style-type: disc;
+  }
+  ul.postlist-style-none {
+    list-style-type: none;
+  }
+  ul.postlist-style-circle {
+    list-style-type: circle;
+  }
+</style>
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+             <section id="wednesday-birders-2018-stats-and-historical-analysis-using-r">
+<h1>Wednesday Birders - 2018 stats and historical analysis using R<a class="headerlink" href="#wednesday-birders-2018-stats-and-historical-analysis-using-r" title="Permalink to this headline">¶</a></h1>
+<p>Using the eBird API from Python, we downloaded birding lists submitted by our Wednesday morning birding group. R was then used to produce various plots relating to counts of birds sighted and frequency of list appearance, by species.</p>
+<section id="the-wednesday-birders">
+<h2>The Wednesday Birders<a class="headerlink" href="#the-wednesday-birders" title="Permalink to this headline">¶</a></h2>
+<p>In a <a class="reference external" href="http://hselab.org/wednesday-ot-birders-using-the-ebird-api-python-and-r-to-analyze-data-for-our-birding-group.html">previous post</a> I described how I used a mix of Python and R to acquire, clean, and analyze <a class="reference external" href="https://ebird.org/home">eBird</a> data from our birding group’s weekly walks. In this post, I’ll add plots for 2018 and do a little more analysis.</p>
+<p>To summarize the basic approach (described in the first post), we:</p>
+<ul class="simple">
+<li><p>used the eBird API (2.0) with Python to download data from our bird lists into a pandas dataframe and then exported to csv file,</p></li>
+<li><p>used R to clean up the data to make sure we were just using our Wednesday Birders lists for the analysis,</p></li>
+<li><p>used the R packages dplyr and ggplot2 to summarize and make plots of
+species counts by year.</p></li>
+</ul>
+</section>
+<section id="data-prep">
+<h2>Data prep<a class="headerlink" href="#data-prep" title="Permalink to this headline">¶</a></h2>
+<p>All of the data prep and analysis is done in R. We’ll need a few libraries:</p>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="nf">library</span><span class="p">(</span><span class="n">dplyr</span><span class="p">)</span>
+<span class="nf">library</span><span class="p">(</span><span class="n">ggplot2</span><span class="p">)</span>
+<span class="nf">library</span><span class="p">(</span><span class="n">lubridate</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Before diving into analysis and plots, a little data prep was needed:</p>
+<ul class="simple">
+<li><p>downloaded data from 2018 and converted the JSON to csv (used appropriately modified Python script detailed in first post)</p></li>
+<li><p>read CSV file into an R dataframe</p></li>
+<li><p>convert datetime fields to POSIXct</p></li>
+<li><p>include only the lists from our Wednesday morning walks</p></li>
+<li><p>combined the 2018 data with the data from 2015-1017 and saved as an RDS file</p></li>
+</ul>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="n">obs_df</span> <span class="o">&lt;-</span> <span class="nf">readRDS</span><span class="p">(</span><span class="n">file</span> <span class="o">=</span> <span class="s">&quot;./data/observations.rds&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>There are a bunch of fields in the observation records from eBird. Here’s
+just a sample focusing on the stuff we need. Each row in the
+data frame corresponds to an individual species count on a certain date
+in a certain location.</p>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="n">obs_df</span> <span class="o">&lt;-</span> <span class="n">obs_df</span> <span class="o">%&gt;%</span> 
+  <span class="nf">select</span><span class="p">(</span><span class="n">checklistId</span><span class="p">,</span> <span class="n">obsDt</span><span class="p">,</span> <span class="n">locName</span><span class="p">,</span> <span class="n">comName</span><span class="p">,</span> <span class="n">sciName</span><span class="p">,</span> <span class="n">howMany</span><span class="p">,</span> <span class="n">subId</span><span class="p">)</span>
+
+<span class="nf">head</span><span class="p">(</span><span class="n">obs_df</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">##   checklistId      obsDt             locName                comName</span>
+<span class="c1">## 1     CL24105 2015-03-18 Charles Ilsley Park           Canada Goose</span>
+<span class="c1">## 2     CL24105 2015-03-18 Charles Ilsley Park         Turkey Vulture</span>
+<span class="c1">## 3     CL24105 2015-03-18 Charles Ilsley Park        Red-tailed Hawk</span>
+<span class="c1">## 4     CL24105 2015-03-18 Charles Ilsley Park         Sandhill Crane</span>
+<span class="c1">## 5     CL24105 2015-03-18 Charles Ilsley Park Red-bellied Woodpecker</span>
+<span class="c1">## 6     CL24105 2015-03-18 Charles Ilsley Park       Downy Woodpecker</span>
+<span class="c1">##                sciName howMany     subId</span>
+<span class="c1">## 1    Branta canadensis       2 S22414352</span>
+<span class="c1">## 2       Cathartes aura       1 S22414352</span>
+<span class="c1">## 3    Buteo jamaicensis       2 S22414352</span>
+<span class="c1">## 4  Antigone canadensis       2 S22414352</span>
+<span class="c1">## 5 Melanerpes carolinus       1 S22414352</span>
+<span class="c1">## 6   Picoides pubescens       1 S22414352</span>
+</pre></div>
+</div>
+</section>
+<section id="plots-of-species-counts">
+<h2>Plots of Species Counts<a class="headerlink" href="#plots-of-species-counts" title="Permalink to this headline">¶</a></h2>
+<p>How many birds of each species have we seen? How frequently are each species
+seen?</p>
+<p>Let’s start with simple bar charts:</p>
+<ul class="simple">
+<li><p>one bar per species, one year per graph,</p></li>
+<li><p>bar length is number of birds seen,</p></li>
+<li><p>color of bar is related to percentage of lists on which that species seen,</p></li>
+<li><p>number at end of bar is percentage of lists on which that species seen.</p></li>
+</ul>
+</section>
+<section id="creating-plots-for-2018">
+<h2>Creating plots for 2018<a class="headerlink" href="#creating-plots-for-2018" title="Permalink to this headline">¶</a></h2>
+<p>The plots are easy to create from a dataframe that looks like this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">##                    comName birding_year num_lists tot_birds totlists</span>
+<span class="c1">## 1           American Robin         2018        31       431       41</span>
+<span class="c1">## 2             Canada Goose         2018        21       211       41</span>
+<span class="c1">## 3       American Goldfinch         2018        30       204       41</span>
+<span class="c1">## 4     Red-winged Blackbird         2018        30       200       41</span>
+<span class="c1">## 5            Mourning Dove         2018        30       134       41</span>
+<span class="c1">## 6                 Blue Jay         2018        35       125       41</span>
+<span class="c1">## 7            Cedar Waxwing         2018        16       116       41</span>
+<span class="c1">## 8   Black-capped Chickadee         2018        36       107       41</span>
+<span class="c1">## 9         Eastern Bluebird         2018        20        90       41</span>
+<span class="c1">## 10       European Starling         2018        13        87       41</span>
+<span class="c1">## 11           American Crow         2018        30        86       41</span>
+<span class="c1">## 12            Song Sparrow         2018        26        81       41</span>
+<span class="c1">## 13       Northern Cardinal         2018        34        72       41</span>
+<span class="c1">## 14            Lesser Scaup         2018         1        50       41</span>
+<span class="c1">## 15                 Redhead         2018         1        50       41</span>
+<span class="c1">## 16          Turkey Vulture         2018        16        50       41</span>
+<span class="c1">## 17                 Mallard         2018        17        49       41</span>
+<span class="c1">## 18         Dark-eyed Junco         2018        12        41       41</span>
+<span class="c1">## 19         Tufted Titmouse         2018        23        41       41</span>
+<span class="c1">## 20        Ring-billed Gull         2018        10        40       41</span>
+<span class="c1">## 21 White-breasted Nuthatch         2018        23        40       41</span>
+<span class="c1">## 22          Common Grackle         2018        15        38       41</span>
+<span class="c1">## 23           Field Sparrow         2018        15        37       41</span>
+<span class="c1">## 24             Rock Pigeon         2018         6        37       41</span>
+<span class="c1">## 25            Barn Swallow         2018        12        36       41</span>
+<span class="c1">## 26        Northern Flicker         2018        21        36       41</span>
+<span class="c1">## 27  Red-bellied Woodpecker         2018        26        36       41</span>
+<span class="c1">## 28            Tree Swallow         2018        11        35       41</span>
+<span class="c1">## 29    Brown-headed Cowbird         2018        12        33       41</span>
+<span class="c1">## 30        Downy Woodpecker         2018        22        32       41</span>
+<span class="c1">##      pctlists</span>
+<span class="c1">## 1  0.75609756</span>
+<span class="c1">## 2  0.51219512</span>
+<span class="c1">## 3  0.73170732</span>
+<span class="c1">## 4  0.73170732</span>
+<span class="c1">## 5  0.73170732</span>
+<span class="c1">## 6  0.85365854</span>
+<span class="c1">## 7  0.39024390</span>
+<span class="c1">## 8  0.87804878</span>
+<span class="c1">## 9  0.48780488</span>
+<span class="c1">## 10 0.31707317</span>
+<span class="c1">## 11 0.73170732</span>
+<span class="c1">## 12 0.63414634</span>
+<span class="c1">## 13 0.82926829</span>
+<span class="c1">## 14 0.02439024</span>
+<span class="c1">## 15 0.02439024</span>
+<span class="c1">## 16 0.39024390</span>
+<span class="c1">## 17 0.41463415</span>
+<span class="c1">## 18 0.29268293</span>
+<span class="c1">## 19 0.56097561</span>
+<span class="c1">## 20 0.24390244</span>
+<span class="c1">## 21 0.56097561</span>
+<span class="c1">## 22 0.36585366</span>
+<span class="c1">## 23 0.36585366</span>
+<span class="c1">## 24 0.14634146</span>
+<span class="c1">## 25 0.29268293</span>
+<span class="c1">## 26 0.51219512</span>
+<span class="c1">## 27 0.63414634</span>
+<span class="c1">## 28 0.26829268</span>
+<span class="c1">## 29 0.29268293</span>
+<span class="c1">## 30 0.53658537</span>
+</pre></div>
+</div>
+<p>Here’s how you can make such a data frame.</p>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create num species by list df</span>
+<span class="n">numsp_bylist</span> <span class="o">&lt;-</span> <span class="n">obs_df</span> <span class="o">%&gt;%</span>
+  <span class="nf">group_by</span><span class="p">(</span><span class="n">year</span><span class="o">=</span><span class="nf">year</span><span class="p">(</span><span class="n">obsDt</span><span class="p">),</span> <span class="n">obsDt</span><span class="p">,</span> <span class="n">locName</span><span class="p">,</span> <span class="n">subId</span><span class="p">)</span> <span class="o">%&gt;%</span>
+  <span class="nf">summarize</span><span class="p">(</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="nf">n</span><span class="p">(),</span>
+    <span class="n">totbirds</span> <span class="o">=</span> <span class="nf">sum</span><span class="p">(</span><span class="n">howMany</span><span class="p">)</span>
+  <span class="p">)</span> <span class="o">%&gt;%</span> 
+  <span class="nf">arrange</span><span class="p">(</span><span class="n">year</span><span class="p">,</span> <span class="n">subId</span><span class="p">)</span>
+
+<span class="c1"># Using numsp_bylist, create num lists by date</span>
+<span class="n">numlists_bydt</span> <span class="o">&lt;-</span> <span class="n">numsp_bylist</span> <span class="o">%&gt;%</span>
+  <span class="nf">group_by</span><span class="p">(</span><span class="n">obsDt</span><span class="p">)</span> <span class="o">%&gt;%</span>
+  <span class="nf">summarise</span><span class="p">(</span>
+    <span class="n">numlists</span> <span class="o">=</span> <span class="nf">n</span><span class="p">()</span>
+  <span class="p">)</span> <span class="o">%&gt;%</span>
+  <span class="nf">filter</span><span class="p">(</span><span class="n">numlists</span> <span class="o">&gt;=</span> <span class="m">1</span><span class="p">)</span> <span class="o">%&gt;%</span>
+  <span class="nf">arrange</span><span class="p">(</span><span class="n">obsDt</span><span class="p">)</span>
+
+<span class="c1"># Usings numlists_bydt, create num lists by year</span>
+<span class="n">numlists_byyear</span> <span class="o">&lt;-</span> <span class="n">numlists_bydt</span> <span class="o">%&gt;%</span>
+  <span class="nf">group_by</span><span class="p">(</span><span class="n">birding_year</span><span class="o">=</span><span class="nf">year</span><span class="p">(</span><span class="n">obsDt</span><span class="p">))</span> <span class="o">%&gt;%</span>
+  <span class="nf">summarise</span><span class="p">(</span>
+    <span class="n">totlists</span> <span class="o">=</span> <span class="nf">sum</span><span class="p">(</span><span class="n">numlists</span><span class="p">)</span>
+  <span class="p">)</span>
+
+<span class="c1"># Now ready to compute species by year</span>
+<span class="n">species_byyear</span> <span class="o">&lt;-</span> <span class="n">obs_df</span> <span class="o">%&gt;%</span>
+  <span class="nf">group_by</span><span class="p">(</span><span class="n">comName</span><span class="p">,</span> <span class="n">birding_year</span><span class="o">=</span><span class="nf">year</span><span class="p">(</span><span class="n">obsDt</span><span class="p">))</span> <span class="o">%&gt;%</span>
+  <span class="nf">summarize</span><span class="p">(</span>
+    <span class="n">num_lists</span> <span class="o">=</span> <span class="nf">n</span><span class="p">(),</span>
+    <span class="n">tot_birds</span> <span class="o">=</span> <span class="nf">sum</span><span class="p">(</span><span class="n">howMany</span><span class="p">)</span>
+  <span class="p">)</span> <span class="o">%&gt;%</span>
+  <span class="nf">arrange</span><span class="p">(</span><span class="n">birding_year</span><span class="p">,</span> <span class="nf">desc</span><span class="p">(</span><span class="n">tot_birds</span><span class="p">))</span>
+
+<span class="c1"># Join to numlists_byyear so we can compute pct of lists each species</span>
+<span class="c1"># appeared in.</span>
+<span class="n">species_byyear</span> <span class="o">&lt;-</span> <span class="nf">left_join</span><span class="p">(</span><span class="n">species_byyear</span><span class="p">,</span> <span class="n">numlists_byyear</span><span class="p">,</span> <span class="n">by</span> <span class="o">=</span> <span class="s">&#39;birding_year&#39;</span><span class="p">)</span> 
+
+<span class="n">bird_year</span> <span class="o">&lt;-</span> <span class="m">2018</span>
+
+<span class="n">top_obs_byyear</span> <span class="o">&lt;-</span> <span class="n">species_byyear</span> <span class="o">%&gt;%</span>
+  <span class="nf">filter</span><span class="p">(</span><span class="n">birding_year</span> <span class="o">==</span> <span class="n">bird_year</span><span class="p">)</span> <span class="o">%&gt;%</span>
+  <span class="nf">mutate</span><span class="p">(</span><span class="n">pctlists</span> <span class="o">=</span> <span class="n">num_lists</span> <span class="o">/</span> <span class="n">totlists</span><span class="p">)</span> <span class="o">%&gt;%</span>
+  <span class="nf">arrange</span><span class="p">(</span><span class="nf">desc</span><span class="p">(</span><span class="n">tot_birds</span><span class="p">))</span> <span class="o">%&gt;%</span>
+  <span class="nf">head</span><span class="p">(</span><span class="m">30</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Make the plot.</p>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="nf">ggplot</span><span class="p">(</span><span class="n">top_obs_byyear</span><span class="p">)</span> <span class="o">+</span> 
+    <span class="nf">geom_bar</span><span class="p">(</span><span class="nf">aes</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="nf">reorder</span><span class="p">(</span><span class="n">comName</span><span class="p">,</span> <span class="n">tot_birds</span><span class="p">),</span> 
+                 <span class="n">y</span><span class="o">=</span><span class="n">tot_birds</span><span class="p">,</span> <span class="n">fill</span><span class="o">=</span><span class="n">pctlists</span><span class="p">),</span> <span class="n">stat</span> <span class="o">=</span> <span class="s">&quot;identity&quot;</span><span class="p">)</span> <span class="o">+</span>
+                 <span class="nf">scale_fill_gradient</span><span class="p">(</span><span class="n">low</span><span class="o">=</span><span class="s">&#39;#05D9F6&#39;</span><span class="p">,</span> <span class="n">high</span><span class="o">=</span><span class="s">&#39;#5011D1&#39;</span><span class="p">)</span> <span class="o">+</span>
+                 <span class="nf">labs</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s">&quot;&quot;</span><span class="p">,</span> 
+                      <span class="n">y</span><span class="o">=</span><span class="s">&quot;Total number of birds sighted&quot;</span><span class="p">,</span> 
+                      <span class="n">fill</span><span class="o">=</span><span class="s">&quot;Pct of lists&quot;</span><span class="p">,</span>
+                      <span class="n">title</span> <span class="o">=</span> <span class="nf">paste0</span><span class="p">(</span><span class="s">&quot;Top 30 most sighted birds by Wednesday Birders in &quot;</span><span class="p">,</span> <span class="n">bird_year</span><span class="p">),</span>
+                      <span class="n">subtitle</span> <span class="o">=</span> <span class="s">&quot;(number at right of bar is % of lists on which the species appeared)&quot;</span><span class="p">)</span> <span class="o">+</span>
+                 <span class="nf">coord_flip</span><span class="p">()</span> <span class="o">+</span>
+    <span class="nf">geom_text</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">top_obs_byyear</span><span class="p">,</span>
+              <span class="nf">aes</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="nf">reorder</span><span class="p">(</span><span class="n">comName</span><span class="p">,</span><span class="n">tot_birds</span><span class="p">),</span>
+                  <span class="n">y</span><span class="o">=</span><span class="n">tot_birds</span><span class="p">,</span>
+                  <span class="n">label</span><span class="o">=</span><span class="nf">format</span><span class="p">(</span><span class="n">pctlists</span><span class="p">,</span> <span class="n">digits</span> <span class="o">=</span> <span class="m">1</span><span class="p">),</span>
+                  <span class="n">hjust</span><span class="o">=</span><span class="m">0</span>
+              <span class="p">),</span> <span class="n">size</span><span class="o">=</span><span class="m">3</span><span class="p">)</span> <span class="o">+</span> <span class="nf">ylim</span><span class="p">(</span><span class="m">0</span><span class="p">,</span><span class="m">500</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><img alt="center" src="../../_images/plot2018-1.png" /></p>
+</section>
+<section id="patterns-and-changes-over-time">
+<h2>Patterns and changes over time<a class="headerlink" href="#patterns-and-changes-over-time" title="Permalink to this headline">¶</a></h2>
+<p>Now that we have four full years of eBird sightings data from the
+four parks we visit each month, let’s see how things look over time (and location).</p>
+<p>Here’s an overall time series plot of number of species appearing on
+each list.</p>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="n">numsp_bylist</span> <span class="o">%&gt;%</span> 
+  <span class="nf">ggplot</span><span class="p">()</span> <span class="o">+</span> <span class="nf">geom_point</span><span class="p">(</span><span class="nf">aes</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="nf">as.Date</span><span class="p">(</span><span class="n">obsDt</span><span class="p">),</span> <span class="n">y</span> <span class="o">=</span> <span class="n">n</span><span class="p">))</span> <span class="o">+</span>
+  <span class="nf">ggtitle</span><span class="p">(</span><span class="s">&quot;Number of species sighted for each list&quot;</span><span class="p">,</span> <span class="n">subtitle</span> <span class="o">=</span> <span class="s">&quot;2015-2018&quot;</span><span class="p">)</span> <span class="o">+</span>
+  <span class="nf">scale_x_date</span><span class="p">(</span><span class="n">date_breaks</span> <span class="o">=</span> <span class="s">&quot;3 months&quot;</span><span class="p">,</span>
+               <span class="n">date_labels</span> <span class="o">=</span> <span class="s">&quot;%m-%y&quot;</span><span class="p">)</span> <span class="o">+</span>
+  <span class="nf">xlab</span><span class="p">(</span><span class="s">&quot;List date (month-year)&quot;</span><span class="p">)</span> <span class="o">+</span>
+  <span class="nf">ylab</span><span class="p">(</span><span class="s">&quot;Number of species&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><img alt="center" src="../../_images/unnamed-chunk-3-1.png" /></p>
+<p>Same plot but faceted by park.</p>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="n">numsp_bylist</span> <span class="o">%&gt;%</span> 
+  <span class="nf">ggplot</span><span class="p">()</span> <span class="o">+</span> <span class="nf">geom_point</span><span class="p">(</span><span class="nf">aes</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="nf">as.Date</span><span class="p">(</span><span class="n">obsDt</span><span class="p">),</span> <span class="n">y</span> <span class="o">=</span> <span class="n">n</span><span class="p">))</span> <span class="o">+</span>
+  <span class="nf">facet_grid</span><span class="p">(</span><span class="n">locName</span> <span class="o">~</span> <span class="n">.</span><span class="p">)</span> <span class="o">+</span>
+  <span class="nf">ggtitle</span><span class="p">(</span><span class="s">&quot;Number of species sighted for each list&quot;</span><span class="p">,</span> <span class="n">subtitle</span> <span class="o">=</span> <span class="s">&quot;2015-2018&quot;</span><span class="p">)</span> <span class="o">+</span>
+  <span class="nf">scale_x_date</span><span class="p">(</span><span class="n">date_breaks</span> <span class="o">=</span> <span class="s">&quot;3 months&quot;</span><span class="p">,</span>
+               <span class="n">date_labels</span> <span class="o">=</span> <span class="s">&quot;%m-%y&quot;</span><span class="p">)</span> <span class="o">+</span>
+  <span class="nf">xlab</span><span class="p">(</span><span class="s">&quot;List date (month-year)&quot;</span><span class="p">)</span> <span class="o">+</span>
+  <span class="nf">ylab</span><span class="p">(</span><span class="s">&quot;Number of species&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><img alt="center" src="../../_images/unnamed-chunk-4-1.png" /></p>
+<p>Let’s look at distribution of list size during the peak period of
+April-October.</p>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="n">numsp_bylist</span> <span class="o">%&gt;%</span> 
+  <span class="nf">filter</span><span class="p">(</span><span class="nf">month</span><span class="p">(</span><span class="n">obsDt</span><span class="p">)</span> <span class="o">%in%</span> <span class="m">4</span><span class="o">:</span><span class="m">10</span><span class="p">)</span> <span class="o">%&gt;%</span> 
+  <span class="nf">ggplot</span><span class="p">()</span> <span class="o">+</span> <span class="nf">geom_histogram</span><span class="p">(</span><span class="nf">aes</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="n">n</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">..density..</span><span class="p">),</span> <span class="n">bins</span> <span class="o">=</span> <span class="m">20</span><span class="p">)</span> <span class="o">+</span>
+  <span class="nf">ggtitle</span><span class="p">(</span><span class="s">&quot;Distribution of list size&quot;</span><span class="p">,</span> <span class="n">subtitle</span> <span class="o">=</span> <span class="s">&quot;April-October&quot;</span><span class="p">)</span> <span class="o">+</span>
+  <span class="nf">xlab</span><span class="p">(</span><span class="s">&quot;List size (number of species)&quot;</span><span class="p">)</span> <span class="o">+</span>
+  <span class="nf">geom_density</span><span class="p">(</span><span class="nf">aes</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="n">n</span><span class="p">))</span>
+</pre></div>
+</div>
+<p><img alt="center" src="../../_images/unnamed-chunk-5-1.png" /></p>
+<p>Use boxplots and group by park.</p>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="n">numsp_bylist</span> <span class="o">%&gt;%</span> 
+  <span class="nf">filter</span><span class="p">(</span><span class="nf">month</span><span class="p">(</span><span class="n">obsDt</span><span class="p">)</span> <span class="o">%in%</span> <span class="m">4</span><span class="o">:</span><span class="m">10</span><span class="p">)</span> <span class="o">%&gt;%</span> 
+  <span class="nf">ggplot</span><span class="p">()</span> <span class="o">+</span> <span class="nf">geom_boxplot</span><span class="p">(</span><span class="nf">aes</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="n">locName</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">n</span><span class="p">))</span> <span class="o">+</span>
+  <span class="nf">ggtitle</span><span class="p">(</span><span class="s">&quot;Distribution of list size&quot;</span><span class="p">,</span> <span class="n">subtitle</span> <span class="o">=</span> <span class="s">&quot;April-October&quot;</span><span class="p">)</span> <span class="o">+</span>
+  <span class="nf">xlab</span><span class="p">(</span><span class="s">&quot;Location&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="nf">ylab</span><span class="p">(</span><span class="s">&quot;List size (number of species)&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><img alt="center" src="../../_images/unnamed-chunk-6-1.png" /></p>
+<p>Let’s repeat the above but using total number of birds counted per
+list instead of number of species per list.</p>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="n">numsp_bylist</span> <span class="o">%&gt;%</span> 
+  <span class="nf">filter</span><span class="p">(</span><span class="nf">month</span><span class="p">(</span><span class="n">obsDt</span><span class="p">)</span> <span class="o">%in%</span> <span class="m">4</span><span class="o">:</span><span class="m">10</span><span class="p">)</span> <span class="o">%&gt;%</span> 
+  <span class="nf">ggplot</span><span class="p">()</span> <span class="o">+</span> <span class="nf">geom_boxplot</span><span class="p">(</span><span class="nf">aes</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="n">locName</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">totbirds</span><span class="p">))</span> <span class="o">+</span>
+  <span class="nf">ggtitle</span><span class="p">(</span><span class="s">&quot;Distribution of number of total birds per list&quot;</span><span class="p">,</span> <span class="n">subtitle</span> <span class="o">=</span> <span class="s">&quot;April-October&quot;</span><span class="p">)</span> <span class="o">+</span>
+  <span class="nf">xlab</span><span class="p">(</span><span class="s">&quot;Location&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="nf">ylab</span><span class="p">(</span><span class="s">&quot;List size (number of birds counted)&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><img alt="center" src="../../_images/unnamed-chunk-7-1.png" /></p>
+<p>Let’s look at time series plots of number of birds counted for each
+of the species in the Top 30 for 2018. We’ll need the following
+data frame to power the plots.</p>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="n">top_species_byyear</span> <span class="o">&lt;-</span> <span class="n">top_obs_byyear</span> <span class="o">%&gt;%</span> 
+  <span class="nf">select</span><span class="p">(</span><span class="s">&quot;comName&quot;</span><span class="p">)</span> <span class="o">%&gt;%</span> 
+  <span class="nf">inner_join</span><span class="p">(</span><span class="n">species_byyear</span><span class="p">,</span> <span class="n">by</span> <span class="o">=</span> <span class="s">&quot;comName&quot;</span><span class="p">)</span> <span class="o">%&gt;%</span> 
+  <span class="nf">mutate</span><span class="p">(</span><span class="n">pctlists</span> <span class="o">=</span> <span class="n">num_lists</span> <span class="o">/</span> <span class="n">totlists</span><span class="p">)</span>
+
+<span class="n">top_species_byyear</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">## # A tibble: 114 x 6</span>
+<span class="c1">## # Groups:   comName [30]</span>
+<span class="c1">##    comName            birding_year num_lists tot_birds totlists pctlists</span>
+<span class="c1">##    &lt;chr&gt;                     &lt;dbl&gt;     &lt;int&gt;     &lt;dbl&gt;    &lt;int&gt;    &lt;dbl&gt;</span>
+<span class="c1">##  1 American Robin             2015        26       313       33    0.788</span>
+<span class="c1">##  2 American Robin             2016        32       491       39    0.821</span>
+<span class="c1">##  3 American Robin             2017        34       269       48    0.708</span>
+<span class="c1">##  4 American Robin             2018        31       431       41    0.756</span>
+<span class="c1">##  5 Canada Goose               2015        20       538       33    0.606</span>
+<span class="c1">##  6 Canada Goose               2016        19       518       39    0.487</span>
+<span class="c1">##  7 Canada Goose               2017        23       200       48    0.479</span>
+<span class="c1">##  8 Canada Goose               2018        21       211       41    0.512</span>
+<span class="c1">##  9 American Goldfinch         2015        25       141       33    0.758</span>
+<span class="c1">## 10 American Goldfinch         2016        28       116       39    0.718</span>
+<span class="c1">## # ... with 104 more rows</span>
+</pre></div>
+</div>
+<p>Bar height is total number of birds counted and bar color
+is related to percentage of lists on which this bird appeared.</p>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="nf">ggplot</span><span class="p">(</span><span class="n">top_species_byyear</span><span class="p">)</span> <span class="o">+</span> 
+  <span class="nf">geom_bar</span><span class="p">(</span><span class="nf">aes</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="n">birding_year</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">tot_birds</span><span class="p">,</span> <span class="n">fill</span><span class="o">=</span><span class="n">pctlists</span><span class="p">),</span> 
+           <span class="n">stat</span> <span class="o">=</span> <span class="s">&quot;identity&quot;</span><span class="p">)</span> <span class="o">+</span>
+  <span class="nf">scale_fill_gradient</span><span class="p">(</span><span class="n">low</span><span class="o">=</span><span class="s">&#39;#05D9F6&#39;</span><span class="p">,</span> <span class="n">high</span><span class="o">=</span><span class="s">&#39;#5011D1&#39;</span><span class="p">)</span> <span class="o">+</span>
+  <span class="nf">ggtitle</span><span class="p">(</span><span class="s">&quot;Number of birds counted by year&quot;</span><span class="p">)</span> <span class="o">+</span>
+  <span class="nf">facet_wrap</span><span class="p">(</span><span class="o">~</span><span class="n">comName</span><span class="p">,</span> <span class="n">ncol</span> <span class="o">=</span> <span class="m">5</span><span class="p">,</span> <span class="n">scales</span> <span class="o">=</span> <span class="s">&quot;free_y&quot;</span><span class="p">)</span> <span class="o">+</span>
+  <span class="nf">labs</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s">&quot;Year&quot;</span><span class="p">,</span> 
+       <span class="n">y</span><span class="o">=</span><span class="s">&quot;Total number of birds sighted&quot;</span><span class="p">,</span> 
+       <span class="n">fill</span><span class="o">=</span><span class="s">&quot;Pct of lists&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><img alt="center" src="../../_images/unnamed-chunk-9-1.png" /></p>
+<p>A few things pop out:</p>
+<ul class="simple">
+<li><p>overall number of <a class="reference external" href="https://www.allaboutbirds.org/guide/Black-capped_Chickadee">Black-capped Chicadees</a> counted has declined, though they are still sighted very frequently. Maybe we’ve become somewhat immune to their
+constant chatter and just aren’t recording as many. “Oh, just another chicadee.”</p></li>
+<li><p><a class="reference external" href="https://www.allaboutbirds.org/guide/Downy_Woodpecker">Downy Woodpecker</a> sightings have declined both in terms of number and frequency as have <a class="reference external" href="https://www.allaboutbirds.org/guide/White-breasted_Nuthatch">White-breasted Nuthatch</a> sightings.</p></li>
+<li><p><a class="reference external" href="https://www.allaboutbirds.org/guide/Mourning_Dove">Mourning Doves</a> are up in both number and frequency.</p></li>
+<li><p>After 2015, sightings of <a class="reference external" href="https://www.allaboutbirds.org/guide/Eastern_Bluebird">Eastern Bluebirds</a> have been remarkably constant.</p></li>
+</ul>
+<p>Now swap roles of total birds and frequency of appearing on a list. Bar
+height is percentage of lists on which this bird appeared and bar color
+is related to total number of birds counted.</p>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="nf">ggplot</span><span class="p">(</span><span class="n">top_species_byyear</span><span class="p">)</span> <span class="o">+</span> 
+  <span class="nf">geom_bar</span><span class="p">(</span><span class="nf">aes</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="n">birding_year</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">pctlists</span><span class="p">,</span> <span class="n">fill</span> <span class="o">=</span> <span class="n">tot_birds</span><span class="p">),</span> 
+           <span class="n">stat</span> <span class="o">=</span> <span class="s">&quot;identity&quot;</span><span class="p">)</span> <span class="o">+</span>
+  <span class="nf">scale_fill_gradient</span><span class="p">(</span><span class="n">low</span><span class="o">=</span><span class="s">&#39;#05D9F6&#39;</span><span class="p">,</span> <span class="n">high</span><span class="o">=</span><span class="s">&#39;#5011D1&#39;</span><span class="p">)</span> <span class="o">+</span>
+  <span class="nf">ggtitle</span><span class="p">(</span><span class="s">&quot;Number of birds counted by year&quot;</span><span class="p">)</span> <span class="o">+</span>
+  <span class="nf">facet_wrap</span><span class="p">(</span><span class="o">~</span><span class="n">comName</span><span class="p">,</span> <span class="n">ncol</span> <span class="o">=</span> <span class="m">5</span><span class="p">)</span> <span class="o">+</span>
+  <span class="nf">labs</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s">&quot;Year&quot;</span><span class="p">,</span> 
+       <span class="n">y</span><span class="o">=</span><span class="s">&quot;Pct of lists&quot;</span><span class="p">,</span> 
+       <span class="n">fill</span><span class="o">=</span><span class="s">&quot;Total birds counted&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><img alt="center" src="../../_images/unnamed-chunk-10-1.png" /></p>
+</section>
+<section id="next-steps">
+<h2>Next steps<a class="headerlink" href="#next-steps" title="Permalink to this headline">¶</a></h2>
+<p>Now our group can try to make sense of these and I’m sure we’ll have ideas for more analysis. In my next post I’m going to
+explore those springtime favorites, the <a class="reference external" href="https://www.allaboutbirds.org/guide/browse/taxonomy/Parulidae">warblers</a>.</p>
+</section>
+</section>
+
+<div class="section">
+    
+
+<div class="section">
+  <span style="float: left">
+     Previous:
+    
+    <a href="../eda_post_balance_func_sfcs/">
+       Use R to explore station balance in bike share systems - and learn a little dplyr programming
+    </a>
+    
+  </span>
+  <span>&nbsp;</span>
+  <span style="float: right">
+     Next: 
+    <a href="../git_newbie_error/">
+      A common git / GitHub error by those new to git 
+    </a>
+    
+  </span>
+</div>
+  
+</div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../">misken</a></h1>
+
+
+
+
+
+
+
+
+  
+<h2>
+   
+  04 February 2019 
+</h2>
+
+<ul>
+   
+<li id="author">
+  <span
+    >Author:</span
+  >
+   
+  <a href="../author/misken/">misken</a>  
+</li>
+    
+<li id="tags">
+  <span
+    >Tags: </span
+  >
+   
+  <a href="../tag/r/">R</a>   
+  <a href="../tag/python/">python</a>   
+  <a href="../tag/birding/">birding</a>   
+  <a href="../tag/dplyr/">dplyr</a>   
+  <a href="../tag/ggplot2/">ggplot2</a>   
+  <a href="../tag/ebird/">ebird</a>  
+</li>
+ 
+</ul>
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../about/">About misken</a></li>
+</ul>
+
+
+<h3>
+  <a href="../">Recent Posts</a>
+</h3>
+<ul>
+   
+  <li>
+    <a href="../hello_world/"
+      >02 April - Hello world from ablog blogging with JupyterLab</a
+    >
+  </li>
+  
+  <li>
+    <a href="../datetime_exploring/"
+      >02 April - Exploring dates and times in Python</a
+    >
+  </li>
+  
+  <li>
+    <a href="../first-post/"
+      >01 April - First Post at new blogging site</a
+    >
+  </li>
+  
+  <li>
+    <a href="../pip_with_conda_local_dev/"
+      >15 March - Using pip with conda for local development projects</a
+    >
+  </li>
+  
+  <li>
+    <a href="../what_if_4_project_packaging/"
+      >11 March - Excel “what if?” analysis with Python - Part 4: Project structure and packaging</a
+    >
+  </li>
+  
+</ul>
+
+<h3><a href="../tag/">Tags</a></h3>
+<style type="text/css">
+  ul.ablog-cloud {
+    list-style: none;
+    overflow: auto;
+  }
+  ul.ablog-cloud li {
+    float: left;
+    height: 20pt;
+    line-height: 18pt;
+    margin-right: 5px;
+  }
+  ul.ablog-cloud a {
+    text-decoration: none;
+    vertical-align: middle;
+  }
+  li.ablog-cloud-1 {
+    font-size: 80%;
+  }
+  li.ablog-cloud-2 {
+    font-size: 95%;
+  }
+  li.ablog-cloud-3 {
+    font-size: 110%;
+  }
+  li.ablog-cloud-4 {
+    font-size: 125%;
+  }
+  li.ablog-cloud-5 {
+    font-size: 140%;
+  }
+</style>
+<ul class="ablog-cloud">
+   
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/github/">GitHub</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-2">
+    <a href="../tag/r/">R</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/ablog/">ablog</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/bikeshare/">bikeshare</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/birding/">birding</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/conda/">conda</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/datetime/">datetime</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/dplyr/">dplyr</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/ebird/">ebird</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/ecology/">ecology</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-2">
+    <a href="../tag/excel/">excel</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/ggplot2/">ggplot2</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/git/">git</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/hillmaker/">hillmaker</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/jupyter/">jupyter</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/occupancy-analysis/">occupancy analysis</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-5">
+    <a href="../tag/python/">python</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/sphinx/">sphinx</a>
+  </li>
+   
+</ul>
+
+<h3>
+  <a href="../archive/">Archives</a>
+</h3>
+<ul>
+   
+  <li>
+    <a href="../2022/">2022 (4)</a>
+  </li>
+    
+  <li>
+    <a href="../2021/">2021 (4)</a>
+  </li>
+    
+  <li>
+    <a href="../2020/">2020 (2)</a>
+  </li>
+    
+  <li>
+    <a href="../2019/">2019 (5)</a>
+  </li>
+   
+</ul>
+
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search/" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2022, misken.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.3.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../../_sources/blog/otbirders_2_stats_2018.md.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

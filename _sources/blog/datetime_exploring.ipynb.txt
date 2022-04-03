@@ -1,0 +1,2679 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Exploring dates and times in Python\n",
+    "==================================="
+   ]
+  },
+  {
+   "cell_type": "raw",
+   "metadata": {
+    "raw_mimetype": "text/restructuredtext",
+    "tags": []
+   },
+   "source": [
+    ".. post:: Apr 02, 2022\n",
+    "   :author: misken\n",
+    "   :tags: python, datetime\n",
+    "   \n",
+    "   Fun with dates and times in Python"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "For many of us in the business analytics world, working with dates and\n",
+    "times is bread and butter stuff. We can work all kinds of magic with\n",
+    "Excel's \"serial\" datetimes and worksheet functions like DATEVALUE(),\n",
+    "WEEKDAY(), MONTH(), DATE() and many more. We can wield VBA functions\n",
+    "like\n",
+    "[DateDiff](http://msdn.microsoft.com/en-us/library/b5xbyt6f%28v=vs.90%29.aspx)\n",
+    "with the best of them. We all know that, according to MS, time started\n",
+    "on 1/1/1900 (or 1904 if you're on a Mac) and we just live with the fact\n",
+    "that we can't do reliable datetime work before those magic epochs. I\n",
+    "even wrote and released a free and open source MS Access add-in called\n",
+    "[Hillmaker](http://hillmaker.sourceforge.net/) many years ago that\n",
+    "did statistical analysis of time interval data by day of week and time\n",
+    "of day. That tool still finds lots of use in the healthcare world for\n",
+    "analyzing occupancy of things like nursing units, emergency departments,\n",
+    "recovery room, and many other places with entry and exit timestamp data.\n",
+    "\n",
+    "So, when I started working with R and Python, one of the first things I\n",
+    "did was see how they handled dates and times. I learned about the [*UTC\n",
+    "epoch* and the POSIX time\n",
+    "standard](http://en.wikipedia.org/wiki/Unix_time). In R, I quickly\n",
+    "learned to love the [lubridate package](http://cran.r-project.org/web/packages/lubridate/index.html).\n",
+    "And then I started to learn about dates and times in Python and started\n",
+    "to know what programmers mean when they say \"there be dragons in there\".\n",
+    "So, while I'm far from an expert, I did put together this little intro\n",
+    "to Python dates and times aimed at business analtytics types who are new\n",
+    "to Python. It is by no means comprehensive, but does cover the basics of\n",
+    "the base Python ``datetime`` and ``timedelta`` classes along with Numpy\n",
+    "``datetime64`` and ``timedelta64`` classes. Oh yeah, it also covers the\n",
+    "pandas ``Timestamp`` and ``timedelta`` classes (confused yet?). I also\n",
+    "show one particular dragon that bit me - conversion between Numpy\n",
+    "datetimes and Pandas datetimes - even though Pandas uses Numpy under the\n",
+    "hood."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Python's `datetime` and `timedelta` classes\n",
+    "-------------------------------------------"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "%matplotlib inline"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 1,
+   "metadata": {
+    "collapsed": false,
+    "jupyter": {
+     "outputs_hidden": false
+    }
+   },
+   "outputs": [],
+   "source": [
+    "import pandas as pd\n",
+    "import numpy as np\n",
+    "from pandas import Series, DataFrame\n",
+    "from datetime import datetime\n",
+    "from datetime import timedelta"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Python has a module called `datetime` as part of its base system. \n",
+    "\n",
+    "https://docs.python.org/3/library/datetime.html\n",
+    "\n",
+    "> The datetime module supplies classes for manipulating dates and times in both simple and complex ways. While date and time arithmetic is supported, the focus of the implementation is on efficient attribute extraction for output formatting and manipulation.\n",
+    "\n",
+    "Datetimes can be *naive* or *aware*\n",
+    "\n",
+    "* naive objects don't know about timezones and their interpretation is application (coder) dependent\n",
+    "* aware objects do know about timezones and are unambiguous"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 2,
+   "metadata": {
+    "collapsed": false,
+    "jupyter": {
+     "outputs_hidden": false
+    }
+   },
+   "outputs": [],
+   "source": [
+    "dates = [datetime(2012, 5, 1, 8, 30), \n",
+    "         datetime(2012, 5, 1, 9, 25), \n",
+    "         datetime(2012, 5, 1, 15, 30)]"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 3,
+   "metadata": {
+    "collapsed": false,
+    "jupyter": {
+     "outputs_hidden": false
+    }
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "[datetime.datetime(2012, 5, 1, 8, 30),\n",
+       " datetime.datetime(2012, 5, 1, 9, 25),\n",
+       " datetime.datetime(2012, 5, 1, 15, 30)]"
+      ]
+     },
+     "execution_count": 3,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "dates"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 4,
+   "metadata": {
+    "collapsed": false,
+    "jupyter": {
+     "outputs_hidden": false
+    }
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "list"
+      ]
+     },
+     "execution_count": 4,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "type(dates)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 5,
+   "metadata": {
+    "collapsed": false,
+    "jupyter": {
+     "outputs_hidden": false
+    }
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "datetime.datetime"
+      ]
+     },
+     "execution_count": 5,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "type(dates[0])"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 6,
+   "metadata": {
+    "collapsed": false,
+    "jupyter": {
+     "outputs_hidden": false
+    }
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "datetime.datetime"
+      ]
+     },
+     "execution_count": 6,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "intime_dt = dates[0]\n",
+    "outtime_dt = dates[1]\n",
+    "type(intime_dt)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 7,
+   "metadata": {
+    "collapsed": false,
+    "jupyter": {
+     "outputs_hidden": false
+    }
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Datetime: 2012-05-01 08:30:00\n",
+      "Date: 2012-05-01\n",
+      "Month: 5\n",
+      "Day: 1\n",
+      "Weekday: 1\n",
+      "Hour: 8\n",
+      "Minute: 30\n",
+      "Second: 0\n",
+      "Microsecond: 0\n"
+     ]
+    }
+   ],
+   "source": [
+    "# The commented out lines represent attributes that ARE available in pandas Timestamp objects\n",
+    "#   but not in Python datetime objects\n",
+    "print ('Datetime: {}'.format(intime_dt))\n",
+    "print ('Date: {}'.format(intime_dt.date()))\n",
+    "print ('Month: {}'.format(intime_dt.month))\n",
+    "print ('Day: {}'.format(intime_dt.day))\n",
+    "#print 'DayOfWeek: {}'.format(intime_dt.dayofweek)\n",
+    "print ('Weekday: {}'.format(intime_dt.weekday()))\n",
+    "#print 'DayOfYear: {}'.format(intime_dt.dayofyear)\n",
+    "#print 'WeekOfYear: {}'.format(intime_dt.weekofyear)\n",
+    "#print 'Quarter: {}'.format(intime_dt.quarter)\n",
+    "print ('Hour: {}'.format(intime_dt.hour))\n",
+    "print ('Minute: {}'.format(intime_dt.minute))\n",
+    "print ('Second: {}'.format(intime_dt.second))\n",
+    "print ('Microsecond: {}'.format(intime_dt.microsecond))"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 8,
+   "metadata": {
+    "collapsed": false,
+    "jupyter": {
+     "outputs_hidden": false
+    }
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "0:55:00\n"
+     ]
+    },
+    {
+     "data": {
+      "text/plain": [
+       "datetime.timedelta"
+      ]
+     },
+     "execution_count": 8,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "los_td = outtime_dt - intime_dt\n",
+    "print (los_td)\n",
+    "type(los_td)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "List out the attributes for `datetime` objects. Notice how we are filtering out any attributes starting with the double underscore. Change that if you want to see what's getting filtered out."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 12,
+   "metadata": {
+    "collapsed": false,
+    "jupyter": {
+     "outputs_hidden": false
+    }
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "['days', 'max', 'microseconds', 'min', 'resolution', 'seconds', 'total_seconds']\n"
+     ]
+    }
+   ],
+   "source": [
+    "atts = [att for att in dir(los_td) if '__' not in att]\n",
+    "#atts = [att for att in dir(los_td)]\n",
+    "print (atts)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 13,
+   "metadata": {
+    "collapsed": false,
+    "jupyter": {
+     "outputs_hidden": false
+    }
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Timedelta: 0:55:00\n",
+      "Seconds: 3300\n",
+      "Total Seconds: 3300.0\n",
+      "Microseconds: 0\n",
+      "Resolution: 0:00:00.000001\n",
+      "Min: -999999999 days, 0:00:00\n",
+      "Max: 999999999 days, 23:59:59.999999\n"
+     ]
+    }
+   ],
+   "source": [
+    "print ('Timedelta: {}'.format(los_td))\n",
+    "print ('Seconds: {}'.format(los_td.seconds))\n",
+    "print ('Total Seconds: {}'.format(los_td.total_seconds()))\n",
+    "print ('Microseconds: {}'.format(los_td.microseconds))\n",
+    "print ('Resolution: {}'.format(los_td.resolution))\n",
+    "print ('Min: {}'.format(los_td.min))\n",
+    "print ('Max: {}'.format(los_td.max))"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "So, you can use the `total_seconds()` method to get a duration in seconds from a `timedelta` object. If duration is < 1 second, it returns fractional seconds. To convert to other time units, just do the simple math."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 14,
+   "metadata": {
+    "collapsed": false,
+    "jupyter": {
+     "outputs_hidden": false
+    }
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "datetime.timedelta(microseconds=10)"
+      ]
+     },
+     "execution_count": 14,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "timedelta(0,0,10)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 15,
+   "metadata": {
+    "collapsed": false,
+    "jupyter": {
+     "outputs_hidden": false
+    }
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "1.7e-05"
+      ]
+     },
+     "execution_count": 15,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "timedelta(0,0,17).total_seconds()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 16,
+   "metadata": {
+    "collapsed": false,
+    "jupyter": {
+     "outputs_hidden": false
+    }
+   },
+   "outputs": [],
+   "source": [
+    "atts = [att for att in dir(intime_dt) if '__' not in att]"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 17,
+   "metadata": {
+    "collapsed": false,
+    "jupyter": {
+     "outputs_hidden": false
+    }
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "['astimezone', 'combine', 'ctime', 'date', 'day', 'dst', 'fold', 'fromisoformat', 'fromordinal', 'fromtimestamp', 'hour', 'isocalendar', 'isoformat', 'isoweekday', 'max', 'microsecond', 'min', 'minute', 'month', 'now', 'replace', 'resolution', 'second', 'strftime', 'strptime', 'time', 'timestamp', 'timetuple', 'timetz', 'today', 'toordinal', 'tzinfo', 'tzname', 'utcfromtimestamp', 'utcnow', 'utcoffset', 'utctimetuple', 'weekday', 'year']\n"
+     ]
+    }
+   ],
+   "source": [
+    "print (atts)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Numpy's newish `datetime64` and `timedelta64` classes\n",
+    "-----------------------------------------------------\n",
+    "\n",
+    "The Numpy library (v 1.7.0) introduced a new datatype called datetime64. Numpy uses this name because there is already a datetime data type in Python datetime library. Like R, dates and times in Python are stored based on the notion of POSIX time - the number of seconds elapsed since Jan 1, 1970 00:00:00 GMT - called the UTC epoch. This doesn't mean that dates and times before that cannot be represented - we just use negative numbers. Representing and working with dates and times for computing is a pretty interesting topic, fraught with complexities like time zones, daylight savings time, and leap seconds. A few good places to start are:\n",
+    "\n",
+    "Numpy docs - http://docs.scipy.org/doc/numpy-dev/reference/arrays.datetime.html\n",
+    "\n",
+    "Pandas docs - http://pandas.pydata.org/pandas-docs/dev/timeseries.html\n",
+    "\n",
+    "See http://cr.yp.to/proto/utctai.html for gory details on UTC and ATI and leap seconds and the problems with the POSIX standard.\n",
+    "\n",
+    "http://stackoverflow.com/questions/13703720/converting-between-datetime-timestamp-and-datetime64\n",
+    "\n",
+    "Here's the actual numpy proposal for datetime64 and timedelta64, authored by Travis Oliphant.\n",
+    "\n",
+    "https://github.com/numpy/numpy/blob/master/doc/neps/datetime-proposal.rst\n",
+    "\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 18,
+   "metadata": {
+    "collapsed": false,
+    "jupyter": {
+     "outputs_hidden": false
+    }
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "numpy.datetime64('2012-05-01T08:30:00')"
+      ]
+     },
+     "execution_count": 18,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "np.datetime64('2012-05-01 08:30:00')"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 19,
+   "metadata": {
+    "collapsed": false,
+    "jupyter": {
+     "outputs_hidden": false
+    }
+   },
+   "outputs": [],
+   "source": [
+    "dates64 = [np.datetime64('2012-05-01 08:30:00'), \n",
+    "           np.datetime64('2012-05-01 09:25:00'), \n",
+    "           np.datetime64('2012-05-01 15:30:00')]"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 20,
+   "metadata": {
+    "collapsed": false,
+    "jupyter": {
+     "outputs_hidden": false
+    }
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "[numpy.datetime64('2012-05-01T08:30:00'),\n",
+       " numpy.datetime64('2012-05-01T09:25:00'),\n",
+       " numpy.datetime64('2012-05-01T15:30:00')]"
+      ]
+     },
+     "execution_count": 20,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "dates64"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "As you can see from below, UTC is four hours later than EDT. In other words, the EDT timezone offset is UTC-4."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 21,
+   "metadata": {
+    "collapsed": false,
+    "jupyter": {
+     "outputs_hidden": false
+    }
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "datetime.datetime(2019, 3, 5, 15, 31, 47, 583555)"
+      ]
+     },
+     "execution_count": 21,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "dt_utcnow = datetime.utcnow()\n",
+    "dt_utcnow"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 22,
+   "metadata": {
+    "collapsed": false,
+    "jupyter": {
+     "outputs_hidden": false
+    }
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "numpy.datetime64('2019-03-05T15:31:47.583555')"
+      ]
+     },
+     "execution_count": 22,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "# Can create datetime64's from dt's.\n",
+    "dt64_utcnow = np.datetime64(dt_utcnow)\n",
+    "dt64_utcnow"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 23,
+   "metadata": {
+    "collapsed": false,
+    "jupyter": {
+     "outputs_hidden": false
+    }
+   },
+   "outputs": [],
+   "source": [
+    "curdates64 = [np.datetime64('2014-06-01 08:30:00'), \n",
+    "              np.datetime64('2014-06-01 09:25:00'), \n",
+    "              np.datetime64('2014-06-01 15:30:00')]"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 24,
+   "metadata": {
+    "collapsed": false,
+    "jupyter": {
+     "outputs_hidden": false
+    }
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "[numpy.datetime64('2014-06-01T08:30:00'),\n",
+       " numpy.datetime64('2014-06-01T09:25:00'),\n",
+       " numpy.datetime64('2014-06-01T15:30:00')]"
+      ]
+     },
+     "execution_count": 24,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "curdates64"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 25,
+   "metadata": {
+    "collapsed": false,
+    "jupyter": {
+     "outputs_hidden": false
+    }
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "<class 'numpy.datetime64'>\n",
+      "2012-05-01T08:30:00\n"
+     ]
+    },
+    {
+     "data": {
+      "text/plain": [
+       "numpy.datetime64('2012-05-01T08:30:00')"
+      ]
+     },
+     "execution_count": 25,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "intime_dt64 = dates64[0]\n",
+    "outtime_dt64 = dates64[1]\n",
+    "print(type(intime_dt64))\n",
+    "print(intime_dt64)\n",
+    "intime_dt64"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 26,
+   "metadata": {
+    "collapsed": false,
+    "jupyter": {
+     "outputs_hidden": false
+    }
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Datetime: 2012-05-01T08:30:00\n"
+     ]
+    }
+   ],
+   "source": [
+    "# The commented out lines represent attributes that ARE available in pandas Timestamp objects\n",
+    "#   but not in numpy datetime64 objects\n",
+    "print ('Datetime: {}'.format(str(intime_dt64)))\n",
+    "#print 'Date: {}'.format(intime_dt64.date())\n",
+    "#print 'Month: {}'.format(intime_dt64.month)\n",
+    "#print 'Day: {}'.format(intime_dt.day)\n",
+    "#print 'DayOfWeek: {}'.format(intime_dt.dayofweek)\n",
+    "#print 'Weekday: {}'.format(intime_dt.weekday())\n",
+    "#print 'DayOfYear: {}'.format(intime_dt.dayofyear)\n",
+    "#print 'WeekOfYear: {}'.format(intime_dt.weekofyear)\n",
+    "#print 'Quarter: {}'.format(intime_dt.quarter)\n",
+    "#print 'Hour: {}'.format(intime_dt.hour)\n",
+    "#print 'Minute: {}'.format(intime_dt.minute)\n",
+    "#print 'Second: {}'.format(intime_dt.second)\n",
+    "#print 'Microsecond: {}'.format(intime_dt.microsecond)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "You can subtract two `datetime64` objects and get a `timedelta64` object in return."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 27,
+   "metadata": {
+    "collapsed": false,
+    "jupyter": {
+     "outputs_hidden": false
+    }
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "numpy.timedelta64(3300,'s')"
+      ]
+     },
+     "execution_count": 27,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "los_dt64 = outtime_dt64 - intime_dt64\n",
+    "los_dt64"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 28,
+   "metadata": {
+    "collapsed": false,
+    "jupyter": {
+     "outputs_hidden": false
+    }
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "numpy.timedelta64(55,'m')"
+      ]
+     },
+     "execution_count": 28,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "# Coerce it to other units\n",
+    "np.timedelta64(los_dt64,'m')"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Unfortunately, `timedelta64` objects have almost no useful attributes in terms of date time math. OTH, see the `datetime.timedelta` object (and Pandas) for a number of useful attributes."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Pandas and datetimes\n",
+    "\n",
+    "\n",
+    "\n",
+    "Pandas prides itself on its handling of time series data (speed, flexibility, power) and is built on time of numpy `datetime64` and `timedelta64` data types (instead of Python's base `datetime` and `timedelta` types. Pandas also wanted to be very [time-zone aware and time-zone capable](http://wesmckinney.com/blog/?cat=5). So, Pandas has its own data type for timestamps called, well, `Timetamp`. It's based on numpy's `datetime64` type but works like Python's `datetime` (I think). The following StackOverlfow post (the \"welcome to hell\" post) is quite popular and relevant.\n",
+    "\n",
+    "http://stackoverflow.com/questions/13703720/converting-between-datetime-timestamp-and-datetime64"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Pandas time series indexes can be timestamp or time period based."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 29,
+   "metadata": {
+    "collapsed": false,
+    "jupyter": {
+     "outputs_hidden": false
+    }
+   },
+   "outputs": [],
+   "source": [
+    "ts = Series(np.random.randint(1,100,3), index=dates)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 30,
+   "metadata": {
+    "collapsed": false,
+    "jupyter": {
+     "outputs_hidden": false
+    }
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "2012-05-01 08:30:00    35\n",
+       "2012-05-01 09:25:00    45\n",
+       "2012-05-01 15:30:00    11\n",
+       "dtype: int64"
+      ]
+     },
+     "execution_count": 30,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "ts"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 31,
+   "metadata": {
+    "collapsed": false,
+    "jupyter": {
+     "outputs_hidden": false
+    }
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "DatetimeIndex(['2012-05-01 08:30:00', '2012-05-01 09:25:00',\n",
+       "               '2012-05-01 15:30:00'],\n",
+       "              dtype='datetime64[ns]', freq=None)"
+      ]
+     },
+     "execution_count": 31,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "ts.index"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "If we have demand data by month, a period based index might make more sense."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 32,
+   "metadata": {
+    "collapsed": false,
+    "jupyter": {
+     "outputs_hidden": false
+    }
+   },
+   "outputs": [],
+   "source": [
+    "from pandas import Period, PeriodIndex"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 33,
+   "metadata": {
+    "collapsed": false,
+    "jupyter": {
+     "outputs_hidden": false
+    }
+   },
+   "outputs": [],
+   "source": [
+    "periods = PeriodIndex([Period('2012-01'), Period('2012-02'),Period('2012-03')])"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 34,
+   "metadata": {
+    "collapsed": false,
+    "jupyter": {
+     "outputs_hidden": false
+    }
+   },
+   "outputs": [],
+   "source": [
+    "ts2 = Series(np.random.randint(1,100,3), index=periods)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 35,
+   "metadata": {
+    "collapsed": false,
+    "jupyter": {
+     "outputs_hidden": false
+    }
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "2012-01    22\n",
+       "2012-02    72\n",
+       "2012-03    54\n",
+       "Freq: M, dtype: int64"
+      ]
+     },
+     "execution_count": 35,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "ts2"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 36,
+   "metadata": {
+    "collapsed": false,
+    "jupyter": {
+     "outputs_hidden": false
+    }
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "PeriodIndex(['2012-01', '2012-02', '2012-03'], dtype='period[M]', freq='M')"
+      ]
+     },
+     "execution_count": 36,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "ts2.index"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "From the [pandas docs](http://pandas.pydata.org/pandas-docs/dev/timeseries.html):\n",
+    "\n",
+    "> Starting with 0.8, pandas allows you to capture both representations and convert between them. Under the hood, pandas represents timestamps using instances of Timestamp and sequences of timestamps using instances of DatetimeIndex. For regular time spans, pandas uses Period objects for scalar values and PeriodIndex for sequences of spans."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 37,
+   "metadata": {
+    "collapsed": false,
+    "jupyter": {
+     "outputs_hidden": false
+    }
+   },
+   "outputs": [],
+   "source": [
+    "from pandas import Timestamp"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 38,
+   "metadata": {
+    "collapsed": false,
+    "jupyter": {
+     "outputs_hidden": false
+    }
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "Timestamp('2012-05-01 08:30:00')"
+      ]
+     },
+     "execution_count": 38,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "Timestamp('20120501 08:30:00')"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 39,
+   "metadata": {
+    "collapsed": false,
+    "jupyter": {
+     "outputs_hidden": false
+    }
+   },
+   "outputs": [],
+   "source": [
+    "timestamps = [Timestamp('20120501 08:30:00'), Timestamp('20120501 09:25:00'), Timestamp('20120501 15:30:00')]"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 40,
+   "metadata": {
+    "collapsed": false,
+    "jupyter": {
+     "outputs_hidden": false
+    }
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "pandas._libs.tslibs.timestamps.Timestamp"
+      ]
+     },
+     "execution_count": 40,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "intime_ts = timestamps[0]\n",
+    "outtime_ts = timestamps[1]\n",
+    "type(intime_ts)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 41,
+   "metadata": {
+    "collapsed": false,
+    "jupyter": {
+     "outputs_hidden": false
+    }
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "0 days 00:55:00\n"
+     ]
+    },
+    {
+     "data": {
+      "text/plain": [
+       "pandas._libs.tslibs.timedeltas.Timedelta"
+      ]
+     },
+     "execution_count": 41,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "los_ptd = outtime_ts - intime_ts\n",
+    "print (los_ptd)\n",
+    "type(los_ptd)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 42,
+   "metadata": {
+    "collapsed": false,
+    "jupyter": {
+     "outputs_hidden": false
+    }
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Datetime: 2012-05-01 08:30:00\n",
+      "Date: 2012-05-01\n",
+      "Month: 5\n",
+      "Day: 1\n",
+      "DayOfWeek: 1\n",
+      "Weekday: 1\n",
+      "DayOfYear: 122\n",
+      "WeekOfYear: 18\n",
+      "Quarter: 2\n",
+      "Hour: 8\n",
+      "Minute: 30\n",
+      "Second: 0\n",
+      "Microsecond: 0\n"
+     ]
+    }
+   ],
+   "source": [
+    "# The pandas Timestamp data type has a number of useful attributes (dayofweek, dayofyear, weekofyear)\n",
+    "#   that the base Python datetime type does not.\n",
+    "print ('Datetime: {}'.format(intime_ts))\n",
+    "print ('Date: {}'.format(intime_ts.date()))\n",
+    "print ('Month: {}'.format(intime_ts.month))\n",
+    "print ('Day: {}'.format(intime_ts.day))\n",
+    "print ('DayOfWeek: {}'.format(intime_ts.dayofweek))\n",
+    "print ('Weekday: {}'.format(intime_ts.weekday()))\n",
+    "print ('DayOfYear: {}'.format(intime_ts.dayofyear))\n",
+    "print ('WeekOfYear: {}'.format(intime_ts.weekofyear))\n",
+    "print ('Quarter: {}'.format(intime_ts.quarter))\n",
+    "print ('Hour: {}'.format(intime_ts.hour))\n",
+    "print ('Minute: {}'.format(intime_ts.minute))\n",
+    "print ('Second: {}'.format(intime_ts.second))\n",
+    "print ('Microsecond: {}'.format(intime_ts.microsecond))"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 43,
+   "metadata": {
+    "collapsed": false,
+    "jupyter": {
+     "outputs_hidden": false
+    }
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Timedelta: 0 days 00:55:00\n",
+      "Days: 0\n",
+      "Seconds: 3300\n",
+      "Total Seconds: 3300.0\n",
+      "Microseconds: 0\n",
+      "Resolution: T\n",
+      "Min: -106752 days +00:12:43.145224\n",
+      "Max: 106751 days 23:47:16.854775\n"
+     ]
+    }
+   ],
+   "source": [
+    "print ('Timedelta: {}'.format(los_ptd))\n",
+    "print ('Days: {}'.format(los_ptd.days))\n",
+    "print ('Seconds: {}'.format(los_ptd.seconds))\n",
+    "print ('Total Seconds: {}'.format(los_ptd.total_seconds()))\n",
+    "print ('Microseconds: {}'.format(los_ptd.microseconds))\n",
+    "print ('Resolution: {}'.format(los_ptd.resolution))\n",
+    "print ('Min: {}'.format(los_ptd.min))\n",
+    "print ('Max: {}'.format(los_ptd.max))"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Pandas and time series\n",
+    "----------------------\n",
+    "\n",
+    "Generally, a time series in pandas is a `Series` object with a `DateTimeIndex`. Pandas has convenience functions for creating time series indexes. The default frequency for date_range is a calendar day while the default for bdate_range is a business day"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 44,
+   "metadata": {
+    "collapsed": false,
+    "jupyter": {
+     "outputs_hidden": false
+    }
+   },
+   "outputs": [],
+   "source": [
+    "index = pd.date_range('2000-1-1', periods=1000, freq='M')"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 45,
+   "metadata": {
+    "collapsed": false,
+    "jupyter": {
+     "outputs_hidden": false
+    }
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "DatetimeIndex(['2000-01-31', '2000-02-29', '2000-03-31', '2000-04-30',\n",
+       "               '2000-05-31', '2000-06-30', '2000-07-31', '2000-08-31',\n",
+       "               '2000-09-30', '2000-10-31',\n",
+       "               ...\n",
+       "               '2082-07-31', '2082-08-31', '2082-09-30', '2082-10-31',\n",
+       "               '2082-11-30', '2082-12-31', '2083-01-31', '2083-02-28',\n",
+       "               '2083-03-31', '2083-04-30'],\n",
+       "              dtype='datetime64[ns]', length=1000, freq='M')"
+      ]
+     },
+     "execution_count": 45,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "index"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 46,
+   "metadata": {
+    "collapsed": false,
+    "jupyter": {
+     "outputs_hidden": false
+    }
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "DatetimeIndex(['2014-01-01', '2014-01-02', '2014-01-03', '2014-01-04',\n",
+       "               '2014-01-05', '2014-01-06', '2014-01-07', '2014-01-08',\n",
+       "               '2014-01-09', '2014-01-10',\n",
+       "               ...\n",
+       "               '2014-06-03', '2014-06-04', '2014-06-05', '2014-06-06',\n",
+       "               '2014-06-07', '2014-06-08', '2014-06-09', '2014-06-10',\n",
+       "               '2014-06-11', '2014-06-12'],\n",
+       "              dtype='datetime64[ns]', length=163, freq='D')"
+      ]
+     },
+     "execution_count": 46,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "start = datetime(2014, 1, 1)\n",
+    "end = datetime(2014, 6, 12)\n",
+    "rng = pd.date_range(start, end)\n",
+    "rng"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 47,
+   "metadata": {
+    "collapsed": false,
+    "jupyter": {
+     "outputs_hidden": false
+    }
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "DatetimeIndex(['2014-01-05', '2014-01-12', '2014-01-19', '2014-01-26',\n",
+       "               '2014-02-02', '2014-02-09', '2014-02-16', '2014-02-23',\n",
+       "               '2014-03-02', '2014-03-09', '2014-03-16', '2014-03-23',\n",
+       "               '2014-03-30', '2014-04-06', '2014-04-13', '2014-04-20',\n",
+       "               '2014-04-27', '2014-05-04', '2014-05-11', '2014-05-18',\n",
+       "               '2014-05-25', '2014-06-01', '2014-06-08'],\n",
+       "              dtype='datetime64[ns]', freq='W-SUN')"
+      ]
+     },
+     "execution_count": 47,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "pd.date_range(start, end, freq='W')"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 48,
+   "metadata": {
+    "collapsed": false,
+    "jupyter": {
+     "outputs_hidden": false
+    }
+   },
+   "outputs": [],
+   "source": [
+    "data = np.random.randint(1, 100, size=163)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 49,
+   "metadata": {
+    "collapsed": false,
+    "jupyter": {
+     "outputs_hidden": false
+    }
+   },
+   "outputs": [],
+   "source": [
+    "df = DataFrame(data, index=rng)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 50,
+   "metadata": {
+    "collapsed": false,
+    "jupyter": {
+     "outputs_hidden": false
+    }
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>0</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>2014-01-01</th>\n",
+       "      <td>12</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2014-01-02</th>\n",
+       "      <td>29</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2014-01-03</th>\n",
+       "      <td>84</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2014-01-04</th>\n",
+       "      <td>4</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2014-01-05</th>\n",
+       "      <td>6</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "             0\n",
+       "2014-01-01  12\n",
+       "2014-01-02  29\n",
+       "2014-01-03  84\n",
+       "2014-01-04   4\n",
+       "2014-01-05   6"
+      ]
+     },
+     "execution_count": 50,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "df.head()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 51,
+   "metadata": {
+    "collapsed": false,
+    "jupyter": {
+     "outputs_hidden": false
+    }
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>0</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>2014-01-02</th>\n",
+       "      <td>29</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2014-01-03</th>\n",
+       "      <td>84</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2014-01-04</th>\n",
+       "      <td>4</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2014-01-05</th>\n",
+       "      <td>6</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2014-01-06</th>\n",
+       "      <td>25</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2014-01-07</th>\n",
+       "      <td>56</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2014-01-08</th>\n",
+       "      <td>63</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2014-01-09</th>\n",
+       "      <td>39</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2014-01-10</th>\n",
+       "      <td>16</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2014-01-11</th>\n",
+       "      <td>10</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2014-01-12</th>\n",
+       "      <td>72</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "             0\n",
+       "2014-01-02  29\n",
+       "2014-01-03  84\n",
+       "2014-01-04   4\n",
+       "2014-01-05   6\n",
+       "2014-01-06  25\n",
+       "2014-01-07  56\n",
+       "2014-01-08  63\n",
+       "2014-01-09  39\n",
+       "2014-01-10  16\n",
+       "2014-01-11  10\n",
+       "2014-01-12  72"
+      ]
+     },
+     "execution_count": 51,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "# Date index slicing is easy but, BE CAREFUL, the end point is included (unlike usual Python slicing behavior).\n",
+    "df['2014-01-02':'2014-01-12']"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 52,
+   "metadata": {
+    "collapsed": false,
+    "jupyter": {
+     "outputs_hidden": false
+    }
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>0</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>2014-01-02</th>\n",
+       "      <td>29</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2014-01-03</th>\n",
+       "      <td>84</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2014-01-04</th>\n",
+       "      <td>4</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2014-01-05</th>\n",
+       "      <td>6</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2014-01-06</th>\n",
+       "      <td>25</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2014-01-07</th>\n",
+       "      <td>56</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2014-01-08</th>\n",
+       "      <td>63</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2014-01-09</th>\n",
+       "      <td>39</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2014-01-10</th>\n",
+       "      <td>16</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2014-01-11</th>\n",
+       "      <td>10</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2014-01-12</th>\n",
+       "      <td>72</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "             0\n",
+       "2014-01-02  29\n",
+       "2014-01-03  84\n",
+       "2014-01-04   4\n",
+       "2014-01-05   6\n",
+       "2014-01-06  25\n",
+       "2014-01-07  56\n",
+       "2014-01-08  63\n",
+       "2014-01-09  39\n",
+       "2014-01-10  16\n",
+       "2014-01-11  10\n",
+       "2014-01-12  72"
+      ]
+     },
+     "execution_count": 52,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "df[datetime(2014,1,2):datetime(2014,1,12)]"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Pandas `DateOffset` objects"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Usually *base frequencies* are specified with a string alias such as 'W' or 'M'. However, "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 53,
+   "metadata": {
+    "collapsed": false,
+    "jupyter": {
+     "outputs_hidden": false
+    }
+   },
+   "outputs": [],
+   "source": [
+    "rng2 = pd.date_range(start, end, freq='M')"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 54,
+   "metadata": {
+    "collapsed": false,
+    "jupyter": {
+     "outputs_hidden": false
+    }
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "5"
+      ]
+     },
+     "execution_count": 54,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "len(rng2)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 55,
+   "metadata": {
+    "collapsed": false,
+    "jupyter": {
+     "outputs_hidden": false
+    }
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "array([12, 29, 84,  4,  6])"
+      ]
+     },
+     "execution_count": 55,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "data[:len(rng2)]"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 56,
+   "metadata": {
+    "collapsed": false,
+    "jupyter": {
+     "outputs_hidden": false
+    }
+   },
+   "outputs": [],
+   "source": [
+    "df2 = DataFrame(data[:len(rng2)], index=rng2)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "collapsed": false,
+    "jupyter": {
+     "outputs_hidden": false
+    }
+   },
+   "outputs": [],
+   "source": [
+    "df2"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "collapsed": false,
+    "jupyter": {
+     "outputs_hidden": false
+    }
+   },
+   "outputs": [],
+   "source": [
+    "from pandas.tseries.offsets import Hour, Minute\n",
+    "#We rarely use these but they are available"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "collapsed": false,
+    "jupyter": {
+     "outputs_hidden": false
+    }
+   },
+   "outputs": [],
+   "source": [
+    "one_hour = Hour()\n",
+    "four_hours = Hour(4)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "collapsed": false,
+    "jupyter": {
+     "outputs_hidden": false
+    }
+   },
+   "outputs": [],
+   "source": [
+    "one_hour + four_hours"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "collapsed": false,
+    "jupyter": {
+     "outputs_hidden": false
+    }
+   },
+   "outputs": [],
+   "source": [
+    "one_hour + Minute(35)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Week of month dates\n",
+    "\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "collapsed": false,
+    "jupyter": {
+     "outputs_hidden": false
+    }
+   },
+   "outputs": [],
+   "source": [
+    "rng = pd.date_range('9/1/2012','1/1/2014',freq='M')"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "collapsed": false,
+    "jupyter": {
+     "outputs_hidden": false
+    }
+   },
+   "outputs": [],
+   "source": [
+    "rng"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "collapsed": false,
+    "jupyter": {
+     "outputs_hidden": false
+    }
+   },
+   "outputs": [],
+   "source": [
+    "list(rng)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "collapsed": false,
+    "jupyter": {
+     "outputs_hidden": false
+    }
+   },
+   "outputs": [],
+   "source": [
+    "rng = pd.date_range('9/1/2012','1/1/2014',freq='WOM-2TUE')"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "collapsed": false,
+    "jupyter": {
+     "outputs_hidden": false
+    }
+   },
+   "outputs": [],
+   "source": [
+    "list(rng)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Shifting (Leading and Lagging) Data\n",
+    "------------------------------------\n",
+    "\n",
+    "Move data back and forth through time. `Series` and `DateFrame` objects have a `shift` method for doing naive shifts forward and backward and leaving the index unchanged."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "collapsed": false,
+    "jupyter": {
+     "outputs_hidden": false
+    }
+   },
+   "outputs": [],
+   "source": [
+    "ts = Series(np.random.randint(1,10,4),index = pd.date_range('1/2/2013',periods=4,freq='M'))\n",
+    "ts"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "collapsed": false,
+    "jupyter": {
+     "outputs_hidden": false
+    }
+   },
+   "outputs": [],
+   "source": [
+    "ts.shift(periods = 2)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "collapsed": false,
+    "jupyter": {
+     "outputs_hidden": false
+    }
+   },
+   "outputs": [],
+   "source": [
+    "# Common use is pct change\n",
+    "ts/ts.shift(1) - 1.0"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "collapsed": false,
+    "jupyter": {
+     "outputs_hidden": false
+    }
+   },
+   "outputs": [],
+   "source": [
+    "# Since naive shifts leave index unchanged, some data is lost. To shift both data and index, pass in the frequency\n",
+    "ts.shift(1)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "collapsed": false,
+    "jupyter": {
+     "outputs_hidden": false
+    }
+   },
+   "outputs": [],
+   "source": [
+    "ts.shift(1, freq='M')"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Periods and period arithmetic\n",
+    "------------------------------\n",
+    "\n",
+    "Periods represent time spans like months or quarters or years."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "collapsed": false,
+    "jupyter": {
+     "outputs_hidden": false
+    }
+   },
+   "outputs": [],
+   "source": [
+    "p = pd.Period('6/1/2014',freq='M')\n",
+    "p"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "collapsed": false,
+    "jupyter": {
+     "outputs_hidden": false
+    }
+   },
+   "outputs": [],
+   "source": [
+    "p+6"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "collapsed": false,
+    "jupyter": {
+     "outputs_hidden": false
+    }
+   },
+   "outputs": [],
+   "source": [
+    "# Ranges of periods is done much like ranges of dates\n",
+    "rng = pd.period_range('1/1/2010','6/1/2014',freq='Q')"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "collapsed": false,
+    "jupyter": {
+     "outputs_hidden": false
+    }
+   },
+   "outputs": [],
+   "source": [
+    "rng"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "collapsed": false,
+    "jupyter": {
+     "outputs_hidden": false
+    }
+   },
+   "outputs": [],
+   "source": [
+    "list(rng)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "collapsed": false,
+    "jupyter": {
+     "outputs_hidden": false
+    }
+   },
+   "outputs": [],
+   "source": [
+    "p.asfreq('M','start')"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "collapsed": false,
+    "jupyter": {
+     "outputs_hidden": false
+    }
+   },
+   "outputs": [],
+   "source": [
+    "p.asfreq('M','end')"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Resampling and frequency conversion\n",
+    "-----------------------------------\n",
+    "\n",
+    "*Resampling* - convert time series from one frequency to another.\n",
+    "\n",
+    "- *Downsampling* - higher frequency to lower frequency (e.g. daily to monthly)\n",
+    "- *Upsampling* - lower frequency to higher frequency (e.g. annual to monthly)\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Downsampling\n",
+    "\n",
+    "Take a daily time series and convert to monthly.\n",
+    "\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "collapsed": false,
+    "jupyter": {
+     "outputs_hidden": false
+    }
+   },
+   "outputs": [],
+   "source": [
+    "rng = pd.date_range('9/1/2012',periods=100,freq='D')"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "collapsed": false,
+    "jupyter": {
+     "outputs_hidden": false
+    }
+   },
+   "outputs": [],
+   "source": [
+    "ts = Series(np.random.randint(1,25,len(rng)),index=rng)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "collapsed": false,
+    "jupyter": {
+     "outputs_hidden": false
+    }
+   },
+   "outputs": [],
+   "source": [
+    "ts"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "collapsed": false,
+    "jupyter": {
+     "outputs_hidden": false
+    }
+   },
+   "outputs": [],
+   "source": [
+    "ts.resample('M',how='mean',kind='period')"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "collapsed": false,
+    "jupyter": {
+     "outputs_hidden": false
+    }
+   },
+   "outputs": [],
+   "source": [
+    "ts.resample('M',how='sum',kind='period')"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "collapsed": false,
+    "jupyter": {
+     "outputs_hidden": false
+    }
+   },
+   "outputs": [],
+   "source": [
+    "ts.resample('M',how='sum')"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Whenver you are downsampling, you need to think about two *bin boundary* issues:\n",
+    "\n",
+    "* is the interval closed on the left or the right?\n",
+    "* is the bin label based on the left or right bin boundary?\n",
+    "\n",
+    "With resampling from days to months, the question of left or right closure isn't really an issue, but consider changing from 15 minute time bins to 30 minute time bins."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "collapsed": false,
+    "jupyter": {
+     "outputs_hidden": false
+    }
+   },
+   "outputs": [],
+   "source": [
+    "rng15 = pd.date_range('9/1/2012',periods=96,freq='15T')"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "collapsed": false,
+    "jupyter": {
+     "outputs_hidden": false
+    }
+   },
+   "outputs": [],
+   "source": [
+    "ts15 = Series(np.random.randint(1,25,len(rng15)),index=rng15)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "collapsed": false,
+    "jupyter": {
+     "outputs_hidden": false
+    }
+   },
+   "outputs": [],
+   "source": [
+    "ts15"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Now, if we resample to 30 minute bins and take the mean across each set of two 15 bins, we need to specify if the times on the half hour such as 22:30 in the original series should go in the bin from (22:15,22:30] or [22:30,22:45). The first is referred to as closed on the right and the second as closed on the left. The default is close on right. You can also control whether the left or right edge of the bin is used as the label (independent of which side \"closes\" the interval)."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "collapsed": false,
+    "jupyter": {
+     "outputs_hidden": false
+    }
+   },
+   "outputs": [],
+   "source": [
+    "ts15.resample('30min', how='mean', closed='right', label='left')"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Notice how in the example above, the first record is labelled with '2012-08-31' since it's the left boundary and we picked 'right' for closing intervals and 'left' for labelling. We might want to close and label on the left."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "collapsed": false,
+    "jupyter": {
+     "outputs_hidden": false
+    }
+   },
+   "outputs": [],
+   "source": [
+    "ts30 = ts15.resample('30min', how='mean', closed='left', label='left')\n",
+    "ts30"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "A common financial aggregation is to compute the first (open), last (close), max (high), min (low) values for each bucket. If you use 'ohlc' for the `how` argument, you get a `DataFrame` with these aggregations computed automatically."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "collapsed": false,
+    "jupyter": {
+     "outputs_hidden": false
+    }
+   },
+   "outputs": [],
+   "source": [
+    "ts60 = ts15.resample('60min', how='ohlc', closed='left', label='left')\n",
+    "ts60"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Upsampling\n",
+    "\n",
+    "Upsampling brings an entirely different set of challenges. If we increase the frequency of the samples, how do we fill in these new time series values? For example, consider the reverse of the last example. Then check out the `fill_method` options."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "collapsed": false,
+    "jupyter": {
+     "outputs_hidden": false
+    }
+   },
+   "outputs": [],
+   "source": [
+    "ts30"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "collapsed": false,
+    "jupyter": {
+     "outputs_hidden": false
+    }
+   },
+   "outputs": [],
+   "source": [
+    "ts30.resample('15min')"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Time Series Plotting \n",
+    "--------------------\n",
+    "\n",
+    "Pandas tries to make it a little easier to create nice looking time series plots using `matplotlib` than if you just used `matplotlib` yourself. Let's read in some stock price data from Yahoo! Finance that has already been saved to a csv file."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "collapsed": false,
+    "jupyter": {
+     "outputs_hidden": false
+    }
+   },
+   "outputs": [],
+   "source": [
+    "close_px_all = pd.read_csv('stock_px.csv', parse_dates=True, index_col=0)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "collapsed": false,
+    "jupyter": {
+     "outputs_hidden": false
+    }
+   },
+   "outputs": [],
+   "source": [
+    "close_px_all.head()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "collapsed": false,
+    "jupyter": {
+     "outputs_hidden": false
+    }
+   },
+   "outputs": [],
+   "source": [
+    "close_px = close_px_all[['AAPL','MSFT','XOM']]"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "collapsed": false,
+    "jupyter": {
+     "outputs_hidden": false
+    }
+   },
+   "outputs": [],
+   "source": [
+    "close_px[1:10]"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "collapsed": false,
+    "jupyter": {
+     "outputs_hidden": false
+    }
+   },
+   "outputs": [],
+   "source": [
+    "close_px['AAPL'].plot()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "collapsed": false,
+    "jupyter": {
+     "outputs_hidden": false
+    }
+   },
+   "outputs": [],
+   "source": [
+    "close_px.plot()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "collapsed": false,
+    "jupyter": {
+     "outputs_hidden": false
+    }
+   },
+   "outputs": [],
+   "source": [
+    "# And here's what it looks like if we just plot one year. Notice the auto x-axis formatting.\n",
+    "close_px.ix['2009'].plot()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "collapsed": false,
+    "jupyter": {
+     "outputs_hidden": false
+    }
+   },
+   "outputs": [],
+   "source": [
+    "close_px.index"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "collapsed": false,
+    "jupyter": {
+     "outputs_hidden": false
+    }
+   },
+   "outputs": [],
+   "source": [
+    "list(close_px.index)[1:25]"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "collapsed": false,
+    "jupyter": {
+     "outputs_hidden": false
+    }
+   },
+   "outputs": [],
+   "source": [
+    "close_px['AAPL'].ix['01-2011':'03-2011'].plot()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Pandas does a particulary nice job with quarterly data."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "collapsed": false,
+    "jupyter": {
+     "outputs_hidden": false
+    }
+   },
+   "outputs": [],
+   "source": [
+    "appl_q = close_px['AAPL'].resample('Q-DEC')"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "collapsed": false,
+    "jupyter": {
+     "outputs_hidden": false
+    }
+   },
+   "outputs": [],
+   "source": [
+    "appl_q"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "collapsed": false,
+    "jupyter": {
+     "outputs_hidden": false
+    }
+   },
+   "outputs": [],
+   "source": [
+    "appl_q.ix['2009':].plot()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Moving window functions\n",
+    "\n",
+    "Pandas makes it easy to do all kinds of *moving window* operations like moving average, cumulative sums, and even things like exponential moving averages (\"exponential smoothing\")."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "collapsed": false,
+    "jupyter": {
+     "outputs_hidden": false
+    }
+   },
+   "outputs": [],
+   "source": [
+    "close_px.AAPL.plot()\n",
+    "pd.rolling_mean(close_px.AAPL,250).plot()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "collapsed": false,
+    "jupyter": {
+     "outputs_hidden": false
+    }
+   },
+   "outputs": [],
+   "source": [
+    "pd.rolling_mean(close_px.AAPL,250)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "This example shows one problem with a moving average - by default you usually can't compute it until you have data for the number of periods corresponding to the window size (250 in this case). Pandas lets you specify an alternate minumum number of data points to get around this problem."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "collapsed": false,
+    "jupyter": {
+     "outputs_hidden": false
+    }
+   },
+   "outputs": [],
+   "source": [
+    "pd.rolling_mean(close_px.AAPL,250,min_periods=10)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "collapsed": false,
+    "jupyter": {
+     "outputs_hidden": false
+    }
+   },
+   "outputs": [],
+   "source": [
+    "close_px.AAPL.plot()\n",
+    "pd.rolling_mean(close_px.AAPL,250,min_periods=10).plot()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "collapsed": false,
+    "jupyter": {
+     "outputs_hidden": false
+    }
+   },
+   "outputs": [],
+   "source": [
+    "# Things like rolling standard deviation are also possible\n",
+    "appl_std250 = pd.rolling_std(close_px.AAPL,250,min_periods=10)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "collapsed": false,
+    "jupyter": {
+     "outputs_hidden": false
+    }
+   },
+   "outputs": [],
+   "source": [
+    "appl_std250.plot()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Learn more about pandas timeseries\n",
+    "-----------------------------------\n",
+    "\n",
+    "Another intro tutorial is [http://earthpy.org/pandas-basics.html](http://earthpy.org/pandas-basics.html)\n",
+    "\n",
+    "Wes Mckinney's 2012 PyCon talk on pandas and timeseries - [http://pyvideo.org/video/1198/time-series-data-analysis-with-pandas](http://pyvideo.org/video/1198/time-series-data-analysis-with-pandas)"
+   ]
+  }
+ ],
+ "metadata": {
+  "anaconda-cloud": {},
+  "kernelspec": {
+   "display_name": "Python 3",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.8.8"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 4
+}

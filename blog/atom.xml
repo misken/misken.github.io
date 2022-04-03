@@ -2,10 +2,84 @@
 <feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en">
   <id>https://misken.github.io/</id>
   <title>Bits of analytics</title>
-  <updated>2022-04-03T01:01:17.924450+00:00</updated>
+  <updated>2022-04-03T03:17:22.351713+00:00</updated>
   <link href="https://misken.github.io/"/>
   <link href="https://misken.github.io/blog/atom.xml" rel="self"/>
   <generator uri="https://ablog.readthedocs.org/" version="0.10.23">ABlog</generator>
+  <entry>
+    <id>https://misken.github.io/blog/eda_post_balance_func_sfcs/</id>
+    <title>Use R to explore station balance in bike share systems - and learn a little dplyr programming</title>
+    <updated>2019-01-31T00:00:00-05:00</updated>
+    <author>
+      <name>misken</name>
+    </author>
+    <content type="html">&lt;div class="ablog-post-excerpt docutils container"&gt;
+&lt;p&gt;Creating a function to analyze events by date which takes “zero days” into account&lt;/p&gt;
+&lt;/div&gt;
+</content>
+    <link href="https://misken.github.io/blog/eda_post_balance_func_sfcs/" rel="alternate"/>
+    <summary>Creating a function to analyze events by date which takes “zero days” into account</summary>
+    <category term="R" label="R"/>
+    <category term="dplyr" label="dplyr"/>
+    <category term="bikeshare" label="bikeshare"/>
+    <published>2019-01-31T00:00:00-05:00</published>
+  </entry>
+  <entry>
+    <id>https://misken.github.io/blog/otbirders_2_stats_2018/</id>
+    <title>Wednesday Birders - 2018 stats and historical analysis using R</title>
+    <updated>2019-02-04T00:00:00-05:00</updated>
+    <author>
+      <name>misken</name>
+    </author>
+    <content type="html">&lt;div class="ablog-post-excerpt docutils container"&gt;
+&lt;p&gt;Using the eBird API from Python, we downloaded birding lists submitted by our Wednesday morning birding group. R was then used to produce various plots relating to counts of birds sighted and frequency of list appearance, by species.&lt;/p&gt;
+&lt;/div&gt;
+</content>
+    <link href="https://misken.github.io/blog/otbirders_2_stats_2018/" rel="alternate"/>
+    <summary>Using the eBird API from Python, we downloaded birding lists submitted by our Wednesday morning birding group. R was then used to produce various plots relating to counts of birds sighted and frequency of list appearance, by species.</summary>
+    <category term="R" label="R"/>
+    <category term="python" label="python"/>
+    <category term="birding" label="birding"/>
+    <category term="dplyr" label="dplyr"/>
+    <category term="ggplot2" label="ggplot2"/>
+    <category term="ebird" label="ebird"/>
+    <published>2019-02-04T00:00:00-05:00</published>
+  </entry>
+  <entry>
+    <id>https://misken.github.io/blog/git_newbie_error/</id>
+    <title>A common git / GitHub error by those new to git</title>
+    <updated>2019-02-13T00:00:00-05:00</updated>
+    <author>
+      <name>misken</name>
+    </author>
+    <content type="html">&lt;div class="ablog-post-excerpt docutils container"&gt;
+&lt;p&gt;Recover from a common git error.&lt;/p&gt;
+&lt;/div&gt;
+</content>
+    <link href="https://misken.github.io/blog/git_newbie_error/" rel="alternate"/>
+    <summary>Recover from a common git error.</summary>
+    <category term="git" label="git"/>
+    <category term="GitHub" label="GitHub"/>
+    <published>2019-02-13T00:00:00-05:00</published>
+  </entry>
+  <entry>
+    <id>https://misken.github.io/blog/hillmaker_r_sfcs/</id>
+    <title>Using hillmaker from R with reticulate to analyze time of day patterns in bike share data</title>
+    <updated>2019-02-23T00:00:00-05:00</updated>
+    <author>
+      <name>misken</name>
+    </author>
+    <content type="html">&lt;div class="ablog-post-excerpt docutils container"&gt;
+&lt;p&gt;Python based hillmaker is called from R using reticulate.&lt;/p&gt;
+&lt;/div&gt;
+</content>
+    <link href="https://misken.github.io/blog/hillmaker_r_sfcs/" rel="alternate"/>
+    <summary>Python based hillmaker is called from R using reticulate.</summary>
+    <category term="R" label="R"/>
+    <category term="python" label="python"/>
+    <category term="hillmaker" label="hillmaker"/>
+    <published>2019-02-23T00:00:00-05:00</published>
+  </entry>
   <entry>
     <id>https://misken.github.io/blog/getandplot_gl_water_levels/</id>
     <title>Using R to download and plot Great Lakes historical water level data</title>
@@ -157,6 +231,23 @@
     <link href="https://misken.github.io/blog/first-post/" rel="alternate"/>
     <summary>hselab.org has moved</summary>
     <published>2022-04-01T00:00:00-04:00</published>
+  </entry>
+  <entry>
+    <id>https://misken.github.io/blog/datetime_exploring/</id>
+    <title>Exploring dates and times in Python</title>
+    <updated>2022-04-02T00:00:00-04:00</updated>
+    <author>
+      <name>misken</name>
+    </author>
+    <content type="html">&lt;div class="ablog-post-excerpt docutils container"&gt;
+&lt;p&gt;Fun with dates and times in Python&lt;/p&gt;
+&lt;/div&gt;
+</content>
+    <link href="https://misken.github.io/blog/datetime_exploring/" rel="alternate"/>
+    <summary>Fun with dates and times in Python</summary>
+    <category term="python" label="python"/>
+    <category term="datetime" label="datetime"/>
+    <published>2022-04-02T00:00:00-04:00</published>
   </entry>
   <entry>
     <id>https://misken.github.io/blog/hello_world/</id>
