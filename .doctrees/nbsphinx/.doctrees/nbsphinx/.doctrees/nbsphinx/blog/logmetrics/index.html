@@ -1,0 +1,1002 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>Firewood math and metrics &#8212; misken 0,1,0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../../../../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../../../../../_static/alabaster.css" />
+    <script data-url_root="../../../../../../../../" id="documentation_options" src="../../../../../../../../_static/documentation_options.js"></script>
+    <script src="../../../../../../../../_static/jquery.js"></script>
+    <script src="../../../../../../../../_static/underscore.js"></script>
+    <script src="../../../../../../../../_static/doctools.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <link rel="author" title="About these documents" href="../../../../../../../../about/" />
+    <link rel="index" title="Index" href="../../../../../../../../genindex/" />
+    <link rel="search" title="Search" href="../../../../../../../../search/" /> 
+   
+  <link rel="stylesheet" href="../../../../../../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+ 
+<link
+  rel="alternate"
+  type="application/atom+xml"
+  href="../../../../../../../../blog/atom.xml"
+  title="Bits of analytics"
+/>
+ 
+<style type="text/css">
+  ul.ablog-archive {
+    list-style: none;
+    overflow: auto;
+    margin-left: 0px;
+  }
+  ul.ablog-archive li {
+    float: left;
+    margin-right: 5px;
+    font-size: 80%;
+  }
+  ul.postlist a {
+    font-style: italic;
+  }
+  ul.postlist-style-disc {
+    list-style-type: disc;
+  }
+  ul.postlist-style-none {
+    list-style-type: none;
+  }
+  ul.postlist-style-circle {
+    list-style-type: circle;
+  }
+</style>
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+             
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt *,
+div.nbinput.container div.input_area pre,
+div.nboutput.container div.output_area pre,
+div.nbinput.container div.input_area .highlight,
+div.nboutput.container div.output_area .highlight {
+    border: none;
+    padding: 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+div.nbinput.container > div[class*=highlight],
+div.nboutput.container > div[class*=highlight] {
+    margin: 0;
+}
+
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt * {
+    background: none;
+}
+
+div.nboutput.container div.output_area .highlight,
+div.nboutput.container div.output_area pre {
+    background: unset;
+}
+
+div.nboutput.container div.output_area div.highlight {
+    color: unset;  /* override Pygments text color */
+}
+
+/* avoid gaps between output lines */
+div.nboutput.container div[class*=highlight] pre {
+    line-height: normal;
+}
+
+/* input/output containers */
+div.nbinput.container,
+div.nboutput.container {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+    width: 100%;
+}
+@media (max-width: 540px) {
+    div.nbinput.container,
+    div.nboutput.container {
+        flex-direction: column;
+    }
+}
+
+/* input container */
+div.nbinput.container {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast.container {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput.container div.prompt pre {
+    color: #307FC1;
+}
+
+/* output prompt */
+div.nboutput.container div.prompt pre {
+    color: #BF5B3D;
+}
+
+/* all prompts */
+div.nbinput.container div.prompt,
+div.nboutput.container div.prompt {
+    width: 4.5ex;
+    padding-top: 5px;
+    position: relative;
+    user-select: none;
+}
+
+div.nbinput.container div.prompt > div,
+div.nboutput.container div.prompt > div {
+    position: absolute;
+    right: 0;
+    margin-right: 0.3ex;
+}
+
+@media (max-width: 540px) {
+    div.nbinput.container div.prompt,
+    div.nboutput.container div.prompt {
+        width: unset;
+        text-align: left;
+        padding: 0.4em;
+    }
+    div.nboutput.container div.prompt.empty {
+        padding: 0;
+    }
+
+    div.nbinput.container div.prompt > div,
+    div.nboutput.container div.prompt > div {
+        position: unset;
+    }
+}
+
+/* disable scrollbars on prompts */
+div.nbinput.container div.prompt pre,
+div.nboutput.container div.prompt pre {
+    overflow: hidden;
+}
+
+/* input/output area */
+div.nbinput.container div.input_area,
+div.nboutput.container div.output_area {
+    -webkit-flex: 1;
+    flex: 1;
+    overflow: auto;
+}
+@media (max-width: 540px) {
+    div.nbinput.container div.input_area,
+    div.nboutput.container div.output_area {
+        width: 100%;
+    }
+}
+
+/* input area */
+div.nbinput.container div.input_area {
+    border: 1px solid #e0e0e0;
+    border-radius: 2px;
+    /*background: #f5f5f5;*/
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput.container div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.imgmath center alignment in output cells */
+div.nboutput.container div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput.container div.output_area.stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-default-inverse-fg { color: #FFFFFF; }
+.ansi-default-inverse-bg { background-color: #000000; }
+
+.ansi-bold { font-weight: bold; }
+.ansi-underline { text-decoration: underline; }
+
+
+div.nbinput.container div.input_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight].math,
+div.nboutput.container div.output_area.rendered_html,
+div.nboutput.container div.output_area > div.output_javascript,
+div.nboutput.container div.output_area:not(.rendered_html) > img{
+    padding: 5px;
+    margin: 0;
+}
+
+/* fix copybtn overflow problem in chromium (needed for 'sphinx_copybutton') */
+div.nbinput.container div.input_area > div[class^='highlight'],
+div.nboutput.container div.output_area > div[class^='highlight']{
+    overflow-y: hidden;
+}
+
+/* hide copybtn icon on prompts (needed for 'sphinx_copybutton') */
+.prompt .copybtn {
+    display: none;
+}
+
+/* Some additional styling taken form the Jupyter notebook CSS */
+div.rendered_html table {
+  border: none;
+  border-collapse: collapse;
+  border-spacing: 0;
+  color: black;
+  font-size: 12px;
+  table-layout: fixed;
+}
+div.rendered_html thead {
+  border-bottom: 1px solid black;
+  vertical-align: bottom;
+}
+div.rendered_html tr,
+div.rendered_html th,
+div.rendered_html td {
+  text-align: right;
+  vertical-align: middle;
+  padding: 0.5em 0.5em;
+  line-height: normal;
+  white-space: normal;
+  max-width: none;
+  border: none;
+}
+div.rendered_html th {
+  font-weight: bold;
+}
+div.rendered_html tbody tr:nth-child(odd) {
+  background: #f5f5f5;
+}
+div.rendered_html tbody tr:hover {
+  background: rgba(66, 165, 245, 0.2);
+}
+</style>
+<section id="Firewood-math-and-metrics">
+<h1>Firewood math and metrics<a class="headerlink" href="#Firewood-math-and-metrics" title="Permalink to this headline">¶</a></h1>
+<p>Firewood metrics and simulating firewood use</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%</span><span class="k">matplotlib</span> inline
+</pre></div>
+</div>
+</div>
+<p>We inherited a large pile of firewood for a wood burning stove. We’ve never had a wood burning stove. People who actually know something about, or sell, firewood for such devices talk about <em>cords</em> and <em>face cords</em> of firewood. Time to learn something about firewood metrics.</p>
+<section id="Cords-and-face-cords">
+<h2>Cords and face cords<a class="headerlink" href="#Cords-and-face-cords" title="Permalink to this headline">¶</a></h2>
+<p>A <a class="reference external" href="https://woodheat.org/cord-wood.html">cord of firewood</a> is about <span class="math notranslate nohighlight">\(4 \text{ft} \times 4 \text{ft} \times 8 \text{ft}\)</span>, or <span class="math notranslate nohighlight">\(128 \text{ft}^3\)</span> in volume. Typically, a log for a wood burning stove is approximately <span class="math notranslate nohighlight">\(16 \text{in}\)</span>. So, you can slice a full cord into three <em>face cords</em>, each being <span class="math notranslate nohighlight">\(4 \text{ft} \times 1 \frac {1}{3} \text{ft} \times 8 \text{ft}\)</span>. Of course, that’s not all wood because there is a bunch of air in the stack. But, I’m not so interested in weight,
+I’m interested in number of logs and how long our stack of wood will last.</p>
+</section>
+<section id="How-much-wood-do-we-have?">
+<h2>How much wood do we have?<a class="headerlink" href="#How-much-wood-do-we-have?" title="Permalink to this headline">¶</a></h2>
+<p>It appears that when our stack of logs was full, it was two cords (~16 feet long).</p>
+<p>Obviously, the number of logs in a face cord is dependent on the diameter of the logs. I did a rough count and got about 20 logs wide by 10 logs high for each face cord.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[41]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pile_height_logs</span> <span class="o">=</span> <span class="mi">10</span>
+<span class="n">pile_width_logs</span> <span class="o">=</span> <span class="mi">20</span>
+<span class="n">logs_per_facecord</span> <span class="o">=</span> <span class="n">pile_height_logs</span> <span class="o">*</span> <span class="n">pile_width_logs</span>
+<span class="n">logs_per_cord</span> <span class="o">=</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">logs_per_facecord</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Logs per face cord: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">logs_per_facecord</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Logs per cord: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">logs_per_cord</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Logs per face cord: 200
+Logs per cord: 600
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">num_facecords</span> <span class="o">=</span> <span class="mi">6</span>
+<span class="n">tot_logs</span> <span class="o">=</span> <span class="n">logs_per_facecord</span> <span class="o">*</span> <span class="n">num_facecords</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Total logs in full pile: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">tot_logs</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Total logs in full pile: 1200
+</pre></div></div>
+</div>
+<p>We’ve used some wood - maybe about 75% of a face cord.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">num_facecords_used</span> <span class="o">=</span> <span class="mf">0.75</span>
+<span class="n">tot_logs_remaining</span> <span class="o">=</span> <span class="n">logs_per_facecord</span> <span class="o">*</span> <span class="p">(</span><span class="n">num_facecords</span> <span class="o">-</span> <span class="n">num_facecords_used</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Total logs left in partial pile: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">tot_logs_remaining</span><span class="p">)))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Total logs left in partial pile: 1050
+</pre></div></div>
+</div>
+</section>
+<section id="How-much-wood-do-we-use?">
+<h2>How much wood do we use?<a class="headerlink" href="#How-much-wood-do-we-use?" title="Permalink to this headline">¶</a></h2>
+<p>On a winter day in which we keep the stove going from morning until night, we use approximately 12-14 logs.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">logs_per_day</span> <span class="o">=</span> <span class="mi">13</span>
+</pre></div>
+</div>
+</div>
+<p>The largest source of uncertainty is the number of <em>equivalent burning days</em> (EBD) in which we use the stove. Some days we might just burn a few logs in the evening. Here’s an estimate of EBD by month:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ebd_month_mean</span> <span class="o">=</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">logs_per_month_mean</span> <span class="o">=</span> <span class="p">[</span><span class="n">logs_per_day</span> <span class="o">*</span> <span class="n">ebd</span> <span class="k">for</span> <span class="n">ebd</span> <span class="ow">in</span> <span class="n">ebd_month_mean</span><span class="p">]</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">logs_per_month_mean</span><span class="p">)</span>
+<span class="n">logs_per_year</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">logs_per_month_mean</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Total logs burned per year: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">logs_per_year</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[65, 130, 65, 65, 26, 13, 26, 13, 39, 65, 65, 130]
+Total logs burned per year: 702
+</pre></div></div>
+</div>
+</section>
+<section id="How-long-would-a-cord-last?">
+<h2>How long would a cord last?<a class="headerlink" href="#How-long-would-a-cord-last?" title="Permalink to this headline">¶</a></h2>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;One cord lasts ~ </span><span class="si">{:.2f}</span><span class="s2"> years.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">logs_per_cord</span> <span class="o">/</span> <span class="n">logs_per_year</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+One cord lasts ~ 0.85 years.
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Two cords lasts ~ </span><span class="si">{:.2f}</span><span class="s2"> years.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">logs_per_cord</span> <span class="o">/</span> <span class="n">logs_per_year</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Two cords lasts ~ 1.71 years.
+</pre></div></div>
+</div>
+</section>
+<section id="Simulating-firewood-use">
+<h2>Simulating firewood use<a class="headerlink" href="#Simulating-firewood-use" title="Permalink to this headline">¶</a></h2>
+<p>The largest component of uncertainty is our monthly usage. Let’s assume that log usage can be approximated by a normal distribution with monthly means specified by <code class="docutils literal notranslate"><span class="pre">logs_per_month_mean</span></code> and monthly standard deviations equal to the square root of the means.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">logs_per_month_sd</span> <span class="o">=</span> <span class="p">[</span><span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">mean</span><span class="p">)</span> <span class="k">for</span> <span class="n">mean</span> <span class="ow">in</span> <span class="n">logs_per_month_mean</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<p>Let’s have the simulation clock tick in months and we’ll simulate until we run out of logs. We’ll record the month in which that happens.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">logsim</span><span class="p">(</span><span class="n">numlogs</span><span class="p">,</span> <span class="n">logs_per_month_mean</span><span class="p">,</span> <span class="n">logs_per_month_sd</span><span class="p">):</span>
+    <span class="n">period</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">month</span> <span class="o">=</span> <span class="n">period</span> <span class="o">%</span> <span class="mi">12</span>
+
+    <span class="k">while</span> <span class="n">numlogs</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">logs_used</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">logs_per_month_mean</span><span class="p">[</span><span class="n">month</span><span class="p">],</span> <span class="n">logs_per_month_sd</span><span class="p">[</span><span class="n">month</span><span class="p">]))</span>
+        <span class="n">numlogs</span> <span class="o">-=</span> <span class="n">logs_used</span>
+        <span class="n">period</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="n">month</span> <span class="o">=</span> <span class="n">period</span> <span class="o">%</span> <span class="mi">12</span>
+
+    <span class="k">return</span> <span class="n">period</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">nsim</span> <span class="o">=</span> <span class="mi">10000</span>
+<span class="n">sim</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">stockout_period</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">num_logs_current</span> <span class="o">=</span> <span class="n">tot_logs_remaining</span>
+
+<span class="k">while</span> <span class="n">sim</span> <span class="o">&lt;</span> <span class="n">nsim</span><span class="p">:</span>
+    <span class="n">so_prd</span> <span class="o">=</span> <span class="n">logsim</span><span class="p">(</span><span class="n">num_logs_current</span><span class="p">,</span> <span class="n">logs_per_month_mean</span><span class="p">,</span> <span class="n">logs_per_month_sd</span><span class="p">)</span>
+    <span class="n">stockout_period</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">so_prd</span><span class="p">)</span>
+    <span class="n">sim</span> <span class="o">+=</span> <span class="mi">1</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">stockout_period</span><span class="p">[:</span><span class="mi">100</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[18, 19, 19, 16, 17, 16, 16, 16, 17, 16, 19, 20, 20, 16, 20, 18, 16, 16, 18, 18, 19, 18, 19, 19, 18, 16, 21, 19, 16, 20, 19, 16, 16, 20, 16, 17, 21, 16, 16, 16, 20, 16, 19, 19, 16, 17, 19, 17, 19, 21, 19, 18, 19, 17, 16, 18, 19, 17, 19, 17, 19, 17, 19, 18, 19, 16, 19, 17, 19, 18, 21, 19, 16, 19, 16, 17, 16, 21, 17, 17, 19, 19, 18, 18, 19, 20, 16, 20, 19, 17, 19, 18, 17, 17, 16, 17, 17, 19, 17, 18]
+</pre></div></div>
+</div>
+<p>Let’s compute summary stats and create a histogram.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[27]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">stockout_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;stockout_period&#39;</span><span class="p">:</span> <span class="n">stockout_period</span><span class="p">})</span>
+<span class="n">stockout_stats</span> <span class="o">=</span> <span class="n">stockout_df</span><span class="o">.</span><span class="n">describe</span><span class="p">()</span>
+<span class="n">stockout_stats</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[27]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>stockout_period</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>count</th>
+      <td>10000.000000</td>
+    </tr>
+    <tr>
+      <th>mean</th>
+      <td>17.659300</td>
+    </tr>
+    <tr>
+      <th>std</th>
+      <td>1.426474</td>
+    </tr>
+    <tr>
+      <th>min</th>
+      <td>15.000000</td>
+    </tr>
+    <tr>
+      <th>25%</th>
+      <td>17.000000</td>
+    </tr>
+    <tr>
+      <th>50%</th>
+      <td>17.000000</td>
+    </tr>
+    <tr>
+      <th>75%</th>
+      <td>19.000000</td>
+    </tr>
+    <tr>
+      <th>max</th>
+      <td>22.000000</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[33]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">minbin</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">stockout_stats</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;min&#39;</span><span class="p">])</span><span class="o">-</span><span class="mi">1</span>
+<span class="n">maxbin</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">stockout_stats</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;max&#39;</span><span class="p">])</span><span class="o">+</span><span class="mi">1</span>
+<span class="n">bins</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">minbin</span><span class="p">,</span> <span class="n">maxbin</span><span class="p">,</span> <span class="n">maxbin</span> <span class="o">-</span> <span class="n">minbin</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">bins</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[33]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+array([14., 15., 16., 17., 18., 19., 20., 21., 22., 23.])
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[34]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><br/><span></span><span class="n">so_df</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">bins</span><span class="o">=</span><span class="n">bins</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[34]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+array([[&lt;matplotlib.axes._subplots.AxesSubplot object at 0x7fc4df3dcd30&gt;]],
+      dtype=object)
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../../../../../../../_images/.doctrees_nbsphinx_.doctrees_nbsphinx_.doctrees_nbsphinx_blog_logmetrics_27_1.png" src="../../../../../../../../_images/.doctrees_nbsphinx_.doctrees_nbsphinx_.doctrees_nbsphinx_blog_logmetrics_27_1.png" />
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[38]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">start_period</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Period</span><span class="p">(</span><span class="s1">&#39;2019-01-01&#39;</span><span class="p">,</span><span class="n">freq</span><span class="o">=</span><span class="s1">&#39;M&#39;</span><span class="p">)</span>
+<span class="n">median_stockout</span> <span class="o">=</span> <span class="n">start_period</span> <span class="o">+</span> <span class="nb">int</span><span class="p">(</span><span class="n">stockout_stats</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;50%&#39;</span><span class="p">])</span>
+<span class="n">q1_stockout</span> <span class="o">=</span> <span class="n">start_period</span> <span class="o">+</span> <span class="nb">int</span><span class="p">(</span><span class="n">stockout_stats</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;25%&#39;</span><span class="p">])</span>
+<span class="n">q3_stockout</span> <span class="o">=</span> <span class="n">start_period</span> <span class="o">+</span> <span class="nb">int</span><span class="p">(</span><span class="n">stockout_stats</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;75%&#39;</span><span class="p">])</span>
+<br/></pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[40]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;The median stockout period is: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">median_stockout</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;The IQR for the stockout period is: </span><span class="si">{}</span><span class="s2"> - </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">q1_stockout</span><span class="p">,</span> <span class="n">q3_stockout</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+The median stockout period is: 2020-06
+The IQR for the stockout period is: 2020-06 - 2020-08
+</pre></div></div>
+</div>
+<p>Looks like the log pile will be gone in summer of 2020.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
+</section>
+</section>
+
+<div class="section">
+    
+
+<div class="section">
+  <span style="float: left">
+     Previous:
+    
+    <a href="../../../../../../blog/basic_usage_cycleshare/">
+       Analyzing bike usage by time of day and day of week
+    </a>
+    
+  </span>
+  <span>&nbsp;</span>
+  <span style="float: right">
+     Next: 
+    <a href="../../../../blog/logmetrics/">
+      Firewood math and metrics 
+    </a>
+    
+  </span>
+</div>
+  
+</div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../../../../../../../">misken</a></h1>
+
+
+
+
+
+
+
+
+  
+<h2>
+   
+  01 January 2019 
+</h2>
+
+<ul>
+   
+<li id="author">
+  <span
+    >Author:</span
+  >
+   
+  <a href="../../../../../../../../blog/author/misken/">misken</a>  
+</li>
+    
+<li id="tags">
+  <span
+    >Tags: </span
+  >
+   
+  <a href="../../../../../../../../blog/tag/jupyter/">jupyter</a>   
+  <a href="../../../../../../../../blog/tag/ablog/">ablog</a>  
+</li>
+ 
+</ul>
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../../about/">About misken</a></li>
+</ul>
+
+
+<h3>
+  <a href="../../../../../../../../blog/">Recent Posts</a>
+</h3>
+<ul>
+   
+  <li>
+    <a href="../../../../../../../../blog/simpy_getting_started_vaccine_clinic/"
+      >04 April - Using SimPy to simulate a vaccine clinic - Part 1: an introductory tutorial</a
+    >
+  </li>
+  
+  <li>
+    <a href="../simpy_getting_started_vaccine_clinic/"
+      >04 April - Using SimPy to simulate a vaccine clinic - Part 1: an introductory tutorial</a
+    >
+  </li>
+  
+  <li>
+    <a href="../../../../blog/simpy_getting_started_vaccine_clinic/"
+      >04 April - Using SimPy to simulate a vaccine clinic - Part 1: an introductory tutorial</a
+    >
+  </li>
+  
+  <li>
+    <a href="../../../../../../blog/simpy_getting_started_vaccine_clinic/"
+      >04 April - Using SimPy to simulate a vaccine clinic - Part 1: an introductory tutorial</a
+    >
+  </li>
+  
+  <li>
+    <a href="../../../../../../../../blog/use_jupyter_conda_envs/"
+      >03 April - Using different conda environments with Jupyter Lab</a
+    >
+  </li>
+  
+</ul>
+
+<h3><a href="../../../../../../../../blog/tag/">Tags</a></h3>
+<style type="text/css">
+  ul.ablog-cloud {
+    list-style: none;
+    overflow: auto;
+  }
+  ul.ablog-cloud li {
+    float: left;
+    height: 20pt;
+    line-height: 18pt;
+    margin-right: 5px;
+  }
+  ul.ablog-cloud a {
+    text-decoration: none;
+    vertical-align: middle;
+  }
+  li.ablog-cloud-1 {
+    font-size: 80%;
+  }
+  li.ablog-cloud-2 {
+    font-size: 95%;
+  }
+  li.ablog-cloud-3 {
+    font-size: 110%;
+  }
+  li.ablog-cloud-4 {
+    font-size: 125%;
+  }
+  li.ablog-cloud-5 {
+    font-size: 140%;
+  }
+</style>
+<ul class="ablog-cloud">
+   
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../../../../../../../../blog/tag/github/">GitHub</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../../../../../../../../blog/tag/r/">R</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-2">
+    <a href="../../../../../../../../blog/tag/ablog/">ablog</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../../../../../../../../blog/tag/bikeshare/">bikeshare</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../../../../../../../../blog/tag/birding/">birding</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../../../../../../../../blog/tag/blogging/">blogging</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../../../../../../../../blog/tag/conda/">conda</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../../../../../../../../blog/tag/datetime/">datetime</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../../../../../../../../blog/tag/dplyr/">dplyr</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../../../../../../../../blog/tag/ebird/">ebird</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../../../../../../../../blog/tag/ecology/">ecology</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-2">
+    <a href="../../../../../../../../blog/tag/excel/">excel</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../../../../../../../../blog/tag/ggplot2/">ggplot2</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../../../../../../../../blog/tag/gis/">gis</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../../../../../../../../blog/tag/git/">git</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../../../../../../../../blog/tag/hiking/">hiking</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../../../../../../../../blog/tag/hillmaker/">hillmaker</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-2">
+    <a href="../../../../../../../../blog/tag/jupyter/">jupyter</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../../../../../../../../blog/tag/occupancy-analysis/">occupancy analysis</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../../../../../../../../blog/tag/pandas/">pandas</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-5">
+    <a href="../../../../../../../../blog/tag/python/">python</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../../../../../../../../blog/tag/r/">r</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../../../../../../../../blog/tag/sphinx/">sphinx</a>
+  </li>
+   
+</ul>
+
+<h3>
+  <a href="../../../../../../../../blog/archive/">Archives</a>
+</h3>
+<ul>
+   
+  <li>
+    <a href="../../../../../../../../blog/2022/">2022 (11)</a>
+  </li>
+    
+  <li>
+    <a href="../../../../../../../../blog/2021/">2021 (16)</a>
+  </li>
+    
+  <li>
+    <a href="../../../../../../../../blog/2020/">2020 (2)</a>
+  </li>
+    
+  <li>
+    <a href="../../../../../../../../blog/2019/">2019 (13)</a>
+  </li>
+    
+  <li>
+    <a href="../../../../../../../../blog/2018/">2018 (10)</a>
+  </li>
+    
+  <li>
+    <a href="../../../../../../../../blog/2016/">2016 (1)</a>
+  </li>
+    
+  <li>
+    <a href="../../../../../../../../blog/2014/">2014 (4)</a>
+  </li>
+   
+</ul>
+
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../../../../../search/" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2022, misken.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.3.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../../../../../../../../_sources/.doctrees/nbsphinx/.doctrees/nbsphinx/.doctrees/nbsphinx/blog/logmetrics.ipynb.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

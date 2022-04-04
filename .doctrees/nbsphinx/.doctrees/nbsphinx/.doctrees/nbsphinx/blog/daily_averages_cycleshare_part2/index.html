@@ -1,0 +1,3553 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>Computing daily averages from transaction data - Part 2 (using pandas and some R magic) &#8212; misken 0,1,0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../../../../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../../../../../_static/alabaster.css" />
+    <script data-url_root="../../../../../../../../" id="documentation_options" src="../../../../../../../../_static/documentation_options.js"></script>
+    <script src="../../../../../../../../_static/jquery.js"></script>
+    <script src="../../../../../../../../_static/underscore.js"></script>
+    <script src="../../../../../../../../_static/doctools.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <link rel="author" title="About these documents" href="../../../../../../../../about/" />
+    <link rel="index" title="Index" href="../../../../../../../../genindex/" />
+    <link rel="search" title="Search" href="../../../../../../../../search/" /> 
+   
+  <link rel="stylesheet" href="../../../../../../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+ 
+<link
+  rel="alternate"
+  type="application/atom+xml"
+  href="../../../../../../../../blog/atom.xml"
+  title="Bits of analytics"
+/>
+ 
+<style type="text/css">
+  ul.ablog-archive {
+    list-style: none;
+    overflow: auto;
+    margin-left: 0px;
+  }
+  ul.ablog-archive li {
+    float: left;
+    margin-right: 5px;
+    font-size: 80%;
+  }
+  ul.postlist a {
+    font-style: italic;
+  }
+  ul.postlist-style-disc {
+    list-style-type: disc;
+  }
+  ul.postlist-style-none {
+    list-style-type: none;
+  }
+  ul.postlist-style-circle {
+    list-style-type: circle;
+  }
+</style>
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+             
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt *,
+div.nbinput.container div.input_area pre,
+div.nboutput.container div.output_area pre,
+div.nbinput.container div.input_area .highlight,
+div.nboutput.container div.output_area .highlight {
+    border: none;
+    padding: 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+div.nbinput.container > div[class*=highlight],
+div.nboutput.container > div[class*=highlight] {
+    margin: 0;
+}
+
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt * {
+    background: none;
+}
+
+div.nboutput.container div.output_area .highlight,
+div.nboutput.container div.output_area pre {
+    background: unset;
+}
+
+div.nboutput.container div.output_area div.highlight {
+    color: unset;  /* override Pygments text color */
+}
+
+/* avoid gaps between output lines */
+div.nboutput.container div[class*=highlight] pre {
+    line-height: normal;
+}
+
+/* input/output containers */
+div.nbinput.container,
+div.nboutput.container {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+    width: 100%;
+}
+@media (max-width: 540px) {
+    div.nbinput.container,
+    div.nboutput.container {
+        flex-direction: column;
+    }
+}
+
+/* input container */
+div.nbinput.container {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast.container {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput.container div.prompt pre {
+    color: #307FC1;
+}
+
+/* output prompt */
+div.nboutput.container div.prompt pre {
+    color: #BF5B3D;
+}
+
+/* all prompts */
+div.nbinput.container div.prompt,
+div.nboutput.container div.prompt {
+    width: 4.5ex;
+    padding-top: 5px;
+    position: relative;
+    user-select: none;
+}
+
+div.nbinput.container div.prompt > div,
+div.nboutput.container div.prompt > div {
+    position: absolute;
+    right: 0;
+    margin-right: 0.3ex;
+}
+
+@media (max-width: 540px) {
+    div.nbinput.container div.prompt,
+    div.nboutput.container div.prompt {
+        width: unset;
+        text-align: left;
+        padding: 0.4em;
+    }
+    div.nboutput.container div.prompt.empty {
+        padding: 0;
+    }
+
+    div.nbinput.container div.prompt > div,
+    div.nboutput.container div.prompt > div {
+        position: unset;
+    }
+}
+
+/* disable scrollbars on prompts */
+div.nbinput.container div.prompt pre,
+div.nboutput.container div.prompt pre {
+    overflow: hidden;
+}
+
+/* input/output area */
+div.nbinput.container div.input_area,
+div.nboutput.container div.output_area {
+    -webkit-flex: 1;
+    flex: 1;
+    overflow: auto;
+}
+@media (max-width: 540px) {
+    div.nbinput.container div.input_area,
+    div.nboutput.container div.output_area {
+        width: 100%;
+    }
+}
+
+/* input area */
+div.nbinput.container div.input_area {
+    border: 1px solid #e0e0e0;
+    border-radius: 2px;
+    /*background: #f5f5f5;*/
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput.container div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.imgmath center alignment in output cells */
+div.nboutput.container div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput.container div.output_area.stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-default-inverse-fg { color: #FFFFFF; }
+.ansi-default-inverse-bg { background-color: #000000; }
+
+.ansi-bold { font-weight: bold; }
+.ansi-underline { text-decoration: underline; }
+
+
+div.nbinput.container div.input_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight].math,
+div.nboutput.container div.output_area.rendered_html,
+div.nboutput.container div.output_area > div.output_javascript,
+div.nboutput.container div.output_area:not(.rendered_html) > img{
+    padding: 5px;
+    margin: 0;
+}
+
+/* fix copybtn overflow problem in chromium (needed for 'sphinx_copybutton') */
+div.nbinput.container div.input_area > div[class^='highlight'],
+div.nboutput.container div.output_area > div[class^='highlight']{
+    overflow-y: hidden;
+}
+
+/* hide copybtn icon on prompts (needed for 'sphinx_copybutton') */
+.prompt .copybtn {
+    display: none;
+}
+
+/* Some additional styling taken form the Jupyter notebook CSS */
+div.rendered_html table {
+  border: none;
+  border-collapse: collapse;
+  border-spacing: 0;
+  color: black;
+  font-size: 12px;
+  table-layout: fixed;
+}
+div.rendered_html thead {
+  border-bottom: 1px solid black;
+  vertical-align: bottom;
+}
+div.rendered_html tr,
+div.rendered_html th,
+div.rendered_html td {
+  text-align: right;
+  vertical-align: middle;
+  padding: 0.5em 0.5em;
+  line-height: normal;
+  white-space: normal;
+  max-width: none;
+  border: none;
+}
+div.rendered_html th {
+  font-weight: bold;
+}
+div.rendered_html tbody tr:nth-child(odd) {
+  background: #f5f5f5;
+}
+div.rendered_html tbody tr:hover {
+  background: rgba(66, 165, 245, 0.2);
+}
+</style>
+<section id="Computing-daily-averages-from-transaction-data---Part-2-(using-pandas-and-some-R-magic)">
+<h1>Computing daily averages from transaction data - Part 2 (using pandas and some R magic)<a class="headerlink" href="#Computing-daily-averages-from-transaction-data---Part-2-(using-pandas-and-some-R-magic)" title="Permalink to this headline">¶</a></h1>
+<p>In Part 2 of this post, we’ll extend this to cases in which we might want to group by an additional field (e.g. station_id for the bike share example) and see how this problem is just one part of the general problem of doing occupancy analysis based on transaction data.</p>
+<p>In <a class="reference external" href="http://hselab.org/daily-averages-1.html">Part 1 of this post</a>, we discuss the importance of taking into account days with zero activity as well as carefully specifiying the date range for analysis when computing things like the average number of bike trips by day in a bike share system. Obviously, this applies more generally to computing averages number of events per day. We showed an approach to dealing with these complications.</p>
+<p>In Part 2 of this post, we’ll extend this to cases in which we might want to group by an additional field (e.g. station_id for the bike share example) and see how this problem is just one part of the general problem of doing occupancy analysis based on transaction data. We’ll see how the <a class="reference external" href="https://github.com/misken/hillmaker">hillmaker</a> package can make these types of analyses easier.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">trip</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;trip.csv&#39;</span><span class="p">,</span> <span class="n">parse_dates</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;starttime&#39;</span><span class="p">,</span> <span class="s1">&#39;stoptime&#39;</span><span class="p">])</span>
+<span class="n">trip</span><span class="p">[</span><span class="s1">&#39;tripdate&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">trip</span><span class="p">[</span><span class="s1">&#39;starttime&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">date</span><span class="p">())</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">trip</span><span class="o">.</span><span class="n">info</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;class &#39;pandas.core.frame.DataFrame&#39;&gt;
+RangeIndex: 286857 entries, 0 to 286856
+Data columns (total 13 columns):
+trip_id              286857 non-null int64
+starttime            286857 non-null datetime64[ns]
+stoptime             286857 non-null datetime64[ns]
+bikeid               286857 non-null object
+tripduration         286857 non-null float64
+from_station_name    286857 non-null object
+to_station_name      286857 non-null object
+from_station_id      286857 non-null object
+to_station_id        286857 non-null object
+usertype             286857 non-null object
+gender               181557 non-null object
+birthyear            181553 non-null float64
+tripdate             286857 non-null object
+dtypes: datetime64[ns](2), float64(2), int64(1), object(8)
+memory usage: 28.5+ MB
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">trip</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>trip_id</th>
+      <th>starttime</th>
+      <th>stoptime</th>
+      <th>bikeid</th>
+      <th>tripduration</th>
+      <th>from_station_name</th>
+      <th>to_station_name</th>
+      <th>from_station_id</th>
+      <th>to_station_id</th>
+      <th>usertype</th>
+      <th>gender</th>
+      <th>birthyear</th>
+      <th>tripdate</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>431</td>
+      <td>2014-10-13 10:31:00</td>
+      <td>2014-10-13 10:48:00</td>
+      <td>SEA00298</td>
+      <td>985.935</td>
+      <td>2nd Ave &amp; Spring St</td>
+      <td>Occidental Park / Occidental Ave S &amp; S Washing...</td>
+      <td>CBD-06</td>
+      <td>PS-04</td>
+      <td>Member</td>
+      <td>Male</td>
+      <td>1960.0</td>
+      <td>2014-10-13</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>432</td>
+      <td>2014-10-13 10:32:00</td>
+      <td>2014-10-13 10:48:00</td>
+      <td>SEA00195</td>
+      <td>926.375</td>
+      <td>2nd Ave &amp; Spring St</td>
+      <td>Occidental Park / Occidental Ave S &amp; S Washing...</td>
+      <td>CBD-06</td>
+      <td>PS-04</td>
+      <td>Member</td>
+      <td>Male</td>
+      <td>1970.0</td>
+      <td>2014-10-13</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>433</td>
+      <td>2014-10-13 10:33:00</td>
+      <td>2014-10-13 10:48:00</td>
+      <td>SEA00486</td>
+      <td>883.831</td>
+      <td>2nd Ave &amp; Spring St</td>
+      <td>Occidental Park / Occidental Ave S &amp; S Washing...</td>
+      <td>CBD-06</td>
+      <td>PS-04</td>
+      <td>Member</td>
+      <td>Female</td>
+      <td>1988.0</td>
+      <td>2014-10-13</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>434</td>
+      <td>2014-10-13 10:34:00</td>
+      <td>2014-10-13 10:48:00</td>
+      <td>SEA00333</td>
+      <td>865.937</td>
+      <td>2nd Ave &amp; Spring St</td>
+      <td>Occidental Park / Occidental Ave S &amp; S Washing...</td>
+      <td>CBD-06</td>
+      <td>PS-04</td>
+      <td>Member</td>
+      <td>Female</td>
+      <td>1977.0</td>
+      <td>2014-10-13</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>435</td>
+      <td>2014-10-13 10:34:00</td>
+      <td>2014-10-13 10:49:00</td>
+      <td>SEA00202</td>
+      <td>923.923</td>
+      <td>2nd Ave &amp; Spring St</td>
+      <td>Occidental Park / Occidental Ave S &amp; S Washing...</td>
+      <td>CBD-06</td>
+      <td>PS-04</td>
+      <td>Member</td>
+      <td>Male</td>
+      <td>1971.0</td>
+      <td>2014-10-13</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+</section>
+<section id="What-is-the-average-number-of-bike-rentals-per-day-from-each-station?">
+<h1>What is the average number of bike rentals per day from each station?<a class="headerlink" href="#What-is-the-average-number-of-bike-rentals-per-day-from-each-station?" title="Permalink to this headline">¶</a></h1>
+<p>Not only do we need to take into account days in which no bikes were rented from each of the stations, we have to decide how we want to handle the fact that not all stations were open for the period of time represented in the <code class="docutils literal notranslate"><span class="pre">trip</span></code> dataframe.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;The first trip was at </span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">trip</span><span class="o">.</span><span class="n">starttime</span><span class="o">.</span><span class="n">min</span><span class="p">()))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;The last trip was at </span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">trip</span><span class="o">.</span><span class="n">starttime</span><span class="o">.</span><span class="n">max</span><span class="p">()))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+The first trip was at 2014-10-13 10:31:00.
+The last trip was at 2016-08-31 23:49:00.
+</pre></div></div>
+</div>
+<p>We can get a sense of the timeframes for when individual stations were open by looking an min and max of the <code class="docutils literal notranslate"><span class="pre">starttime</span></code> field.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">trip</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;from_station_id&#39;</span><span class="p">)[</span><span class="s1">&#39;starttime&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">aggregate</span><span class="p">([</span><span class="s1">&#39;min&#39;</span><span class="p">,</span> <span class="s1">&#39;max&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>min</th>
+      <th>max</th>
+    </tr>
+    <tr>
+      <th>from_station_id</th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>8D OPS 02</th>
+      <td>2016-08-12 09:03:00</td>
+      <td>2016-08-12 09:06:00</td>
+    </tr>
+    <tr>
+      <th>BT-01</th>
+      <td>2014-10-13 15:39:00</td>
+      <td>2016-08-31 22:13:00</td>
+    </tr>
+    <tr>
+      <th>BT-03</th>
+      <td>2014-10-13 12:35:00</td>
+      <td>2016-08-31 17:21:00</td>
+    </tr>
+    <tr>
+      <th>BT-04</th>
+      <td>2014-10-13 12:05:00</td>
+      <td>2016-08-31 19:31:00</td>
+    </tr>
+    <tr>
+      <th>BT-05</th>
+      <td>2014-10-13 13:08:00</td>
+      <td>2016-08-31 18:21:00</td>
+    </tr>
+    <tr>
+      <th>CBD-03</th>
+      <td>2014-10-13 13:30:00</td>
+      <td>2016-08-31 19:36:00</td>
+    </tr>
+    <tr>
+      <th>CBD-04</th>
+      <td>2015-07-27 15:52:00</td>
+      <td>2016-08-31 20:44:00</td>
+    </tr>
+    <tr>
+      <th>CBD-05</th>
+      <td>2014-10-13 11:52:00</td>
+      <td>2016-08-31 17:26:00</td>
+    </tr>
+    <tr>
+      <th>CBD-06</th>
+      <td>2014-10-13 10:31:00</td>
+      <td>2016-08-31 20:32:00</td>
+    </tr>
+    <tr>
+      <th>CBD-07</th>
+      <td>2014-10-13 11:49:00</td>
+      <td>2016-08-31 18:23:00</td>
+    </tr>
+    <tr>
+      <th>CBD-13</th>
+      <td>2014-10-13 12:58:00</td>
+      <td>2016-08-31 19:58:00</td>
+    </tr>
+    <tr>
+      <th>CD-01</th>
+      <td>2015-05-23 08:01:00</td>
+      <td>2016-08-09 18:43:00</td>
+    </tr>
+    <tr>
+      <th>CH-01</th>
+      <td>2014-10-13 16:31:00</td>
+      <td>2016-08-31 22:37:00</td>
+    </tr>
+    <tr>
+      <th>CH-02</th>
+      <td>2014-10-13 11:54:00</td>
+      <td>2016-08-31 21:59:00</td>
+    </tr>
+    <tr>
+      <th>CH-03</th>
+      <td>2014-10-13 17:16:00</td>
+      <td>2016-08-31 20:33:00</td>
+    </tr>
+    <tr>
+      <th>CH-05</th>
+      <td>2014-10-13 13:45:00</td>
+      <td>2016-08-31 20:43:00</td>
+    </tr>
+    <tr>
+      <th>CH-06</th>
+      <td>2014-10-13 15:33:00</td>
+      <td>2016-08-31 15:44:00</td>
+    </tr>
+    <tr>
+      <th>CH-07</th>
+      <td>2014-10-13 14:06:00</td>
+      <td>2016-08-31 19:27:00</td>
+    </tr>
+    <tr>
+      <th>CH-08</th>
+      <td>2014-10-13 13:32:00</td>
+      <td>2016-08-31 23:49:00</td>
+    </tr>
+    <tr>
+      <th>CH-09</th>
+      <td>2014-10-13 13:01:00</td>
+      <td>2016-08-31 23:34:00</td>
+    </tr>
+    <tr>
+      <th>CH-12</th>
+      <td>2014-10-13 17:51:00</td>
+      <td>2016-08-31 18:30:00</td>
+    </tr>
+    <tr>
+      <th>CH-15</th>
+      <td>2014-10-13 13:08:00</td>
+      <td>2016-08-31 20:57:00</td>
+    </tr>
+    <tr>
+      <th>CH-16</th>
+      <td>2016-03-19 01:06:00</td>
+      <td>2016-08-31 17:38:00</td>
+    </tr>
+    <tr>
+      <th>DPD-01</th>
+      <td>2014-10-13 11:59:00</td>
+      <td>2016-08-31 18:57:00</td>
+    </tr>
+    <tr>
+      <th>DPD-03</th>
+      <td>2014-10-13 13:43:00</td>
+      <td>2016-08-31 19:32:00</td>
+    </tr>
+    <tr>
+      <th>EL-01</th>
+      <td>2014-10-13 15:03:00</td>
+      <td>2016-08-31 19:03:00</td>
+    </tr>
+    <tr>
+      <th>EL-03</th>
+      <td>2014-10-13 18:19:00</td>
+      <td>2016-08-31 17:35:00</td>
+    </tr>
+    <tr>
+      <th>EL-05</th>
+      <td>2014-10-13 15:05:00</td>
+      <td>2016-08-30 18:23:00</td>
+    </tr>
+    <tr>
+      <th>FH-01</th>
+      <td>2014-10-13 12:59:00</td>
+      <td>2016-03-18 17:19:00</td>
+    </tr>
+    <tr>
+      <th>FH-04</th>
+      <td>2014-10-13 18:44:00</td>
+      <td>2016-08-31 20:58:00</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>PS-04</th>
+      <td>2014-10-13 11:35:00</td>
+      <td>2016-08-31 18:10:00</td>
+    </tr>
+    <tr>
+      <th>PS-05</th>
+      <td>2014-10-13 11:51:00</td>
+      <td>2016-08-31 16:47:00</td>
+    </tr>
+    <tr>
+      <th>Pronto shop</th>
+      <td>2015-06-02 20:36:00</td>
+      <td>2015-06-02 20:36:00</td>
+    </tr>
+    <tr>
+      <th>Pronto shop 2</th>
+      <td>2016-05-17 12:03:00</td>
+      <td>2016-05-17 15:41:00</td>
+    </tr>
+    <tr>
+      <th>SLU-01</th>
+      <td>2014-10-13 13:09:00</td>
+      <td>2016-08-31 18:54:00</td>
+    </tr>
+    <tr>
+      <th>SLU-02</th>
+      <td>2014-10-13 13:51:00</td>
+      <td>2016-08-31 18:02:00</td>
+    </tr>
+    <tr>
+      <th>SLU-04</th>
+      <td>2014-10-13 15:34:00</td>
+      <td>2016-08-31 21:27:00</td>
+    </tr>
+    <tr>
+      <th>SLU-07</th>
+      <td>2014-10-13 19:11:00</td>
+      <td>2016-08-31 18:49:00</td>
+    </tr>
+    <tr>
+      <th>SLU-15</th>
+      <td>2014-10-13 13:02:00</td>
+      <td>2016-08-31 18:57:00</td>
+    </tr>
+    <tr>
+      <th>SLU-16</th>
+      <td>2014-10-13 20:57:00</td>
+      <td>2016-08-31 16:10:00</td>
+    </tr>
+    <tr>
+      <th>SLU-17</th>
+      <td>2014-10-13 14:53:00</td>
+      <td>2016-08-31 19:17:00</td>
+    </tr>
+    <tr>
+      <th>SLU-18</th>
+      <td>2014-10-13 13:02:00</td>
+      <td>2016-07-02 11:09:00</td>
+    </tr>
+    <tr>
+      <th>SLU-19</th>
+      <td>2014-10-13 13:38:00</td>
+      <td>2016-08-31 22:02:00</td>
+    </tr>
+    <tr>
+      <th>SLU-20</th>
+      <td>2015-06-12 15:13:00</td>
+      <td>2016-08-31 18:36:00</td>
+    </tr>
+    <tr>
+      <th>SLU-21</th>
+      <td>2015-09-19 16:24:00</td>
+      <td>2016-08-30 18:41:00</td>
+    </tr>
+    <tr>
+      <th>SLU-22</th>
+      <td>2016-07-03 19:35:00</td>
+      <td>2016-08-31 14:20:00</td>
+    </tr>
+    <tr>
+      <th>UD-01</th>
+      <td>2014-10-13 12:02:00</td>
+      <td>2016-08-31 17:32:00</td>
+    </tr>
+    <tr>
+      <th>UD-02</th>
+      <td>2014-10-13 12:48:00</td>
+      <td>2016-08-31 08:07:00</td>
+    </tr>
+    <tr>
+      <th>UD-04</th>
+      <td>2014-10-13 12:54:00</td>
+      <td>2016-08-31 09:24:00</td>
+    </tr>
+    <tr>
+      <th>UD-07</th>
+      <td>2014-10-13 13:20:00</td>
+      <td>2016-08-31 08:48:00</td>
+    </tr>
+    <tr>
+      <th>UW-01</th>
+      <td>2014-10-14 16:35:00</td>
+      <td>2015-10-27 17:26:00</td>
+    </tr>
+    <tr>
+      <th>UW-02</th>
+      <td>2014-10-13 12:15:00</td>
+      <td>2016-08-31 15:08:00</td>
+    </tr>
+    <tr>
+      <th>UW-04</th>
+      <td>2014-10-13 14:49:00</td>
+      <td>2016-08-31 18:43:00</td>
+    </tr>
+    <tr>
+      <th>UW-06</th>
+      <td>2014-10-13 14:21:00</td>
+      <td>2016-08-30 15:26:00</td>
+    </tr>
+    <tr>
+      <th>UW-07</th>
+      <td>2014-10-13 12:37:00</td>
+      <td>2016-08-30 20:44:00</td>
+    </tr>
+    <tr>
+      <th>UW-10</th>
+      <td>2014-10-13 13:04:00</td>
+      <td>2016-08-30 13:50:00</td>
+    </tr>
+    <tr>
+      <th>UW-11</th>
+      <td>2015-11-05 16:28:00</td>
+      <td>2016-08-31 21:35:00</td>
+    </tr>
+    <tr>
+      <th>WF-01</th>
+      <td>2014-10-13 13:45:00</td>
+      <td>2016-08-31 22:47:00</td>
+    </tr>
+    <tr>
+      <th>WF-03</th>
+      <td>2016-08-10 10:36:00</td>
+      <td>2016-08-31 17:52:00</td>
+    </tr>
+    <tr>
+      <th>WF-04</th>
+      <td>2014-10-13 12:04:00</td>
+      <td>2016-08-31 22:10:00</td>
+    </tr>
+  </tbody>
+</table>
+<p>61 rows × 2 columns</p>
+</div></div>
+</div>
+<p>Let’s look at the <code class="docutils literal notranslate"><span class="pre">station.csv</span></code> file so that we can see the installation and decommision dates.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">station</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;station.csv&#39;</span><span class="p">,</span>
+                      <span class="n">parse_dates</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;install_date&#39;</span><span class="p">,</span> <span class="s1">&#39;modification_date&#39;</span><span class="p">,</span> <span class="s1">&#39;decommission_date&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">station</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">15</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>station_id</th>
+      <th>name</th>
+      <th>lat</th>
+      <th>long</th>
+      <th>install_date</th>
+      <th>install_dockcount</th>
+      <th>modification_date</th>
+      <th>current_dockcount</th>
+      <th>decommission_date</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>BT-01</td>
+      <td>3rd Ave &amp; Broad St</td>
+      <td>47.618418</td>
+      <td>-122.350964</td>
+      <td>2014-10-13</td>
+      <td>18</td>
+      <td>NaT</td>
+      <td>18</td>
+      <td>NaT</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>BT-03</td>
+      <td>2nd Ave &amp; Vine St</td>
+      <td>47.615829</td>
+      <td>-122.348564</td>
+      <td>2014-10-13</td>
+      <td>16</td>
+      <td>NaT</td>
+      <td>16</td>
+      <td>NaT</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>BT-04</td>
+      <td>6th Ave &amp; Blanchard St</td>
+      <td>47.616094</td>
+      <td>-122.341102</td>
+      <td>2014-10-13</td>
+      <td>16</td>
+      <td>NaT</td>
+      <td>16</td>
+      <td>NaT</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>BT-05</td>
+      <td>2nd Ave &amp; Blanchard St</td>
+      <td>47.613110</td>
+      <td>-122.344208</td>
+      <td>2014-10-13</td>
+      <td>14</td>
+      <td>NaT</td>
+      <td>14</td>
+      <td>NaT</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>CBD-03</td>
+      <td>7th Ave &amp; Union St</td>
+      <td>47.610731</td>
+      <td>-122.332447</td>
+      <td>2014-10-13</td>
+      <td>20</td>
+      <td>NaT</td>
+      <td>20</td>
+      <td>NaT</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>CBD-04</td>
+      <td>Union St &amp; 4th Ave</td>
+      <td>47.609221</td>
+      <td>-122.335596</td>
+      <td>2015-07-27</td>
+      <td>18</td>
+      <td>NaT</td>
+      <td>18</td>
+      <td>NaT</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>CBD-05</td>
+      <td>1st Ave &amp; Marion St</td>
+      <td>47.604058</td>
+      <td>-122.335800</td>
+      <td>2014-10-13</td>
+      <td>20</td>
+      <td>NaT</td>
+      <td>20</td>
+      <td>NaT</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>CBD-06</td>
+      <td>2nd Ave &amp; Spring St</td>
+      <td>47.605950</td>
+      <td>-122.335768</td>
+      <td>2014-10-13</td>
+      <td>20</td>
+      <td>2015-11-09</td>
+      <td>18</td>
+      <td>NaT</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>CBD-07</td>
+      <td>City Hall / 4th Ave &amp; James St</td>
+      <td>47.603509</td>
+      <td>-122.330409</td>
+      <td>2014-10-13</td>
+      <td>20</td>
+      <td>NaT</td>
+      <td>20</td>
+      <td>NaT</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>CBD-13</td>
+      <td>2nd Ave &amp; Pine St</td>
+      <td>47.610185</td>
+      <td>-122.339641</td>
+      <td>2014-10-13</td>
+      <td>18</td>
+      <td>NaT</td>
+      <td>18</td>
+      <td>NaT</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>CD-01</td>
+      <td>12th Ave &amp; E Yesler Way</td>
+      <td>47.602103</td>
+      <td>-122.316923</td>
+      <td>2015-05-22</td>
+      <td>16</td>
+      <td>2016-08-09</td>
+      <td>0</td>
+      <td>2016-08-09</td>
+    </tr>
+    <tr>
+      <th>11</th>
+      <td>CH-01</td>
+      <td>Summit Ave &amp; E Denny Way</td>
+      <td>47.618633</td>
+      <td>-122.325249</td>
+      <td>2014-10-13</td>
+      <td>16</td>
+      <td>NaT</td>
+      <td>16</td>
+      <td>NaT</td>
+    </tr>
+    <tr>
+      <th>12</th>
+      <td>CH-02</td>
+      <td>E Harrison St &amp; Broadway Ave E</td>
+      <td>47.622063</td>
+      <td>-122.321251</td>
+      <td>2014-10-13</td>
+      <td>18</td>
+      <td>2015-02-24</td>
+      <td>20</td>
+      <td>NaT</td>
+    </tr>
+    <tr>
+      <th>13</th>
+      <td>CH-03</td>
+      <td>Summit Ave E &amp; E Republican St</td>
+      <td>47.623367</td>
+      <td>-122.325279</td>
+      <td>2014-10-13</td>
+      <td>16</td>
+      <td>NaT</td>
+      <td>16</td>
+      <td>NaT</td>
+    </tr>
+    <tr>
+      <th>14</th>
+      <td>CH-05</td>
+      <td>15th Ave E &amp; E Thomas St</td>
+      <td>47.620712</td>
+      <td>-122.312805</td>
+      <td>2014-10-13</td>
+      <td>16</td>
+      <td>NaT</td>
+      <td>16</td>
+      <td>NaT</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<p>To simplify things, let’s only consider trips for stations who have <strong>not</strong> been decommissioned.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create a list of stations to consider for the analysis</span>
+<span class="n">active_stations</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">station</span><span class="p">[</span><span class="n">station</span><span class="o">.</span><span class="n">decommission_date</span><span class="o">.</span><span class="n">isna</span><span class="p">()][</span><span class="s1">&#39;station_id&#39;</span><span class="p">])</span>
+<span class="c1"># Only keep records for active stations</span>
+<span class="n">trip</span> <span class="o">=</span> <span class="n">trip</span><span class="p">[</span><span class="n">trip</span><span class="o">.</span><span class="n">from_station_id</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">active_stations</span><span class="p">)]</span>
+</pre></div>
+</div>
+</div>
+<p>Now let’s create a DataFrame containing the analysis start and end dates for each active stations. For the start date we’ll use the <code class="docutils literal notranslate"><span class="pre">install_date</span></code> field and for end date we’ll use the last date in the trip data - 2016-08-31.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Just grab the rows of active stations</span>
+<span class="n">station_dates</span> <span class="o">=</span> <span class="n">station</span><span class="p">[</span><span class="n">station</span><span class="o">.</span><span class="n">decommission_date</span><span class="o">.</span><span class="n">isna</span><span class="p">()]</span>
+<span class="c1"># Just grab columns of interest</span>
+<span class="n">station_dates</span> <span class="o">=</span> <span class="n">station_dates</span><span class="p">[[</span><span class="s1">&#39;station_id&#39;</span><span class="p">,</span><span class="s1">&#39;install_date&#39;</span><span class="p">,</span><span class="s1">&#39;decommission_date&#39;</span><span class="p">]]</span>
+<span class="c1"># Rename the date columns</span>
+<span class="n">station_dates</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;install_date&#39;</span><span class="p">:</span> <span class="s1">&#39;start_date&#39;</span><span class="p">,</span> <span class="s1">&#39;decommission_date&#39;</span><span class="p">:</span> <span class="s1">&#39;end_date&#39;</span><span class="p">},</span>
+                    <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="c1"># Set end date for all stations</span>
+<span class="n">station_dates</span><span class="o">.</span><span class="n">end_date</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">datetime</span><span class="p">(</span><span class="mi">2016</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">31</span><span class="p">)</span>
+<span class="c1"># Check out the result</span>
+<span class="n">station_dates</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">7</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>station_id</th>
+      <th>start_date</th>
+      <th>end_date</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>BT-01</td>
+      <td>2014-10-13</td>
+      <td>2016-08-31</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>BT-03</td>
+      <td>2014-10-13</td>
+      <td>2016-08-31</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>BT-04</td>
+      <td>2014-10-13</td>
+      <td>2016-08-31</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>BT-05</td>
+      <td>2014-10-13</td>
+      <td>2016-08-31</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>CBD-03</td>
+      <td>2014-10-13</td>
+      <td>2016-08-31</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>CBD-04</td>
+      <td>2015-07-27</td>
+      <td>2016-08-31</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>CBD-05</td>
+      <td>2014-10-13</td>
+      <td>2016-08-31</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<p>In Part 1 we outlined the basic strategy for computing the average number of daily events when some days might not have any events.</p>
+<ol class="arabic simple">
+<li><p>Create a range of dates based on the start and end date of the time period of interest.</p></li>
+<li><p>Create an empty DataFrame using the range of dates as the index. For convenience, add weekday column based on date to facility day of week analysis. Let’s call this new DataFrame the “seeded” DataFrame</p></li>
+<li><p>Use groupby on the original trip DataFrame to compute number of trips by date and store result as DataFrame</p></li>
+<li><p>Merge the two DataFrames on their indexes (tripdate) but do a “left join”. Pandas <code class="docutils literal notranslate"><span class="pre">merge</span></code> function is perfect for this.</p></li>
+<li><p>If there are dates with no trips, they’ll have missing data in the new merged DataFrame. Update the missing values to 0 using the <code class="docutils literal notranslate"><span class="pre">fillna</span></code> function in pandas.</p></li>
+<li><p>Now you can compute overall mean number of trips per day. You could also compute means by day of week.</p></li>
+</ol>
+<p>In order to compute the average number of trips per day by station, a few details in the above process have to be generalized.</p>
+<ul class="simple">
+<li><p>In Step 1, the start and end dates can depend on the station.</p></li>
+<li><p>In Step 2, we need a DataFrame containing each station and its associated date range.</p></li>
+<li><p>In Step 3, we need to group by both station and trip date.</p></li>
+</ul>
+<section id="Accounting-for-zero-days-and-station-specific-analysis-timeframe">
+<h2>Accounting for zero days and station specific analysis timeframe<a class="headerlink" href="#Accounting-for-zero-days-and-station-specific-analysis-timeframe" title="Permalink to this headline">¶</a></h2>
+<section id="Steps-1-and-2:-Create-an-empty-DataFrame-using-stations-and-associated-range-of-dates-as-the-MultiIndex.">
+<h3>Steps 1 and 2: Create an empty DataFrame using stations and associated range of dates as the MultiIndex.<a class="headerlink" href="#Steps-1-and-2:-Create-an-empty-DataFrame-using-stations-and-associated-range-of-dates-as-the-MultiIndex." title="Permalink to this headline">¶</a></h3>
+<p>We’ll construct the desired MultiIndex from a list of tuples of station ids and dates. To create the list of tuples we can use a list comprehension to iterate over the rows of the <code class="docutils literal notranslate"><span class="pre">station_dates</span></code> dataframe and associated date range. Gotta love list comprehensions.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">index_tuples</span> <span class="o">=</span> <span class="p">[(</span><span class="n">row</span><span class="o">.</span><span class="n">station_id</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span> <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">station_dates</span><span class="o">.</span><span class="n">iterrows</span><span class="p">()</span>
+                         <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">pd</span><span class="o">.</span><span class="n">date_range</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">start_date</span><span class="p">,</span> <span class="n">row</span><span class="o">.</span><span class="n">end_date</span><span class="p">)]</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">index_tuples</span><span class="p">[:</span><span class="mi">5</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[(&#39;BT-01&#39;, Timestamp(&#39;2014-10-13 00:00:00&#39;, freq=&#39;D&#39;)), (&#39;BT-01&#39;, Timestamp(&#39;2014-10-14 00:00:00&#39;, freq=&#39;D&#39;)), (&#39;BT-01&#39;, Timestamp(&#39;2014-10-15 00:00:00&#39;, freq=&#39;D&#39;)), (&#39;BT-01&#39;, Timestamp(&#39;2014-10-16 00:00:00&#39;, freq=&#39;D&#39;)), (&#39;BT-01&#39;, Timestamp(&#39;2014-10-17 00:00:00&#39;, freq=&#39;D&#39;))]
+</pre></div></div>
+</div>
+<p>Create the empty DataFrame and add a weekday column for convenience.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">trips_by_station_date_seeded</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">MultiIndex</span><span class="o">.</span><span class="n">from_tuples</span><span class="p">(</span><span class="n">index_tuples</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Add weekday column to new dataframe</span>
+<span class="n">trips_by_station_date_seeded</span><span class="p">[</span><span class="s1">&#39;weekday&#39;</span><span class="p">]</span> <span class="o">=</span> \
+    <span class="n">trips_by_station_date_seeded</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">get_level_values</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">weekday</span><span class="p">())</span>
+
+<span class="n">trips_by_station_date_seeded</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">names</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;from_station_id&#39;</span><span class="p">,</span> <span class="s1">&#39;tripdate&#39;</span><span class="p">]</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">trips_by_station_date_seeded</span><span class="o">.</span><span class="n">head</span><span class="p">())</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">trips_by_station_date_seeded</span><span class="o">.</span><span class="n">tail</span><span class="p">())</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+                            weekday
+from_station_id tripdate
+BT-01           2014-10-13        0
+                2014-10-14        1
+                2014-10-15        2
+                2014-10-16        3
+                2014-10-17        4
+                            weekday
+from_station_id tripdate
+WF-03           2016-08-27        5
+                2016-08-28        6
+                2016-08-29        0
+                2016-08-30        1
+                2016-08-31        2
+</pre></div></div>
+</div>
+</section>
+<section id="Step-3:-Use-groupby-on-the-original-trip-DataFrame-to-compute-number-of-trips-by-station-by-date">
+<h3>Step 3: Use groupby on the original trip DataFrame to compute number of trips by station by date<a class="headerlink" href="#Step-3:-Use-groupby-on-the-original-trip-DataFrame-to-compute-number-of-trips-by-station-by-date" title="Permalink to this headline">¶</a></h3>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create a Group by object using from_station_id and tripdate</span>
+<span class="n">grp_station_date</span> <span class="o">=</span> <span class="n">trip</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s1">&#39;from_station_id&#39;</span><span class="p">,</span> <span class="s1">&#39;tripdate&#39;</span><span class="p">])</span>
+
+<span class="c1"># Compute number of trips by date and check out the result</span>
+<span class="n">trips_by_station_date</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">grp_station_date</span><span class="o">.</span><span class="n">size</span><span class="p">(),</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;num_trips&#39;</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">trips_by_station_date</span><span class="o">.</span><span class="n">head</span><span class="p">())</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+                            num_trips
+from_station_id tripdate
+BT-01           2014-10-13         20
+                2014-10-14         28
+                2014-10-15          8
+                2014-10-16         24
+                2014-10-17         16
+</pre></div></div>
+</div>
+</section>
+<section id="Step-4:-Merge-the-two-DataFrames-on-their-indexes-but-do-a-“left-join”.">
+<h3>Step 4: Merge the two DataFrames on their indexes but do a “left join”.<a class="headerlink" href="#Step-4:-Merge-the-two-DataFrames-on-their-indexes-but-do-a-“left-join”." title="Permalink to this headline">¶</a></h3>
+<p>Pandas <code class="docutils literal notranslate"><span class="pre">merge</span></code> function is perfect for this. The <code class="docutils literal notranslate"><span class="pre">left_index=True,</span> <span class="pre">right_index=True</span></code> are telling pandas to use those respective indexes as the joining columns. Check out the <a class="reference external" href="http://pandas.pydata.org/pandas-docs/stable/merging.html#database-style-dataframe-joining-merging">documentation</a> for <code class="docutils literal notranslate"><span class="pre">merge()</span></code>.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Merge the two dataframes doing a left join (with seeded table on left)</span>
+<span class="n">trips_by_station_date_merged</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">trips_by_station_date_seeded</span><span class="p">,</span>
+                                        <span class="n">trips_by_station_date</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s1">&#39;left&#39;</span><span class="p">,</span>
+                                        <span class="n">left_index</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">right_index</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">sort</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">trips_by_station_date_merged</span><span class="p">[</span><span class="mi">100</span><span class="p">:</span><span class="mi">125</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th></th>
+      <th>weekday</th>
+      <th>num_trips</th>
+    </tr>
+    <tr>
+      <th>from_station_id</th>
+      <th>tripdate</th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th rowspan="25" valign="top">BT-01</th>
+      <th>2015-01-21</th>
+      <td>2</td>
+      <td>2.0</td>
+    </tr>
+    <tr>
+      <th>2015-01-22</th>
+      <td>3</td>
+      <td>8.0</td>
+    </tr>
+    <tr>
+      <th>2015-01-23</th>
+      <td>4</td>
+      <td>12.0</td>
+    </tr>
+    <tr>
+      <th>2015-01-24</th>
+      <td>5</td>
+      <td>28.0</td>
+    </tr>
+    <tr>
+      <th>2015-01-25</th>
+      <td>6</td>
+      <td>20.0</td>
+    </tr>
+    <tr>
+      <th>2015-01-26</th>
+      <td>0</td>
+      <td>12.0</td>
+    </tr>
+    <tr>
+      <th>2015-01-27</th>
+      <td>1</td>
+      <td>12.0</td>
+    </tr>
+    <tr>
+      <th>2015-01-28</th>
+      <td>2</td>
+      <td>10.0</td>
+    </tr>
+    <tr>
+      <th>2015-01-29</th>
+      <td>3</td>
+      <td>14.0</td>
+    </tr>
+    <tr>
+      <th>2015-01-30</th>
+      <td>4</td>
+      <td>10.0</td>
+    </tr>
+    <tr>
+      <th>2015-01-31</th>
+      <td>5</td>
+      <td>14.0</td>
+    </tr>
+    <tr>
+      <th>2015-02-01</th>
+      <td>6</td>
+      <td>2.0</td>
+    </tr>
+    <tr>
+      <th>2015-02-02</th>
+      <td>0</td>
+      <td>2.0</td>
+    </tr>
+    <tr>
+      <th>2015-02-03</th>
+      <td>1</td>
+      <td>6.0</td>
+    </tr>
+    <tr>
+      <th>2015-02-04</th>
+      <td>2</td>
+      <td>8.0</td>
+    </tr>
+    <tr>
+      <th>2015-02-05</th>
+      <td>3</td>
+      <td>2.0</td>
+    </tr>
+    <tr>
+      <th>2015-02-06</th>
+      <td>4</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>2015-02-07</th>
+      <td>5</td>
+      <td>14.0</td>
+    </tr>
+    <tr>
+      <th>2015-02-08</th>
+      <td>6</td>
+      <td>14.0</td>
+    </tr>
+    <tr>
+      <th>2015-02-09</th>
+      <td>0</td>
+      <td>10.0</td>
+    </tr>
+    <tr>
+      <th>2015-02-10</th>
+      <td>1</td>
+      <td>8.0</td>
+    </tr>
+    <tr>
+      <th>2015-02-11</th>
+      <td>2</td>
+      <td>10.0</td>
+    </tr>
+    <tr>
+      <th>2015-02-12</th>
+      <td>3</td>
+      <td>18.0</td>
+    </tr>
+    <tr>
+      <th>2015-02-13</th>
+      <td>4</td>
+      <td>30.0</td>
+    </tr>
+    <tr>
+      <th>2015-02-14</th>
+      <td>5</td>
+      <td>52.0</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+</section>
+<section id="Step-5:-Replace-missing-values-with-zeroes-for-those-dates-with-no-trips">
+<h3>Step 5: Replace missing values with zeroes for those dates with no trips<a class="headerlink" href="#Step-5:-Replace-missing-values-with-zeroes-for-those-dates-with-no-trips" title="Permalink to this headline">¶</a></h3>
+<p>If there are dates with no trips, they’ll have missing data in the new merged DataFrame. Update the missing values to 0 using the <code class="docutils literal notranslate"><span class="pre">fillna</span></code> function in pandas. Remember, these are the instances of “zero activity” that would cause biased (high) estimates of the average number of daily trips.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># How many missing values do we have?</span>
+<span class="n">trips_by_station_date_merged</span><span class="p">[</span><span class="s1">&#39;num_trips&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">isna</span><span class="p">()</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+3072
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Fill in any missing values with 0.</span>
+<span class="n">trips_by_station_date_merged</span><span class="p">[</span><span class="s1">&#39;num_trips&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">trips_by_station_date_merged</span><span class="p">[</span><span class="s1">&#39;num_trips&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">trips_by_station_date_merged</span><span class="p">[</span><span class="mi">100</span><span class="p">:</span><span class="mi">125</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th></th>
+      <th>weekday</th>
+      <th>num_trips</th>
+    </tr>
+    <tr>
+      <th>from_station_id</th>
+      <th>tripdate</th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th rowspan="25" valign="top">BT-01</th>
+      <th>2015-01-21</th>
+      <td>2</td>
+      <td>2.0</td>
+    </tr>
+    <tr>
+      <th>2015-01-22</th>
+      <td>3</td>
+      <td>8.0</td>
+    </tr>
+    <tr>
+      <th>2015-01-23</th>
+      <td>4</td>
+      <td>12.0</td>
+    </tr>
+    <tr>
+      <th>2015-01-24</th>
+      <td>5</td>
+      <td>28.0</td>
+    </tr>
+    <tr>
+      <th>2015-01-25</th>
+      <td>6</td>
+      <td>20.0</td>
+    </tr>
+    <tr>
+      <th>2015-01-26</th>
+      <td>0</td>
+      <td>12.0</td>
+    </tr>
+    <tr>
+      <th>2015-01-27</th>
+      <td>1</td>
+      <td>12.0</td>
+    </tr>
+    <tr>
+      <th>2015-01-28</th>
+      <td>2</td>
+      <td>10.0</td>
+    </tr>
+    <tr>
+      <th>2015-01-29</th>
+      <td>3</td>
+      <td>14.0</td>
+    </tr>
+    <tr>
+      <th>2015-01-30</th>
+      <td>4</td>
+      <td>10.0</td>
+    </tr>
+    <tr>
+      <th>2015-01-31</th>
+      <td>5</td>
+      <td>14.0</td>
+    </tr>
+    <tr>
+      <th>2015-02-01</th>
+      <td>6</td>
+      <td>2.0</td>
+    </tr>
+    <tr>
+      <th>2015-02-02</th>
+      <td>0</td>
+      <td>2.0</td>
+    </tr>
+    <tr>
+      <th>2015-02-03</th>
+      <td>1</td>
+      <td>6.0</td>
+    </tr>
+    <tr>
+      <th>2015-02-04</th>
+      <td>2</td>
+      <td>8.0</td>
+    </tr>
+    <tr>
+      <th>2015-02-05</th>
+      <td>3</td>
+      <td>2.0</td>
+    </tr>
+    <tr>
+      <th>2015-02-06</th>
+      <td>4</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>2015-02-07</th>
+      <td>5</td>
+      <td>14.0</td>
+    </tr>
+    <tr>
+      <th>2015-02-08</th>
+      <td>6</td>
+      <td>14.0</td>
+    </tr>
+    <tr>
+      <th>2015-02-09</th>
+      <td>0</td>
+      <td>10.0</td>
+    </tr>
+    <tr>
+      <th>2015-02-10</th>
+      <td>1</td>
+      <td>8.0</td>
+    </tr>
+    <tr>
+      <th>2015-02-11</th>
+      <td>2</td>
+      <td>10.0</td>
+    </tr>
+    <tr>
+      <th>2015-02-12</th>
+      <td>3</td>
+      <td>18.0</td>
+    </tr>
+    <tr>
+      <th>2015-02-13</th>
+      <td>4</td>
+      <td>30.0</td>
+    </tr>
+    <tr>
+      <th>2015-02-14</th>
+      <td>5</td>
+      <td>52.0</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+</section>
+<section id="Step-6:-Compute-statistics-of-interest">
+<h3>Step 6: Compute statistics of interest<a class="headerlink" href="#Step-6:-Compute-statistics-of-interest" title="Permalink to this headline">¶</a></h3>
+<p>Now we can safely compute means and other statistics of interest for the <code class="docutils literal notranslate"><span class="pre">num_trips</span></code> column after grouping by <code class="docutils literal notranslate"><span class="pre">from_station_id</span></code>. Since we have taken the zero activity days into account, the stations having count values less than 689 are those stations which were installed sometime after 2014-10-13 (the installation date is in the <code class="docutils literal notranslate"><span class="pre">station</span></code> table).</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">trips_by_station_date_merged</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;from_station_id&#39;</span><span class="p">)[</span><span class="s1">&#39;num_trips&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">describe</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>count</th>
+      <th>mean</th>
+      <th>std</th>
+      <th>min</th>
+      <th>25%</th>
+      <th>50%</th>
+      <th>75%</th>
+      <th>max</th>
+    </tr>
+    <tr>
+      <th>from_station_id</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>BT-01</th>
+      <td>689.0</td>
+      <td>15.869376</td>
+      <td>10.729919</td>
+      <td>0.0</td>
+      <td>8.0</td>
+      <td>14.0</td>
+      <td>22.00</td>
+      <td>62.0</td>
+    </tr>
+    <tr>
+      <th>BT-03</th>
+      <td>689.0</td>
+      <td>11.854862</td>
+      <td>7.494522</td>
+      <td>0.0</td>
+      <td>6.0</td>
+      <td>10.0</td>
+      <td>16.00</td>
+      <td>52.0</td>
+    </tr>
+    <tr>
+      <th>BT-04</th>
+      <td>689.0</td>
+      <td>6.798258</td>
+      <td>4.590017</td>
+      <td>0.0</td>
+      <td>3.0</td>
+      <td>6.0</td>
+      <td>10.00</td>
+      <td>26.0</td>
+    </tr>
+    <tr>
+      <th>BT-05</th>
+      <td>689.0</td>
+      <td>9.100145</td>
+      <td>6.731142</td>
+      <td>0.0</td>
+      <td>4.0</td>
+      <td>8.0</td>
+      <td>13.00</td>
+      <td>42.0</td>
+    </tr>
+    <tr>
+      <th>CBD-03</th>
+      <td>689.0</td>
+      <td>8.062409</td>
+      <td>7.649699</td>
+      <td>0.0</td>
+      <td>3.0</td>
+      <td>6.0</td>
+      <td>10.00</td>
+      <td>57.0</td>
+    </tr>
+    <tr>
+      <th>CBD-04</th>
+      <td>402.0</td>
+      <td>6.699005</td>
+      <td>4.044817</td>
+      <td>0.0</td>
+      <td>4.0</td>
+      <td>7.0</td>
+      <td>9.00</td>
+      <td>22.0</td>
+    </tr>
+    <tr>
+      <th>CBD-05</th>
+      <td>689.0</td>
+      <td>8.165457</td>
+      <td>5.902446</td>
+      <td>0.0</td>
+      <td>4.0</td>
+      <td>7.0</td>
+      <td>12.00</td>
+      <td>50.0</td>
+    </tr>
+    <tr>
+      <th>CBD-06</th>
+      <td>689.0</td>
+      <td>7.930334</td>
+      <td>6.506778</td>
+      <td>0.0</td>
+      <td>3.0</td>
+      <td>7.0</td>
+      <td>11.00</td>
+      <td>52.0</td>
+    </tr>
+    <tr>
+      <th>CBD-07</th>
+      <td>689.0</td>
+      <td>5.271408</td>
+      <td>5.189189</td>
+      <td>0.0</td>
+      <td>2.0</td>
+      <td>4.0</td>
+      <td>8.00</td>
+      <td>72.0</td>
+    </tr>
+    <tr>
+      <th>CBD-13</th>
+      <td>689.0</td>
+      <td>14.584906</td>
+      <td>9.699203</td>
+      <td>0.0</td>
+      <td>7.0</td>
+      <td>13.0</td>
+      <td>21.00</td>
+      <td>82.0</td>
+    </tr>
+    <tr>
+      <th>CH-01</th>
+      <td>689.0</td>
+      <td>9.822932</td>
+      <td>5.693529</td>
+      <td>0.0</td>
+      <td>6.0</td>
+      <td>9.0</td>
+      <td>12.00</td>
+      <td>38.0</td>
+    </tr>
+    <tr>
+      <th>CH-02</th>
+      <td>689.0</td>
+      <td>13.989840</td>
+      <td>7.987720</td>
+      <td>0.0</td>
+      <td>8.0</td>
+      <td>13.0</td>
+      <td>18.00</td>
+      <td>48.0</td>
+    </tr>
+    <tr>
+      <th>CH-03</th>
+      <td>689.0</td>
+      <td>9.544267</td>
+      <td>5.981427</td>
+      <td>0.0</td>
+      <td>5.0</td>
+      <td>8.0</td>
+      <td>13.00</td>
+      <td>36.0</td>
+    </tr>
+    <tr>
+      <th>CH-05</th>
+      <td>689.0</td>
+      <td>11.146589</td>
+      <td>6.491743</td>
+      <td>0.0</td>
+      <td>7.0</td>
+      <td>10.0</td>
+      <td>15.00</td>
+      <td>40.0</td>
+    </tr>
+    <tr>
+      <th>CH-06</th>
+      <td>689.0</td>
+      <td>5.568940</td>
+      <td>3.525442</td>
+      <td>0.0</td>
+      <td>3.0</td>
+      <td>5.0</td>
+      <td>8.00</td>
+      <td>26.0</td>
+    </tr>
+    <tr>
+      <th>CH-07</th>
+      <td>689.0</td>
+      <td>16.534107</td>
+      <td>7.045270</td>
+      <td>0.0</td>
+      <td>12.0</td>
+      <td>16.0</td>
+      <td>21.00</td>
+      <td>40.0</td>
+    </tr>
+    <tr>
+      <th>CH-08</th>
+      <td>689.0</td>
+      <td>13.741655</td>
+      <td>8.355998</td>
+      <td>0.0</td>
+      <td>8.0</td>
+      <td>12.0</td>
+      <td>19.00</td>
+      <td>68.0</td>
+    </tr>
+    <tr>
+      <th>CH-09</th>
+      <td>689.0</td>
+      <td>8.269956</td>
+      <td>5.721211</td>
+      <td>0.0</td>
+      <td>4.0</td>
+      <td>7.0</td>
+      <td>11.00</td>
+      <td>54.0</td>
+    </tr>
+    <tr>
+      <th>CH-12</th>
+      <td>689.0</td>
+      <td>8.052250</td>
+      <td>5.954298</td>
+      <td>0.0</td>
+      <td>4.0</td>
+      <td>7.0</td>
+      <td>12.00</td>
+      <td>34.0</td>
+    </tr>
+    <tr>
+      <th>CH-15</th>
+      <td>689.0</td>
+      <td>9.175617</td>
+      <td>5.059781</td>
+      <td>0.0</td>
+      <td>6.0</td>
+      <td>8.0</td>
+      <td>12.00</td>
+      <td>34.0</td>
+    </tr>
+    <tr>
+      <th>CH-16</th>
+      <td>167.0</td>
+      <td>7.712575</td>
+      <td>3.112551</td>
+      <td>0.0</td>
+      <td>6.0</td>
+      <td>8.0</td>
+      <td>10.00</td>
+      <td>16.0</td>
+    </tr>
+    <tr>
+      <th>DPD-01</th>
+      <td>689.0</td>
+      <td>7.490566</td>
+      <td>5.212656</td>
+      <td>0.0</td>
+      <td>4.0</td>
+      <td>7.0</td>
+      <td>10.00</td>
+      <td>32.0</td>
+    </tr>
+    <tr>
+      <th>DPD-03</th>
+      <td>689.0</td>
+      <td>2.404935</td>
+      <td>2.601996</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>2.0</td>
+      <td>4.00</td>
+      <td>18.0</td>
+    </tr>
+    <tr>
+      <th>EL-01</th>
+      <td>689.0</td>
+      <td>5.195936</td>
+      <td>4.585833</td>
+      <td>0.0</td>
+      <td>2.0</td>
+      <td>4.0</td>
+      <td>7.00</td>
+      <td>29.0</td>
+    </tr>
+    <tr>
+      <th>EL-03</th>
+      <td>689.0</td>
+      <td>8.341074</td>
+      <td>5.414082</td>
+      <td>0.0</td>
+      <td>5.0</td>
+      <td>8.0</td>
+      <td>11.00</td>
+      <td>38.0</td>
+    </tr>
+    <tr>
+      <th>EL-05</th>
+      <td>689.0</td>
+      <td>5.290276</td>
+      <td>5.603926</td>
+      <td>0.0</td>
+      <td>2.0</td>
+      <td>4.0</td>
+      <td>7.00</td>
+      <td>48.0</td>
+    </tr>
+    <tr>
+      <th>FH-04</th>
+      <td>689.0</td>
+      <td>5.917271</td>
+      <td>3.751411</td>
+      <td>0.0</td>
+      <td>3.0</td>
+      <td>6.0</td>
+      <td>8.00</td>
+      <td>22.0</td>
+    </tr>
+    <tr>
+      <th>ID-04</th>
+      <td>689.0</td>
+      <td>3.963716</td>
+      <td>3.996745</td>
+      <td>0.0</td>
+      <td>1.0</td>
+      <td>3.0</td>
+      <td>6.00</td>
+      <td>24.0</td>
+    </tr>
+    <tr>
+      <th>PS-04</th>
+      <td>689.0</td>
+      <td>8.195936</td>
+      <td>8.135708</td>
+      <td>0.0</td>
+      <td>4.0</td>
+      <td>7.0</td>
+      <td>11.00</td>
+      <td>142.0</td>
+    </tr>
+    <tr>
+      <th>PS-05</th>
+      <td>689.0</td>
+      <td>5.613933</td>
+      <td>4.158087</td>
+      <td>0.0</td>
+      <td>3.0</td>
+      <td>5.0</td>
+      <td>8.00</td>
+      <td>30.0</td>
+    </tr>
+    <tr>
+      <th>SLU-01</th>
+      <td>689.0</td>
+      <td>12.165457</td>
+      <td>9.145079</td>
+      <td>0.0</td>
+      <td>5.0</td>
+      <td>10.0</td>
+      <td>17.00</td>
+      <td>50.0</td>
+    </tr>
+    <tr>
+      <th>SLU-02</th>
+      <td>689.0</td>
+      <td>10.068215</td>
+      <td>5.630042</td>
+      <td>0.0</td>
+      <td>6.0</td>
+      <td>10.0</td>
+      <td>14.00</td>
+      <td>32.0</td>
+    </tr>
+    <tr>
+      <th>SLU-04</th>
+      <td>689.0</td>
+      <td>8.233672</td>
+      <td>6.192806</td>
+      <td>0.0</td>
+      <td>4.0</td>
+      <td>7.0</td>
+      <td>12.00</td>
+      <td>48.0</td>
+    </tr>
+    <tr>
+      <th>SLU-07</th>
+      <td>689.0</td>
+      <td>10.458636</td>
+      <td>7.894570</td>
+      <td>0.0</td>
+      <td>4.0</td>
+      <td>8.0</td>
+      <td>15.00</td>
+      <td>42.0</td>
+    </tr>
+    <tr>
+      <th>SLU-15</th>
+      <td>689.0</td>
+      <td>14.505080</td>
+      <td>8.536365</td>
+      <td>0.0</td>
+      <td>8.0</td>
+      <td>14.0</td>
+      <td>20.00</td>
+      <td>48.0</td>
+    </tr>
+    <tr>
+      <th>SLU-16</th>
+      <td>689.0</td>
+      <td>8.795356</td>
+      <td>8.992095</td>
+      <td>0.0</td>
+      <td>3.0</td>
+      <td>6.0</td>
+      <td>12.00</td>
+      <td>51.0</td>
+    </tr>
+    <tr>
+      <th>SLU-17</th>
+      <td>689.0</td>
+      <td>8.238026</td>
+      <td>7.888482</td>
+      <td>0.0</td>
+      <td>2.0</td>
+      <td>6.0</td>
+      <td>12.00</td>
+      <td>68.0</td>
+    </tr>
+    <tr>
+      <th>SLU-19</th>
+      <td>689.0</td>
+      <td>10.865022</td>
+      <td>6.683941</td>
+      <td>0.0</td>
+      <td>6.0</td>
+      <td>10.0</td>
+      <td>15.00</td>
+      <td>36.0</td>
+    </tr>
+    <tr>
+      <th>SLU-20</th>
+      <td>447.0</td>
+      <td>4.774049</td>
+      <td>3.943030</td>
+      <td>0.0</td>
+      <td>2.0</td>
+      <td>4.0</td>
+      <td>7.00</td>
+      <td>22.0</td>
+    </tr>
+    <tr>
+      <th>SLU-21</th>
+      <td>352.0</td>
+      <td>2.451705</td>
+      <td>2.590350</td>
+      <td>0.0</td>
+      <td>1.0</td>
+      <td>2.0</td>
+      <td>4.00</td>
+      <td>20.0</td>
+    </tr>
+    <tr>
+      <th>SLU-22</th>
+      <td>60.0</td>
+      <td>12.683333</td>
+      <td>6.215049</td>
+      <td>4.0</td>
+      <td>9.0</td>
+      <td>11.0</td>
+      <td>16.25</td>
+      <td>28.0</td>
+    </tr>
+    <tr>
+      <th>UD-01</th>
+      <td>689.0</td>
+      <td>5.492017</td>
+      <td>4.780381</td>
+      <td>0.0</td>
+      <td>2.0</td>
+      <td>4.0</td>
+      <td>8.00</td>
+      <td>30.0</td>
+    </tr>
+    <tr>
+      <th>UD-02</th>
+      <td>689.0</td>
+      <td>2.081277</td>
+      <td>2.709117</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>1.0</td>
+      <td>3.00</td>
+      <td>16.0</td>
+    </tr>
+    <tr>
+      <th>UD-04</th>
+      <td>689.0</td>
+      <td>5.268505</td>
+      <td>4.673858</td>
+      <td>0.0</td>
+      <td>2.0</td>
+      <td>4.0</td>
+      <td>8.00</td>
+      <td>30.0</td>
+    </tr>
+    <tr>
+      <th>UD-07</th>
+      <td>689.0</td>
+      <td>3.708273</td>
+      <td>3.380511</td>
+      <td>0.0</td>
+      <td>1.0</td>
+      <td>3.0</td>
+      <td>5.00</td>
+      <td>26.0</td>
+    </tr>
+    <tr>
+      <th>UW-02</th>
+      <td>689.0</td>
+      <td>3.001451</td>
+      <td>3.168476</td>
+      <td>0.0</td>
+      <td>1.0</td>
+      <td>2.0</td>
+      <td>4.00</td>
+      <td>22.0</td>
+    </tr>
+    <tr>
+      <th>UW-04</th>
+      <td>689.0</td>
+      <td>4.065312</td>
+      <td>3.487949</td>
+      <td>0.0</td>
+      <td>2.0</td>
+      <td>3.0</td>
+      <td>6.00</td>
+      <td>26.0</td>
+    </tr>
+    <tr>
+      <th>UW-06</th>
+      <td>689.0</td>
+      <td>3.902758</td>
+      <td>4.051716</td>
+      <td>0.0</td>
+      <td>1.0</td>
+      <td>3.0</td>
+      <td>6.00</td>
+      <td>26.0</td>
+    </tr>
+    <tr>
+      <th>UW-07</th>
+      <td>689.0</td>
+      <td>2.682148</td>
+      <td>3.015799</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>2.0</td>
+      <td>4.00</td>
+      <td>24.0</td>
+    </tr>
+    <tr>
+      <th>UW-10</th>
+      <td>689.0</td>
+      <td>2.029028</td>
+      <td>2.601827</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>1.0</td>
+      <td>3.00</td>
+      <td>18.0</td>
+    </tr>
+    <tr>
+      <th>UW-11</th>
+      <td>308.0</td>
+      <td>3.207792</td>
+      <td>3.306642</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>2.0</td>
+      <td>5.25</td>
+      <td>16.0</td>
+    </tr>
+    <tr>
+      <th>WF-01</th>
+      <td>689.0</td>
+      <td>18.946299</td>
+      <td>14.597358</td>
+      <td>0.0</td>
+      <td>7.0</td>
+      <td>16.0</td>
+      <td>28.00</td>
+      <td>110.0</td>
+    </tr>
+    <tr>
+      <th>WF-03</th>
+      <td>23.0</td>
+      <td>6.956522</td>
+      <td>3.831428</td>
+      <td>0.0</td>
+      <td>4.0</td>
+      <td>6.0</td>
+      <td>9.50</td>
+      <td>14.0</td>
+    </tr>
+    <tr>
+      <th>WF-04</th>
+      <td>689.0</td>
+      <td>9.226415</td>
+      <td>8.179196</td>
+      <td>0.0</td>
+      <td>3.0</td>
+      <td>8.0</td>
+      <td>13.00</td>
+      <td>60.0</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<p>Can even do by day of week.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[23]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">trips_by_station_date_merged</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s1">&#39;from_station_id&#39;</span><span class="p">,</span> <span class="s1">&#39;weekday&#39;</span><span class="p">])[</span><span class="s1">&#39;num_trips&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">describe</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[23]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th></th>
+      <th>count</th>
+      <th>mean</th>
+      <th>std</th>
+      <th>min</th>
+      <th>25%</th>
+      <th>50%</th>
+      <th>75%</th>
+      <th>max</th>
+    </tr>
+    <tr>
+      <th>from_station_id</th>
+      <th>weekday</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th rowspan="7" valign="top">BT-01</th>
+      <th>0</th>
+      <td>99.0</td>
+      <td>15.282828</td>
+      <td>9.574669</td>
+      <td>2.0</td>
+      <td>8.00</td>
+      <td>13.0</td>
+      <td>20.00</td>
+      <td>56.0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>99.0</td>
+      <td>13.949495</td>
+      <td>8.374370</td>
+      <td>2.0</td>
+      <td>8.00</td>
+      <td>12.0</td>
+      <td>19.50</td>
+      <td>38.0</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>99.0</td>
+      <td>13.525253</td>
+      <td>7.661650</td>
+      <td>2.0</td>
+      <td>8.00</td>
+      <td>12.0</td>
+      <td>18.00</td>
+      <td>39.0</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>98.0</td>
+      <td>15.285714</td>
+      <td>10.632570</td>
+      <td>0.0</td>
+      <td>7.25</td>
+      <td>13.0</td>
+      <td>18.00</td>
+      <td>62.0</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>98.0</td>
+      <td>17.377551</td>
+      <td>11.544191</td>
+      <td>0.0</td>
+      <td>9.25</td>
+      <td>16.0</td>
+      <td>21.75</td>
+      <td>61.0</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>98.0</td>
+      <td>20.632653</td>
+      <td>14.058338</td>
+      <td>0.0</td>
+      <td>8.25</td>
+      <td>18.0</td>
+      <td>30.75</td>
+      <td>58.0</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>98.0</td>
+      <td>15.081633</td>
+      <td>10.674832</td>
+      <td>0.0</td>
+      <td>6.00</td>
+      <td>14.5</td>
+      <td>22.00</td>
+      <td>46.0</td>
+    </tr>
+    <tr>
+      <th rowspan="7" valign="top">BT-03</th>
+      <th>0</th>
+      <td>99.0</td>
+      <td>11.676768</td>
+      <td>6.948540</td>
+      <td>1.0</td>
+      <td>7.00</td>
+      <td>11.0</td>
+      <td>16.00</td>
+      <td>38.0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>99.0</td>
+      <td>12.151515</td>
+      <td>6.153419</td>
+      <td>2.0</td>
+      <td>8.00</td>
+      <td>11.0</td>
+      <td>16.00</td>
+      <td>30.0</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>99.0</td>
+      <td>12.676768</td>
+      <td>7.296670</td>
+      <td>1.0</td>
+      <td>7.00</td>
+      <td>12.0</td>
+      <td>17.50</td>
+      <td>32.0</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>98.0</td>
+      <td>12.336735</td>
+      <td>7.303359</td>
+      <td>0.0</td>
+      <td>6.25</td>
+      <td>11.5</td>
+      <td>16.00</td>
+      <td>40.0</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>98.0</td>
+      <td>12.755102</td>
+      <td>7.065323</td>
+      <td>0.0</td>
+      <td>7.00</td>
+      <td>12.0</td>
+      <td>18.00</td>
+      <td>34.0</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>98.0</td>
+      <td>10.877551</td>
+      <td>8.820390</td>
+      <td>0.0</td>
+      <td>4.00</td>
+      <td>8.5</td>
+      <td>15.00</td>
+      <td>42.0</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>98.0</td>
+      <td>10.500000</td>
+      <td>8.474644</td>
+      <td>0.0</td>
+      <td>5.00</td>
+      <td>9.0</td>
+      <td>14.00</td>
+      <td>52.0</td>
+    </tr>
+    <tr>
+      <th rowspan="7" valign="top">BT-04</th>
+      <th>0</th>
+      <td>99.0</td>
+      <td>7.858586</td>
+      <td>5.076979</td>
+      <td>0.0</td>
+      <td>4.00</td>
+      <td>7.0</td>
+      <td>10.00</td>
+      <td>26.0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>99.0</td>
+      <td>7.878788</td>
+      <td>4.291122</td>
+      <td>1.0</td>
+      <td>5.00</td>
+      <td>7.0</td>
+      <td>10.00</td>
+      <td>24.0</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>99.0</td>
+      <td>7.919192</td>
+      <td>4.006823</td>
+      <td>0.0</td>
+      <td>5.00</td>
+      <td>8.0</td>
+      <td>10.00</td>
+      <td>20.0</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>98.0</td>
+      <td>7.816327</td>
+      <td>4.782586</td>
+      <td>0.0</td>
+      <td>4.00</td>
+      <td>7.0</td>
+      <td>11.00</td>
+      <td>24.0</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>98.0</td>
+      <td>7.755102</td>
+      <td>4.240359</td>
+      <td>0.0</td>
+      <td>5.00</td>
+      <td>7.0</td>
+      <td>10.00</td>
+      <td>20.0</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>98.0</td>
+      <td>4.346939</td>
+      <td>3.964019</td>
+      <td>0.0</td>
+      <td>2.00</td>
+      <td>4.0</td>
+      <td>6.00</td>
+      <td>23.0</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>98.0</td>
+      <td>3.979592</td>
+      <td>3.508398</td>
+      <td>0.0</td>
+      <td>1.00</td>
+      <td>3.0</td>
+      <td>6.00</td>
+      <td>16.0</td>
+    </tr>
+    <tr>
+      <th rowspan="7" valign="top">BT-05</th>
+      <th>0</th>
+      <td>99.0</td>
+      <td>9.454545</td>
+      <td>6.429004</td>
+      <td>1.0</td>
+      <td>4.50</td>
+      <td>8.0</td>
+      <td>13.50</td>
+      <td>32.0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>99.0</td>
+      <td>9.030303</td>
+      <td>6.333350</td>
+      <td>1.0</td>
+      <td>4.00</td>
+      <td>8.0</td>
+      <td>13.00</td>
+      <td>28.0</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>99.0</td>
+      <td>9.040404</td>
+      <td>6.626969</td>
+      <td>0.0</td>
+      <td>4.00</td>
+      <td>7.0</td>
+      <td>12.50</td>
+      <td>34.0</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>98.0</td>
+      <td>9.540816</td>
+      <td>7.211343</td>
+      <td>0.0</td>
+      <td>4.00</td>
+      <td>8.0</td>
+      <td>14.00</td>
+      <td>30.0</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>98.0</td>
+      <td>10.255102</td>
+      <td>6.709451</td>
+      <td>0.0</td>
+      <td>5.00</td>
+      <td>9.0</td>
+      <td>14.00</td>
+      <td>42.0</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>98.0</td>
+      <td>9.000000</td>
+      <td>7.550517</td>
+      <td>0.0</td>
+      <td>3.00</td>
+      <td>8.0</td>
+      <td>13.00</td>
+      <td>42.0</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>98.0</td>
+      <td>7.377551</td>
+      <td>5.999167</td>
+      <td>0.0</td>
+      <td>3.00</td>
+      <td>7.0</td>
+      <td>10.00</td>
+      <td>28.0</td>
+    </tr>
+    <tr>
+      <th rowspan="2" valign="top">CBD-03</th>
+      <th>0</th>
+      <td>99.0</td>
+      <td>8.585859</td>
+      <td>8.279567</td>
+      <td>0.0</td>
+      <td>4.00</td>
+      <td>6.0</td>
+      <td>10.00</td>
+      <td>57.0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>99.0</td>
+      <td>8.393939</td>
+      <td>6.589754</td>
+      <td>0.0</td>
+      <td>4.00</td>
+      <td>6.0</td>
+      <td>12.00</td>
+      <td>34.0</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th rowspan="2" valign="top">UW-10</th>
+      <th>5</th>
+      <td>98.0</td>
+      <td>2.377551</td>
+      <td>3.131204</td>
+      <td>0.0</td>
+      <td>0.00</td>
+      <td>1.5</td>
+      <td>3.75</td>
+      <td>18.0</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>98.0</td>
+      <td>1.775510</td>
+      <td>3.000105</td>
+      <td>0.0</td>
+      <td>0.00</td>
+      <td>0.0</td>
+      <td>2.00</td>
+      <td>16.0</td>
+    </tr>
+    <tr>
+      <th rowspan="7" valign="top">UW-11</th>
+      <th>0</th>
+      <td>44.0</td>
+      <td>3.272727</td>
+      <td>3.142830</td>
+      <td>0.0</td>
+      <td>1.00</td>
+      <td>3.0</td>
+      <td>5.00</td>
+      <td>11.0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>44.0</td>
+      <td>3.181818</td>
+      <td>3.074824</td>
+      <td>0.0</td>
+      <td>0.00</td>
+      <td>2.0</td>
+      <td>6.00</td>
+      <td>10.0</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>44.0</td>
+      <td>3.431818</td>
+      <td>3.030064</td>
+      <td>0.0</td>
+      <td>0.00</td>
+      <td>3.0</td>
+      <td>6.00</td>
+      <td>11.0</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>44.0</td>
+      <td>3.772727</td>
+      <td>3.469895</td>
+      <td>0.0</td>
+      <td>1.00</td>
+      <td>2.5</td>
+      <td>6.00</td>
+      <td>16.0</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>44.0</td>
+      <td>3.681818</td>
+      <td>3.489337</td>
+      <td>0.0</td>
+      <td>0.75</td>
+      <td>3.0</td>
+      <td>6.00</td>
+      <td>13.0</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>44.0</td>
+      <td>2.636364</td>
+      <td>3.424202</td>
+      <td>0.0</td>
+      <td>0.00</td>
+      <td>1.0</td>
+      <td>3.25</td>
+      <td>12.0</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>44.0</td>
+      <td>2.477273</td>
+      <td>3.480769</td>
+      <td>0.0</td>
+      <td>0.00</td>
+      <td>1.0</td>
+      <td>3.00</td>
+      <td>15.0</td>
+    </tr>
+    <tr>
+      <th rowspan="7" valign="top">WF-01</th>
+      <th>0</th>
+      <td>99.0</td>
+      <td>17.212121</td>
+      <td>11.908900</td>
+      <td>0.0</td>
+      <td>7.00</td>
+      <td>16.0</td>
+      <td>26.00</td>
+      <td>56.0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>99.0</td>
+      <td>16.222222</td>
+      <td>10.312025</td>
+      <td>2.0</td>
+      <td>8.00</td>
+      <td>14.0</td>
+      <td>21.50</td>
+      <td>56.0</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>99.0</td>
+      <td>15.616162</td>
+      <td>10.238689</td>
+      <td>2.0</td>
+      <td>7.00</td>
+      <td>13.0</td>
+      <td>22.00</td>
+      <td>44.0</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>98.0</td>
+      <td>18.438776</td>
+      <td>11.849630</td>
+      <td>2.0</td>
+      <td>9.00</td>
+      <td>17.5</td>
+      <td>26.00</td>
+      <td>66.0</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>98.0</td>
+      <td>17.979592</td>
+      <td>13.641945</td>
+      <td>0.0</td>
+      <td>6.00</td>
+      <td>14.0</td>
+      <td>28.00</td>
+      <td>53.0</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>98.0</td>
+      <td>24.530612</td>
+      <td>19.283669</td>
+      <td>0.0</td>
+      <td>8.00</td>
+      <td>22.0</td>
+      <td>37.00</td>
+      <td>74.0</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>98.0</td>
+      <td>22.704082</td>
+      <td>19.682641</td>
+      <td>0.0</td>
+      <td>5.25</td>
+      <td>20.0</td>
+      <td>34.75</td>
+      <td>110.0</td>
+    </tr>
+    <tr>
+      <th rowspan="7" valign="top">WF-03</th>
+      <th>0</th>
+      <td>3.0</td>
+      <td>4.000000</td>
+      <td>1.000000</td>
+      <td>3.0</td>
+      <td>3.50</td>
+      <td>4.0</td>
+      <td>4.50</td>
+      <td>5.0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>4.0</td>
+      <td>5.000000</td>
+      <td>4.690416</td>
+      <td>0.0</td>
+      <td>2.25</td>
+      <td>4.5</td>
+      <td>7.25</td>
+      <td>11.0</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>4.0</td>
+      <td>6.250000</td>
+      <td>2.872281</td>
+      <td>4.0</td>
+      <td>4.00</td>
+      <td>5.5</td>
+      <td>7.75</td>
+      <td>10.0</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>3.0</td>
+      <td>8.333333</td>
+      <td>4.041452</td>
+      <td>4.0</td>
+      <td>6.50</td>
+      <td>9.0</td>
+      <td>10.50</td>
+      <td>12.0</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>3.0</td>
+      <td>10.333333</td>
+      <td>3.214550</td>
+      <td>8.0</td>
+      <td>8.50</td>
+      <td>9.0</td>
+      <td>11.50</td>
+      <td>14.0</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>3.0</td>
+      <td>7.333333</td>
+      <td>5.859465</td>
+      <td>3.0</td>
+      <td>4.00</td>
+      <td>5.0</td>
+      <td>9.50</td>
+      <td>14.0</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>3.0</td>
+      <td>8.333333</td>
+      <td>3.055050</td>
+      <td>5.0</td>
+      <td>7.00</td>
+      <td>9.0</td>
+      <td>10.00</td>
+      <td>11.0</td>
+    </tr>
+    <tr>
+      <th rowspan="7" valign="top">WF-04</th>
+      <th>0</th>
+      <td>99.0</td>
+      <td>8.383838</td>
+      <td>6.974746</td>
+      <td>0.0</td>
+      <td>3.00</td>
+      <td>6.0</td>
+      <td>12.00</td>
+      <td>32.0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>99.0</td>
+      <td>7.525253</td>
+      <td>6.221004</td>
+      <td>0.0</td>
+      <td>3.00</td>
+      <td>6.0</td>
+      <td>11.00</td>
+      <td>32.0</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>99.0</td>
+      <td>6.888889</td>
+      <td>6.057360</td>
+      <td>0.0</td>
+      <td>2.00</td>
+      <td>6.0</td>
+      <td>10.00</td>
+      <td>29.0</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>98.0</td>
+      <td>8.163265</td>
+      <td>6.818250</td>
+      <td>0.0</td>
+      <td>4.00</td>
+      <td>6.5</td>
+      <td>12.00</td>
+      <td>36.0</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>98.0</td>
+      <td>8.765306</td>
+      <td>6.601782</td>
+      <td>0.0</td>
+      <td>4.00</td>
+      <td>7.5</td>
+      <td>11.00</td>
+      <td>29.0</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>98.0</td>
+      <td>13.326531</td>
+      <td>10.597389</td>
+      <td>0.0</td>
+      <td>4.00</td>
+      <td>12.0</td>
+      <td>19.00</td>
+      <td>48.0</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>98.0</td>
+      <td>11.581633</td>
+      <td>10.658643</td>
+      <td>0.0</td>
+      <td>2.25</td>
+      <td>9.5</td>
+      <td>18.00</td>
+      <td>60.0</td>
+    </tr>
+  </tbody>
+</table>
+<p>378 rows × 8 columns</p>
+</div></div>
+</div>
+</section>
+</section>
+<section id="A-similar-example-using-R---airline-flights">
+<h2>A similar example using R - airline flights<a class="headerlink" href="#A-similar-example-using-R---airline-flights" title="Permalink to this headline">¶</a></h2>
+<p>Here’s how you can do the same thing using R. I’ll use the <code class="docutils literal notranslate"><span class="pre">nycflights13</span></code> package and we’ll compute the average number of flights by day of week by carrier.</p>
+<p>In order to use R magic within Jupyter notebook cells, you need to:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>pip install rpy2
+</pre></div>
+</div>
+<p>The latest version (2.9.4 as of this post) requires the <code class="docutils literal notranslate"><span class="pre">tzlocal</span></code> module as well.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>pip install tzlocal
+</pre></div>
+</div>
+<p>Now you can load the <code class="docutils literal notranslate"><span class="pre">rpy2.ipython</span></code> module via a magic command.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[25]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%</span><span class="k">load_ext</span> rpy2.ipython
+</pre></div>
+</div>
+</div>
+<p>Now just put <code class="docutils literal notranslate"><span class="pre">%%R</span></code> at top of any cell you want to treat as an R code chunk.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[30]:
+</pre></div>
+</div>
+<div class="input_area highlight-r notranslate"><div class="highlight"><pre><span></span><span class="o">%%</span><span class="n">R</span>
+<span class="nf">library</span><span class="p">(</span><span class="n">dplyr</span><span class="p">,</span> <span class="n">quietly</span> <span class="o">=</span> <span class="kc">TRUE</span><span class="p">,</span> <span class="n">warn.conflicts</span> <span class="o">=</span> <span class="kc">FALSE</span><span class="p">,</span> <span class="n">verbose</span> <span class="o">=</span> <span class="kc">FALSE</span><span class="p">)</span>
+<span class="nf">library</span><span class="p">(</span><span class="n">lubridate</span><span class="p">,</span> <span class="n">quietly</span> <span class="o">=</span> <span class="kc">TRUE</span><span class="p">,</span> <span class="n">warn.conflicts</span> <span class="o">=</span> <span class="kc">FALSE</span><span class="p">,</span> <span class="n">verbose</span> <span class="o">=</span> <span class="kc">FALSE</span><span class="p">)</span>
+<span class="nf">library</span><span class="p">(</span><span class="n">ggplot2</span><span class="p">,</span> <span class="n">quietly</span> <span class="o">=</span> <span class="kc">TRUE</span><span class="p">,</span> <span class="n">warn.conflicts</span> <span class="o">=</span> <span class="kc">FALSE</span><span class="p">,</span> <span class="n">verbose</span> <span class="o">=</span> <span class="kc">FALSE</span><span class="p">)</span>
+<span class="nf">library</span><span class="p">(</span><span class="n">nycflights13</span><span class="p">,</span> <span class="n">quietly</span> <span class="o">=</span> <span class="kc">TRUE</span><span class="p">,</span> <span class="n">warn.conflicts</span> <span class="o">=</span> <span class="kc">FALSE</span><span class="p">,</span> <span class="n">verbose</span> <span class="o">=</span> <span class="kc">FALSE</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>Load the NYC Flights data package and add a flight date field.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[31]:
+</pre></div>
+</div>
+<div class="input_area highlight-r notranslate"><div class="highlight"><pre><span></span><span class="o">%%</span><span class="n">R</span>
+<span class="n">flights</span> <span class="o">&lt;-</span> <span class="n">nycflights13</span><span class="o">::</span><span class="n">flights</span>
+<span class="n">flights</span><span class="o">$</span><span class="n">fl_date</span> <span class="o">&lt;-</span> <span class="nf">with</span><span class="p">(</span><span class="n">flights</span><span class="p">,</span> <span class="nf">ISOdate</span><span class="p">(</span><span class="n">year</span><span class="p">,</span> <span class="n">month</span><span class="p">,</span> <span class="n">day</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<p>Count the number of flights by date by carrier.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[32]:
+</pre></div>
+</div>
+<div class="input_area highlight-r notranslate"><div class="highlight"><pre><span></span><span class="o">%%</span><span class="n">R</span>
+<span class="n">flights_by_date_carrier_1</span> <span class="o">&lt;-</span> <span class="n">flights</span> <span class="o">%&gt;%</span>
+  <span class="nf">group_by</span><span class="p">(</span><span class="n">carrier</span><span class="p">,</span> <span class="n">fl_date</span><span class="p">)</span> <span class="o">%&gt;%</span>
+  <span class="nf">summarize</span><span class="p">(</span><span class="n">numflights</span> <span class="o">=</span> <span class="nf">n</span><span class="p">())</span>
+</pre></div>
+</div>
+</div>
+<p>We need to make sure that we have a data frame containing every combination of <code class="docutils literal notranslate"><span class="pre">fl_date</span></code> and <code class="docutils literal notranslate"><span class="pre">carrier</span></code> so that the days with zero flights are properly accounted for when computing the average number of flights by day of week. R has a function called <code class="docutils literal notranslate"><span class="pre">expand.grid</span></code> which is perfect for this. I’ll create two vectors - one containing all the dates and one containing all the carriers. Then <code class="docutils literal notranslate"><span class="pre">expand.grid</span></code> will create a dataframe with all the combinations of the elements of two vectors.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[33]:
+</pre></div>
+</div>
+<div class="input_area highlight-r notranslate"><div class="highlight"><pre><span></span><span class="o">%%</span><span class="n">R</span>
+<span class="n">dates</span> <span class="o">&lt;-</span> <span class="nf">seq</span><span class="p">(</span><span class="nf">ymd</span><span class="p">(</span><span class="s">&#39;2013-01-01&#39;</span><span class="p">),</span><span class="nf">ymd</span><span class="p">(</span><span class="s">&#39;2013-12-31&#39;</span><span class="p">),</span><span class="n">by</span><span class="o">=</span><span class="s">&#39;days&#39;</span><span class="p">)</span>
+<span class="n">carriers</span> <span class="o">&lt;-</span> <span class="nf">unique</span><span class="p">(</span><span class="n">flights</span><span class="o">$</span><span class="n">carrier</span><span class="p">)</span>
+<span class="n">date_carrier</span> <span class="o">&lt;-</span> <span class="nf">expand.grid</span><span class="p">(</span><span class="n">carriers</span><span class="p">,</span> <span class="n">dates</span><span class="p">)</span>
+<span class="nf">names</span><span class="p">(</span><span class="n">date_carrier</span><span class="p">)</span> <span class="o">&lt;-</span> <span class="nf">c</span><span class="p">(</span><span class="s">&quot;carrier&quot;</span><span class="p">,</span> <span class="s">&quot;fl_date&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>Now we can merge the two dataframes using a left join.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[34]:
+</pre></div>
+</div>
+<div class="input_area highlight-r notranslate"><div class="highlight"><pre><span></span><span class="o">%%</span><span class="n">R</span>
+<span class="n">flights_by_date_carrier</span> <span class="o">&lt;-</span> <span class="nf">merge</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="n">date_carrier</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">flights_by_date_carrier_1</span><span class="p">,</span>
+                      <span class="n">by.x</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="s">&quot;carrier&quot;</span><span class="p">,</span> <span class="s">&quot;fl_date&quot;</span><span class="p">),</span>
+                      <span class="n">by.y</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="s">&quot;carrier&quot;</span><span class="p">,</span> <span class="s">&quot;fl_date&quot;</span><span class="p">),</span>
+                      <span class="n">all.x</span> <span class="o">=</span> <span class="kc">TRUE</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>Add a day of week column for convenience.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[35]:
+</pre></div>
+</div>
+<div class="input_area highlight-r notranslate"><div class="highlight"><pre><span></span><span class="o">%%</span><span class="n">R</span>
+<span class="n">flights_by_date_carrier</span><span class="o">$</span><span class="n">weekday</span> <span class="o">&lt;-</span> <span class="nf">wday</span><span class="p">(</span><span class="n">flights_by_date_carrier</span><span class="o">$</span><span class="n">fl_date</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>Finally, compute the average number of flights.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[36]:
+</pre></div>
+</div>
+<div class="input_area highlight-r notranslate"><div class="highlight"><pre><span></span><span class="o">%%</span><span class="n">R</span>
+<span class="n">flights_carrier_dow</span> <span class="o">&lt;-</span> <span class="n">flights_by_date_carrier</span> <span class="o">%&gt;%</span>
+  <span class="nf">group_by</span><span class="p">(</span><span class="n">carrier</span><span class="p">,</span> <span class="n">weekday</span><span class="p">)</span> <span class="o">%&gt;%</span>
+  <span class="nf">summarize</span><span class="p">(</span>
+    <span class="n">avg_numflights</span> <span class="o">=</span> <span class="nf">mean</span><span class="p">(</span><span class="n">numflights</span><span class="p">)</span>
+  <span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>Let’s plot it.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[37]:
+</pre></div>
+</div>
+<div class="input_area highlight-r notranslate"><div class="highlight"><pre><span></span><span class="o">%%</span><span class="n">R</span>
+<span class="nf">ggplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">flights_carrier_dow</span><span class="p">)</span> <span class="o">+</span> <span class="nf">geom_bar</span><span class="p">(</span><span class="nf">aes</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="nf">factor</span><span class="p">(</span><span class="n">weekday</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="nf">c</span><span class="p">(</span><span class="s">&quot;Su&quot;</span><span class="p">,</span><span class="s">&quot;Mo&quot;</span><span class="p">,</span><span class="s">&quot;Tu&quot;</span><span class="p">,</span><span class="s">&quot;We&quot;</span><span class="p">,</span><span class="s">&quot;Th&quot;</span><span class="p">,</span><span class="s">&quot;Fr&quot;</span><span class="p">,</span><span class="s">&quot;Sa&quot;</span><span class="p">)),</span> <span class="n">y</span><span class="o">=</span><span class="n">avg_numflights</span><span class="p">),</span> <span class="n">stat</span> <span class="o">=</span> <span class="s">&quot;identity&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="nf">facet_wrap</span><span class="p">(</span><span class="o">~</span><span class="n">carrier</span><span class="p">)</span> <span class="o">+</span>
+  <span class="nf">xlab</span><span class="p">(</span><span class="s">&quot;Day of Week&quot;</span><span class="p">)</span> <span class="o">+</span>
+  <span class="nf">ylab</span><span class="p">(</span><span class="s">&quot;Avg # of Flights&quot;</span><span class="p">)</span> <span class="o">+</span>
+  <span class="nf">ggtitle</span><span class="p">(</span><span class="s">&quot;Avg # Flights by Day of Week and Carrier&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../../../../../../../_images/.doctrees_nbsphinx_.doctrees_nbsphinx_.doctrees_nbsphinx_blog_daily_averages_cycleshare_part2_54_0.png" src="../../../../../../../../_images/.doctrees_nbsphinx_.doctrees_nbsphinx_.doctrees_nbsphinx_blog_daily_averages_cycleshare_part2_54_0.png" />
+</div>
+</div>
+</section>
+<section id="Closing-remarks---check-out-hillmaker">
+<h2>Closing remarks - check out hillmaker<a class="headerlink" href="#Closing-remarks---check-out-hillmaker" title="Permalink to this headline">¶</a></h2>
+<p>In addition to simply counting number of bike rentals (or flights), we might be interested in related statistics such as the average and percentiles of the number of bikes in use by time of day and day of week. My <a class="reference external" href="https://github.com/misken/hillmaker">hillmaker</a> package is designed for just such analysis. You can find an example here of it being used to <a class="reference external" href="http://hselab.org/cycle-share-hills-1.html">analyze the Pronto Cycle Share data</a>.</p>
+</section>
+</section>
+
+<div class="section">
+    
+
+<div class="section">
+  <span style="float: left">
+     Previous:
+    
+    <a href="../../../../../../../../blog/daily_averages_cycleshare_part2/">
+       Computing daily averages from transaction data - Part 2 (using pandas and some R magic)
+    </a>
+    
+  </span>
+  <span>&nbsp;</span>
+  <span style="float: right">
+     Next: 
+    <a href="../../../../blog/daily_averages_cycleshare_part2/">
+      Computing daily averages from transaction data - Part 2 (using pandas and some R magic) 
+    </a>
+    
+  </span>
+</div>
+  
+</div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../../../../../../../">misken</a></h1>
+
+
+
+
+
+
+
+
+  
+<h2>
+   
+  18 July 2018 
+</h2>
+
+<ul>
+   
+<li id="author">
+  <span
+    >Author:</span
+  >
+   
+  <a href="../../../../../../../../blog/author/misken/">misken</a>  
+</li>
+    
+<li id="tags">
+  <span
+    >Tags: </span
+  >
+   
+  <a href="../../../../../../../../blog/tag/python/">python</a>   
+  <a href="../../../../../../../../blog/tag/occupancy-analysis/">occupancy analysis</a>   
+  <a href="../../../../../../../../blog/tag/pandas/">pandas</a>  
+</li>
+ 
+</ul>
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../../about/">About misken</a></li>
+</ul>
+
+
+<h3>
+  <a href="../../../../../../../../blog/">Recent Posts</a>
+</h3>
+<ul>
+   
+  <li>
+    <a href="../../../../../../../../blog/simpy_getting_started_vaccine_clinic/"
+      >04 April - Using SimPy to simulate a vaccine clinic - Part 1: an introductory tutorial</a
+    >
+  </li>
+  
+  <li>
+    <a href="../simpy_getting_started_vaccine_clinic/"
+      >04 April - Using SimPy to simulate a vaccine clinic - Part 1: an introductory tutorial</a
+    >
+  </li>
+  
+  <li>
+    <a href="../../../../blog/simpy_getting_started_vaccine_clinic/"
+      >04 April - Using SimPy to simulate a vaccine clinic - Part 1: an introductory tutorial</a
+    >
+  </li>
+  
+  <li>
+    <a href="../../../../../../blog/simpy_getting_started_vaccine_clinic/"
+      >04 April - Using SimPy to simulate a vaccine clinic - Part 1: an introductory tutorial</a
+    >
+  </li>
+  
+  <li>
+    <a href="../../../../../../../../blog/use_jupyter_conda_envs/"
+      >03 April - Using different conda environments with Jupyter Lab</a
+    >
+  </li>
+  
+</ul>
+
+<h3><a href="../../../../../../../../blog/tag/">Tags</a></h3>
+<style type="text/css">
+  ul.ablog-cloud {
+    list-style: none;
+    overflow: auto;
+  }
+  ul.ablog-cloud li {
+    float: left;
+    height: 20pt;
+    line-height: 18pt;
+    margin-right: 5px;
+  }
+  ul.ablog-cloud a {
+    text-decoration: none;
+    vertical-align: middle;
+  }
+  li.ablog-cloud-1 {
+    font-size: 80%;
+  }
+  li.ablog-cloud-2 {
+    font-size: 95%;
+  }
+  li.ablog-cloud-3 {
+    font-size: 110%;
+  }
+  li.ablog-cloud-4 {
+    font-size: 125%;
+  }
+  li.ablog-cloud-5 {
+    font-size: 140%;
+  }
+</style>
+<ul class="ablog-cloud">
+   
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../../../../../../../../blog/tag/github/">GitHub</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../../../../../../../../blog/tag/r/">R</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-2">
+    <a href="../../../../../../../../blog/tag/ablog/">ablog</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../../../../../../../../blog/tag/bikeshare/">bikeshare</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../../../../../../../../blog/tag/birding/">birding</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../../../../../../../../blog/tag/blogging/">blogging</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../../../../../../../../blog/tag/conda/">conda</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../../../../../../../../blog/tag/datetime/">datetime</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../../../../../../../../blog/tag/dplyr/">dplyr</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../../../../../../../../blog/tag/ebird/">ebird</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../../../../../../../../blog/tag/ecology/">ecology</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-2">
+    <a href="../../../../../../../../blog/tag/excel/">excel</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../../../../../../../../blog/tag/ggplot2/">ggplot2</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../../../../../../../../blog/tag/gis/">gis</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../../../../../../../../blog/tag/git/">git</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../../../../../../../../blog/tag/hiking/">hiking</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../../../../../../../../blog/tag/hillmaker/">hillmaker</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-2">
+    <a href="../../../../../../../../blog/tag/jupyter/">jupyter</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../../../../../../../../blog/tag/occupancy-analysis/">occupancy analysis</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../../../../../../../../blog/tag/pandas/">pandas</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-5">
+    <a href="../../../../../../../../blog/tag/python/">python</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../../../../../../../../blog/tag/r/">r</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../../../../../../../../blog/tag/sphinx/">sphinx</a>
+  </li>
+   
+</ul>
+
+<h3>
+  <a href="../../../../../../../../blog/archive/">Archives</a>
+</h3>
+<ul>
+   
+  <li>
+    <a href="../../../../../../../../blog/2022/">2022 (11)</a>
+  </li>
+    
+  <li>
+    <a href="../../../../../../../../blog/2021/">2021 (16)</a>
+  </li>
+    
+  <li>
+    <a href="../../../../../../../../blog/2020/">2020 (2)</a>
+  </li>
+    
+  <li>
+    <a href="../../../../../../../../blog/2019/">2019 (13)</a>
+  </li>
+    
+  <li>
+    <a href="../../../../../../../../blog/2018/">2018 (10)</a>
+  </li>
+    
+  <li>
+    <a href="../../../../../../../../blog/2016/">2016 (1)</a>
+  </li>
+    
+  <li>
+    <a href="../../../../../../../../blog/2014/">2014 (4)</a>
+  </li>
+   
+</ul>
+
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../../../../../search/" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2022, misken.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.3.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../../../../../../../../_sources/.doctrees/nbsphinx/.doctrees/nbsphinx/.doctrees/nbsphinx/blog/daily_averages_cycleshare_part2.ipynb.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

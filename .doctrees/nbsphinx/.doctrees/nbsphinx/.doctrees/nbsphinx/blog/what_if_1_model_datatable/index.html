@@ -1,0 +1,3043 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>Excel “what if?” analysis with Python - Part 1: Models and Data Tables &#8212; misken 0,1,0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../../../../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../../../../../_static/alabaster.css" />
+    <script data-url_root="../../../../../../../../" id="documentation_options" src="../../../../../../../../_static/documentation_options.js"></script>
+    <script src="../../../../../../../../_static/jquery.js"></script>
+    <script src="../../../../../../../../_static/underscore.js"></script>
+    <script src="../../../../../../../../_static/doctools.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <link rel="author" title="About these documents" href="../../../../../../../../about/" />
+    <link rel="index" title="Index" href="../../../../../../../../genindex/" />
+    <link rel="search" title="Search" href="../../../../../../../../search/" /> 
+   
+  <link rel="stylesheet" href="../../../../../../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+ 
+<link
+  rel="alternate"
+  type="application/atom+xml"
+  href="../../../../../../../../blog/atom.xml"
+  title="Bits of analytics"
+/>
+ 
+<style type="text/css">
+  ul.ablog-archive {
+    list-style: none;
+    overflow: auto;
+    margin-left: 0px;
+  }
+  ul.ablog-archive li {
+    float: left;
+    margin-right: 5px;
+    font-size: 80%;
+  }
+  ul.postlist a {
+    font-style: italic;
+  }
+  ul.postlist-style-disc {
+    list-style-type: disc;
+  }
+  ul.postlist-style-none {
+    list-style-type: none;
+  }
+  ul.postlist-style-circle {
+    list-style-type: circle;
+  }
+</style>
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+             
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt *,
+div.nbinput.container div.input_area pre,
+div.nboutput.container div.output_area pre,
+div.nbinput.container div.input_area .highlight,
+div.nboutput.container div.output_area .highlight {
+    border: none;
+    padding: 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+div.nbinput.container > div[class*=highlight],
+div.nboutput.container > div[class*=highlight] {
+    margin: 0;
+}
+
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt * {
+    background: none;
+}
+
+div.nboutput.container div.output_area .highlight,
+div.nboutput.container div.output_area pre {
+    background: unset;
+}
+
+div.nboutput.container div.output_area div.highlight {
+    color: unset;  /* override Pygments text color */
+}
+
+/* avoid gaps between output lines */
+div.nboutput.container div[class*=highlight] pre {
+    line-height: normal;
+}
+
+/* input/output containers */
+div.nbinput.container,
+div.nboutput.container {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+    width: 100%;
+}
+@media (max-width: 540px) {
+    div.nbinput.container,
+    div.nboutput.container {
+        flex-direction: column;
+    }
+}
+
+/* input container */
+div.nbinput.container {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast.container {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput.container div.prompt pre {
+    color: #307FC1;
+}
+
+/* output prompt */
+div.nboutput.container div.prompt pre {
+    color: #BF5B3D;
+}
+
+/* all prompts */
+div.nbinput.container div.prompt,
+div.nboutput.container div.prompt {
+    width: 4.5ex;
+    padding-top: 5px;
+    position: relative;
+    user-select: none;
+}
+
+div.nbinput.container div.prompt > div,
+div.nboutput.container div.prompt > div {
+    position: absolute;
+    right: 0;
+    margin-right: 0.3ex;
+}
+
+@media (max-width: 540px) {
+    div.nbinput.container div.prompt,
+    div.nboutput.container div.prompt {
+        width: unset;
+        text-align: left;
+        padding: 0.4em;
+    }
+    div.nboutput.container div.prompt.empty {
+        padding: 0;
+    }
+
+    div.nbinput.container div.prompt > div,
+    div.nboutput.container div.prompt > div {
+        position: unset;
+    }
+}
+
+/* disable scrollbars on prompts */
+div.nbinput.container div.prompt pre,
+div.nboutput.container div.prompt pre {
+    overflow: hidden;
+}
+
+/* input/output area */
+div.nbinput.container div.input_area,
+div.nboutput.container div.output_area {
+    -webkit-flex: 1;
+    flex: 1;
+    overflow: auto;
+}
+@media (max-width: 540px) {
+    div.nbinput.container div.input_area,
+    div.nboutput.container div.output_area {
+        width: 100%;
+    }
+}
+
+/* input area */
+div.nbinput.container div.input_area {
+    border: 1px solid #e0e0e0;
+    border-radius: 2px;
+    /*background: #f5f5f5;*/
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput.container div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.imgmath center alignment in output cells */
+div.nboutput.container div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput.container div.output_area.stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-default-inverse-fg { color: #FFFFFF; }
+.ansi-default-inverse-bg { background-color: #000000; }
+
+.ansi-bold { font-weight: bold; }
+.ansi-underline { text-decoration: underline; }
+
+
+div.nbinput.container div.input_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight].math,
+div.nboutput.container div.output_area.rendered_html,
+div.nboutput.container div.output_area > div.output_javascript,
+div.nboutput.container div.output_area:not(.rendered_html) > img{
+    padding: 5px;
+    margin: 0;
+}
+
+/* fix copybtn overflow problem in chromium (needed for 'sphinx_copybutton') */
+div.nbinput.container div.input_area > div[class^='highlight'],
+div.nboutput.container div.output_area > div[class^='highlight']{
+    overflow-y: hidden;
+}
+
+/* hide copybtn icon on prompts (needed for 'sphinx_copybutton') */
+.prompt .copybtn {
+    display: none;
+}
+
+/* Some additional styling taken form the Jupyter notebook CSS */
+div.rendered_html table {
+  border: none;
+  border-collapse: collapse;
+  border-spacing: 0;
+  color: black;
+  font-size: 12px;
+  table-layout: fixed;
+}
+div.rendered_html thead {
+  border-bottom: 1px solid black;
+  vertical-align: bottom;
+}
+div.rendered_html tr,
+div.rendered_html th,
+div.rendered_html td {
+  text-align: right;
+  vertical-align: middle;
+  padding: 0.5em 0.5em;
+  line-height: normal;
+  white-space: normal;
+  max-width: none;
+  border: none;
+}
+div.rendered_html th {
+  font-weight: bold;
+}
+div.rendered_html tbody tr:nth-child(odd) {
+  background: #f5f5f5;
+}
+div.rendered_html tbody tr:hover {
+  background: rgba(66, 165, 245, 0.2);
+}
+</style>
+<section id="Excel-“what-if?”-analysis-with-Python---Part-1:-Models-and-Data-Tables">
+<h1>Excel “what if?” analysis with Python - Part 1: Models and Data Tables<a class="headerlink" href="#Excel-“what-if?”-analysis-with-Python---Part-1:-Models-and-Data-Tables" title="Permalink to this headline">¶</a></h1>
+<p>Build spreadsheet type models using Python.</p>
+<p>Excel is widely used for building and using models of business problems to explore the impact of various model inputs on key outputs. Built in “what if?” tools such as Excel Data Tables and Goal Seek are well known to power spreadsheet modelers. How might we do similar modeling and analysis using Python?</p>
+<p>While Python has been gaining momentum in the business analytics world, it is often used for data wrangling, analysis and visualization of tablular data using tools like pandas and matplotlib or Seaborn. You can find some great examples at <a class="reference external" href="https://pbpython.com/">Chris Moffit’s Practical Business Python blog</a>. I use Python all the time for such tasks and teach a course called <a class="reference external" href="http://www.sba.oakland.edu/faculty/isken/courses/mis5470_w21/">Practical Computing for Data Analytics</a> that is
+Python (and R) based. But, it got me to thinking. What about those things for which Excel is well suited such as building formula based models and doing sensitivity analysis on these models? What would those look like in Python?</p>
+<p>In this first installment of a multi-part series we begin our exploration of basic modeling in Python and creation of a <code class="docutils literal notranslate"><span class="pre">data_table</span></code> function that generalizes Excel’s Data Table tool.</p>
+<p>You can also read and download the <a class="reference external" href="https://github.com/misken/whatif_modeling_oo">notebook based tutorial from GitHub</a>.</p>
+<p>For example, here’s a high level screenshot of a model that I assign for homework in my <a class="reference external" href="http://www.sba.oakland.edu/faculty/isken/courses/mis5460_w22/">MIS 4460/5460 Business Analytics class</a> (a spreadsheet based modeling class). It’s a really simple model in which we are selling a single product that we produce. There is a fixed cost to producing the product as well as a variable production cost per unit. We can sell the product for some price and we believe that demand for the product is
+related to the selling price through a power function. Let’s assume for now that we have sufficient capacity to produce to demand and that all inputs are deterministic (we’ll deal with simulating uncertainty later in this document).</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">IPython.display</span> <span class="kn">import</span> <span class="n">Image</span>
+<span class="n">Image</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="s1">&#39;images/tech_sales_model.png&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<img alt="../../../../../../../../_images/.doctrees_nbsphinx_.doctrees_nbsphinx_.doctrees_nbsphinx_blog_what_if_1_model_datatable_4_0.png" src="../../../../../../../../_images/.doctrees_nbsphinx_.doctrees_nbsphinx_.doctrees_nbsphinx_blog_what_if_1_model_datatable_4_0.png" />
+</div>
+</div>
+<p>The details aren’t so important right now as is the overall structure of the model. There’s a few key inputs and some pretty straightforward formulas for computing cost, revenue and profit. Notice the 1-way Data Table being used to explore how profit varies for different selling prices. There’s a graph driven by the Data Table and some Text Boxes used for annotation and summary interpretative comments. There’s a button that launches Goal Seek to find the break even selling price and a 2-way Data
+Table (not shown) to explore the joint effect of selling price and variable cost. Classic Excel modeling stuff. How might we go about building a similar model using Python?</p>
+<p>What if we wanted to push it a little further and model some of the key inputs with probability distributions to reflect our uncertainty about their values? In the Excel world, we might use add-ins such as &#64;Risk which allow uncertain quantities to be directly modeled with probability distributions. For example, we might have a key input such as the exponent in the power function that relates selling price to demand that is highly uncertain. By modeling it with a probability distribution and then
+sampling from that distribution many times (essentially by recalcing the spreadsheet) we can generate a bunch of possible values for key outputs (e.g. profit) and use statistics to summarize these outputs using things like histograms and summary stats. Often this type of simulation model is referred to as a <em>Monte-Carlo</em> model to suggest repeated sampling from one or more probability distributions within an otherwise pretty static model. If you want to see such models in action, check out my
+<a class="reference external" href="http://www.sba.oakland.edu/faculty/isken/courses/mis5460_w22/simulation.html">Simulation Modeling with Excel page</a> from my Business Analytics course. Again, how might we do this with Python?</p>
+<p>In the remainder of this notebook (and subsequent follow on notebooks), we’ll explore these questions and along the way introduce some basic object-oriented (OO) programming concepts and other slightly more advanced Python techniques. This is aimed at those who might have a strong Excel based background but only a basic familiarity with Python programming. We are going to use a slightly different problem example than the one I’ve discussed above (we’ll save that one for an “exercise for the
+motivated reader”). I’ve structured things as follows:</p>
+<p><strong>Part 1 - Models and Data Tables: this notebook</strong> * The bookstore problem - Non-OO model for the bookstore problem - 1-, 2-, n-way Data Tables with the non-OO model * Everything is an object in Python * An OO model for the bookstore problem - 1-, 2-, n-way data tables with the OO model</p>
+<p><strong>Part 2 - Goal Seek: second notebook</strong> * Goal Seek - a non-OO hornet’s nest - the OO approach</p>
+<p><strong>Part 3 - Simulation: third notebook</strong> * Monte-Carlo simulation</p>
+<p><strong>Part 4 - Create package: fourth notebook</strong> * share the results</p>
+<p><strong>Part 5 - Simple GUI w/widgets: fifth notebook</strong></p>
+<section id="Import-some-libraries">
+<h2>Import some libraries<a class="headerlink" href="#Import-some-libraries" title="Permalink to this headline">¶</a></h2>
+<p>We’ll need several Python libraries for this post.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">mpl_toolkits.mplot3d</span> <span class="kn">import</span> <span class="n">Axes3D</span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+<span class="kn">import</span> <span class="nn">copy</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%</span><span class="k">matplotlib</span> inline
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Bookstore-model">
+<h2>Bookstore model<a class="headerlink" href="#Bookstore-model" title="Permalink to this headline">¶</a></h2>
+<p>This example is based on one in the <a class="reference external" href="https://host.kelley.iu.edu/albrightbooks/">spreadsheet modeling textbook(s) I’ve used in my classes since 2001</a>. I started out using Practical Management Science by Winston and Albright and switched to their Business Analytics: Data Analysis and Decision Making (Albright and Winston) around 2013ish. In both books, they introduce the “Walton Bookstore” problem in the chapter on Monte-Carlo simulation. Here’s the basic problem (with a few modifications):</p>
+<ul class="simple">
+<li><p>we have to place an order for a perishable product (e.g. a calendar),</p></li>
+<li><p>there’s a known unit cost for each one ordered,</p></li>
+<li><p>we have a known selling price,</p></li>
+<li><p>demand is uncertain but we can model it with some simple probability distribution,</p></li>
+<li><p>for each unsold item, we can get a partial refund of our unit cost,</p></li>
+<li><p>we need to select the order quantity for our one order for the year; orders can only be in multiples of 25.</p></li>
+</ul>
+<section id="Base-model---non-OO-approach">
+<h3>Base model - non-OO approach<a class="headerlink" href="#Base-model---non-OO-approach" title="Permalink to this headline">¶</a></h3>
+<p>Starting simple, let’s create some initialized variables for the base inputs.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Base inputs</span>
+<span class="n">unit_cost</span> <span class="o">=</span> <span class="mf">7.50</span>
+<span class="n">selling_price</span> <span class="o">=</span> <span class="mf">10.00</span>
+<span class="n">unit_refund</span> <span class="o">=</span> <span class="mf">2.50</span>
+</pre></div>
+</div>
+</div>
+<p>Assume we’ve used historical data to estimate the mean and standard deviation of demand. Furthermore, let’s pretend that a histogram revealed a relatively normal looking distribution. However, we are going to start by:</p>
+<ul class="simple">
+<li><p>assuming away the uncertainty,</p></li>
+<li><p>treat demand as deterministic using the mean,</p></li>
+<li><p>we’ll do some sensitivity analysis to the demand.</p></li>
+</ul>
+<p>Later, we’ll use Monte-Carlo simulation with normally distribution demand.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Demand parameters</span>
+<span class="n">demand_mean</span> <span class="o">=</span> <span class="mi">193</span>
+<span class="n">demand_sd</span> <span class="o">=</span> <span class="mi">40</span>
+
+<span class="c1"># Deterministic model</span>
+<span class="n">demand</span> <span class="o">=</span> <span class="n">demand_mean</span>
+</pre></div>
+</div>
+</div>
+<p>Finally, let’s set the initial order quantity. This will be the variable we’ll focus on in the sensitivity analysis (along with demand). Of course, if we pretend that we know demand is really equal to 193, then we’d only consider ordering 175 or 200 and would pick the one leading to higher profit. Let’s set it to 200.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">order_quantity</span> <span class="o">=</span> <span class="mi">200</span>
+</pre></div>
+</div>
+</div>
+<p>Now we can compute the various cost and revenue components and get to the bottom line profit.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">order_cost</span> <span class="o">=</span> <span class="n">unit_cost</span> <span class="o">*</span> <span class="n">order_quantity</span>
+<span class="n">sales_revenue</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">order_quantity</span><span class="p">,</span> <span class="n">demand</span><span class="p">)</span> <span class="o">*</span> <span class="n">selling_price</span>
+<span class="n">refund_revenue</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">order_quantity</span> <span class="o">-</span> <span class="n">demand</span><span class="p">)</span> <span class="o">*</span> <span class="n">unit_refund</span>
+<span class="n">profit</span> <span class="o">=</span> <span class="n">sales_revenue</span> <span class="o">+</span> <span class="n">refund_revenue</span> <span class="o">-</span> <span class="n">order_cost</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">profit</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+447.5
+</pre></div></div>
+</div>
+<p>Of course, working in a Jupyter notebook is different than working in an Excel workbook. If we modify one of the base input values, the value of <code class="docutils literal notranslate"><span class="pre">profit</span></code> is <strong>not</strong> going to magically update.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">unit_cost</span> <span class="o">=</span> <span class="mf">8.00</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">profit</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+447.5
+</pre></div></div>
+</div>
+<p>We either need to:</p>
+<ul class="simple">
+<li><p>rerun the code cell up above that computes the cost, revenue and profit,</p></li>
+<li><p>or make the unit cost change up above when we first initialized and rerun all the cells,</p></li>
+<li><p>or take a different approach…</p></li>
+</ul>
+<p>Since it feels like we are going to want to compute profit for different combinations of base input values, it makes sense to create a function to compute it. We’ll do that eventually, but let’s keep going with this simplistic approach for a bit longer and learn some things about working with vectors.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Reset entire model</span>
+<span class="n">unit_cost</span> <span class="o">=</span> <span class="mf">7.50</span>
+<span class="n">selling_price</span> <span class="o">=</span> <span class="mf">10.00</span>
+<span class="n">unit_refund</span> <span class="o">=</span> <span class="mf">2.50</span>
+
+<span class="n">demand</span> <span class="o">=</span> <span class="mi">193</span>
+
+<span class="n">order_quantity</span> <span class="o">=</span> <span class="mi">200</span>
+
+<span class="n">order_cost</span> <span class="o">=</span> <span class="n">unit_cost</span> <span class="o">*</span> <span class="n">order_quantity</span>
+<span class="n">sales_revenue</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">order_quantity</span><span class="p">,</span> <span class="n">demand</span><span class="p">)</span> <span class="o">*</span> <span class="n">selling_price</span>
+<span class="n">refund_revenue</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">order_quantity</span> <span class="o">-</span> <span class="n">demand</span><span class="p">)</span> <span class="o">*</span> <span class="n">unit_refund</span>
+<span class="n">profit</span> <span class="o">=</span> <span class="n">sales_revenue</span> <span class="o">+</span> <span class="n">refund_revenue</span> <span class="o">-</span> <span class="n">order_cost</span>
+
+<span class="n">message</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="s1">&#39;Order Cost&#39;</span><span class="si">:</span><span class="s2">15</span><span class="si">}{</span><span class="n">order_cost</span><span class="si">:</span><span class="s2">10.2f</span><span class="si">}</span><span class="s2"> </span><span class="se">\n</span><span class="s2">&quot;</span> \
+          <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="s1">&#39;Sales Revenue&#39;</span><span class="si">:</span><span class="s2">15</span><span class="si">}{</span><span class="n">sales_revenue</span><span class="si">:</span><span class="s2">10.2f</span><span class="si">}</span><span class="s2"> </span><span class="se">\n</span><span class="s2">&quot;</span> \
+          <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="s1">&#39;Refund&#39;</span><span class="si">:</span><span class="s2">15</span><span class="si">}{</span><span class="n">refund_revenue</span><span class="si">:</span><span class="s2">10.2f</span><span class="si">}</span><span class="s2"> </span><span class="se">\n</span><span class="s2">&quot;</span> \
+          <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="s1">&#39;Profit&#39;</span><span class="si">:</span><span class="s2">15</span><span class="si">}{</span><span class="n">profit</span><span class="si">:</span><span class="s2">10.2f</span><span class="si">}</span><span class="s2">&quot;</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Order Cost        1500.00
+Sales Revenue     1930.00
+Refund              17.50
+Profit             447.50
+</pre></div></div>
+</div>
+<p>Notice we’ve used Python newish approach to formatting strings called <a class="reference external" href="https://realpython.com/python-f-strings/">f-strings</a>. See <a class="reference external" href="https://pyformat.info/">https://pyformat.info/</a> for the basics on the format specification (using examples comparing the old % style formatting versus the newer <code class="docutils literal notranslate"><span class="pre">str.format()</span></code> approach) or the <a class="reference external" href="https://docs.python.org/3/library/string.html#format-specification-mini-language">official docs for all the gory details</a>.</p>
+</section>
+<section id="Sensitivity-analysis-analogous-to-a-1-way-Data-Table">
+<h3>Sensitivity analysis analogous to a 1-way Data Table<a class="headerlink" href="#Sensitivity-analysis-analogous-to-a-1-way-Data-Table" title="Permalink to this headline">¶</a></h3>
+<p>To compute <code class="docutils literal notranslate"><span class="pre">profit</span></code> for several different values of <code class="docutils literal notranslate"><span class="pre">order_quantity</span></code> in Excel, we could do a 1-way Data Table.</p>
+<p>In Python, we could set <code class="docutils literal notranslate"><span class="pre">order_quantity</span></code> equal to a vector and then recompute profit. Our model should spit out a vector of profit values corresponding to the order quantities in our <code class="docutils literal notranslate"><span class="pre">order_quantity</span></code> vector. The numpy function <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.arange.html">arange</a> can be used to create the vector.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">order_quantity</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">stop</span><span class="o">=</span><span class="mi">301</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mi">25</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">order_quantity</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[ 50  75 100 125 150 175 200 225 250 275 300]
+</pre></div></div>
+</div>
+<p><strong>QUESTION</strong> Why do we set <code class="docutils literal notranslate"><span class="pre">stop=301</span></code> instead of 300?</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">order_cost</span> <span class="o">=</span> <span class="n">unit_cost</span> <span class="o">*</span> <span class="n">order_quantity</span>
+<span class="n">sales_revenue</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">minimum</span><span class="p">(</span><span class="n">order_quantity</span><span class="p">,</span> <span class="n">demand</span><span class="p">)</span> <span class="o">*</span> <span class="n">selling_price</span>
+<span class="n">refund_revenue</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">order_quantity</span> <span class="o">-</span> <span class="n">demand</span><span class="p">)</span> <span class="o">*</span> <span class="n">unit_refund</span>
+<span class="n">profit</span> <span class="o">=</span> <span class="n">sales_revenue</span> <span class="o">+</span> <span class="n">refund_revenue</span> <span class="o">-</span> <span class="n">order_cost</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">profit</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[125.  187.5 250.  312.5 375.  437.5 447.5 322.5 197.5  72.5 -52.5]
+</pre></div></div>
+</div>
+<p>We can’t just use <code class="docutils literal notranslate"><span class="pre">min()</span></code>( with a scalar (<code class="docutils literal notranslate"><span class="pre">demand</span></code>) compared to a vector (<code class="docutils literal notranslate"><span class="pre">order_quantity</span></code>). Need to use numpy functions since they will do the necessary <a class="reference external" href="https://numpy.org/doc/stable/user/basics.broadcasting.html">broadcasting</a> of demand values to fill out a vector the same size as the <code class="docutils literal notranslate"><span class="pre">order_quantity</span></code> vector. In R, broadcasting is usually referred to as <em>recycling</em>.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">minimum</span><span class="p">(</span><span class="n">order_quantity</span><span class="p">,</span> <span class="n">demand</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+array([ 50,  75, 100, 125, 150, 175, 193, 193, 193, 193, 193])
+</pre></div></div>
+</div>
+<p>This won’t work:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>min(order_quantity, demand)
+
+---------------------------------------------------------------------------
+ValueError                                Traceback (most recent call last)
+&lt;ipython-input-42-675af9b521e5&gt; in &lt;module&gt;
+----&gt; 1 min(order_quantity, demand)
+
+ValueError: The truth value of an array with more than one element is ambiguous. Use a.any() or a.all()
+</pre></div>
+</div>
+<p>Here’s a simple plot to show how profit varies by order quantity.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">order_quantity</span><span class="p">,</span> <span class="n">profit</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Profit&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Order Quantity&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Profit&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">();</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../../../../../../../_images/.doctrees_nbsphinx_.doctrees_nbsphinx_.doctrees_nbsphinx_blog_what_if_1_model_datatable_34_0.png" src="../../../../../../../../_images/.doctrees_nbsphinx_.doctrees_nbsphinx_.doctrees_nbsphinx_blog_what_if_1_model_datatable_34_0.png" />
+</div>
+</div>
+<p><strong>QUESTION</strong> What about a 2-way Data Table? Why can’t we just set one of the other inputs (e.g. demand) to a vector and do the same thing we did above?</p>
+<p>One approach to creating a 2-way (actually, n-way) is to create a profit function that we can call from within a list comprehension.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">bookstore_profit</span><span class="p">(</span><span class="n">unit_cost</span><span class="p">,</span> <span class="n">selling_price</span><span class="p">,</span> <span class="n">unit_refund</span><span class="p">,</span> <span class="n">order_quantity</span><span class="p">,</span> <span class="n">demand</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Compute profit in bookstore model</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">order_cost</span> <span class="o">=</span> <span class="n">unit_cost</span> <span class="o">*</span> <span class="n">order_quantity</span>
+    <span class="n">sales_revenue</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">minimum</span><span class="p">(</span><span class="n">order_quantity</span><span class="p">,</span> <span class="n">demand</span><span class="p">)</span> <span class="o">*</span> <span class="n">selling_price</span>
+    <span class="n">refund_revenue</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">order_quantity</span> <span class="o">-</span> <span class="n">demand</span><span class="p">)</span>
+    <span class="n">profit</span> <span class="o">=</span> <span class="n">sales_revenue</span> <span class="o">+</span> <span class="n">refund_revenue</span> <span class="o">-</span> <span class="n">order_cost</span>
+    <span class="k">return</span> <span class="n">profit</span>
+</pre></div>
+</div>
+</div>
+<p>A <a class="reference external" href="https://www.pythontutorial.net/python-basics/python-list-comprehensions/">list comprehension</a> can be used to create an n-way Data Table. List comprehensions provide a nice syntactical shortcut to creating a list based one looping over one or more iterables and computing associated values to store in the list. As a simple first example that’s related to the model we are working on, let’s compute the difference between demand and order quantity for all the combinations of those variables in
+the following ranges:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">demand_range</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">50</span><span class="p">,</span> <span class="mi">101</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+<span class="n">order_quantity_range</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">50</span><span class="p">,</span> <span class="mi">101</span><span class="p">,</span> <span class="mi">25</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">demand_range</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">order_quantity_range</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[ 50  60  70  80  90 100]
+[ 50  75 100]
+</pre></div></div>
+</div>
+<p>Let’s first use a list comprehension to list the combinations (we’ll store each combo in a tuple). Each combination is a <em>scenario</em> for which we’d like to compute profit.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="p">[(</span><span class="n">d</span><span class="p">,</span> <span class="n">o</span><span class="p">)</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">demand_range</span> <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">order_quantity_range</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[(50, 50),
+ (50, 75),
+ (50, 100),
+ (60, 50),
+ (60, 75),
+ (60, 100),
+ (70, 50),
+ (70, 75),
+ (70, 100),
+ (80, 50),
+ (80, 75),
+ (80, 100),
+ (90, 50),
+ (90, 75),
+ (90, 100),
+ (100, 50),
+ (100, 75),
+ (100, 100)]
+</pre></div></div>
+</div>
+<p>This time I’ll compute a list of differences between demand and order quantity.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">([</span><span class="n">d</span> <span class="o">-</span> <span class="n">o</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">demand_range</span> <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">order_quantity_range</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[0, -25, -50, 10, -15, -40, 20, -5, -30, 30, 5, -20, 40, 15, -10, 50, 25, 0]
+</pre></div></div>
+</div>
+<p>Here’s a 2-way with demand and order quantity - the other inputs are held constant at their current values and the <code class="docutils literal notranslate"><span class="pre">bookstore_profit</span></code> function is used to compute profit. The list comprehension will generate a list of tuples, <code class="docutils literal notranslate"><span class="pre">(demand,</span> <span class="pre">order</span> <span class="pre">quantity,</span> <span class="pre">profit)</span></code>. To facilitate further analysis, we’ll create a pandas DataFrame from this list.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">demand_range</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">50</span><span class="p">,</span> <span class="mi">301</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+<span class="n">order_quantity_range</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">50</span><span class="p">,</span> <span class="mi">301</span><span class="p">,</span> <span class="mi">25</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create data table (as a list of tuples)</span>
+<span class="n">data_table_1</span> <span class="o">=</span> <span class="p">[(</span><span class="n">d</span><span class="p">,</span> <span class="n">oq</span><span class="p">,</span> <span class="n">bookstore_profit</span><span class="p">(</span><span class="n">unit_cost</span><span class="p">,</span> <span class="n">selling_price</span><span class="p">,</span> <span class="n">unit_refund</span><span class="p">,</span> <span class="n">oq</span><span class="p">,</span> <span class="n">d</span><span class="p">))</span>
+                 <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">demand_range</span> <span class="k">for</span> <span class="n">oq</span> <span class="ow">in</span> <span class="n">order_quantity_range</span><span class="p">]</span>
+
+<span class="c1"># Convert to dataframe</span>
+<span class="n">dtbl_1_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data_table_1</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Demand&#39;</span><span class="p">,</span> <span class="s1">&#39;OrderQuantity&#39;</span><span class="p">,</span> <span class="s1">&#39;Profit&#39;</span><span class="p">])</span>
+<span class="n">dtbl_1_df</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">25</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Demand</th>
+      <th>OrderQuantity</th>
+      <th>Profit</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>50</td>
+      <td>50</td>
+      <td>125.0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>50</td>
+      <td>75</td>
+      <td>-37.5</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>50</td>
+      <td>100</td>
+      <td>-200.0</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>50</td>
+      <td>125</td>
+      <td>-362.5</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>50</td>
+      <td>150</td>
+      <td>-525.0</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>50</td>
+      <td>175</td>
+      <td>-687.5</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>50</td>
+      <td>200</td>
+      <td>-850.0</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>50</td>
+      <td>225</td>
+      <td>-1012.5</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>50</td>
+      <td>250</td>
+      <td>-1175.0</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>50</td>
+      <td>275</td>
+      <td>-1337.5</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>50</td>
+      <td>300</td>
+      <td>-1500.0</td>
+    </tr>
+    <tr>
+      <th>11</th>
+      <td>55</td>
+      <td>50</td>
+      <td>125.0</td>
+    </tr>
+    <tr>
+      <th>12</th>
+      <td>55</td>
+      <td>75</td>
+      <td>7.5</td>
+    </tr>
+    <tr>
+      <th>13</th>
+      <td>55</td>
+      <td>100</td>
+      <td>-155.0</td>
+    </tr>
+    <tr>
+      <th>14</th>
+      <td>55</td>
+      <td>125</td>
+      <td>-317.5</td>
+    </tr>
+    <tr>
+      <th>15</th>
+      <td>55</td>
+      <td>150</td>
+      <td>-480.0</td>
+    </tr>
+    <tr>
+      <th>16</th>
+      <td>55</td>
+      <td>175</td>
+      <td>-642.5</td>
+    </tr>
+    <tr>
+      <th>17</th>
+      <td>55</td>
+      <td>200</td>
+      <td>-805.0</td>
+    </tr>
+    <tr>
+      <th>18</th>
+      <td>55</td>
+      <td>225</td>
+      <td>-967.5</td>
+    </tr>
+    <tr>
+      <th>19</th>
+      <td>55</td>
+      <td>250</td>
+      <td>-1130.0</td>
+    </tr>
+    <tr>
+      <th>20</th>
+      <td>55</td>
+      <td>275</td>
+      <td>-1292.5</td>
+    </tr>
+    <tr>
+      <th>21</th>
+      <td>55</td>
+      <td>300</td>
+      <td>-1455.0</td>
+    </tr>
+    <tr>
+      <th>22</th>
+      <td>60</td>
+      <td>50</td>
+      <td>125.0</td>
+    </tr>
+    <tr>
+      <th>23</th>
+      <td>60</td>
+      <td>75</td>
+      <td>52.5</td>
+    </tr>
+    <tr>
+      <th>24</th>
+      <td>60</td>
+      <td>100</td>
+      <td>-110.0</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<p>Here’s a quick scatter plot showing how profit (mapped to color hue) varies jointly by order quantity and demand. No surprises.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sns</span><span class="o">.</span><span class="n">set_style</span><span class="p">(</span><span class="s2">&quot;darkgrid&quot;</span><span class="p">)</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">scatterplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s2">&quot;Demand&quot;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s2">&quot;OrderQuantity&quot;</span><span class="p">,</span> <span class="n">hue</span><span class="o">=</span><span class="s2">&quot;Profit&quot;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">dtbl_1_df</span><span class="p">,</span> <span class="n">palette</span><span class="o">=</span><span class="s2">&quot;viridis&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../../../../../../../_images/.doctrees_nbsphinx_.doctrees_nbsphinx_.doctrees_nbsphinx_blog_what_if_1_model_datatable_48_0.png" src="../../../../../../../../_images/.doctrees_nbsphinx_.doctrees_nbsphinx_.doctrees_nbsphinx_blog_what_if_1_model_datatable_48_0.png" />
+</div>
+</div>
+<p>For fun, let’s try a 3d plot.</p>
+<p><a class="reference external" href="https://matplotlib.org/mpl_toolkits/mplot3d/tutorial.html#mplot3d-tutorial">https://matplotlib.org/mpl_toolkits/mplot3d/tutorial.html#mplot3d-tutorial</a></p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Make the plot</span>
+<span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">111</span><span class="p">,</span> <span class="n">projection</span><span class="o">=</span><span class="s1">&#39;3d&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">dtbl_1_df</span><span class="p">[</span><span class="s1">&#39;OrderQuantity&#39;</span><span class="p">],</span> <span class="n">dtbl_1_df</span><span class="p">[</span><span class="s1">&#39;Demand&#39;</span><span class="p">],</span> <span class="n">dtbl_1_df</span><span class="p">[</span><span class="s1">&#39;Profit&#39;</span><span class="p">],</span>
+                <span class="n">cmap</span><span class="o">=</span><span class="n">plt</span><span class="o">.</span><span class="n">cm</span><span class="o">.</span><span class="n">viridis</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;OrderQuantity&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Demand&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_zlabel</span><span class="p">(</span><span class="s1">&#39;Profit&#39;</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">();</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../../../../../../../_images/.doctrees_nbsphinx_.doctrees_nbsphinx_.doctrees_nbsphinx_blog_what_if_1_model_datatable_50_0.png" src="../../../../../../../../_images/.doctrees_nbsphinx_.doctrees_nbsphinx_.doctrees_nbsphinx_blog_what_if_1_model_datatable_50_0.png" />
+</div>
+</div>
+</section>
+</section>
+<section id="Everything-is-an-object-in-Python">
+<h2>Everything is an object in Python<a class="headerlink" href="#Everything-is-an-object-in-Python" title="Permalink to this headline">¶</a></h2>
+<p>So far we have used standard procedural Python for creating and using our model. However, we want to explore using an object-oriented approach to doing the same things we just did. Before doing that, we need to review some basics regarding object-oriented programming.</p>
+<p>Objects are the “things” we create, use, change and share in our Python programs. Objects contain both data about the object and functions for using and changing the object. If you’ve programmed in Excel VBA, you’ve already worked with objects and their various properties (data) and methods (functions). For example, consider a <code class="docutils literal notranslate"><span class="pre">Worksheet</span></code> object. One of its properties is <code class="docutils literal notranslate"><span class="pre">Name</span></code> and we can reference it with <code class="docutils literal notranslate"><span class="pre">Worksheet.Name</span></code>. To copy a worksheet, we use <code class="docutils literal notranslate"><span class="pre">Worksheet.Copy</span></code> - <code class="docutils literal notranslate"><span class="pre">Copy</span></code> is a
+method.</p>
+<section id="List-objects">
+<h3>List objects<a class="headerlink" href="#List-objects" title="Permalink to this headline">¶</a></h3>
+<p>In Python, everything is an object and we’ve already been using objects in this Notebook. It’s probably not surprising that something like an array or a list are objects. Let’s see what kind of objects they are.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[23]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">type</span><span class="p">(</span><span class="n">order_quantity_range</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[23]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+numpy.ndarray
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[24]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">type</span><span class="p">(</span><span class="n">data_table_1</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[24]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+list
+</pre></div></div>
+</div>
+<p>Let’s explore some list methods. To start, we will create a list based on the <code class="docutils literal notranslate"><span class="pre">order_quantity_range</span></code> and then do a few things with the new list.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[25]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">oq_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">order_quantity_range</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">oq_list</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">oq_list</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[50, 75, 100, 125, 150, 175, 200, 225, 250, 275, 300]
+&lt;class &#39;list&#39;&gt;
+</pre></div></div>
+</div>
+<p>A Python <code class="docutils literal notranslate"><span class="pre">class</span></code> is the template from which we create individual objects, called <em>instances</em> in our programs. The <code class="docutils literal notranslate"><span class="pre">list</span></code> class lets us create list objects. Python has many built in classes with numerous predefined methods and properties.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[26]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Append a new item to end of list</span>
+<span class="n">oq_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">350</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">oq_list</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[50, 75, 100, 125, 150, 175, 200, 225, 250, 275, 300, 350]
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[27]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Reverse the order of our list</span>
+<span class="n">oq_list</span><span class="o">.</span><span class="n">reverse</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">oq_list</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[350, 300, 275, 250, 225, 200, 175, 150, 125, 100, 75, 50]
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[28]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Reverse it back</span>
+<span class="n">oq_list</span><span class="o">.</span><span class="n">reverse</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">oq_list</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[50, 75, 100, 125, 150, 175, 200, 225, 250, 275, 300, 350]
+</pre></div></div>
+</div>
+<p>Notice that when we use the <code class="docutils literal notranslate"><span class="pre">append</span></code> and <code class="docutils literal notranslate"><span class="pre">reverse</span></code> functions we need to include parentheses just as we do when calling any function. In this case, we aren’t passing any arguments into the function, but often we will.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[29]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Use sort() method to do a reverse sort of our list</span>
+<span class="n">oq_list</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">oq_list</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[350, 300, 275, 250, 225, 200, 175, 150, 125, 100, 75, 50]
+</pre></div></div>
+</div>
+<p>What if we forget the parentheses?</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[30]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">oq_list</span><span class="o">.</span><span class="n">reverse</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;built-in method reverse of list object at 0x7fe0c28a2680&gt;
+</pre></div></div>
+</div>
+<p>Python just tells us that <code class="docutils literal notranslate"><span class="pre">reverse</span></code> is a function. It’s also telling us that <code class="docutils literal notranslate"><span class="pre">reverse</span></code>, a function, is also an object. Yes, functions are objects, too. That means we can do things like pass them to other functions or modify some of their properties. Why would we ever want to do this? We’ll get to that.</p>
+<p>I’m sure you already know how to get items from a list by their index number.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[31]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Get the first element from the list</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">oq_list</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+350
+</pre></div></div>
+</div>
+<p>The bracket notation is really just a convenient shorthand for calling one of the built in methods of list objects. We can use Python <code class="docutils literal notranslate"><span class="pre">dir</span></code> function to see all of the attributes of any object.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[32]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">dir</span><span class="p">(</span><span class="n">oq_list</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[32]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[&#39;__add__&#39;,
+ &#39;__class__&#39;,
+ &#39;__contains__&#39;,
+ &#39;__delattr__&#39;,
+ &#39;__delitem__&#39;,
+ &#39;__dir__&#39;,
+ &#39;__doc__&#39;,
+ &#39;__eq__&#39;,
+ &#39;__format__&#39;,
+ &#39;__ge__&#39;,
+ &#39;__getattribute__&#39;,
+ &#39;__getitem__&#39;,
+ &#39;__gt__&#39;,
+ &#39;__hash__&#39;,
+ &#39;__iadd__&#39;,
+ &#39;__imul__&#39;,
+ &#39;__init__&#39;,
+ &#39;__init_subclass__&#39;,
+ &#39;__iter__&#39;,
+ &#39;__le__&#39;,
+ &#39;__len__&#39;,
+ &#39;__lt__&#39;,
+ &#39;__mul__&#39;,
+ &#39;__ne__&#39;,
+ &#39;__new__&#39;,
+ &#39;__reduce__&#39;,
+ &#39;__reduce_ex__&#39;,
+ &#39;__repr__&#39;,
+ &#39;__reversed__&#39;,
+ &#39;__rmul__&#39;,
+ &#39;__setattr__&#39;,
+ &#39;__setitem__&#39;,
+ &#39;__sizeof__&#39;,
+ &#39;__str__&#39;,
+ &#39;__subclasshook__&#39;,
+ &#39;append&#39;,
+ &#39;clear&#39;,
+ &#39;copy&#39;,
+ &#39;count&#39;,
+ &#39;extend&#39;,
+ &#39;index&#39;,
+ &#39;insert&#39;,
+ &#39;pop&#39;,
+ &#39;remove&#39;,
+ &#39;reverse&#39;,
+ &#39;sort&#39;]
+</pre></div></div>
+</div>
+<p>Many of the attributes have both leading and trailing double underscores, known as “dunder” attributes. These are just special names reserved by Python for particular uses. In Python, uou’ll see use of both single and double underscores, as both leading and trailing characters. To dig deeper, check out <a class="reference external" href="https://dbader.org/blog/meaning-of-underscores-in-python">https://dbader.org/blog/meaning-of-underscores-in-python</a>.</p>
+<p>In our example, using brackets to access a list item is really just a different way of calling the <code class="docutils literal notranslate"><span class="pre">__getitem__</span></code> dunder method.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[33]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">oq_list</span><span class="o">.</span><span class="fm">__getitem__</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+350
+</pre></div></div>
+</div>
+<p>Also notice that all of these functions worked <em>in place</em> - they operated directly on the object <code class="docutils literal notranslate"><span class="pre">oq_list</span></code> and modified it. Some methods will create a new instance of the object and if you want to “save” it, you’ll have to assign the result back to your original object or create a new variable. If you’ve used R, you might recall that the dplyr package <strong>never</strong> modifies dataframes in place. The dplyr functions (e.g. <code class="docutils literal notranslate"><span class="pre">select</span></code>, <code class="docutils literal notranslate"><span class="pre">mutate</span></code>, <code class="docutils literal notranslate"><span class="pre">filter</span></code>, …) always return new objects and we have
+to “catch the results” by assigning to a variable if we wanted to actually modify our dataframe.</p>
+<p>Returning to our list example, we’ll make a copy and explore a bit.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[34]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">new_list</span> <span class="o">=</span> <span class="n">oq_list</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>    <span class="c1"># Make a copy and save to new variable</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">new_list</span><span class="p">)</span>              <span class="c1"># Check out the new variable</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">new_list</span> <span class="o">==</span> <span class="n">oq_list</span><span class="p">)</span>   <span class="c1"># Does the new variable have the same value as the old variable?</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">new_list</span><span class="p">)</span> <span class="o">==</span> <span class="nb">type</span><span class="p">(</span><span class="n">oq_list</span><span class="p">))</span>  <span class="c1"># Are the two variables of the same type?</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">new_list</span> <span class="ow">is</span> <span class="n">oq_list</span><span class="p">)</span>   <span class="c1"># Is the new variable actually the same object as the old variable?</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="n">oq_list</span><span class="p">),</span> <span class="nb">id</span><span class="p">(</span><span class="n">new_list</span><span class="p">))</span>  <span class="c1"># Every object has its own unique id number. Use id() to see it.</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[350, 300, 275, 250, 225, 200, 175, 150, 125, 100, 75, 50]
+True
+True
+False
+140603313235584 140603307857920
+</pre></div></div>
+</div>
+<p>The two lists have the same value and are of the same datatype, but are <strong>not</strong> the same object.</p>
+<p><strong>QUESTION</strong> If we reversed one of the two lists, would they still be considered to have the same value? In other words, does order matter with lists?</p>
+<p>Care must be taken when copying lists.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[35]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">oq_list</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[350, 300, 275, 250, 225, 200, 175, 150, 125, 100, 75, 50]
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[36]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">new_oq_list</span> <span class="o">=</span> <span class="n">oq_list</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">new_oq_list</span><span class="p">)</span>
+<span class="n">oq_list</span><span class="o">.</span><span class="n">reverse</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">new_oq_list</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="n">oq_list</span><span class="p">),</span> <span class="nb">id</span><span class="p">(</span><span class="n">new_oq_list</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[350, 300, 275, 250, 225, 200, 175, 150, 125, 100, 75, 50]
+[50, 75, 100, 125, 150, 175, 200, 225, 250, 275, 300, 350]
+140603313235584 140603313235584
+</pre></div></div>
+</div>
+<p>Yikes! As you can see from the <code class="docutils literal notranslate"><span class="pre">id</span></code> numbers, both list variables point to the same object in memory. Changing one list, changes the other - they’re the same object. So, how do you safely copy lists? You use the <code class="docutils literal notranslate"><span class="pre">copy</span></code> method like we did above.</p>
+<p>Let’s look at the attributes of a <code class="docutils literal notranslate"><span class="pre">numpy.array</span></code> object and see how that compares to a list. They are both data structures that allow us to store a bunch of values and get at them via an index number. What differences do you think these two data structures might have?</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[37]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="nb">dir</span><span class="p">(</span><span class="n">order_quantity_range</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[&#39;T&#39;, &#39;__abs__&#39;, &#39;__add__&#39;, &#39;__and__&#39;, &#39;__array__&#39;, &#39;__array_finalize__&#39;, &#39;__array_function__&#39;, &#39;__array_interface__&#39;, &#39;__array_prepare__&#39;, &#39;__array_priority__&#39;, &#39;__array_struct__&#39;, &#39;__array_ufunc__&#39;, &#39;__array_wrap__&#39;, &#39;__bool__&#39;, &#39;__class__&#39;, &#39;__complex__&#39;, &#39;__contains__&#39;, &#39;__copy__&#39;, &#39;__deepcopy__&#39;, &#39;__delattr__&#39;, &#39;__delitem__&#39;, &#39;__dir__&#39;, &#39;__divmod__&#39;, &#39;__doc__&#39;, &#39;__eq__&#39;, &#39;__float__&#39;, &#39;__floordiv__&#39;, &#39;__format__&#39;, &#39;__ge__&#39;, &#39;__getattribute__&#39;, &#39;__getitem__&#39;, &#39;__gt__&#39;, &#39;__hash__&#39;, &#39;__iadd__&#39;, &#39;__iand__&#39;, &#39;__ifloordiv__&#39;, &#39;__ilshift__&#39;, &#39;__imatmul__&#39;, &#39;__imod__&#39;, &#39;__imul__&#39;, &#39;__index__&#39;, &#39;__init__&#39;, &#39;__init_subclass__&#39;, &#39;__int__&#39;, &#39;__invert__&#39;, &#39;__ior__&#39;, &#39;__ipow__&#39;, &#39;__irshift__&#39;, &#39;__isub__&#39;, &#39;__iter__&#39;, &#39;__itruediv__&#39;, &#39;__ixor__&#39;, &#39;__le__&#39;, &#39;__len__&#39;, &#39;__lshift__&#39;, &#39;__lt__&#39;, &#39;__matmul__&#39;, &#39;__mod__&#39;, &#39;__mul__&#39;, &#39;__ne__&#39;, &#39;__neg__&#39;, &#39;__new__&#39;, &#39;__or__&#39;, &#39;__pos__&#39;, &#39;__pow__&#39;, &#39;__radd__&#39;, &#39;__rand__&#39;, &#39;__rdivmod__&#39;, &#39;__reduce__&#39;, &#39;__reduce_ex__&#39;, &#39;__repr__&#39;, &#39;__rfloordiv__&#39;, &#39;__rlshift__&#39;, &#39;__rmatmul__&#39;, &#39;__rmod__&#39;, &#39;__rmul__&#39;, &#39;__ror__&#39;, &#39;__rpow__&#39;, &#39;__rrshift__&#39;, &#39;__rshift__&#39;, &#39;__rsub__&#39;, &#39;__rtruediv__&#39;, &#39;__rxor__&#39;, &#39;__setattr__&#39;, &#39;__setitem__&#39;, &#39;__setstate__&#39;, &#39;__sizeof__&#39;, &#39;__str__&#39;, &#39;__sub__&#39;, &#39;__subclasshook__&#39;, &#39;__truediv__&#39;, &#39;__xor__&#39;, &#39;all&#39;, &#39;any&#39;, &#39;argmax&#39;, &#39;argmin&#39;, &#39;argpartition&#39;, &#39;argsort&#39;, &#39;astype&#39;, &#39;base&#39;, &#39;byteswap&#39;, &#39;choose&#39;, &#39;clip&#39;, &#39;compress&#39;, &#39;conj&#39;, &#39;conjugate&#39;, &#39;copy&#39;, &#39;ctypes&#39;, &#39;cumprod&#39;, &#39;cumsum&#39;, &#39;data&#39;, &#39;diagonal&#39;, &#39;dot&#39;, &#39;dtype&#39;, &#39;dump&#39;, &#39;dumps&#39;, &#39;fill&#39;, &#39;flags&#39;, &#39;flat&#39;, &#39;flatten&#39;, &#39;getfield&#39;, &#39;imag&#39;, &#39;item&#39;, &#39;itemset&#39;, &#39;itemsize&#39;, &#39;max&#39;, &#39;mean&#39;, &#39;min&#39;, &#39;nbytes&#39;, &#39;ndim&#39;, &#39;newbyteorder&#39;, &#39;nonzero&#39;, &#39;partition&#39;, &#39;prod&#39;, &#39;ptp&#39;, &#39;put&#39;, &#39;ravel&#39;, &#39;real&#39;, &#39;repeat&#39;, &#39;reshape&#39;, &#39;resize&#39;, &#39;round&#39;, &#39;searchsorted&#39;, &#39;setfield&#39;, &#39;setflags&#39;, &#39;shape&#39;, &#39;size&#39;, &#39;sort&#39;, &#39;squeeze&#39;, &#39;std&#39;, &#39;strides&#39;, &#39;sum&#39;, &#39;swapaxes&#39;, &#39;take&#39;, &#39;tobytes&#39;, &#39;tofile&#39;, &#39;tolist&#39;, &#39;tostring&#39;, &#39;trace&#39;, &#39;transpose&#39;, &#39;var&#39;, &#39;view&#39;]
+</pre></div></div>
+</div>
+<p>Wow, <a class="reference external" href="https://jakevdp.github.io/PythonDataScienceHandbook/02.02-the-basics-of-numpy-arrays.html">numpy arrays</a> have a whole lot more going on under the hood than do lists. They play a huge role in doing data science work in Python with many packages using numpy to store and work with data. Notice that there are various mathematical methods such as <code class="docutils literal notranslate"><span class="pre">sum</span></code> and <code class="docutils literal notranslate"><span class="pre">mean</span></code> and methods to convert arrays to lists and strings using the obviously named methods. We see that there is a <code class="docutils literal notranslate"><span class="pre">dtype</span></code>
+property - it tells us the data type of the array. Our array stores 64bit integers.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[38]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">order_quantity_range</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+int64
+</pre></div></div>
+</div>
+<p><strong>QUESTIONS</strong> Why don’t we use parens with <code class="docutils literal notranslate"><span class="pre">dtype</span></code>? Why don’t list objects have a <code class="docutils literal notranslate"><span class="pre">dtype</span></code> property?</p>
+</section>
+<section id="What-about-numbers?">
+<h3>What about numbers?<a class="headerlink" href="#What-about-numbers?" title="Permalink to this headline">¶</a></h3>
+<p>Are things like integers and floating point numbers actually objects?</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[39]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">unit_cost</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">unit_cost</span><span class="p">))</span>
+<span class="nb">dir</span><span class="p">(</span><span class="n">unit_cost</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+7.5
+&lt;class &#39;float&#39;&gt;
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[39]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[&#39;__abs__&#39;,
+ &#39;__add__&#39;,
+ &#39;__bool__&#39;,
+ &#39;__class__&#39;,
+ &#39;__delattr__&#39;,
+ &#39;__dir__&#39;,
+ &#39;__divmod__&#39;,
+ &#39;__doc__&#39;,
+ &#39;__eq__&#39;,
+ &#39;__float__&#39;,
+ &#39;__floordiv__&#39;,
+ &#39;__format__&#39;,
+ &#39;__ge__&#39;,
+ &#39;__getattribute__&#39;,
+ &#39;__getformat__&#39;,
+ &#39;__getnewargs__&#39;,
+ &#39;__gt__&#39;,
+ &#39;__hash__&#39;,
+ &#39;__init__&#39;,
+ &#39;__init_subclass__&#39;,
+ &#39;__int__&#39;,
+ &#39;__le__&#39;,
+ &#39;__lt__&#39;,
+ &#39;__mod__&#39;,
+ &#39;__mul__&#39;,
+ &#39;__ne__&#39;,
+ &#39;__neg__&#39;,
+ &#39;__new__&#39;,
+ &#39;__pos__&#39;,
+ &#39;__pow__&#39;,
+ &#39;__radd__&#39;,
+ &#39;__rdivmod__&#39;,
+ &#39;__reduce__&#39;,
+ &#39;__reduce_ex__&#39;,
+ &#39;__repr__&#39;,
+ &#39;__rfloordiv__&#39;,
+ &#39;__rmod__&#39;,
+ &#39;__rmul__&#39;,
+ &#39;__round__&#39;,
+ &#39;__rpow__&#39;,
+ &#39;__rsub__&#39;,
+ &#39;__rtruediv__&#39;,
+ &#39;__set_format__&#39;,
+ &#39;__setattr__&#39;,
+ &#39;__sizeof__&#39;,
+ &#39;__str__&#39;,
+ &#39;__sub__&#39;,
+ &#39;__subclasshook__&#39;,
+ &#39;__truediv__&#39;,
+ &#39;__trunc__&#39;,
+ &#39;as_integer_ratio&#39;,
+ &#39;conjugate&#39;,
+ &#39;fromhex&#39;,
+ &#39;hex&#39;,
+ &#39;imag&#39;,
+ &#39;is_integer&#39;,
+ &#39;real&#39;]
+</pre></div></div>
+</div>
+<p>Yep. Try out some of the attributes.</p>
+</section>
+<section id="Writing-our-own-classes">
+<h3>Writing our own classes<a class="headerlink" href="#Writing-our-own-classes" title="Permalink to this headline">¶</a></h3>
+<p>While Python has many useful built in classes, true <a class="reference external" href="https://en.wikipedia.org/wiki/Object-oriented_programming">object-oriented programming</a> (OOP) involves creating our own classes from which we can create object instances that are useful for the problem at hand. Python is an OOP language but it does <strong>not</strong> force you to create classes if you don’t want to. You can write any blend you’d like of <a class="reference external" href="https://en.wikipedia.org/wiki/Procedural_programming">procedural</a>, object oriented and
+<a class="reference external" href="https://en.wikipedia.org/wiki/Functional_programming">functional programming</a>. We aren’t going to get into debates about which programming paradigm is the “best”. There are times when OOP makes a lot of sense, and for those times, we’ll use it. Other times, simply creating useful functions (such as the <code class="docutils literal notranslate"><span class="pre">bookstore_profit</span></code> function we used earlier) is the appropriate thing to do.</p>
+<p>Many business analysts who learn Excel VBA, don’t realize that you can actually create classes in VBA. Most stick with using the built in Excel objects.</p>
+</section>
+</section>
+<section id="An-OO-version-of-the-Bookstore-Model">
+<h2>An OO version of the Bookstore Model<a class="headerlink" href="#An-OO-version-of-the-Bookstore-Model" title="Permalink to this headline">¶</a></h2>
+<p>Let’s create an OO version of the Bookstore Model and figure out how to do n-way data tables just as we did with the non-OO version of the model. Then we’ll go on and figure out how to duplicate the functionality of Excel’s Goal Seek tool in Python. It’s not clear whether the non-OO or the OO version of our model will ultimately prove best for this use case. Regardless, we’ll learn a few things along the way.</p>
+<p>As an aside, there’s a very useful site aimed at using Python for quantitative economics and finance - <a class="reference external" href="https://quantecon.org/">https://quantecon.org/</a>. Within there are some terrific notebooks on various Python topics. Here are two related to OOP:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://python-programming.quantecon.org/oop_intro.html">https://python-programming.quantecon.org/oop_intro.html</a></p></li>
+<li><p><a class="reference external" href="https://python-programming.quantecon.org/python_oop.html">https://python-programming.quantecon.org/python_oop.html</a></p></li>
+</ul>
+<section id="Initial-design-of-the-BookstoreModel-class">
+<h3>Initial design of the BookstoreModel class<a class="headerlink" href="#Initial-design-of-the-BookstoreModel-class" title="Permalink to this headline">¶</a></h3>
+<p>It seems like we would want all of the base inputs such as unit cost, selling price, unit refund, order quantity and demand to be attributes (properties) of the class. Here’s the start of our class definition code:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[40]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">BookstoreModel</span><span class="p">():</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">unit_cost</span><span class="p">,</span> <span class="n">selling_price</span><span class="p">,</span> <span class="n">unit_refund</span><span class="p">,</span> <span class="n">order_quantity</span><span class="p">,</span> <span class="n">demand</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">unit_cost</span> <span class="o">=</span> <span class="n">unit_cost</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">selling_price</span> <span class="o">=</span> <span class="n">selling_price</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">unit_refund</span> <span class="o">=</span> <span class="n">unit_refund</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">order_quantity</span> <span class="o">=</span> <span class="n">order_quantity</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">demand</span> <span class="o">=</span> <span class="n">demand</span>
+</pre></div>
+</div>
+</div>
+<p>Some important things of note:</p>
+<ul class="simple">
+<li><p>we use the keyword <code class="docutils literal notranslate"><span class="pre">class</span></code> followed by the name of our class.</p></li>
+<li><p>by convention, class names are capitalized (each word if multi-word).</p></li>
+<li><p>the class declaration looks a little like defining a function but we use <code class="docutils literal notranslate"><span class="pre">class</span></code> instead of <code class="docutils literal notranslate"><span class="pre">def</span></code>.</p></li>
+<li><p>there’s nothing in the parentheses following the class name. We’ll defer talking about this for now.</p></li>
+<li><p>there’s a single method (function) defined within the class and it is called <code class="docutils literal notranslate"><span class="pre">__init__</span></code>. From earlier in this document we know that this must be a built in dunder method that has some special purpose. From its name you’ve probably already guessed that it’s the function called when a new object instance is first created. If you’ve programmed in Java or C++, this is kind of like a constructor.</p></li>
+<li><p>the first argument to the <code class="docutils literal notranslate"><span class="pre">__init__</span></code> function is <code class="docutils literal notranslate"><span class="pre">self</span></code> and represents the object instance being created.</p></li>
+<li><p>the remaining arguments to the <code class="docutils literal notranslate"><span class="pre">__init__</span></code> function are values that we want to use in the function. In this case, we simply want to create object properties corresponding to the base inputs for the bookstore model.</p></li>
+<li><p>the rest of the lines within the <code class="docutils literal notranslate"><span class="pre">__init__</span></code> function are initializing our object properties to the values passed in.</p></li>
+<li><p>in order to reference (i.e. to get the value or set the value) an object property, we always preface the property with the <code class="docutils literal notranslate"><span class="pre">self</span></code> object, e.g., <code class="docutils literal notranslate"><span class="pre">self.unit_cost</span></code>.</p></li>
+<li><p>if you’ve programmed in Java you might be used to using “setters and getters”. In general <a class="reference external" href="https://www.python-course.eu/python3_properties.php">we don’t do that in Python</a> and instead just reference the property directly using dot notation.</p></li>
+</ul>
+<p>Well, our class isn’t super useful yet, but let’s try it out. Make sure you run the code chunk above that defines the BookstoreModel class.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[41]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Reset the base inputs</span>
+<span class="n">unit_cost</span> <span class="o">=</span> <span class="mf">7.50</span>
+<span class="n">selling_price</span> <span class="o">=</span> <span class="mf">10.00</span>
+<span class="n">unit_refund</span> <span class="o">=</span> <span class="mf">2.50</span>
+<span class="n">demand</span> <span class="o">=</span> <span class="mi">193</span>
+<span class="n">order_quantity</span> <span class="o">=</span> <span class="mi">200</span>
+
+<span class="c1"># Create a new BookstoreModel object</span>
+<span class="n">model_1</span> <span class="o">=</span> <span class="n">BookstoreModel</span><span class="p">(</span><span class="n">unit_cost</span><span class="p">,</span> <span class="n">selling_price</span><span class="p">,</span> <span class="n">unit_refund</span><span class="p">,</span> <span class="n">order_quantity</span><span class="p">,</span> <span class="n">demand</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>Let’s print out one of the properties.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[42]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">model_1</span><span class="o">.</span><span class="n">unit_cost</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+7.5
+</pre></div></div>
+</div>
+<p>What happens if we try to print the model object itself?</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[43]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">model_1</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;__main__.BookstoreModel object at 0x7fe0c238d130&gt;
+</pre></div></div>
+</div>
+<p>Ok, not the most useful but we do see that we’ve got an object of the right type and that the object lives in the <code class="docutils literal notranslate"><span class="pre">__main__</span></code> <em>namespace</em>. Namespaces are important in Python. They’re even mentioned in the Zen of Python. You can <a class="reference external" href="https://realpython.com/python-namespaces-scope/">learn more about namespaces here</a>.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[44]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">this</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+The Zen of Python, by Tim Peters
+
+Beautiful is better than ugly.
+Explicit is better than implicit.
+Simple is better than complex.
+Complex is better than complicated.
+Flat is better than nested.
+Sparse is better than dense.
+Readability counts.
+Special cases aren&#39;t special enough to break the rules.
+Although practicality beats purity.
+Errors should never pass silently.
+Unless explicitly silenced.
+In the face of ambiguity, refuse the temptation to guess.
+There should be one-- and preferably only one --obvious way to do it.
+Although that way may not be obvious at first unless you&#39;re Dutch.
+Now is better than never.
+Although never is often better than *right* now.
+If the implementation is hard to explain, it&#39;s a bad idea.
+If the implementation is easy to explain, it may be a good idea.
+Namespaces are one honking great idea -- let&#39;s do more of those!
+</pre></div></div>
+</div>
+<p>If you look back at our <code class="docutils literal notranslate"><span class="pre">bookstore_profit</span></code> function, you’ll see that it first computes the various cost and revenue components and then computes profit from that. So, it would seem useful to add some methods to our BookstoreModel class that computed these things.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[45]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">BookstoreModel</span><span class="p">():</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">unit_cost</span><span class="p">,</span> <span class="n">selling_price</span><span class="p">,</span> <span class="n">unit_refund</span><span class="p">,</span> <span class="n">order_quantity</span><span class="p">,</span> <span class="n">demand</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">unit_cost</span> <span class="o">=</span> <span class="n">unit_cost</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">selling_price</span> <span class="o">=</span> <span class="n">selling_price</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">unit_refund</span> <span class="o">=</span> <span class="n">unit_refund</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">order_quantity</span> <span class="o">=</span> <span class="n">order_quantity</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">demand</span> <span class="o">=</span> <span class="n">demand</span>
+
+    <span class="k">def</span> <span class="nf">order_cost</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Compute total order cost&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">unit_cost</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">order_quantity</span>
+
+    <span class="k">def</span> <span class="nf">sales_revenue</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Compute sales revenue&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">minimum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">order_quantity</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">demand</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">selling_price</span>
+
+    <span class="k">def</span> <span class="nf">refund_revenue</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Compute revenue from refunds for unsold items&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">order_quantity</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">demand</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">unit_refund</span>
+
+    <span class="k">def</span> <span class="nf">profit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Compute profit</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">profit</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sales_revenue</span><span class="p">()</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">refund_revenue</span><span class="p">()</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">order_cost</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">profit</span>
+</pre></div>
+</div>
+</div>
+<p>A few important things to note: * we added four new object functions (methods) * each method only takes the <code class="docutils literal notranslate"><span class="pre">self</span></code> object as an input argument. We don’t pass in the properties such as <code class="docutils literal notranslate"><span class="pre">unit_cost</span></code> or <code class="docutils literal notranslate"><span class="pre">order_quantity</span></code>. We don’t need to since <code class="docutils literal notranslate"><span class="pre">self</span></code> knows about these things via its properties. They are <em>encapsulated</em> within the object. * within each method we have to use <code class="docutils literal notranslate"><span class="pre">self.someproperty</span></code> in our expressions * the <code class="docutils literal notranslate"><span class="pre">profit</span></code> method calls some of the other methods and when it does, it
+prefaces the method with <code class="docutils literal notranslate"><span class="pre">self.</span></code> and follows it with empty parens. The <code class="docutils literal notranslate"><span class="pre">self</span></code> object is implicitly passed. * each method returns a value * each method has a simple docstring</p>
+<p>Before we can test out our enhanced class, we need to run the code cell above and we need to create a new object instance based on the updated class definition.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[46]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create a new BookstoreModel object</span>
+<span class="n">model_2</span> <span class="o">=</span> <span class="n">BookstoreModel</span><span class="p">(</span><span class="n">unit_cost</span><span class="p">,</span> <span class="n">selling_price</span><span class="p">,</span> <span class="n">unit_refund</span><span class="p">,</span> <span class="n">order_quantity</span><span class="p">,</span> <span class="n">demand</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[47]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">model_2</span><span class="o">.</span><span class="n">sales_revenue</span><span class="p">())</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">model_2</span><span class="o">.</span><span class="n">profit</span><span class="p">())</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+1930.0
+447.5
+</pre></div></div>
+</div>
+<p>It would nice to have a way to print out a succinct summary of a BookstoreModel object. Let’s start by just listing out the properties. We can use the Python <code class="docutils literal notranslate"><span class="pre">vars</span></code> function to help. This StackOverflow post has some good info on getting a dictionary of object properties:</p>
+<p><a class="reference external" href="https://stackoverflow.com/questions/61517/python-dictionary-from-an-objects-fields">https://stackoverflow.com/questions/61517/python-dictionary-from-an-objects-fields</a></p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[48]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">vars</span><span class="p">(</span><span class="n">model_2</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[48]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+{&#39;unit_cost&#39;: 7.5,
+ &#39;selling_price&#39;: 10.0,
+ &#39;unit_refund&#39;: 2.5,
+ &#39;order_quantity&#39;: 200,
+ &#39;demand&#39;: 193}
+</pre></div></div>
+</div>
+<p>The Pythonic way for creating a string representation of an object is to implement a <code class="docutils literal notranslate"><span class="pre">__str__</span></code> dunder function for our object. This function needs to return a string. Notice that the <code class="docutils literal notranslate"><span class="pre">vars</span></code> function returns a dictionary. You can learn more about <code class="docutils literal notranslate"><span class="pre">__str__</span></code> and the related <code class="docutils literal notranslate"><span class="pre">__repr__</span></code> dunder functions at <a class="reference external" href="https://dbader.org/blog/python-repr-vs-str">https://dbader.org/blog/python-repr-vs-str</a>. In a nutshell, we use <code class="docutils literal notranslate"><span class="pre">__str__</span></code> to create “pretty” string representations of an object for our user and <code class="docutils literal notranslate"><span class="pre">__repr__</span></code> for an unambiguous string
+representation that includes the object type.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[49]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">BookstoreModel</span><span class="p">():</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">unit_cost</span><span class="p">,</span> <span class="n">selling_price</span><span class="p">,</span> <span class="n">unit_refund</span><span class="p">,</span> <span class="n">order_quantity</span><span class="p">,</span> <span class="n">demand</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">unit_cost</span> <span class="o">=</span> <span class="n">unit_cost</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">selling_price</span> <span class="o">=</span> <span class="n">selling_price</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">unit_refund</span> <span class="o">=</span> <span class="n">unit_refund</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">order_quantity</span> <span class="o">=</span> <span class="n">order_quantity</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">demand</span> <span class="o">=</span> <span class="n">demand</span>
+
+    <span class="k">def</span> <span class="nf">order_cost</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Compute total order cost&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">unit_cost</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">order_quantity</span>
+
+    <span class="k">def</span> <span class="nf">sales_revenue</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Compute sales revenue&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">minimum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">order_quantity</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">demand</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">selling_price</span>
+
+    <span class="k">def</span> <span class="nf">refund_revenue</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Compute revenue from refunds for unsold items&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">order_quantity</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">demand</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">unit_refund</span>
+
+    <span class="k">def</span> <span class="nf">profit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Compute profit</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">profit</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sales_revenue</span><span class="p">()</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">refund_revenue</span><span class="p">()</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">order_cost</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">profit</span>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        String representation of bookstore inputs</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="nb">vars</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<p>Notice we wrapped <code class="docutils literal notranslate"><span class="pre">vars</span></code> with <code class="docutils literal notranslate"><span class="pre">str</span></code> to convert the dictionary to a string.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[50]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Reset the base inputs</span>
+<span class="n">unit_cost</span> <span class="o">=</span> <span class="mf">7.50</span>
+<span class="n">selling_price</span> <span class="o">=</span> <span class="mf">10.00</span>
+<span class="n">unit_refund</span> <span class="o">=</span> <span class="mf">2.50</span>
+<span class="n">demand</span> <span class="o">=</span> <span class="mi">193</span>
+<span class="n">order_quantity</span> <span class="o">=</span> <span class="mi">200</span>
+
+<span class="c1"># Create a new BookstoreModel object</span>
+<span class="n">model_3</span> <span class="o">=</span> <span class="n">BookstoreModel</span><span class="p">(</span><span class="n">unit_cost</span><span class="p">,</span> <span class="n">selling_price</span><span class="p">,</span> <span class="n">unit_refund</span><span class="p">,</span> <span class="n">order_quantity</span><span class="p">,</span> <span class="n">demand</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[51]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">model_3</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[51]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;__main__.BookstoreModel at 0x7fe0c232f370&gt;
+</pre></div></div>
+</div>
+<p><strong>CHALLENGE</strong> Modify the <code class="docutils literal notranslate"><span class="pre">__str__</span></code> function so that it also shows the computed value of <code class="docutils literal notranslate"><span class="pre">order_cost</span></code>, <code class="docutils literal notranslate"><span class="pre">sales_revenue</span></code>, <code class="docutils literal notranslate"><span class="pre">refund_revenue</span></code> and <code class="docutils literal notranslate"><span class="pre">profit</span></code>.</p>
+</section>
+<section id="1-way-Data-Table-with-OO-model">
+<h3>1-way Data Table with OO model<a class="headerlink" href="#1-way-Data-Table-with-OO-model" title="Permalink to this headline">¶</a></h3>
+<p>It seems entirely plausible that we could simply set one of the inputs to an array of values and then call the <code class="docutils literal notranslate"><span class="pre">profit</span></code> method.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[52]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Set property equal to an array</span>
+<span class="n">model_3</span><span class="o">.</span><span class="n">order_quantity</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">50</span><span class="p">,</span> <span class="mi">301</span><span class="p">,</span> <span class="mi">25</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[53]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Can we compute an array of profits? Yep.</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">model_3</span><span class="o">.</span><span class="n">profit</span><span class="p">())</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[125.  187.5 250.  312.5 375.  437.5 447.5 322.5 197.5  72.5 -52.5]
+</pre></div></div>
+</div>
+<p>What about a 2-way data table using the OO model? We can’t use the same direct array passing approach because of …</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[54]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># This won&#39;t work unless the two arrays are the same size - can&#39;t broadcast.</span>
+<span class="c1"># Also, even if same size, doesn&#39;t do all combinations, just aligned elements.</span>
+<span class="n">demand_range</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">70</span><span class="p">,</span> <span class="mi">321</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+<span class="n">order_quantity_range</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">70</span><span class="p">,</span> <span class="mi">321</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>    <span class="c1"># Broadcast error</span>
+<span class="c1"># order_quantity_range = np.arange(70, 321, 5)   # Doesn&#39;t do all combinations</span>
+
+<span class="c1"># Method 1: Set property equal to an array</span>
+<span class="n">model_3</span><span class="o">.</span><span class="n">demand</span> <span class="o">=</span> <span class="n">demand_range</span>
+<span class="n">model_3</span><span class="o">.</span><span class="n">order_quantity</span> <span class="o">=</span> <span class="n">order_quantity_range</span>
+
+<span class="c1"># model_3.profit()  # This line will trigger the broadcast error</span>
+</pre></div>
+</div>
+</div>
+<p>Recall that for the non-OO model, we could easily do an n-way data table using a list comprehension that made use of the <code class="docutils literal notranslate"><span class="pre">bookstore_profit</span></code> function because we could explicitly loop over ranges of any subset of the input variables and call the <code class="docutils literal notranslate"><span class="pre">bookstore_profit</span></code> function with all of the input arguments specified. We can’t do that with the OO model because the <code class="docutils literal notranslate"><span class="pre">profit</span></code> function is a method of the object and we don’t pass it any input arguments other than <code class="docutils literal notranslate"><span class="pre">self</span></code>. So, we need a way to loop
+over alll the input ranges and update the bookstore model object’s input attributes and then call the <code class="docutils literal notranslate"><span class="pre">profit</span></code> method.</p>
+</section>
+<section id="A-decision-point-in-our-software-design-process">
+<h3>A decision point in our software design process<a class="headerlink" href="#A-decision-point-in-our-software-design-process" title="Permalink to this headline">¶</a></h3>
+<p>An end user modeler analagous to your basic Excel power user isn’t going to write OO code to do a Data Table. The list comprehension approach based on a global function (i.e. the non-OO model) is much more likely. However, a relatively generic Data Table function could be implemented in an OO way and be quite reusable. Also, we still want to implement Goal Seek and it’s not clear whether the OO or non-OO approach makes the most sense.</p>
+<p>Well, let’s forge ahead and design and create a Python based Data Table function that accepts an OO BookstoreModel object as one of its inputs. Surely, we’ll learn some things along the way.</p>
+<section id="Adding-an-update-method">
+<h4>Adding an <code class="docutils literal notranslate"><span class="pre">update</span></code> method<a class="headerlink" href="#Adding-an-update-method" title="Permalink to this headline">¶</a></h4>
+<p>Since were are going to need to repeatedly update some subset of the input parameters, let’s add an <code class="docutils literal notranslate"><span class="pre">update</span></code> method to the BookstoreModel class that takes a dictionary of property, value pairs. The question is, how do we update object attributes from a dictionary specifying the attribute and the new value? This StackoverFlow post was quite helpful:</p>
+<p><a class="reference external" href="https://stackoverflow.com/questions/2466191/set-attributes-from-dictionary-in-python">https://stackoverflow.com/questions/2466191/set-attributes-from-dictionary-in-python</a></p>
+<p>The idea is that we use Python’s <code class="docutils literal notranslate"><span class="pre">setattr</span></code> function. Using <code class="docutils literal notranslate"><span class="pre">`setattr</span></code> &lt;<a class="reference external" href="https://www.w3schools.com/python/ref_func_setattr.asp">https://www.w3schools.com/python/ref_func_setattr.asp</a>&gt;`__ is really easy:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>setattr(object, attribute name, attribute value)
+</pre></div>
+</div>
+<p>As a specific example, it can be used like this.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[55]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">model_4</span> <span class="o">=</span> <span class="n">BookstoreModel</span><span class="p">(</span><span class="n">unit_cost</span><span class="p">,</span> <span class="n">selling_price</span><span class="p">,</span> <span class="n">unit_refund</span><span class="p">,</span> <span class="n">order_quantity</span><span class="p">,</span> <span class="n">demand</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">model_4</span><span class="p">)</span>
+
+<span class="c1"># We want to update a existing model object with these parameter values</span>
+<span class="n">new_params</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;unit_cost&#39;</span><span class="p">:</span> <span class="mf">8.5</span><span class="p">,</span> <span class="s1">&#39;order_quantity&#39;</span><span class="p">:</span> <span class="mi">250</span><span class="p">}</span>
+
+<span class="c1"># Iterate over the keys in new_params</span>
+<span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">new_params</span><span class="p">:</span>
+            <span class="nb">setattr</span><span class="p">(</span><span class="n">model_4</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">new_params</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">model_4</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+{&#39;unit_cost&#39;: 7.5, &#39;selling_price&#39;: 10.0, &#39;unit_refund&#39;: 2.5, &#39;order_quantity&#39;: 200, &#39;demand&#39;: 193}
+{&#39;unit_cost&#39;: 8.5, &#39;selling_price&#39;: 10.0, &#39;unit_refund&#39;: 2.5, &#39;order_quantity&#39;: 250, &#39;demand&#39;: 193}
+</pre></div></div>
+</div>
+<p>Okay, here’s our updated BookstoreModel class. Note that I’ve changed to keyword arguments with default values.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[56]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">BookstoreModel</span><span class="p">():</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">unit_cost</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">selling_price</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">unit_refund</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                 <span class="n">order_quantity</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">demand</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">unit_cost</span> <span class="o">=</span> <span class="n">unit_cost</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">selling_price</span> <span class="o">=</span> <span class="n">selling_price</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">unit_refund</span> <span class="o">=</span> <span class="n">unit_refund</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">order_quantity</span> <span class="o">=</span> <span class="n">order_quantity</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">demand</span> <span class="o">=</span> <span class="n">demand</span>
+
+
+    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">param_dict</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Update parameter values</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">param_dict</span><span class="p">:</span>
+            <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">param_dict</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
+
+    <span class="k">def</span> <span class="nf">order_cost</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">unit_cost</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">order_quantity</span>
+
+    <span class="k">def</span> <span class="nf">sales_revenue</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">minimum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">order_quantity</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">demand</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">selling_price</span>
+
+    <span class="k">def</span> <span class="nf">refund_revenue</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">order_quantity</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">demand</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">unit_refund</span>
+
+    <span class="k">def</span> <span class="nf">total_revenue</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">sales_revenue</span><span class="p">()</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">refund_revenue</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">profit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Compute profit in bookstore model</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">profit</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sales_revenue</span><span class="p">()</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">refund_revenue</span><span class="p">()</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">order_cost</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">profit</span>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Print dictionary of object attributes but don&#39;t include an underscore as first char</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">({</span><span class="n">key</span><span class="p">:</span> <span class="n">val</span> <span class="k">for</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">vars</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">key</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;_&#39;</span><span class="p">})</span>
+</pre></div>
+</div>
+</div>
+<p>Let’s try out our <code class="docutils literal notranslate"><span class="pre">update</span></code> method. Also, since now the BookstoreModel class uses keyword arguments with defaults, I’m going to create a new model object in a slightly different way:</p>
+<ul class="simple">
+<li><p>create a new model object and just take the zero default values for the input attributes</p></li>
+<li><p>use the <code class="docutils literal notranslate"><span class="pre">update</span></code> method to set the input attributes via a dictionary</p></li>
+</ul>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[57]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">base_inputs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;unit_cost&#39;</span><span class="p">:</span> <span class="mf">7.50</span><span class="p">,</span>
+              <span class="s1">&#39;selling_price&#39;</span><span class="p">:</span> <span class="mf">10.00</span><span class="p">,</span>
+              <span class="s1">&#39;unit_refund&#39;</span><span class="p">:</span> <span class="mf">2.50</span><span class="p">,</span>
+              <span class="s1">&#39;order_quantity&#39;</span><span class="p">:</span> <span class="mi">200</span><span class="p">,</span>
+              <span class="s1">&#39;demand&#39;</span><span class="p">:</span> <span class="mi">193</span><span class="p">}</span>
+
+<span class="n">model_5</span> <span class="o">=</span> <span class="n">BookstoreModel</span><span class="p">()</span>
+<span class="n">model_5</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">base_inputs</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">model_5</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+{&#39;unit_cost&#39;: 7.5, &#39;selling_price&#39;: 10.0, &#39;unit_refund&#39;: 2.5, &#39;order_quantity&#39;: 200, &#39;demand&#39;: 193}
+</pre></div></div>
+</div>
+</section>
+<section id="How-to-generate-and-iterate-over-scenarios-to-create-a-2-way-Data-Table?">
+<h4>How to generate and iterate over scenarios to create a 2-way Data Table?<a class="headerlink" href="#How-to-generate-and-iterate-over-scenarios-to-create-a-2-way-Data-Table?" title="Permalink to this headline">¶</a></h4>
+<p>Let’s regroup and remind ourselves where we are in the development process for our 2-way data table function. We’ve got two input variables, <code class="docutils literal notranslate"><span class="pre">demand</span></code> and <code class="docutils literal notranslate"><span class="pre">order_quantity</span></code> and we’d like to specify a range over which each variable should vary. Then, we want to consider all combinations of these variable values and compute the associated, say, profit (really, any ouput of our model). It would be convenient to be be able to specify our input ranges with a dictionary whose keys are the input
+variable names and the values are any valid Python iterable (such as a list or the output of some function that returns a range of values). For example:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[58]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">dt_param_ranges</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;demand&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">70</span><span class="p">,</span> <span class="mi">321</span><span class="p">,</span> <span class="mi">25</span><span class="p">),</span>
+                <span class="s1">&#39;order_quantity&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">70</span><span class="p">,</span> <span class="mi">321</span><span class="p">,</span> <span class="mi">50</span><span class="p">)}</span>
+</pre></div>
+</div>
+</div>
+<p>Our immediate goal is to convert this dictionary into a list of dictionaries - one dictionary per scenario. Like this:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>[{&#39;demand&#39;: 70, &#39;order_quantity&#39;: 70},
+ {&#39;demand&#39;: 70, &#39;order_quantity&#39;: 120},
+ {&#39;demand&#39;: 70, &#39;order_quantity&#39;: 170},
+ {&#39;demand&#39;: 70, &#39;order_quantity&#39;: 220},
+ {&#39;demand&#39;: 70, &#39;order_quantity&#39;: 270},
+ {&#39;demand&#39;: 70, &#39;order_quantity&#39;: 320},
+ {&#39;demand&#39;: 95, &#39;order_quantity&#39;: 70},
+ {&#39;demand&#39;: 95, &#39;order_quantity&#39;: 120},
+ ...
+ ...
+ ...
+ {&#39;demand&#39;: 320, &#39;order_quantity&#39;: 220},
+ {&#39;demand&#39;: 320, &#39;order_quantity&#39;: 270},
+ {&#39;demand&#39;: 320, &#39;order_quantity&#39;: 320}]
+</pre></div>
+</div>
+<p>Each of these component dictionaries is something we can use with our new model object <code class="docutils literal notranslate"><span class="pre">update</span></code> method to set the corresponding values for each scenario. Hmmm, feels like some clever iterating and zipping and more iterating. Before doing that ourselves, can we do this using the functionality of some existing Python library? Spoiler alert, yes, we can.</p>
+</section>
+<section id="Learning-from-the-ideas-and-code-from-scikit-learn">
+<h4>Learning from the ideas and code from scikit-learn<a class="headerlink" href="#Learning-from-the-ideas-and-code-from-scikit-learn" title="Permalink to this headline">¶</a></h4>
+<p><a class="reference external" href="https://scikit-learn.org/stable/index.html">Scikit-learn</a> is an extremely popular Python package for building, testing and using machine learning models. In thinking about the input values for an n-way data table, it feels similar to a <a class="reference external" href="https://scikit-learn.org/stable/modules/grid_search.html">parameter grid for a hyperparameter grid search in scikit learn</a>. Can we borrow some of their patterns or code ideas?</p>
+<p><a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.GridSearchCV.html#sklearn.model_selection.GridSearchCV">https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.GridSearchCV.html#sklearn.model_selection.GridSearchCV</a></p>
+<p><a class="reference external" href="https://scikit-learn.org/stable/modules/grid_search.html#grid-search">https://scikit-learn.org/stable/modules/grid_search.html#grid-search</a></p>
+<p>Example from User Guide shows passing in two different grids to explore as a list of dicts. Notice that each dict is like the setup for an Excel Data Table - the key is just the name of some variable and the value is some iterable. Don’t worry about the details, just look at the structure of <code class="docutils literal notranslate"><span class="pre">param_grid</span></code>.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>param_grid = [
+  {&#39;C&#39;: [1, 10, 100, 1000], &#39;kernel&#39;: [&#39;linear&#39;]},
+  {&#39;C&#39;: [1, 10, 100, 1000], &#39;gamma&#39;: [0.001, 0.0001], &#39;kernel&#39;: [&#39;rbf&#39;]},
+ ]
+</pre></div>
+</div>
+<p>For example, the <code class="docutils literal notranslate"><span class="pre">GridSearchCV</span></code> takes an estimator object and a parameter grid object. The parameter grid is a dict or list of dicts in which the keys are the parameter names. SKLearn implements a <code class="docutils literal notranslate"><span class="pre">ParameterGrid</span></code> class. Looking at its source, the docstring contains the following example. Notice that the result of <code class="docutils literal notranslate"><span class="pre">ParameterGrid(param_grid)</span></code> is a list of dicts in which each dict contains a specific combination of the parameter values, i.e., it generates all the scenarios to explore.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>Examples
+--------
+&gt;&gt;&gt; from sklearn.model_selection import ParameterGrid
+&gt;&gt;&gt; param_grid = {&#39;a&#39;: [1, 2], &#39;b&#39;: [True, False]}
+&gt;&gt;&gt; list(ParameterGrid(param_grid)) == (
+...    [{&#39;a&#39;: 1, &#39;b&#39;: True}, {&#39;a&#39;: 1, &#39;b&#39;: False},
+...     {&#39;a&#39;: 2, &#39;b&#39;: True}, {&#39;a&#39;: 2, &#39;b&#39;: False}])
+True
+</pre></div>
+</div>
+<p>Hmm, we could use this class directly.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[59]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.model_selection._search</span> <span class="kn">import</span> <span class="n">ParameterGrid</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[60]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">dt_param_ranges</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;demand&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">70</span><span class="p">,</span> <span class="mi">321</span><span class="p">,</span> <span class="mi">25</span><span class="p">),</span>
+                <span class="s1">&#39;order_quantity&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">70</span><span class="p">,</span> <span class="mi">321</span><span class="p">,</span> <span class="mi">50</span><span class="p">)}</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[61]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">dt_param_grid</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">ParameterGrid</span><span class="p">(</span><span class="n">dt_param_ranges</span><span class="p">))</span>
+<span class="n">dt_param_grid</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[61]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[{&#39;demand&#39;: 70, &#39;order_quantity&#39;: 70},
+ {&#39;demand&#39;: 70, &#39;order_quantity&#39;: 120},
+ {&#39;demand&#39;: 70, &#39;order_quantity&#39;: 170},
+ {&#39;demand&#39;: 70, &#39;order_quantity&#39;: 220},
+ {&#39;demand&#39;: 70, &#39;order_quantity&#39;: 270},
+ {&#39;demand&#39;: 70, &#39;order_quantity&#39;: 320},
+ {&#39;demand&#39;: 95, &#39;order_quantity&#39;: 70},
+ {&#39;demand&#39;: 95, &#39;order_quantity&#39;: 120},
+ {&#39;demand&#39;: 95, &#39;order_quantity&#39;: 170},
+ {&#39;demand&#39;: 95, &#39;order_quantity&#39;: 220},
+ {&#39;demand&#39;: 95, &#39;order_quantity&#39;: 270},
+ {&#39;demand&#39;: 95, &#39;order_quantity&#39;: 320},
+ {&#39;demand&#39;: 120, &#39;order_quantity&#39;: 70},
+ {&#39;demand&#39;: 120, &#39;order_quantity&#39;: 120},
+ {&#39;demand&#39;: 120, &#39;order_quantity&#39;: 170},
+ {&#39;demand&#39;: 120, &#39;order_quantity&#39;: 220},
+ {&#39;demand&#39;: 120, &#39;order_quantity&#39;: 270},
+ {&#39;demand&#39;: 120, &#39;order_quantity&#39;: 320},
+ {&#39;demand&#39;: 145, &#39;order_quantity&#39;: 70},
+ {&#39;demand&#39;: 145, &#39;order_quantity&#39;: 120},
+ {&#39;demand&#39;: 145, &#39;order_quantity&#39;: 170},
+ {&#39;demand&#39;: 145, &#39;order_quantity&#39;: 220},
+ {&#39;demand&#39;: 145, &#39;order_quantity&#39;: 270},
+ {&#39;demand&#39;: 145, &#39;order_quantity&#39;: 320},
+ {&#39;demand&#39;: 170, &#39;order_quantity&#39;: 70},
+ {&#39;demand&#39;: 170, &#39;order_quantity&#39;: 120},
+ {&#39;demand&#39;: 170, &#39;order_quantity&#39;: 170},
+ {&#39;demand&#39;: 170, &#39;order_quantity&#39;: 220},
+ {&#39;demand&#39;: 170, &#39;order_quantity&#39;: 270},
+ {&#39;demand&#39;: 170, &#39;order_quantity&#39;: 320},
+ {&#39;demand&#39;: 195, &#39;order_quantity&#39;: 70},
+ {&#39;demand&#39;: 195, &#39;order_quantity&#39;: 120},
+ {&#39;demand&#39;: 195, &#39;order_quantity&#39;: 170},
+ {&#39;demand&#39;: 195, &#39;order_quantity&#39;: 220},
+ {&#39;demand&#39;: 195, &#39;order_quantity&#39;: 270},
+ {&#39;demand&#39;: 195, &#39;order_quantity&#39;: 320},
+ {&#39;demand&#39;: 220, &#39;order_quantity&#39;: 70},
+ {&#39;demand&#39;: 220, &#39;order_quantity&#39;: 120},
+ {&#39;demand&#39;: 220, &#39;order_quantity&#39;: 170},
+ {&#39;demand&#39;: 220, &#39;order_quantity&#39;: 220},
+ {&#39;demand&#39;: 220, &#39;order_quantity&#39;: 270},
+ {&#39;demand&#39;: 220, &#39;order_quantity&#39;: 320},
+ {&#39;demand&#39;: 245, &#39;order_quantity&#39;: 70},
+ {&#39;demand&#39;: 245, &#39;order_quantity&#39;: 120},
+ {&#39;demand&#39;: 245, &#39;order_quantity&#39;: 170},
+ {&#39;demand&#39;: 245, &#39;order_quantity&#39;: 220},
+ {&#39;demand&#39;: 245, &#39;order_quantity&#39;: 270},
+ {&#39;demand&#39;: 245, &#39;order_quantity&#39;: 320},
+ {&#39;demand&#39;: 270, &#39;order_quantity&#39;: 70},
+ {&#39;demand&#39;: 270, &#39;order_quantity&#39;: 120},
+ {&#39;demand&#39;: 270, &#39;order_quantity&#39;: 170},
+ {&#39;demand&#39;: 270, &#39;order_quantity&#39;: 220},
+ {&#39;demand&#39;: 270, &#39;order_quantity&#39;: 270},
+ {&#39;demand&#39;: 270, &#39;order_quantity&#39;: 320},
+ {&#39;demand&#39;: 295, &#39;order_quantity&#39;: 70},
+ {&#39;demand&#39;: 295, &#39;order_quantity&#39;: 120},
+ {&#39;demand&#39;: 295, &#39;order_quantity&#39;: 170},
+ {&#39;demand&#39;: 295, &#39;order_quantity&#39;: 220},
+ {&#39;demand&#39;: 295, &#39;order_quantity&#39;: 270},
+ {&#39;demand&#39;: 295, &#39;order_quantity&#39;: 320},
+ {&#39;demand&#39;: 320, &#39;order_quantity&#39;: 70},
+ {&#39;demand&#39;: 320, &#39;order_quantity&#39;: 120},
+ {&#39;demand&#39;: 320, &#39;order_quantity&#39;: 170},
+ {&#39;demand&#39;: 320, &#39;order_quantity&#39;: 220},
+ {&#39;demand&#39;: 320, &#39;order_quantity&#39;: 270},
+ {&#39;demand&#39;: 320, &#39;order_quantity&#39;: 320}]
+</pre></div></div>
+</div>
+<p>Perfect! We have a list of dictionaries, each of which contains one of the combinations of the <code class="docutils literal notranslate"><span class="pre">demand</span></code> and <code class="docutils literal notranslate"><span class="pre">order_quantity</span></code> attributes that we want in our data table. Isn’t it nice that we just implemented an <code class="docutils literal notranslate"><span class="pre">update</span></code> method that takes just such a dictionary as its input. Almost like we planned it. :)</p>
+<p>While there’s nothing wrong with leveraging the skikit-learn library for this task (after all, reusing objects is one of the whole reasons for OOP), we really don’t need all the generality provided by its <code class="docutils literal notranslate"><span class="pre">ParameterGrid</span></code> class. We just need to do some careful iteration through our dictionary of input ranges to create the same output. It will give us a chance to use the very useful <a class="reference external" href="https://docs.python.org/3/library/itertools.html">itertools library</a> and see Python’s <code class="docutils literal notranslate"><span class="pre">zip</span></code> function in
+action.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[62]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">product</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[63]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Look at the key, value pairs (tuples) in dt_param_ranges dictionary</span>
+<span class="n">dt_param_ranges</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[63]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+dict_items([(&#39;demand&#39;, array([ 70,  95, 120, 145, 170, 195, 220, 245, 270, 295, 320])), (&#39;order_quantity&#39;, array([ 70, 120, 170, 220, 270, 320]))])
+</pre></div></div>
+</div>
+<p>Now we can use <a class="reference external" href="https://docs.python.org/3.6/tutorial/controlflow.html#unpacking-argument-lists">tuple unpacking</a> along with the <a class="reference external" href="https://www.w3schools.com/python/ref_func_zip.asp">zip function</a> to get two tuples. One tuple will get stored in the variable <code class="docutils literal notranslate"><span class="pre">keys</span></code> and the other in <code class="docutils literal notranslate"><span class="pre">values</span></code>.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[64]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;The original tuples&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="o">*</span><span class="n">dt_param_ranges</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">The zipped tuples&quot;</span><span class="p">)</span>
+<span class="n">keys</span><span class="p">,</span> <span class="n">values</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">dt_param_ranges</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">keys</span><span class="p">,</span> <span class="n">values</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+The original tuples
+(&#39;demand&#39;, array([ 70,  95, 120, 145, 170, 195, 220, 245, 270, 295, 320])) (&#39;order_quantity&#39;, array([ 70, 120, 170, 220, 270, 320]))
+
+The zipped tuples
+(&#39;demand&#39;, &#39;order_quantity&#39;) (array([ 70,  95, 120, 145, 170, 195, 220, 245, 270, 295, 320]), array([ 70, 120, 170, 220, 270, 320]))
+</pre></div></div>
+</div>
+<p>Now we have a tuple of the keys, <code class="docutils literal notranslate"><span class="pre">('demand',</span> <span class="pre">'order_quantity')</span></code> and a tuple containing the two arrays of associated values.</p>
+<p>What we need next is a way to get all the combinations of the values in the two arrays. This is a perfect job for the <code class="docutils literal notranslate"><span class="pre">itertools.product</span></code> function. Here’s a simple example of what <code class="docutils literal notranslate"><span class="pre">product</span></code> does.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[65]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">colors</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;red&#39;</span><span class="p">,</span> <span class="s1">&#39;blue&#39;</span><span class="p">,</span> <span class="s1">&#39;green&#39;</span><span class="p">]</span>
+<span class="n">intensities</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;pale&#39;</span><span class="p">,</span> <span class="s1">&#39;bright&#39;</span><span class="p">]</span>
+<span class="k">for</span> <span class="n">pair</span> <span class="ow">in</span> <span class="n">product</span><span class="p">(</span><span class="n">intensities</span><span class="p">,</span> <span class="n">colors</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">pair</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+(&#39;pale&#39;, &#39;red&#39;)
+(&#39;pale&#39;, &#39;blue&#39;)
+(&#39;pale&#39;, &#39;green&#39;)
+(&#39;bright&#39;, &#39;red&#39;)
+(&#39;bright&#39;, &#39;blue&#39;)
+(&#39;bright&#39;, &#39;green&#39;)
+</pre></div></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">values</span></code> variable is a tuple (that needs unpacking) containing the two arrays for which we want the <code class="docutils literal notranslate"><span class="pre">product</span></code>. I’ll turn the result into a list so we can see it. Try it without the list to see what you get.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[66]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">list</span><span class="p">(</span><span class="n">product</span><span class="p">(</span><span class="o">*</span><span class="n">values</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[66]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[(70, 70),
+ (70, 120),
+ (70, 170),
+ (70, 220),
+ (70, 270),
+ (70, 320),
+ (95, 70),
+ (95, 120),
+ (95, 170),
+ (95, 220),
+ (95, 270),
+ (95, 320),
+ (120, 70),
+ (120, 120),
+ (120, 170),
+ (120, 220),
+ (120, 270),
+ (120, 320),
+ (145, 70),
+ (145, 120),
+ (145, 170),
+ (145, 220),
+ (145, 270),
+ (145, 320),
+ (170, 70),
+ (170, 120),
+ (170, 170),
+ (170, 220),
+ (170, 270),
+ (170, 320),
+ (195, 70),
+ (195, 120),
+ (195, 170),
+ (195, 220),
+ (195, 270),
+ (195, 320),
+ (220, 70),
+ (220, 120),
+ (220, 170),
+ (220, 220),
+ (220, 270),
+ (220, 320),
+ (245, 70),
+ (245, 120),
+ (245, 170),
+ (245, 220),
+ (245, 270),
+ (245, 320),
+ (270, 70),
+ (270, 120),
+ (270, 170),
+ (270, 220),
+ (270, 270),
+ (270, 320),
+ (295, 70),
+ (295, 120),
+ (295, 170),
+ (295, 220),
+ (295, 270),
+ (295, 320),
+ (320, 70),
+ (320, 120),
+ (320, 170),
+ (320, 220),
+ (320, 270),
+ (320, 320)]
+</pre></div></div>
+</div>
+<p>Finally, we need to zip each of these tuples with the <code class="docutils literal notranslate"><span class="pre">keys</span></code> variable and turn the resulting tuple into a dictionary. Let’s recall what it contains:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[67]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">keys</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[67]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+(&#39;demand&#39;, &#39;order_quantity&#39;)
+</pre></div></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">zip</span></code> function works like a zipper and pairs elements in the same position in our two tuples.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[68]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">keys</span><span class="p">,</span> <span class="p">(</span><span class="mi">70</span><span class="p">,</span> <span class="mi">120</span><span class="p">)))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[68]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[(&#39;demand&#39;, 70), (&#39;order_quantity&#39;, 120)]
+</pre></div></div>
+</div>
+<p>… and it’s easy to turn this into a dictionary (which is what we want).</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[69]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">keys</span><span class="p">,</span> <span class="p">(</span><span class="mi">70</span><span class="p">,</span> <span class="mi">120</span><span class="p">)))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[69]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+{&#39;demand&#39;: 70, &#39;order_quantity&#39;: 120}
+</pre></div></div>
+</div>
+<p>Ok, just put all these ideas together.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[70]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">param_grid</span> <span class="o">=</span> <span class="p">[]</span>
+
+<span class="n">keys</span><span class="p">,</span> <span class="n">values</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">dt_param_ranges</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
+
+<span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">product</span><span class="p">(</span><span class="o">*</span><span class="n">values</span><span class="p">):</span>
+    <span class="n">params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">keys</span><span class="p">,</span> <span class="n">v</span><span class="p">))</span>
+    <span class="n">param_grid</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+
+<span class="n">param_grid</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[70]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[{&#39;demand&#39;: 70, &#39;order_quantity&#39;: 70},
+ {&#39;demand&#39;: 70, &#39;order_quantity&#39;: 120},
+ {&#39;demand&#39;: 70, &#39;order_quantity&#39;: 170},
+ {&#39;demand&#39;: 70, &#39;order_quantity&#39;: 220},
+ {&#39;demand&#39;: 70, &#39;order_quantity&#39;: 270},
+ {&#39;demand&#39;: 70, &#39;order_quantity&#39;: 320},
+ {&#39;demand&#39;: 95, &#39;order_quantity&#39;: 70},
+ {&#39;demand&#39;: 95, &#39;order_quantity&#39;: 120},
+ {&#39;demand&#39;: 95, &#39;order_quantity&#39;: 170},
+ {&#39;demand&#39;: 95, &#39;order_quantity&#39;: 220},
+ {&#39;demand&#39;: 95, &#39;order_quantity&#39;: 270},
+ {&#39;demand&#39;: 95, &#39;order_quantity&#39;: 320},
+ {&#39;demand&#39;: 120, &#39;order_quantity&#39;: 70},
+ {&#39;demand&#39;: 120, &#39;order_quantity&#39;: 120},
+ {&#39;demand&#39;: 120, &#39;order_quantity&#39;: 170},
+ {&#39;demand&#39;: 120, &#39;order_quantity&#39;: 220},
+ {&#39;demand&#39;: 120, &#39;order_quantity&#39;: 270},
+ {&#39;demand&#39;: 120, &#39;order_quantity&#39;: 320},
+ {&#39;demand&#39;: 145, &#39;order_quantity&#39;: 70},
+ {&#39;demand&#39;: 145, &#39;order_quantity&#39;: 120},
+ {&#39;demand&#39;: 145, &#39;order_quantity&#39;: 170},
+ {&#39;demand&#39;: 145, &#39;order_quantity&#39;: 220},
+ {&#39;demand&#39;: 145, &#39;order_quantity&#39;: 270},
+ {&#39;demand&#39;: 145, &#39;order_quantity&#39;: 320},
+ {&#39;demand&#39;: 170, &#39;order_quantity&#39;: 70},
+ {&#39;demand&#39;: 170, &#39;order_quantity&#39;: 120},
+ {&#39;demand&#39;: 170, &#39;order_quantity&#39;: 170},
+ {&#39;demand&#39;: 170, &#39;order_quantity&#39;: 220},
+ {&#39;demand&#39;: 170, &#39;order_quantity&#39;: 270},
+ {&#39;demand&#39;: 170, &#39;order_quantity&#39;: 320},
+ {&#39;demand&#39;: 195, &#39;order_quantity&#39;: 70},
+ {&#39;demand&#39;: 195, &#39;order_quantity&#39;: 120},
+ {&#39;demand&#39;: 195, &#39;order_quantity&#39;: 170},
+ {&#39;demand&#39;: 195, &#39;order_quantity&#39;: 220},
+ {&#39;demand&#39;: 195, &#39;order_quantity&#39;: 270},
+ {&#39;demand&#39;: 195, &#39;order_quantity&#39;: 320},
+ {&#39;demand&#39;: 220, &#39;order_quantity&#39;: 70},
+ {&#39;demand&#39;: 220, &#39;order_quantity&#39;: 120},
+ {&#39;demand&#39;: 220, &#39;order_quantity&#39;: 170},
+ {&#39;demand&#39;: 220, &#39;order_quantity&#39;: 220},
+ {&#39;demand&#39;: 220, &#39;order_quantity&#39;: 270},
+ {&#39;demand&#39;: 220, &#39;order_quantity&#39;: 320},
+ {&#39;demand&#39;: 245, &#39;order_quantity&#39;: 70},
+ {&#39;demand&#39;: 245, &#39;order_quantity&#39;: 120},
+ {&#39;demand&#39;: 245, &#39;order_quantity&#39;: 170},
+ {&#39;demand&#39;: 245, &#39;order_quantity&#39;: 220},
+ {&#39;demand&#39;: 245, &#39;order_quantity&#39;: 270},
+ {&#39;demand&#39;: 245, &#39;order_quantity&#39;: 320},
+ {&#39;demand&#39;: 270, &#39;order_quantity&#39;: 70},
+ {&#39;demand&#39;: 270, &#39;order_quantity&#39;: 120},
+ {&#39;demand&#39;: 270, &#39;order_quantity&#39;: 170},
+ {&#39;demand&#39;: 270, &#39;order_quantity&#39;: 220},
+ {&#39;demand&#39;: 270, &#39;order_quantity&#39;: 270},
+ {&#39;demand&#39;: 270, &#39;order_quantity&#39;: 320},
+ {&#39;demand&#39;: 295, &#39;order_quantity&#39;: 70},
+ {&#39;demand&#39;: 295, &#39;order_quantity&#39;: 120},
+ {&#39;demand&#39;: 295, &#39;order_quantity&#39;: 170},
+ {&#39;demand&#39;: 295, &#39;order_quantity&#39;: 220},
+ {&#39;demand&#39;: 295, &#39;order_quantity&#39;: 270},
+ {&#39;demand&#39;: 295, &#39;order_quantity&#39;: 320},
+ {&#39;demand&#39;: 320, &#39;order_quantity&#39;: 70},
+ {&#39;demand&#39;: 320, &#39;order_quantity&#39;: 120},
+ {&#39;demand&#39;: 320, &#39;order_quantity&#39;: 170},
+ {&#39;demand&#39;: 320, &#39;order_quantity&#39;: 220},
+ {&#39;demand&#39;: 320, &#39;order_quantity&#39;: 270},
+ {&#39;demand&#39;: 320, &#39;order_quantity&#39;: 320}]
+</pre></div></div>
+</div>
+<p>Voila! We’ve recreated the same output as <code class="docutils literal notranslate"><span class="pre">ParameterGrid</span></code> gave us.</p>
+<blockquote>
+<div><p>This little exercise underscores the value of knowing the basics of OOP if you are going to do analytics work in Python. Almost all of the main libraries that you’ll encounter (e.g. pandas, matplotlib, scikit-learn) are written in OO fashion. So, in order for you to be able to peek into their source code, make sense of things, and maybe even borrow some code as we did, you need to understand the basics of OOP in Python.</p>
+</div></blockquote>
+</section>
+</section>
+<section id="Creating-the-data_table-function">
+<h3>Creating the data_table function<a class="headerlink" href="#Creating-the-data_table-function" title="Permalink to this headline">¶</a></h3>
+<p>Our plan is to create a function that takes three inputs:</p>
+<ul class="simple">
+<li><p>a model object such as <code class="docutils literal notranslate"><span class="pre">model_5</span></code>,</p></li>
+<li><p>a dictionary containing the input attributes and associated ranges for the data table such as <code class="docutils literal notranslate"><span class="pre">dt_param_ranges</span></code>,</p></li>
+<li><p>a list of outputs which are methods of the the model object; for example <code class="docutils literal notranslate"><span class="pre">['profit']</span></code></p></li>
+</ul>
+<p>Since we don’t want the <code class="docutils literal notranslate"><span class="pre">data_table</span></code> function to modify our passed in model object, we’ll create a copy of the model within the function. As we saw when copying list objects, we need to be careful when copying user defined objects. We’ll create what is known as a <em>deep copy</em> using the <code class="docutils literal notranslate"><span class="pre">copy</span></code> library. Learn more about <a class="reference external" href="https://docs.python.org/3/library/copy.html">shallow and deep copying here</a>.</p>
+<p>Then we’ll generate our parameter grid. I like to think of each element in the parameter grid, e.g. <code class="docutils literal notranslate"><span class="pre">{'demand':</span> <span class="pre">295,</span> <span class="pre">'order_quantity':</span> <span class="pre">270}</span></code>, as a <em>scenario</em>. We loop over all the scenarios in the grid, updating the model copy and computing the requested outputs. For each scenario, we’ll end up with a dictionary containing both the inputs and outputs. For example, <code class="docutils literal notranslate"><span class="pre">{'demand':</span> <span class="pre">295,</span> <span class="pre">'order_quantity':</span> <span class="pre">270,</span> <span class="pre">'profit':405.0}</span></code>. Each such dictionary will get stored in a list and then at the very end
+our function will convert this list to a pandas DataFrame and return it.</p>
+<p>Here’s our first version. Take note of the use of <code class="docutils literal notranslate"><span class="pre">getattr</span></code> to indirectly call methods (e.g. <code class="docutils literal notranslate"><span class="pre">profit</span></code>) of the model.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[71]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Demo of getattr for indirect method calling</span>
+<span class="nb">getattr</span><span class="p">(</span><span class="n">model_5</span><span class="p">,</span> <span class="s1">&#39;profit&#39;</span><span class="p">)()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[71]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+447.5
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[72]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">data_table</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">scenario_inputs</span><span class="p">,</span> <span class="n">outputs</span><span class="p">):</span>
+    <span class="c1"># TODO: Validity checking of inputs and outputs</span>
+
+    <span class="c1"># Clone the model using deepcopy</span>
+    <span class="n">model_clone</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
+
+    <span class="c1"># Create parameter grid</span>
+    <span class="n">dt_param_grid</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">ParameterGrid</span><span class="p">(</span><span class="n">scenario_inputs</span><span class="p">))</span>
+
+    <span class="c1"># Create the table as a list of dictionaries</span>
+    <span class="n">results</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="c1"># Loop over the scenarios</span>
+    <span class="k">for</span> <span class="n">params</span> <span class="ow">in</span> <span class="n">dt_param_grid</span><span class="p">:</span>
+        <span class="c1"># Update the model clone with scenario specific values</span>
+        <span class="n">model_clone</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+        <span class="c1"># Create a result dictionary based on a copy of the scenario inputs</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+        <span class="c1"># Loop over the list of requested outputs</span>
+        <span class="k">for</span> <span class="n">output</span> <span class="ow">in</span> <span class="n">outputs</span><span class="p">:</span>
+            <span class="c1"># Compute the output.</span>
+            <span class="n">out_val</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">model_clone</span><span class="p">,</span> <span class="n">output</span><span class="p">)()</span>
+            <span class="c1"># Add the output to the result dictionary</span>
+            <span class="n">result</span><span class="p">[</span><span class="n">output</span><span class="p">]</span> <span class="o">=</span> <span class="n">out_val</span>
+
+        <span class="c1"># Append the result dictionary to the results list</span>
+        <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+
+    <span class="c1"># Convert the results list (of dictionaries) to a pandas DataFrame and return it</span>
+    <span class="n">results_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">results_df</span>
+</pre></div>
+</div>
+</div>
+<p>Okay, let’s try it out. This time, I’ll use <em>dictionary unpacking</em> to pass in the parameter values to our class.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[73]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create a dictionary of base input values</span>
+
+<span class="n">base_inputs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;unit_cost&#39;</span><span class="p">:</span> <span class="mf">7.5</span><span class="p">,</span>
+               <span class="s1">&#39;selling_price&#39;</span><span class="p">:</span> <span class="mf">10.0</span><span class="p">,</span>
+               <span class="s1">&#39;unit_refund&#39;</span><span class="p">:</span> <span class="mf">2.5</span><span class="p">,</span>
+               <span class="s1">&#39;order_quantity&#39;</span><span class="p">:</span> <span class="mi">200</span><span class="p">,</span>
+               <span class="s1">&#39;demand&#39;</span><span class="p">:</span> <span class="mi">193</span><span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[74]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create a new model with default input values (0&#39;s)</span>
+<span class="n">model_6</span> <span class="o">=</span> <span class="n">BookstoreModel</span><span class="p">(</span><span class="o">**</span><span class="n">base_inputs</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">model_6</span><span class="p">)</span>
+<span class="n">model_6</span><span class="o">.</span><span class="n">profit</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+{&#39;unit_cost&#39;: 7.5, &#39;selling_price&#39;: 10.0, &#39;unit_refund&#39;: 2.5, &#39;order_quantity&#39;: 200, &#39;demand&#39;: 193}
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[74]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+447.5
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[75]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Specify input ranges for scenarios (dictionary)</span>
+<span class="c1"># 1-way table</span>
+<span class="n">dt_param_ranges_1</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;demand&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">70</span><span class="p">,</span> <span class="mi">321</span><span class="p">,</span> <span class="mi">25</span><span class="p">)}</span>
+
+<span class="c1"># 2-way table</span>
+<span class="n">dt_param_ranges_2</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;demand&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">70</span><span class="p">,</span> <span class="mi">321</span><span class="p">,</span> <span class="mi">25</span><span class="p">),</span>
+                   <span class="s1">&#39;order_quantity&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">70</span><span class="p">,</span> <span class="mi">321</span><span class="p">,</span> <span class="mi">50</span><span class="p">)}</span>
+
+<span class="c1"># Specify desired outputs (list)</span>
+<span class="n">outputs</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;profit&#39;</span><span class="p">,</span> <span class="s1">&#39;order_cost&#39;</span><span class="p">]</span>
+
+<span class="c1"># Use data_table function to create 1-way data table</span>
+<span class="n">m6_dt1_df</span> <span class="o">=</span> <span class="n">data_table</span><span class="p">(</span><span class="n">model_6</span><span class="p">,</span> <span class="n">dt_param_ranges_1</span><span class="p">,</span> <span class="n">outputs</span><span class="p">)</span>
+<span class="n">m6_dt1_df</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[75]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>demand</th>
+      <th>profit</th>
+      <th>order_cost</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>70</td>
+      <td>-475.0</td>
+      <td>1500.0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>95</td>
+      <td>-287.5</td>
+      <td>1500.0</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>120</td>
+      <td>-100.0</td>
+      <td>1500.0</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>145</td>
+      <td>87.5</td>
+      <td>1500.0</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>170</td>
+      <td>275.0</td>
+      <td>1500.0</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>195</td>
+      <td>462.5</td>
+      <td>1500.0</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>220</td>
+      <td>500.0</td>
+      <td>1500.0</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>245</td>
+      <td>500.0</td>
+      <td>1500.0</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>270</td>
+      <td>500.0</td>
+      <td>1500.0</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>295</td>
+      <td>500.0</td>
+      <td>1500.0</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>320</td>
+      <td>500.0</td>
+      <td>1500.0</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[76]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Use data_table function to create 2-way data table</span>
+<span class="n">m6_dt2_df</span> <span class="o">=</span> <span class="n">data_table</span><span class="p">(</span><span class="n">model_6</span><span class="p">,</span> <span class="n">dt_param_ranges_2</span><span class="p">,</span> <span class="n">outputs</span><span class="p">)</span>
+<span class="n">m6_dt2_df</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[76]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>demand</th>
+      <th>order_quantity</th>
+      <th>profit</th>
+      <th>order_cost</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>70</td>
+      <td>70</td>
+      <td>175.0</td>
+      <td>525.0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>70</td>
+      <td>120</td>
+      <td>-75.0</td>
+      <td>900.0</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>70</td>
+      <td>170</td>
+      <td>-325.0</td>
+      <td>1275.0</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>70</td>
+      <td>220</td>
+      <td>-575.0</td>
+      <td>1650.0</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>70</td>
+      <td>270</td>
+      <td>-825.0</td>
+      <td>2025.0</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>61</th>
+      <td>320</td>
+      <td>120</td>
+      <td>300.0</td>
+      <td>900.0</td>
+    </tr>
+    <tr>
+      <th>62</th>
+      <td>320</td>
+      <td>170</td>
+      <td>425.0</td>
+      <td>1275.0</td>
+    </tr>
+    <tr>
+      <th>63</th>
+      <td>320</td>
+      <td>220</td>
+      <td>550.0</td>
+      <td>1650.0</td>
+    </tr>
+    <tr>
+      <th>64</th>
+      <td>320</td>
+      <td>270</td>
+      <td>675.0</td>
+      <td>2025.0</td>
+    </tr>
+    <tr>
+      <th>65</th>
+      <td>320</td>
+      <td>320</td>
+      <td>800.0</td>
+      <td>2400.0</td>
+    </tr>
+  </tbody>
+</table>
+<p>66 rows × 4 columns</p>
+</div></div>
+</div>
+<p>Let’s plot the 2-way results using Seaborn.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[77]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">profit_dt_g</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">FacetGrid</span><span class="p">(</span><span class="n">m6_dt2_df</span><span class="p">,</span> <span class="n">col</span><span class="o">=</span><span class="s2">&quot;order_quantity&quot;</span><span class="p">,</span> <span class="n">sharey</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">col_wrap</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">profit_dt_g</span> <span class="o">=</span> <span class="n">profit_dt_g</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">,</span> <span class="s2">&quot;demand&quot;</span><span class="p">,</span> <span class="s2">&quot;profit&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../../../../../../../_images/.doctrees_nbsphinx_.doctrees_nbsphinx_.doctrees_nbsphinx_blog_what_if_1_model_datatable_161_0.png" src="../../../../../../../../_images/.doctrees_nbsphinx_.doctrees_nbsphinx_.doctrees_nbsphinx_blog_what_if_1_model_datatable_161_0.png" />
+</div>
+</div>
+<p>Perfect! The plots make sense in that the order quantity acts as an upper limit on profit since we end up with unmet demand whenever demand exceeds our order quantity.</p>
+</section>
+</section>
+<section id="Concluding-thoughts-and-next-steps">
+<h2>Concluding thoughts and next steps<a class="headerlink" href="#Concluding-thoughts-and-next-steps" title="Permalink to this headline">¶</a></h2>
+<p>We’ve created an OO version of a simple spreadsheet type model that lends itself pretty well to the type of sensitivity analysis we would do with something like Excel’s Data Table tool. Our Python <code class="docutils literal notranslate"><span class="pre">data_table</span></code> function actually allows <em>n</em> input variables and <em>m</em> output variables. In Excel, you can either do a <span class="math notranslate nohighlight">\(1xn\)</span> (a one-way Data Table) or <span class="math notranslate nohighlight">\(2x1\)</span> (a two-way Data Table).</p>
+<p>Along the way we wearned the basics of doing OOP in Python and a bunch of more advanced Python functions and techniques. While that might have seemed like a bunch of work, now we’ve got a reusable model object and reusable data table function that we can build on.</p>
+<p>In the next post, we’ll build on this work and take on implementing an Excel-style Goal Seek function in Python. We’ll explore this using both the OO and the non-OO models. Each leads to some interesting challenges. Which approach do you think will end up being easier to use within a Python <code class="docutils literal notranslate"><span class="pre">goal_seek</span></code> function?</p>
+<p>In the third post in this series, we’ll use these same models for Monte-Carlo simulation. We’ll be creating our own <code class="docutils literal notranslate"><span class="pre">simulate</span></code> function to add to the <code class="docutils literal notranslate"><span class="pre">data_table</span></code> and <code class="docutils literal notranslate"><span class="pre">goal_seek</span></code> functions that we created in the first and second parts of this series.</p>
+<p>In the fourth post in this series, we’ll learn to create a Python package containing our three “what-if?” functions so that we can share our work and easily use these functions in different notebooks or Python programs.</p>
+<p>Finally, we’ll end the series with a post on using widgets to add some GUI style interaction with the model.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
+</section>
+</section>
+
+<div class="section">
+    
+
+<div class="section">
+  <span style="float: left">
+     Previous:
+    
+    <a href="../../../../../../../../blog/what_if_1_model_datatable/">
+       Excel “what if?” analysis with Python - Part 1: Models and Data Tables
+    </a>
+    
+  </span>
+  <span>&nbsp;</span>
+  <span style="float: right">
+     Next: 
+    <a href="../../../../blog/what_if_1_model_datatable/">
+      Excel “what if?” analysis with Python - Part 1: Models and Data Tables 
+    </a>
+    
+  </span>
+</div>
+  
+</div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../../../../../../../">misken</a></h1>
+
+
+
+
+
+
+
+
+  
+<h2>
+   
+  12 February 2021 
+</h2>
+
+<ul>
+   
+<li id="author">
+  <span
+    >Author:</span
+  >
+   
+  <a href="../../../../../../../../blog/author/misken/">misken</a>  
+</li>
+    
+<li id="tags">
+  <span
+    >Tags: </span
+  >
+   
+  <a href="../../../../../../../../blog/tag/python/">python</a>   
+  <a href="../../../../../../../../blog/tag/excel/">excel</a>  
+</li>
+ 
+</ul>
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../../about/">About misken</a></li>
+</ul>
+
+
+<h3>
+  <a href="../../../../../../../../blog/">Recent Posts</a>
+</h3>
+<ul>
+   
+  <li>
+    <a href="../../../../../../../../blog/simpy_getting_started_vaccine_clinic/"
+      >04 April - Using SimPy to simulate a vaccine clinic - Part 1: an introductory tutorial</a
+    >
+  </li>
+  
+  <li>
+    <a href="../simpy_getting_started_vaccine_clinic/"
+      >04 April - Using SimPy to simulate a vaccine clinic - Part 1: an introductory tutorial</a
+    >
+  </li>
+  
+  <li>
+    <a href="../../../../blog/simpy_getting_started_vaccine_clinic/"
+      >04 April - Using SimPy to simulate a vaccine clinic - Part 1: an introductory tutorial</a
+    >
+  </li>
+  
+  <li>
+    <a href="../../../../../../blog/simpy_getting_started_vaccine_clinic/"
+      >04 April - Using SimPy to simulate a vaccine clinic - Part 1: an introductory tutorial</a
+    >
+  </li>
+  
+  <li>
+    <a href="../../../../../../../../blog/use_jupyter_conda_envs/"
+      >03 April - Using different conda environments with Jupyter Lab</a
+    >
+  </li>
+  
+</ul>
+
+<h3><a href="../../../../../../../../blog/tag/">Tags</a></h3>
+<style type="text/css">
+  ul.ablog-cloud {
+    list-style: none;
+    overflow: auto;
+  }
+  ul.ablog-cloud li {
+    float: left;
+    height: 20pt;
+    line-height: 18pt;
+    margin-right: 5px;
+  }
+  ul.ablog-cloud a {
+    text-decoration: none;
+    vertical-align: middle;
+  }
+  li.ablog-cloud-1 {
+    font-size: 80%;
+  }
+  li.ablog-cloud-2 {
+    font-size: 95%;
+  }
+  li.ablog-cloud-3 {
+    font-size: 110%;
+  }
+  li.ablog-cloud-4 {
+    font-size: 125%;
+  }
+  li.ablog-cloud-5 {
+    font-size: 140%;
+  }
+</style>
+<ul class="ablog-cloud">
+   
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../../../../../../../../blog/tag/github/">GitHub</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../../../../../../../../blog/tag/r/">R</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-2">
+    <a href="../../../../../../../../blog/tag/ablog/">ablog</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../../../../../../../../blog/tag/bikeshare/">bikeshare</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../../../../../../../../blog/tag/birding/">birding</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../../../../../../../../blog/tag/blogging/">blogging</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../../../../../../../../blog/tag/conda/">conda</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../../../../../../../../blog/tag/datetime/">datetime</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../../../../../../../../blog/tag/dplyr/">dplyr</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../../../../../../../../blog/tag/ebird/">ebird</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../../../../../../../../blog/tag/ecology/">ecology</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-2">
+    <a href="../../../../../../../../blog/tag/excel/">excel</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../../../../../../../../blog/tag/ggplot2/">ggplot2</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../../../../../../../../blog/tag/gis/">gis</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../../../../../../../../blog/tag/git/">git</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../../../../../../../../blog/tag/hiking/">hiking</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../../../../../../../../blog/tag/hillmaker/">hillmaker</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-2">
+    <a href="../../../../../../../../blog/tag/jupyter/">jupyter</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../../../../../../../../blog/tag/occupancy-analysis/">occupancy analysis</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../../../../../../../../blog/tag/pandas/">pandas</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-5">
+    <a href="../../../../../../../../blog/tag/python/">python</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../../../../../../../../blog/tag/r/">r</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../../../../../../../../blog/tag/sphinx/">sphinx</a>
+  </li>
+   
+</ul>
+
+<h3>
+  <a href="../../../../../../../../blog/archive/">Archives</a>
+</h3>
+<ul>
+   
+  <li>
+    <a href="../../../../../../../../blog/2022/">2022 (11)</a>
+  </li>
+    
+  <li>
+    <a href="../../../../../../../../blog/2021/">2021 (16)</a>
+  </li>
+    
+  <li>
+    <a href="../../../../../../../../blog/2020/">2020 (2)</a>
+  </li>
+    
+  <li>
+    <a href="../../../../../../../../blog/2019/">2019 (13)</a>
+  </li>
+    
+  <li>
+    <a href="../../../../../../../../blog/2018/">2018 (10)</a>
+  </li>
+    
+  <li>
+    <a href="../../../../../../../../blog/2016/">2016 (1)</a>
+  </li>
+    
+  <li>
+    <a href="../../../../../../../../blog/2014/">2014 (4)</a>
+  </li>
+   
+</ul>
+
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../../../../../search/" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2022, misken.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.3.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../../../../../../../../_sources/.doctrees/nbsphinx/.doctrees/nbsphinx/.doctrees/nbsphinx/blog/what_if_1_model_datatable.ipynb.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

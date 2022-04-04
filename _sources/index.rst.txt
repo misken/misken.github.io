@@ -9,7 +9,7 @@ Bits of analytics
 I've moved my hselab.org blog content here and will phase that site out.
 I'm in the process of porting all of that content to this new location.
 
-.. postlist:: 5
+.. postlist:: 100
    :date: %Y-%m-%d
    :format: {date} - {title}
    :list-style: none

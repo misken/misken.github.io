@@ -1,0 +1,2294 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>Exploring dates and times in Python &#8212; misken 0,1,0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../../../../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../../../../../_static/alabaster.css" />
+    <script data-url_root="../../../../../../../../" id="documentation_options" src="../../../../../../../../_static/documentation_options.js"></script>
+    <script src="../../../../../../../../_static/jquery.js"></script>
+    <script src="../../../../../../../../_static/underscore.js"></script>
+    <script src="../../../../../../../../_static/doctools.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <link rel="author" title="About these documents" href="../../../../../../../../about/" />
+    <link rel="index" title="Index" href="../../../../../../../../genindex/" />
+    <link rel="search" title="Search" href="../../../../../../../../search/" /> 
+   
+  <link rel="stylesheet" href="../../../../../../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+ 
+<link
+  rel="alternate"
+  type="application/atom+xml"
+  href="../../../../../../../../blog/atom.xml"
+  title="Bits of analytics"
+/>
+ 
+<style type="text/css">
+  ul.ablog-archive {
+    list-style: none;
+    overflow: auto;
+    margin-left: 0px;
+  }
+  ul.ablog-archive li {
+    float: left;
+    margin-right: 5px;
+    font-size: 80%;
+  }
+  ul.postlist a {
+    font-style: italic;
+  }
+  ul.postlist-style-disc {
+    list-style-type: disc;
+  }
+  ul.postlist-style-none {
+    list-style-type: none;
+  }
+  ul.postlist-style-circle {
+    list-style-type: circle;
+  }
+</style>
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+             
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt *,
+div.nbinput.container div.input_area pre,
+div.nboutput.container div.output_area pre,
+div.nbinput.container div.input_area .highlight,
+div.nboutput.container div.output_area .highlight {
+    border: none;
+    padding: 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+div.nbinput.container > div[class*=highlight],
+div.nboutput.container > div[class*=highlight] {
+    margin: 0;
+}
+
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt * {
+    background: none;
+}
+
+div.nboutput.container div.output_area .highlight,
+div.nboutput.container div.output_area pre {
+    background: unset;
+}
+
+div.nboutput.container div.output_area div.highlight {
+    color: unset;  /* override Pygments text color */
+}
+
+/* avoid gaps between output lines */
+div.nboutput.container div[class*=highlight] pre {
+    line-height: normal;
+}
+
+/* input/output containers */
+div.nbinput.container,
+div.nboutput.container {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+    width: 100%;
+}
+@media (max-width: 540px) {
+    div.nbinput.container,
+    div.nboutput.container {
+        flex-direction: column;
+    }
+}
+
+/* input container */
+div.nbinput.container {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast.container {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput.container div.prompt pre {
+    color: #307FC1;
+}
+
+/* output prompt */
+div.nboutput.container div.prompt pre {
+    color: #BF5B3D;
+}
+
+/* all prompts */
+div.nbinput.container div.prompt,
+div.nboutput.container div.prompt {
+    width: 4.5ex;
+    padding-top: 5px;
+    position: relative;
+    user-select: none;
+}
+
+div.nbinput.container div.prompt > div,
+div.nboutput.container div.prompt > div {
+    position: absolute;
+    right: 0;
+    margin-right: 0.3ex;
+}
+
+@media (max-width: 540px) {
+    div.nbinput.container div.prompt,
+    div.nboutput.container div.prompt {
+        width: unset;
+        text-align: left;
+        padding: 0.4em;
+    }
+    div.nboutput.container div.prompt.empty {
+        padding: 0;
+    }
+
+    div.nbinput.container div.prompt > div,
+    div.nboutput.container div.prompt > div {
+        position: unset;
+    }
+}
+
+/* disable scrollbars on prompts */
+div.nbinput.container div.prompt pre,
+div.nboutput.container div.prompt pre {
+    overflow: hidden;
+}
+
+/* input/output area */
+div.nbinput.container div.input_area,
+div.nboutput.container div.output_area {
+    -webkit-flex: 1;
+    flex: 1;
+    overflow: auto;
+}
+@media (max-width: 540px) {
+    div.nbinput.container div.input_area,
+    div.nboutput.container div.output_area {
+        width: 100%;
+    }
+}
+
+/* input area */
+div.nbinput.container div.input_area {
+    border: 1px solid #e0e0e0;
+    border-radius: 2px;
+    /*background: #f5f5f5;*/
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput.container div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.imgmath center alignment in output cells */
+div.nboutput.container div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput.container div.output_area.stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-default-inverse-fg { color: #FFFFFF; }
+.ansi-default-inverse-bg { background-color: #000000; }
+
+.ansi-bold { font-weight: bold; }
+.ansi-underline { text-decoration: underline; }
+
+
+div.nbinput.container div.input_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight].math,
+div.nboutput.container div.output_area.rendered_html,
+div.nboutput.container div.output_area > div.output_javascript,
+div.nboutput.container div.output_area:not(.rendered_html) > img{
+    padding: 5px;
+    margin: 0;
+}
+
+/* fix copybtn overflow problem in chromium (needed for 'sphinx_copybutton') */
+div.nbinput.container div.input_area > div[class^='highlight'],
+div.nboutput.container div.output_area > div[class^='highlight']{
+    overflow-y: hidden;
+}
+
+/* hide copybtn icon on prompts (needed for 'sphinx_copybutton') */
+.prompt .copybtn {
+    display: none;
+}
+
+/* Some additional styling taken form the Jupyter notebook CSS */
+div.rendered_html table {
+  border: none;
+  border-collapse: collapse;
+  border-spacing: 0;
+  color: black;
+  font-size: 12px;
+  table-layout: fixed;
+}
+div.rendered_html thead {
+  border-bottom: 1px solid black;
+  vertical-align: bottom;
+}
+div.rendered_html tr,
+div.rendered_html th,
+div.rendered_html td {
+  text-align: right;
+  vertical-align: middle;
+  padding: 0.5em 0.5em;
+  line-height: normal;
+  white-space: normal;
+  max-width: none;
+  border: none;
+}
+div.rendered_html th {
+  font-weight: bold;
+}
+div.rendered_html tbody tr:nth-child(odd) {
+  background: #f5f5f5;
+}
+div.rendered_html tbody tr:hover {
+  background: rgba(66, 165, 245, 0.2);
+}
+</style>
+<section id="Exploring-dates-and-times-in-Python">
+<h1>Exploring dates and times in Python<a class="headerlink" href="#Exploring-dates-and-times-in-Python" title="Permalink to this headline">¶</a></h1>
+<p>Fun with dates and times in Python</p>
+<p>For many of us in the business analytics world, working with dates and times is bread and butter stuff. We can work all kinds of magic with Excel’s “serial” datetimes and worksheet functions like DATEVALUE(), WEEKDAY(), MONTH(), DATE() and many more. We can wield VBA functions like <a class="reference external" href="http://msdn.microsoft.com/en-us/library/b5xbyt6f%28v=vs.90%29.aspx">DateDiff</a> with the best of them. We all know that, according to MS, time started on 1/1/1900 (or 1904 if you’re on a Mac) and we just live with
+the fact that we can’t do reliable datetime work before those magic epochs. I even wrote and released a free and open source MS Access add-in called <a class="reference external" href="http://hillmaker.sourceforge.net/">Hillmaker</a> many years ago that did statistical analysis of time interval data by day of week and time of day. That tool still finds lots of use in the healthcare world for analyzing occupancy of things like nursing units, emergency departments, recovery room, and many other places with entry and exit timestamp
+data.</p>
+<p>So, when I started working with R and Python, one of the first things I did was see how they handled dates and times. I learned about the <a class="reference external" href="http://en.wikipedia.org/wiki/Unix_time">UTC epoch and the POSIX time standard</a>. In R, I quickly learned to love the <a class="reference external" href="http://cran.r-project.org/web/packages/lubridate/index.html">lubridate package</a>. And then I started to learn about dates and times in Python and started to know what programmers mean when they say “there be dragons in there”. So, while
+I’m far from an expert, I did put together this little intro to Python dates and times aimed at business analtytics types who are new to Python. It is by no means comprehensive, but does cover the basics of the base Python <code class="docutils literal notranslate"><span class="pre">datetime</span></code> and <code class="docutils literal notranslate"><span class="pre">timedelta</span></code> classes along with Numpy <code class="docutils literal notranslate"><span class="pre">datetime64</span></code> and <code class="docutils literal notranslate"><span class="pre">timedelta64</span></code> classes. Oh yeah, it also covers the pandas <code class="docutils literal notranslate"><span class="pre">Timestamp</span></code> and <code class="docutils literal notranslate"><span class="pre">timedelta</span></code> classes (confused yet?). I also show one particular dragon that bit me - conversion between Numpy datetimes
+and Pandas datetimes - even though Pandas uses Numpy under the hood.</p>
+<section id="Python’s-datetime-and-timedelta-classes">
+<h2>Python’s <code class="docutils literal notranslate"><span class="pre">datetime</span></code> and <code class="docutils literal notranslate"><span class="pre">timedelta</span></code> classes<a class="headerlink" href="#Python’s-datetime-and-timedelta-classes" title="Permalink to this headline">¶</a></h2>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%</span><span class="k">matplotlib</span> inline
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">pandas</span> <span class="kn">import</span> <span class="n">Series</span><span class="p">,</span> <span class="n">DataFrame</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">timedelta</span>
+</pre></div>
+</div>
+</div>
+<p>Python has a module called <code class="docutils literal notranslate"><span class="pre">datetime</span></code> as part of its base system.</p>
+<p><a class="reference external" href="https://docs.python.org/3/library/datetime.html">https://docs.python.org/3/library/datetime.html</a></p>
+<blockquote>
+<div><p>The datetime module supplies classes for manipulating dates and times in both simple and complex ways. While date and time arithmetic is supported, the focus of the implementation is on efficient attribute extraction for output formatting and manipulation.</p>
+</div></blockquote>
+<p>Datetimes can be <em>naive</em> or <em>aware</em></p>
+<ul class="simple">
+<li><p>naive objects don’t know about timezones and their interpretation is application (coder) dependent</p></li>
+<li><p>aware objects do know about timezones and are unambiguous</p></li>
+</ul>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">dates</span> <span class="o">=</span> <span class="p">[</span><span class="n">datetime</span><span class="p">(</span><span class="mi">2012</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">30</span><span class="p">),</span>
+         <span class="n">datetime</span><span class="p">(</span><span class="mi">2012</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">25</span><span class="p">),</span>
+         <span class="n">datetime</span><span class="p">(</span><span class="mi">2012</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span> <span class="mi">30</span><span class="p">)]</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">dates</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[datetime.datetime(2012, 5, 1, 8, 30),
+ datetime.datetime(2012, 5, 1, 9, 25),
+ datetime.datetime(2012, 5, 1, 15, 30)]
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">type</span><span class="p">(</span><span class="n">dates</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+list
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">type</span><span class="p">(</span><span class="n">dates</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+datetime.datetime
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">intime_dt</span> <span class="o">=</span> <span class="n">dates</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">outtime_dt</span> <span class="o">=</span> <span class="n">dates</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+<span class="nb">type</span><span class="p">(</span><span class="n">intime_dt</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+datetime.datetime
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># The commented out lines represent attributes that ARE available in pandas Timestamp objects</span>
+<span class="c1">#   but not in Python datetime objects</span>
+<span class="nb">print</span> <span class="p">(</span><span class="s1">&#39;Datetime: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">intime_dt</span><span class="p">))</span>
+<span class="nb">print</span> <span class="p">(</span><span class="s1">&#39;Date: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">intime_dt</span><span class="o">.</span><span class="n">date</span><span class="p">()))</span>
+<span class="nb">print</span> <span class="p">(</span><span class="s1">&#39;Month: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">intime_dt</span><span class="o">.</span><span class="n">month</span><span class="p">))</span>
+<span class="nb">print</span> <span class="p">(</span><span class="s1">&#39;Day: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">intime_dt</span><span class="o">.</span><span class="n">day</span><span class="p">))</span>
+<span class="c1">#print &#39;DayOfWeek: {}&#39;.format(intime_dt.dayofweek)</span>
+<span class="nb">print</span> <span class="p">(</span><span class="s1">&#39;Weekday: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">intime_dt</span><span class="o">.</span><span class="n">weekday</span><span class="p">()))</span>
+<span class="c1">#print &#39;DayOfYear: {}&#39;.format(intime_dt.dayofyear)</span>
+<span class="c1">#print &#39;WeekOfYear: {}&#39;.format(intime_dt.weekofyear)</span>
+<span class="c1">#print &#39;Quarter: {}&#39;.format(intime_dt.quarter)</span>
+<span class="nb">print</span> <span class="p">(</span><span class="s1">&#39;Hour: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">intime_dt</span><span class="o">.</span><span class="n">hour</span><span class="p">))</span>
+<span class="nb">print</span> <span class="p">(</span><span class="s1">&#39;Minute: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">intime_dt</span><span class="o">.</span><span class="n">minute</span><span class="p">))</span>
+<span class="nb">print</span> <span class="p">(</span><span class="s1">&#39;Second: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">intime_dt</span><span class="o">.</span><span class="n">second</span><span class="p">))</span>
+<span class="nb">print</span> <span class="p">(</span><span class="s1">&#39;Microsecond: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">intime_dt</span><span class="o">.</span><span class="n">microsecond</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Datetime: 2012-05-01 08:30:00
+Date: 2012-05-01
+Month: 5
+Day: 1
+Weekday: 1
+Hour: 8
+Minute: 30
+Second: 0
+Microsecond: 0
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">los_td</span> <span class="o">=</span> <span class="n">outtime_dt</span> <span class="o">-</span> <span class="n">intime_dt</span>
+<span class="nb">print</span> <span class="p">(</span><span class="n">los_td</span><span class="p">)</span>
+<span class="nb">type</span><span class="p">(</span><span class="n">los_td</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+0:55:00
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+datetime.timedelta
+</pre></div></div>
+</div>
+<p>List out the attributes for <code class="docutils literal notranslate"><span class="pre">datetime</span></code> objects. Notice how we are filtering out any attributes starting with the double underscore. Change that if you want to see what’s getting filtered out.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">atts</span> <span class="o">=</span> <span class="p">[</span><span class="n">att</span> <span class="k">for</span> <span class="n">att</span> <span class="ow">in</span> <span class="nb">dir</span><span class="p">(</span><span class="n">los_td</span><span class="p">)</span> <span class="k">if</span> <span class="s1">&#39;__&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">att</span><span class="p">]</span>
+<span class="c1">#atts = [att for att in dir(los_td)]</span>
+<span class="nb">print</span> <span class="p">(</span><span class="n">atts</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[&#39;days&#39;, &#39;max&#39;, &#39;microseconds&#39;, &#39;min&#39;, &#39;resolution&#39;, &#39;seconds&#39;, &#39;total_seconds&#39;]
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span> <span class="p">(</span><span class="s1">&#39;Timedelta: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">los_td</span><span class="p">))</span>
+<span class="nb">print</span> <span class="p">(</span><span class="s1">&#39;Seconds: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">los_td</span><span class="o">.</span><span class="n">seconds</span><span class="p">))</span>
+<span class="nb">print</span> <span class="p">(</span><span class="s1">&#39;Total Seconds: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">los_td</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">()))</span>
+<span class="nb">print</span> <span class="p">(</span><span class="s1">&#39;Microseconds: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">los_td</span><span class="o">.</span><span class="n">microseconds</span><span class="p">))</span>
+<span class="nb">print</span> <span class="p">(</span><span class="s1">&#39;Resolution: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">los_td</span><span class="o">.</span><span class="n">resolution</span><span class="p">))</span>
+<span class="nb">print</span> <span class="p">(</span><span class="s1">&#39;Min: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">los_td</span><span class="o">.</span><span class="n">min</span><span class="p">))</span>
+<span class="nb">print</span> <span class="p">(</span><span class="s1">&#39;Max: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">los_td</span><span class="o">.</span><span class="n">max</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Timedelta: 0:55:00
+Seconds: 3300
+Total Seconds: 3300.0
+Microseconds: 0
+Resolution: 0:00:00.000001
+Min: -999999999 days, 0:00:00
+Max: 999999999 days, 23:59:59.999999
+</pre></div></div>
+</div>
+<p>So, you can use the <code class="docutils literal notranslate"><span class="pre">total_seconds()</span></code> method to get a duration in seconds from a <code class="docutils literal notranslate"><span class="pre">timedelta</span></code> object. If duration is &lt; 1 second, it returns fractional seconds. To convert to other time units, just do the simple math.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">timedelta</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">10</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+datetime.timedelta(microseconds=10)
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">timedelta</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">17</span><span class="p">)</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+1.7e-05
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">atts</span> <span class="o">=</span> <span class="p">[</span><span class="n">att</span> <span class="k">for</span> <span class="n">att</span> <span class="ow">in</span> <span class="nb">dir</span><span class="p">(</span><span class="n">intime_dt</span><span class="p">)</span> <span class="k">if</span> <span class="s1">&#39;__&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">att</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span> <span class="p">(</span><span class="n">atts</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[&#39;astimezone&#39;, &#39;combine&#39;, &#39;ctime&#39;, &#39;date&#39;, &#39;day&#39;, &#39;dst&#39;, &#39;fold&#39;, &#39;fromisoformat&#39;, &#39;fromordinal&#39;, &#39;fromtimestamp&#39;, &#39;hour&#39;, &#39;isocalendar&#39;, &#39;isoformat&#39;, &#39;isoweekday&#39;, &#39;max&#39;, &#39;microsecond&#39;, &#39;min&#39;, &#39;minute&#39;, &#39;month&#39;, &#39;now&#39;, &#39;replace&#39;, &#39;resolution&#39;, &#39;second&#39;, &#39;strftime&#39;, &#39;strptime&#39;, &#39;time&#39;, &#39;timestamp&#39;, &#39;timetuple&#39;, &#39;timetz&#39;, &#39;today&#39;, &#39;toordinal&#39;, &#39;tzinfo&#39;, &#39;tzname&#39;, &#39;utcfromtimestamp&#39;, &#39;utcnow&#39;, &#39;utcoffset&#39;, &#39;utctimetuple&#39;, &#39;weekday&#39;, &#39;year&#39;]
+</pre></div></div>
+</div>
+</section>
+<section id="Numpy’s-newish-datetime64-and-timedelta64-classes">
+<h2>Numpy’s newish <code class="docutils literal notranslate"><span class="pre">datetime64</span></code> and <code class="docutils literal notranslate"><span class="pre">timedelta64</span></code> classes<a class="headerlink" href="#Numpy’s-newish-datetime64-and-timedelta64-classes" title="Permalink to this headline">¶</a></h2>
+<p>The Numpy library (v 1.7.0) introduced a new datatype called datetime64. Numpy uses this name because there is already a datetime data type in Python datetime library. Like R, dates and times in Python are stored based on the notion of POSIX time - the number of seconds elapsed since Jan 1, 1970 00:00:00 GMT - called the UTC epoch. This doesn’t mean that dates and times before that cannot be represented - we just use negative numbers. Representing and working with dates and times for computing
+is a pretty interesting topic, fraught with complexities like time zones, daylight savings time, and leap seconds. A few good places to start are:</p>
+<p>Numpy docs - <a class="reference external" href="http://docs.scipy.org/doc/numpy-dev/reference/arrays.datetime.html">http://docs.scipy.org/doc/numpy-dev/reference/arrays.datetime.html</a></p>
+<p>Pandas docs - <a class="reference external" href="http://pandas.pydata.org/pandas-docs/dev/timeseries.html">http://pandas.pydata.org/pandas-docs/dev/timeseries.html</a></p>
+<p>See <a class="reference external" href="http://cr.yp.to/proto/utctai.html">http://cr.yp.to/proto/utctai.html</a> for gory details on UTC and ATI and leap seconds and the problems with the POSIX standard.</p>
+<p><a class="reference external" href="http://stackoverflow.com/questions/13703720/converting-between-datetime-timestamp-and-datetime64">http://stackoverflow.com/questions/13703720/converting-between-datetime-timestamp-and-datetime64</a></p>
+<p>Here’s the actual numpy proposal for datetime64 and timedelta64, authored by Travis Oliphant.</p>
+<p><a class="reference external" href="https://github.com/numpy/numpy/blob/master/doc/neps/datetime-proposal.rst">https://github.com/numpy/numpy/blob/master/doc/neps/datetime-proposal.rst</a></p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">datetime64</span><span class="p">(</span><span class="s1">&#39;2012-05-01 08:30:00&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+numpy.datetime64(&#39;2012-05-01T08:30:00&#39;)
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">dates64</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">datetime64</span><span class="p">(</span><span class="s1">&#39;2012-05-01 08:30:00&#39;</span><span class="p">),</span>
+           <span class="n">np</span><span class="o">.</span><span class="n">datetime64</span><span class="p">(</span><span class="s1">&#39;2012-05-01 09:25:00&#39;</span><span class="p">),</span>
+           <span class="n">np</span><span class="o">.</span><span class="n">datetime64</span><span class="p">(</span><span class="s1">&#39;2012-05-01 15:30:00&#39;</span><span class="p">)]</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">dates64</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[numpy.datetime64(&#39;2012-05-01T08:30:00&#39;),
+ numpy.datetime64(&#39;2012-05-01T09:25:00&#39;),
+ numpy.datetime64(&#39;2012-05-01T15:30:00&#39;)]
+</pre></div></div>
+</div>
+<p>As you can see from below, UTC is four hours later than EDT. In other words, the EDT timezone offset is UTC-4.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">dt_utcnow</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span>
+<span class="n">dt_utcnow</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+datetime.datetime(2019, 3, 5, 15, 31, 47, 583555)
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Can create datetime64&#39;s from dt&#39;s.</span>
+<span class="n">dt64_utcnow</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">datetime64</span><span class="p">(</span><span class="n">dt_utcnow</span><span class="p">)</span>
+<span class="n">dt64_utcnow</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+numpy.datetime64(&#39;2019-03-05T15:31:47.583555&#39;)
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[23]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">curdates64</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">datetime64</span><span class="p">(</span><span class="s1">&#39;2014-06-01 08:30:00&#39;</span><span class="p">),</span>
+              <span class="n">np</span><span class="o">.</span><span class="n">datetime64</span><span class="p">(</span><span class="s1">&#39;2014-06-01 09:25:00&#39;</span><span class="p">),</span>
+              <span class="n">np</span><span class="o">.</span><span class="n">datetime64</span><span class="p">(</span><span class="s1">&#39;2014-06-01 15:30:00&#39;</span><span class="p">)]</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[24]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">curdates64</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[24]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[numpy.datetime64(&#39;2014-06-01T08:30:00&#39;),
+ numpy.datetime64(&#39;2014-06-01T09:25:00&#39;),
+ numpy.datetime64(&#39;2014-06-01T15:30:00&#39;)]
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[25]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">intime_dt64</span> <span class="o">=</span> <span class="n">dates64</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">outtime_dt64</span> <span class="o">=</span> <span class="n">dates64</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">intime_dt64</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">intime_dt64</span><span class="p">)</span>
+<span class="n">intime_dt64</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;class &#39;numpy.datetime64&#39;&gt;
+2012-05-01T08:30:00
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[25]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+numpy.datetime64(&#39;2012-05-01T08:30:00&#39;)
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[26]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># The commented out lines represent attributes that ARE available in pandas Timestamp objects</span>
+<span class="c1">#   but not in numpy datetime64 objects</span>
+<span class="nb">print</span> <span class="p">(</span><span class="s1">&#39;Datetime: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">intime_dt64</span><span class="p">)))</span>
+<span class="c1">#print &#39;Date: {}&#39;.format(intime_dt64.date())</span>
+<span class="c1">#print &#39;Month: {}&#39;.format(intime_dt64.month)</span>
+<span class="c1">#print &#39;Day: {}&#39;.format(intime_dt.day)</span>
+<span class="c1">#print &#39;DayOfWeek: {}&#39;.format(intime_dt.dayofweek)</span>
+<span class="c1">#print &#39;Weekday: {}&#39;.format(intime_dt.weekday())</span>
+<span class="c1">#print &#39;DayOfYear: {}&#39;.format(intime_dt.dayofyear)</span>
+<span class="c1">#print &#39;WeekOfYear: {}&#39;.format(intime_dt.weekofyear)</span>
+<span class="c1">#print &#39;Quarter: {}&#39;.format(intime_dt.quarter)</span>
+<span class="c1">#print &#39;Hour: {}&#39;.format(intime_dt.hour)</span>
+<span class="c1">#print &#39;Minute: {}&#39;.format(intime_dt.minute)</span>
+<span class="c1">#print &#39;Second: {}&#39;.format(intime_dt.second)</span>
+<span class="c1">#print &#39;Microsecond: {}&#39;.format(intime_dt.microsecond)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Datetime: 2012-05-01T08:30:00
+</pre></div></div>
+</div>
+<p>You can subtract two <code class="docutils literal notranslate"><span class="pre">datetime64</span></code> objects and get a <code class="docutils literal notranslate"><span class="pre">timedelta64</span></code> object in return.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[27]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">los_dt64</span> <span class="o">=</span> <span class="n">outtime_dt64</span> <span class="o">-</span> <span class="n">intime_dt64</span>
+<span class="n">los_dt64</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[27]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+numpy.timedelta64(3300,&#39;s&#39;)
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[28]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Coerce it to other units</span>
+<span class="n">np</span><span class="o">.</span><span class="n">timedelta64</span><span class="p">(</span><span class="n">los_dt64</span><span class="p">,</span><span class="s1">&#39;m&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[28]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+numpy.timedelta64(55,&#39;m&#39;)
+</pre></div></div>
+</div>
+<p>Unfortunately, <code class="docutils literal notranslate"><span class="pre">timedelta64</span></code> objects have almost no useful attributes in terms of date time math. OTH, see the <code class="docutils literal notranslate"><span class="pre">datetime.timedelta</span></code> object (and Pandas) for a number of useful attributes.</p>
+</section>
+<section id="Pandas-and-datetimes">
+<h2>Pandas and datetimes<a class="headerlink" href="#Pandas-and-datetimes" title="Permalink to this headline">¶</a></h2>
+<p>Pandas prides itself on its handling of time series data (speed, flexibility, power) and is built on time of numpy <code class="docutils literal notranslate"><span class="pre">datetime64</span></code> and <code class="docutils literal notranslate"><span class="pre">timedelta64</span></code> data types (instead of Python’s base <code class="docutils literal notranslate"><span class="pre">datetime</span></code> and <code class="docutils literal notranslate"><span class="pre">timedelta</span></code> types. Pandas also wanted to be very <a class="reference external" href="http://wesmckinney.com/blog/?cat=5">time-zone aware and time-zone capable</a>. So, Pandas has its own data type for timestamps called, well, <code class="docutils literal notranslate"><span class="pre">Timetamp</span></code>. It’s based on numpy’s <code class="docutils literal notranslate"><span class="pre">datetime64</span></code> type but works like Python’s <code class="docutils literal notranslate"><span class="pre">datetime</span></code> (I think).
+The following StackOverlfow post (the “welcome to hell” post) is quite popular and relevant.</p>
+<p><a class="reference external" href="http://stackoverflow.com/questions/13703720/converting-between-datetime-timestamp-and-datetime64">http://stackoverflow.com/questions/13703720/converting-between-datetime-timestamp-and-datetime64</a></p>
+<p>Pandas time series indexes can be timestamp or time period based.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[29]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ts</span> <span class="o">=</span> <span class="n">Series</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">100</span><span class="p">,</span><span class="mi">3</span><span class="p">),</span> <span class="n">index</span><span class="o">=</span><span class="n">dates</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[30]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ts</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[30]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+2012-05-01 08:30:00    35
+2012-05-01 09:25:00    45
+2012-05-01 15:30:00    11
+dtype: int64
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[31]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ts</span><span class="o">.</span><span class="n">index</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[31]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+DatetimeIndex([&#39;2012-05-01 08:30:00&#39;, &#39;2012-05-01 09:25:00&#39;,
+               &#39;2012-05-01 15:30:00&#39;],
+              dtype=&#39;datetime64[ns]&#39;, freq=None)
+</pre></div></div>
+</div>
+<p>If we have demand data by month, a period based index might make more sense.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[32]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pandas</span> <span class="kn">import</span> <span class="n">Period</span><span class="p">,</span> <span class="n">PeriodIndex</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[33]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">periods</span> <span class="o">=</span> <span class="n">PeriodIndex</span><span class="p">([</span><span class="n">Period</span><span class="p">(</span><span class="s1">&#39;2012-01&#39;</span><span class="p">),</span> <span class="n">Period</span><span class="p">(</span><span class="s1">&#39;2012-02&#39;</span><span class="p">),</span><span class="n">Period</span><span class="p">(</span><span class="s1">&#39;2012-03&#39;</span><span class="p">)])</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[34]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ts2</span> <span class="o">=</span> <span class="n">Series</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">100</span><span class="p">,</span><span class="mi">3</span><span class="p">),</span> <span class="n">index</span><span class="o">=</span><span class="n">periods</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[35]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ts2</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[35]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+2012-01    22
+2012-02    72
+2012-03    54
+Freq: M, dtype: int64
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[36]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ts2</span><span class="o">.</span><span class="n">index</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[36]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+PeriodIndex([&#39;2012-01&#39;, &#39;2012-02&#39;, &#39;2012-03&#39;], dtype=&#39;period[M]&#39;, freq=&#39;M&#39;)
+</pre></div></div>
+</div>
+<p>From the <a class="reference external" href="http://pandas.pydata.org/pandas-docs/dev/timeseries.html">pandas docs</a>:</p>
+<blockquote>
+<div><p>Starting with 0.8, pandas allows you to capture both representations and convert between them. Under the hood, pandas represents timestamps using instances of Timestamp and sequences of timestamps using instances of DatetimeIndex. For regular time spans, pandas uses Period objects for scalar values and PeriodIndex for sequences of spans.</p>
+</div></blockquote>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[37]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pandas</span> <span class="kn">import</span> <span class="n">Timestamp</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[38]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">Timestamp</span><span class="p">(</span><span class="s1">&#39;20120501 08:30:00&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[38]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Timestamp(&#39;2012-05-01 08:30:00&#39;)
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[39]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">timestamps</span> <span class="o">=</span> <span class="p">[</span><span class="n">Timestamp</span><span class="p">(</span><span class="s1">&#39;20120501 08:30:00&#39;</span><span class="p">),</span> <span class="n">Timestamp</span><span class="p">(</span><span class="s1">&#39;20120501 09:25:00&#39;</span><span class="p">),</span> <span class="n">Timestamp</span><span class="p">(</span><span class="s1">&#39;20120501 15:30:00&#39;</span><span class="p">)]</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[40]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">intime_ts</span> <span class="o">=</span> <span class="n">timestamps</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">outtime_ts</span> <span class="o">=</span> <span class="n">timestamps</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+<span class="nb">type</span><span class="p">(</span><span class="n">intime_ts</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[40]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+pandas._libs.tslibs.timestamps.Timestamp
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[41]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">los_ptd</span> <span class="o">=</span> <span class="n">outtime_ts</span> <span class="o">-</span> <span class="n">intime_ts</span>
+<span class="nb">print</span> <span class="p">(</span><span class="n">los_ptd</span><span class="p">)</span>
+<span class="nb">type</span><span class="p">(</span><span class="n">los_ptd</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+0 days 00:55:00
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[41]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+pandas._libs.tslibs.timedeltas.Timedelta
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[42]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># The pandas Timestamp data type has a number of useful attributes (dayofweek, dayofyear, weekofyear)</span>
+<span class="c1">#   that the base Python datetime type does not.</span>
+<span class="nb">print</span> <span class="p">(</span><span class="s1">&#39;Datetime: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">intime_ts</span><span class="p">))</span>
+<span class="nb">print</span> <span class="p">(</span><span class="s1">&#39;Date: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">intime_ts</span><span class="o">.</span><span class="n">date</span><span class="p">()))</span>
+<span class="nb">print</span> <span class="p">(</span><span class="s1">&#39;Month: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">intime_ts</span><span class="o">.</span><span class="n">month</span><span class="p">))</span>
+<span class="nb">print</span> <span class="p">(</span><span class="s1">&#39;Day: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">intime_ts</span><span class="o">.</span><span class="n">day</span><span class="p">))</span>
+<span class="nb">print</span> <span class="p">(</span><span class="s1">&#39;DayOfWeek: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">intime_ts</span><span class="o">.</span><span class="n">dayofweek</span><span class="p">))</span>
+<span class="nb">print</span> <span class="p">(</span><span class="s1">&#39;Weekday: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">intime_ts</span><span class="o">.</span><span class="n">weekday</span><span class="p">()))</span>
+<span class="nb">print</span> <span class="p">(</span><span class="s1">&#39;DayOfYear: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">intime_ts</span><span class="o">.</span><span class="n">dayofyear</span><span class="p">))</span>
+<span class="nb">print</span> <span class="p">(</span><span class="s1">&#39;WeekOfYear: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">intime_ts</span><span class="o">.</span><span class="n">weekofyear</span><span class="p">))</span>
+<span class="nb">print</span> <span class="p">(</span><span class="s1">&#39;Quarter: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">intime_ts</span><span class="o">.</span><span class="n">quarter</span><span class="p">))</span>
+<span class="nb">print</span> <span class="p">(</span><span class="s1">&#39;Hour: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">intime_ts</span><span class="o">.</span><span class="n">hour</span><span class="p">))</span>
+<span class="nb">print</span> <span class="p">(</span><span class="s1">&#39;Minute: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">intime_ts</span><span class="o">.</span><span class="n">minute</span><span class="p">))</span>
+<span class="nb">print</span> <span class="p">(</span><span class="s1">&#39;Second: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">intime_ts</span><span class="o">.</span><span class="n">second</span><span class="p">))</span>
+<span class="nb">print</span> <span class="p">(</span><span class="s1">&#39;Microsecond: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">intime_ts</span><span class="o">.</span><span class="n">microsecond</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Datetime: 2012-05-01 08:30:00
+Date: 2012-05-01
+Month: 5
+Day: 1
+DayOfWeek: 1
+Weekday: 1
+DayOfYear: 122
+WeekOfYear: 18
+Quarter: 2
+Hour: 8
+Minute: 30
+Second: 0
+Microsecond: 0
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[43]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span> <span class="p">(</span><span class="s1">&#39;Timedelta: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">los_ptd</span><span class="p">))</span>
+<span class="nb">print</span> <span class="p">(</span><span class="s1">&#39;Days: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">los_ptd</span><span class="o">.</span><span class="n">days</span><span class="p">))</span>
+<span class="nb">print</span> <span class="p">(</span><span class="s1">&#39;Seconds: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">los_ptd</span><span class="o">.</span><span class="n">seconds</span><span class="p">))</span>
+<span class="nb">print</span> <span class="p">(</span><span class="s1">&#39;Total Seconds: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">los_ptd</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">()))</span>
+<span class="nb">print</span> <span class="p">(</span><span class="s1">&#39;Microseconds: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">los_ptd</span><span class="o">.</span><span class="n">microseconds</span><span class="p">))</span>
+<span class="nb">print</span> <span class="p">(</span><span class="s1">&#39;Resolution: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">los_ptd</span><span class="o">.</span><span class="n">resolution</span><span class="p">))</span>
+<span class="nb">print</span> <span class="p">(</span><span class="s1">&#39;Min: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">los_ptd</span><span class="o">.</span><span class="n">min</span><span class="p">))</span>
+<span class="nb">print</span> <span class="p">(</span><span class="s1">&#39;Max: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">los_ptd</span><span class="o">.</span><span class="n">max</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Timedelta: 0 days 00:55:00
+Days: 0
+Seconds: 3300
+Total Seconds: 3300.0
+Microseconds: 0
+Resolution: T
+Min: -106752 days +00:12:43.145224
+Max: 106751 days 23:47:16.854775
+</pre></div></div>
+</div>
+</section>
+<section id="Pandas-and-time-series">
+<h2>Pandas and time series<a class="headerlink" href="#Pandas-and-time-series" title="Permalink to this headline">¶</a></h2>
+<p>Generally, a time series in pandas is a <code class="docutils literal notranslate"><span class="pre">Series</span></code> object with a <code class="docutils literal notranslate"><span class="pre">DateTimeIndex</span></code>. Pandas has convenience functions for creating time series indexes. The default frequency for date_range is a calendar day while the default for bdate_range is a business day</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[44]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">index</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">date_range</span><span class="p">(</span><span class="s1">&#39;2000-1-1&#39;</span><span class="p">,</span> <span class="n">periods</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="s1">&#39;M&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[45]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">index</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[45]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+DatetimeIndex([&#39;2000-01-31&#39;, &#39;2000-02-29&#39;, &#39;2000-03-31&#39;, &#39;2000-04-30&#39;,
+               &#39;2000-05-31&#39;, &#39;2000-06-30&#39;, &#39;2000-07-31&#39;, &#39;2000-08-31&#39;,
+               &#39;2000-09-30&#39;, &#39;2000-10-31&#39;,
+               ...
+               &#39;2082-07-31&#39;, &#39;2082-08-31&#39;, &#39;2082-09-30&#39;, &#39;2082-10-31&#39;,
+               &#39;2082-11-30&#39;, &#39;2082-12-31&#39;, &#39;2083-01-31&#39;, &#39;2083-02-28&#39;,
+               &#39;2083-03-31&#39;, &#39;2083-04-30&#39;],
+              dtype=&#39;datetime64[ns]&#39;, length=1000, freq=&#39;M&#39;)
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[46]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">start</span> <span class="o">=</span> <span class="n">datetime</span><span class="p">(</span><span class="mi">2014</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">end</span> <span class="o">=</span> <span class="n">datetime</span><span class="p">(</span><span class="mi">2014</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">12</span><span class="p">)</span>
+<span class="n">rng</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">date_range</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">)</span>
+<span class="n">rng</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[46]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+DatetimeIndex([&#39;2014-01-01&#39;, &#39;2014-01-02&#39;, &#39;2014-01-03&#39;, &#39;2014-01-04&#39;,
+               &#39;2014-01-05&#39;, &#39;2014-01-06&#39;, &#39;2014-01-07&#39;, &#39;2014-01-08&#39;,
+               &#39;2014-01-09&#39;, &#39;2014-01-10&#39;,
+               ...
+               &#39;2014-06-03&#39;, &#39;2014-06-04&#39;, &#39;2014-06-05&#39;, &#39;2014-06-06&#39;,
+               &#39;2014-06-07&#39;, &#39;2014-06-08&#39;, &#39;2014-06-09&#39;, &#39;2014-06-10&#39;,
+               &#39;2014-06-11&#39;, &#39;2014-06-12&#39;],
+              dtype=&#39;datetime64[ns]&#39;, length=163, freq=&#39;D&#39;)
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[47]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pd</span><span class="o">.</span><span class="n">date_range</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="s1">&#39;W&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[47]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+DatetimeIndex([&#39;2014-01-05&#39;, &#39;2014-01-12&#39;, &#39;2014-01-19&#39;, &#39;2014-01-26&#39;,
+               &#39;2014-02-02&#39;, &#39;2014-02-09&#39;, &#39;2014-02-16&#39;, &#39;2014-02-23&#39;,
+               &#39;2014-03-02&#39;, &#39;2014-03-09&#39;, &#39;2014-03-16&#39;, &#39;2014-03-23&#39;,
+               &#39;2014-03-30&#39;, &#39;2014-04-06&#39;, &#39;2014-04-13&#39;, &#39;2014-04-20&#39;,
+               &#39;2014-04-27&#39;, &#39;2014-05-04&#39;, &#39;2014-05-11&#39;, &#39;2014-05-18&#39;,
+               &#39;2014-05-25&#39;, &#39;2014-06-01&#39;, &#39;2014-06-08&#39;],
+              dtype=&#39;datetime64[ns]&#39;, freq=&#39;W-SUN&#39;)
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[48]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">163</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[49]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">df</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">rng</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[50]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">df</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[50]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>0</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>2014-01-01</th>
+      <td>12</td>
+    </tr>
+    <tr>
+      <th>2014-01-02</th>
+      <td>29</td>
+    </tr>
+    <tr>
+      <th>2014-01-03</th>
+      <td>84</td>
+    </tr>
+    <tr>
+      <th>2014-01-04</th>
+      <td>4</td>
+    </tr>
+    <tr>
+      <th>2014-01-05</th>
+      <td>6</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[51]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Date index slicing is easy but, BE CAREFUL, the end point is included (unlike usual Python slicing behavior).</span>
+<span class="n">df</span><span class="p">[</span><span class="s1">&#39;2014-01-02&#39;</span><span class="p">:</span><span class="s1">&#39;2014-01-12&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[51]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>0</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>2014-01-02</th>
+      <td>29</td>
+    </tr>
+    <tr>
+      <th>2014-01-03</th>
+      <td>84</td>
+    </tr>
+    <tr>
+      <th>2014-01-04</th>
+      <td>4</td>
+    </tr>
+    <tr>
+      <th>2014-01-05</th>
+      <td>6</td>
+    </tr>
+    <tr>
+      <th>2014-01-06</th>
+      <td>25</td>
+    </tr>
+    <tr>
+      <th>2014-01-07</th>
+      <td>56</td>
+    </tr>
+    <tr>
+      <th>2014-01-08</th>
+      <td>63</td>
+    </tr>
+    <tr>
+      <th>2014-01-09</th>
+      <td>39</td>
+    </tr>
+    <tr>
+      <th>2014-01-10</th>
+      <td>16</td>
+    </tr>
+    <tr>
+      <th>2014-01-11</th>
+      <td>10</td>
+    </tr>
+    <tr>
+      <th>2014-01-12</th>
+      <td>72</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[52]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">df</span><span class="p">[</span><span class="n">datetime</span><span class="p">(</span><span class="mi">2014</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">):</span><span class="n">datetime</span><span class="p">(</span><span class="mi">2014</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">12</span><span class="p">)]</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[52]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>0</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>2014-01-02</th>
+      <td>29</td>
+    </tr>
+    <tr>
+      <th>2014-01-03</th>
+      <td>84</td>
+    </tr>
+    <tr>
+      <th>2014-01-04</th>
+      <td>4</td>
+    </tr>
+    <tr>
+      <th>2014-01-05</th>
+      <td>6</td>
+    </tr>
+    <tr>
+      <th>2014-01-06</th>
+      <td>25</td>
+    </tr>
+    <tr>
+      <th>2014-01-07</th>
+      <td>56</td>
+    </tr>
+    <tr>
+      <th>2014-01-08</th>
+      <td>63</td>
+    </tr>
+    <tr>
+      <th>2014-01-09</th>
+      <td>39</td>
+    </tr>
+    <tr>
+      <th>2014-01-10</th>
+      <td>16</td>
+    </tr>
+    <tr>
+      <th>2014-01-11</th>
+      <td>10</td>
+    </tr>
+    <tr>
+      <th>2014-01-12</th>
+      <td>72</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<section id="Pandas-DateOffset-objects">
+<h3>Pandas <code class="docutils literal notranslate"><span class="pre">DateOffset</span></code> objects<a class="headerlink" href="#Pandas-DateOffset-objects" title="Permalink to this headline">¶</a></h3>
+<p>Usually <em>base frequencies</em> are specified with a string alias such as ‘W’ or ‘M’. However,</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[53]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">rng2</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">date_range</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="s1">&#39;M&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[54]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">len</span><span class="p">(</span><span class="n">rng2</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[54]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+5
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[55]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">data</span><span class="p">[:</span><span class="nb">len</span><span class="p">(</span><span class="n">rng2</span><span class="p">)]</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[55]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+array([12, 29, 84,  4,  6])
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[56]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">df2</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="p">[:</span><span class="nb">len</span><span class="p">(</span><span class="n">rng2</span><span class="p">)],</span> <span class="n">index</span><span class="o">=</span><span class="n">rng2</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">df2</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pandas.tseries.offsets</span> <span class="kn">import</span> <span class="n">Hour</span><span class="p">,</span> <span class="n">Minute</span>
+<span class="c1">#We rarely use these but they are available</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">one_hour</span> <span class="o">=</span> <span class="n">Hour</span><span class="p">()</span>
+<span class="n">four_hours</span> <span class="o">=</span> <span class="n">Hour</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">one_hour</span> <span class="o">+</span> <span class="n">four_hours</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">one_hour</span> <span class="o">+</span> <span class="n">Minute</span><span class="p">(</span><span class="mi">35</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Week-of-month-dates">
+<h3>Week of month dates<a class="headerlink" href="#Week-of-month-dates" title="Permalink to this headline">¶</a></h3>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">rng</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">date_range</span><span class="p">(</span><span class="s1">&#39;9/1/2012&#39;</span><span class="p">,</span><span class="s1">&#39;1/1/2014&#39;</span><span class="p">,</span><span class="n">freq</span><span class="o">=</span><span class="s1">&#39;M&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">rng</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">list</span><span class="p">(</span><span class="n">rng</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">rng</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">date_range</span><span class="p">(</span><span class="s1">&#39;9/1/2012&#39;</span><span class="p">,</span><span class="s1">&#39;1/1/2014&#39;</span><span class="p">,</span><span class="n">freq</span><span class="o">=</span><span class="s1">&#39;WOM-2TUE&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">list</span><span class="p">(</span><span class="n">rng</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</section>
+</section>
+<section id="Shifting-(Leading-and-Lagging)-Data">
+<h2>Shifting (Leading and Lagging) Data<a class="headerlink" href="#Shifting-(Leading-and-Lagging)-Data" title="Permalink to this headline">¶</a></h2>
+<p>Move data back and forth through time. <code class="docutils literal notranslate"><span class="pre">Series</span></code> and <code class="docutils literal notranslate"><span class="pre">DateFrame</span></code> objects have a <code class="docutils literal notranslate"><span class="pre">shift</span></code> method for doing naive shifts forward and backward and leaving the index unchanged.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ts</span> <span class="o">=</span> <span class="n">Series</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">10</span><span class="p">,</span><span class="mi">4</span><span class="p">),</span><span class="n">index</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">date_range</span><span class="p">(</span><span class="s1">&#39;1/2/2013&#39;</span><span class="p">,</span><span class="n">periods</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span><span class="n">freq</span><span class="o">=</span><span class="s1">&#39;M&#39;</span><span class="p">))</span>
+<span class="n">ts</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ts</span><span class="o">.</span><span class="n">shift</span><span class="p">(</span><span class="n">periods</span> <span class="o">=</span> <span class="mi">2</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Common use is pct change</span>
+<span class="n">ts</span><span class="o">/</span><span class="n">ts</span><span class="o">.</span><span class="n">shift</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="mf">1.0</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Since naive shifts leave index unchanged, some data is lost. To shift both data and index, pass in the frequency</span>
+<span class="n">ts</span><span class="o">.</span><span class="n">shift</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ts</span><span class="o">.</span><span class="n">shift</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="s1">&#39;M&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Periods-and-period-arithmetic">
+<h2>Periods and period arithmetic<a class="headerlink" href="#Periods-and-period-arithmetic" title="Permalink to this headline">¶</a></h2>
+<p>Periods represent time spans like months or quarters or years.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">p</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Period</span><span class="p">(</span><span class="s1">&#39;6/1/2014&#39;</span><span class="p">,</span><span class="n">freq</span><span class="o">=</span><span class="s1">&#39;M&#39;</span><span class="p">)</span>
+<span class="n">p</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">p</span><span class="o">+</span><span class="mi">6</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Ranges of periods is done much like ranges of dates</span>
+<span class="n">rng</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">period_range</span><span class="p">(</span><span class="s1">&#39;1/1/2010&#39;</span><span class="p">,</span><span class="s1">&#39;6/1/2014&#39;</span><span class="p">,</span><span class="n">freq</span><span class="o">=</span><span class="s1">&#39;Q&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">rng</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">list</span><span class="p">(</span><span class="n">rng</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">p</span><span class="o">.</span><span class="n">asfreq</span><span class="p">(</span><span class="s1">&#39;M&#39;</span><span class="p">,</span><span class="s1">&#39;start&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">p</span><span class="o">.</span><span class="n">asfreq</span><span class="p">(</span><span class="s1">&#39;M&#39;</span><span class="p">,</span><span class="s1">&#39;end&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Resampling-and-frequency-conversion">
+<h2>Resampling and frequency conversion<a class="headerlink" href="#Resampling-and-frequency-conversion" title="Permalink to this headline">¶</a></h2>
+<p><em>Resampling</em> - convert time series from one frequency to another.</p>
+<ul class="simple">
+<li><p><em>Downsampling</em> - higher frequency to lower frequency (e.g. daily to monthly)</p></li>
+<li><p><em>Upsampling</em> - lower frequency to higher frequency (e.g. annual to monthly)</p></li>
+</ul>
+<section id="Downsampling">
+<h3>Downsampling<a class="headerlink" href="#Downsampling" title="Permalink to this headline">¶</a></h3>
+<p>Take a daily time series and convert to monthly.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">rng</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">date_range</span><span class="p">(</span><span class="s1">&#39;9/1/2012&#39;</span><span class="p">,</span><span class="n">periods</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span><span class="n">freq</span><span class="o">=</span><span class="s1">&#39;D&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ts</span> <span class="o">=</span> <span class="n">Series</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">25</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">rng</span><span class="p">)),</span><span class="n">index</span><span class="o">=</span><span class="n">rng</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ts</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ts</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="s1">&#39;M&#39;</span><span class="p">,</span><span class="n">how</span><span class="o">=</span><span class="s1">&#39;mean&#39;</span><span class="p">,</span><span class="n">kind</span><span class="o">=</span><span class="s1">&#39;period&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ts</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="s1">&#39;M&#39;</span><span class="p">,</span><span class="n">how</span><span class="o">=</span><span class="s1">&#39;sum&#39;</span><span class="p">,</span><span class="n">kind</span><span class="o">=</span><span class="s1">&#39;period&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ts</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="s1">&#39;M&#39;</span><span class="p">,</span><span class="n">how</span><span class="o">=</span><span class="s1">&#39;sum&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>Whenver you are downsampling, you need to think about two <em>bin boundary</em> issues:</p>
+<ul class="simple">
+<li><p>is the interval closed on the left or the right?</p></li>
+<li><p>is the bin label based on the left or right bin boundary?</p></li>
+</ul>
+<p>With resampling from days to months, the question of left or right closure isn’t really an issue, but consider changing from 15 minute time bins to 30 minute time bins.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">rng15</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">date_range</span><span class="p">(</span><span class="s1">&#39;9/1/2012&#39;</span><span class="p">,</span><span class="n">periods</span><span class="o">=</span><span class="mi">96</span><span class="p">,</span><span class="n">freq</span><span class="o">=</span><span class="s1">&#39;15T&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ts15</span> <span class="o">=</span> <span class="n">Series</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">25</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">rng15</span><span class="p">)),</span><span class="n">index</span><span class="o">=</span><span class="n">rng15</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ts15</span>
+</pre></div>
+</div>
+</div>
+<p>Now, if we resample to 30 minute bins and take the mean across each set of two 15 bins, we need to specify if the times on the half hour such as 22:30 in the original series should go in the bin from (22:15,22:30] or [22:30,22:45). The first is referred to as closed on the right and the second as closed on the left. The default is close on right. You can also control whether the left or right edge of the bin is used as the label (independent of which side “closes” the interval).</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ts15</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="s1">&#39;30min&#39;</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s1">&#39;mean&#39;</span><span class="p">,</span> <span class="n">closed</span><span class="o">=</span><span class="s1">&#39;right&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;left&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>Notice how in the example above, the first record is labelled with ‘2012-08-31’ since it’s the left boundary and we picked ‘right’ for closing intervals and ‘left’ for labelling. We might want to close and label on the left.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ts30</span> <span class="o">=</span> <span class="n">ts15</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="s1">&#39;30min&#39;</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s1">&#39;mean&#39;</span><span class="p">,</span> <span class="n">closed</span><span class="o">=</span><span class="s1">&#39;left&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;left&#39;</span><span class="p">)</span>
+<span class="n">ts30</span>
+</pre></div>
+</div>
+</div>
+<p>A common financial aggregation is to compute the first (open), last (close), max (high), min (low) values for each bucket. If you use ‘ohlc’ for the <code class="docutils literal notranslate"><span class="pre">how</span></code> argument, you get a <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code> with these aggregations computed automatically.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ts60</span> <span class="o">=</span> <span class="n">ts15</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="s1">&#39;60min&#39;</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s1">&#39;ohlc&#39;</span><span class="p">,</span> <span class="n">closed</span><span class="o">=</span><span class="s1">&#39;left&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;left&#39;</span><span class="p">)</span>
+<span class="n">ts60</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Upsampling">
+<h3>Upsampling<a class="headerlink" href="#Upsampling" title="Permalink to this headline">¶</a></h3>
+<p>Upsampling brings an entirely different set of challenges. If we increase the frequency of the samples, how do we fill in these new time series values? For example, consider the reverse of the last example. Then check out the <code class="docutils literal notranslate"><span class="pre">fill_method</span></code> options.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ts30</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ts30</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="s1">&#39;15min&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</section>
+</section>
+<section id="Time-Series-Plotting">
+<h2>Time Series Plotting<a class="headerlink" href="#Time-Series-Plotting" title="Permalink to this headline">¶</a></h2>
+<p>Pandas tries to make it a little easier to create nice looking time series plots using <code class="docutils literal notranslate"><span class="pre">matplotlib</span></code> than if you just used <code class="docutils literal notranslate"><span class="pre">matplotlib</span></code> yourself. Let’s read in some stock price data from Yahoo! Finance that has already been saved to a csv file.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">close_px_all</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;stock_px.csv&#39;</span><span class="p">,</span> <span class="n">parse_dates</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">index_col</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">close_px_all</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">close_px</span> <span class="o">=</span> <span class="n">close_px_all</span><span class="p">[[</span><span class="s1">&#39;AAPL&#39;</span><span class="p">,</span><span class="s1">&#39;MSFT&#39;</span><span class="p">,</span><span class="s1">&#39;XOM&#39;</span><span class="p">]]</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">close_px</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">10</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">close_px</span><span class="p">[</span><span class="s1">&#39;AAPL&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">close_px</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># And here&#39;s what it looks like if we just plot one year. Notice the auto x-axis formatting.</span>
+<span class="n">close_px</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="s1">&#39;2009&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">close_px</span><span class="o">.</span><span class="n">index</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">list</span><span class="p">(</span><span class="n">close_px</span><span class="o">.</span><span class="n">index</span><span class="p">)[</span><span class="mi">1</span><span class="p">:</span><span class="mi">25</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">close_px</span><span class="p">[</span><span class="s1">&#39;AAPL&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="s1">&#39;01-2011&#39;</span><span class="p">:</span><span class="s1">&#39;03-2011&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<p>Pandas does a particulary nice job with quarterly data.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">appl_q</span> <span class="o">=</span> <span class="n">close_px</span><span class="p">[</span><span class="s1">&#39;AAPL&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="s1">&#39;Q-DEC&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">appl_q</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">appl_q</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="s1">&#39;2009&#39;</span><span class="p">:]</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<section id="Moving-window-functions">
+<h3>Moving window functions<a class="headerlink" href="#Moving-window-functions" title="Permalink to this headline">¶</a></h3>
+<p>Pandas makes it easy to do all kinds of <em>moving window</em> operations like moving average, cumulative sums, and even things like exponential moving averages (“exponential smoothing”).</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">close_px</span><span class="o">.</span><span class="n">AAPL</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">rolling_mean</span><span class="p">(</span><span class="n">close_px</span><span class="o">.</span><span class="n">AAPL</span><span class="p">,</span><span class="mi">250</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pd</span><span class="o">.</span><span class="n">rolling_mean</span><span class="p">(</span><span class="n">close_px</span><span class="o">.</span><span class="n">AAPL</span><span class="p">,</span><span class="mi">250</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>This example shows one problem with a moving average - by default you usually can’t compute it until you have data for the number of periods corresponding to the window size (250 in this case). Pandas lets you specify an alternate minumum number of data points to get around this problem.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pd</span><span class="o">.</span><span class="n">rolling_mean</span><span class="p">(</span><span class="n">close_px</span><span class="o">.</span><span class="n">AAPL</span><span class="p">,</span><span class="mi">250</span><span class="p">,</span><span class="n">min_periods</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">close_px</span><span class="o">.</span><span class="n">AAPL</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">rolling_mean</span><span class="p">(</span><span class="n">close_px</span><span class="o">.</span><span class="n">AAPL</span><span class="p">,</span><span class="mi">250</span><span class="p">,</span><span class="n">min_periods</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Things like rolling standard deviation are also possible</span>
+<span class="n">appl_std250</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">rolling_std</span><span class="p">(</span><span class="n">close_px</span><span class="o">.</span><span class="n">AAPL</span><span class="p">,</span><span class="mi">250</span><span class="p">,</span><span class="n">min_periods</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">appl_std250</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</section>
+</section>
+<section id="Learn-more-about-pandas-timeseries">
+<h2>Learn more about pandas timeseries<a class="headerlink" href="#Learn-more-about-pandas-timeseries" title="Permalink to this headline">¶</a></h2>
+<p>Another intro tutorial is <a class="reference external" href="http://earthpy.org/pandas-basics.html">http://earthpy.org/pandas-basics.html</a></p>
+<p>Wes Mckinney’s 2012 PyCon talk on pandas and timeseries - <a class="reference external" href="http://pyvideo.org/video/1198/time-series-data-analysis-with-pandas">http://pyvideo.org/video/1198/time-series-data-analysis-with-pandas</a></p>
+</section>
+</section>
+
+<div class="section">
+    
+
+<div class="section">
+  <span style="float: left">
+     Previous:
+    
+    <a href="../../../../../../../../blog/datetime_exploring/">
+       Exploring dates and times in Python
+    </a>
+    
+  </span>
+  <span>&nbsp;</span>
+  <span style="float: right">
+     Next: 
+    <a href="../../../../blog/datetime_exploring/">
+      Exploring dates and times in Python 
+    </a>
+    
+  </span>
+</div>
+  
+</div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../../../../../../../">misken</a></h1>
+
+
+
+
+
+
+
+
+  
+<h2>
+   
+  25 June 2014 
+</h2>
+
+<ul>
+   
+<li id="author">
+  <span
+    >Author:</span
+  >
+   
+  <a href="../../../../../../../../blog/author/misken/">misken</a>  
+</li>
+    
+<li id="tags">
+  <span
+    >Tags: </span
+  >
+   
+  <a href="../../../../../../../../blog/tag/python/">python</a>   
+  <a href="../../../../../../../../blog/tag/datetime/">datetime</a>  
+</li>
+ 
+</ul>
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../../about/">About misken</a></li>
+</ul>
+
+
+<h3>
+  <a href="../../../../../../../../blog/">Recent Posts</a>
+</h3>
+<ul>
+   
+  <li>
+    <a href="../../../../../../../../blog/simpy_getting_started_vaccine_clinic/"
+      >04 April - Using SimPy to simulate a vaccine clinic - Part 1: an introductory tutorial</a
+    >
+  </li>
+  
+  <li>
+    <a href="../simpy_getting_started_vaccine_clinic/"
+      >04 April - Using SimPy to simulate a vaccine clinic - Part 1: an introductory tutorial</a
+    >
+  </li>
+  
+  <li>
+    <a href="../../../../blog/simpy_getting_started_vaccine_clinic/"
+      >04 April - Using SimPy to simulate a vaccine clinic - Part 1: an introductory tutorial</a
+    >
+  </li>
+  
+  <li>
+    <a href="../../../../../../blog/simpy_getting_started_vaccine_clinic/"
+      >04 April - Using SimPy to simulate a vaccine clinic - Part 1: an introductory tutorial</a
+    >
+  </li>
+  
+  <li>
+    <a href="../../../../../../../../blog/use_jupyter_conda_envs/"
+      >03 April - Using different conda environments with Jupyter Lab</a
+    >
+  </li>
+  
+</ul>
+
+<h3><a href="../../../../../../../../blog/tag/">Tags</a></h3>
+<style type="text/css">
+  ul.ablog-cloud {
+    list-style: none;
+    overflow: auto;
+  }
+  ul.ablog-cloud li {
+    float: left;
+    height: 20pt;
+    line-height: 18pt;
+    margin-right: 5px;
+  }
+  ul.ablog-cloud a {
+    text-decoration: none;
+    vertical-align: middle;
+  }
+  li.ablog-cloud-1 {
+    font-size: 80%;
+  }
+  li.ablog-cloud-2 {
+    font-size: 95%;
+  }
+  li.ablog-cloud-3 {
+    font-size: 110%;
+  }
+  li.ablog-cloud-4 {
+    font-size: 125%;
+  }
+  li.ablog-cloud-5 {
+    font-size: 140%;
+  }
+</style>
+<ul class="ablog-cloud">
+   
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../../../../../../../../blog/tag/github/">GitHub</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../../../../../../../../blog/tag/r/">R</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-2">
+    <a href="../../../../../../../../blog/tag/ablog/">ablog</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../../../../../../../../blog/tag/bikeshare/">bikeshare</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../../../../../../../../blog/tag/birding/">birding</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../../../../../../../../blog/tag/blogging/">blogging</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../../../../../../../../blog/tag/conda/">conda</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../../../../../../../../blog/tag/datetime/">datetime</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../../../../../../../../blog/tag/dplyr/">dplyr</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../../../../../../../../blog/tag/ebird/">ebird</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../../../../../../../../blog/tag/ecology/">ecology</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-2">
+    <a href="../../../../../../../../blog/tag/excel/">excel</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../../../../../../../../blog/tag/ggplot2/">ggplot2</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../../../../../../../../blog/tag/gis/">gis</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../../../../../../../../blog/tag/git/">git</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../../../../../../../../blog/tag/hiking/">hiking</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../../../../../../../../blog/tag/hillmaker/">hillmaker</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-2">
+    <a href="../../../../../../../../blog/tag/jupyter/">jupyter</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../../../../../../../../blog/tag/occupancy-analysis/">occupancy analysis</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../../../../../../../../blog/tag/pandas/">pandas</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-5">
+    <a href="../../../../../../../../blog/tag/python/">python</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../../../../../../../../blog/tag/r/">r</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../../../../../../../../blog/tag/sphinx/">sphinx</a>
+  </li>
+   
+</ul>
+
+<h3>
+  <a href="../../../../../../../../blog/archive/">Archives</a>
+</h3>
+<ul>
+   
+  <li>
+    <a href="../../../../../../../../blog/2022/">2022 (11)</a>
+  </li>
+    
+  <li>
+    <a href="../../../../../../../../blog/2021/">2021 (16)</a>
+  </li>
+    
+  <li>
+    <a href="../../../../../../../../blog/2020/">2020 (2)</a>
+  </li>
+    
+  <li>
+    <a href="../../../../../../../../blog/2019/">2019 (13)</a>
+  </li>
+    
+  <li>
+    <a href="../../../../../../../../blog/2018/">2018 (10)</a>
+  </li>
+    
+  <li>
+    <a href="../../../../../../../../blog/2016/">2016 (1)</a>
+  </li>
+    
+  <li>
+    <a href="../../../../../../../../blog/2014/">2014 (4)</a>
+  </li>
+   
+</ul>
+
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../../../../../search/" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2022, misken.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.3.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../../../../../../../../_sources/.doctrees/nbsphinx/.doctrees/nbsphinx/.doctrees/nbsphinx/blog/datetime_exploring.ipynb.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
