@@ -14,7 +14,7 @@
     "tags": []
    },
    "source": [
-    ".. post:: Jan 01, 2019\n",
+    ".. post:: Jan 02, 2019\n",
     "   :author: misken\n",
     "   :tags: jupyter, ablog\n",
     "   \n",

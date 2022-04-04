@@ -1,0 +1,686 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>Using Ubuntu to acquire and manage GPS data from Garmin eTrex &#8212; misken 0,1,0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css" />
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <link rel="author" title="About these documents" href="../../about/" />
+    <link rel="index" title="Index" href="../../genindex/" />
+    <link rel="search" title="Search" href="../../search/" /> 
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+ 
+<link
+  rel="alternate"
+  type="application/atom+xml"
+  href="../../blog/atom.xml"
+  title="Bits of analytics"
+/>
+ 
+<style type="text/css">
+  ul.ablog-archive {
+    list-style: none;
+    overflow: auto;
+    margin-left: 0px;
+  }
+  ul.ablog-archive li {
+    float: left;
+    margin-right: 5px;
+    font-size: 80%;
+  }
+  ul.postlist a {
+    font-style: italic;
+  }
+  ul.postlist-style-disc {
+    list-style-type: disc;
+  }
+  ul.postlist-style-none {
+    list-style-type: none;
+  }
+  ul.postlist-style-circle {
+    list-style-type: circle;
+  }
+</style>
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+             <section id="using-ubuntu-to-acquire-and-manage-gps-data-from-garmin-etrex">
+<h1>Using Ubuntu to acquire and manage GPS data from Garmin eTrex<a class="headerlink" href="#using-ubuntu-to-acquire-and-manage-gps-data-from-garmin-etrex" title="Permalink to this headline">¶</a></h1>
+<p>I’ve had a Garmin eTrex Vista C GPS unit for about 10 years. Yes, phones
+now have GPS capabilties but my trusty Garmin has terrific battery life,
+is light, durable and has great functionality. It came with Windows
+based software that allowed me to download track and waypoint data
+via a USB connection and then plot my hiking route on a map. Now that I use Linux almost exclusively, I
+wanted to be able to download data directly from the Garmin to my laptop
+using software available for Ubuntu. My initial goals were:</p>
+<ul class="simple">
+<li><p>Get Ubuntu to recognize the Garmin GPS as a USB device,</p></li>
+<li><p>Find software for transferring data from the Garmin to my laptop in standard formats such as GPX and/or KML,</p></li>
+<li><p>Do some light data editing of the track and waypoint data</p></li>
+<li><p>Make a simple map showing my hiking route layered on top of a standard USGS tophographical map.</p></li>
+</ul>
+<p>Once I could get this to work, then I’ll move on to more complete Linux
+based mapping and spatial analysis exploration (e.g. <a class="reference external" href="https://qgis.org/">QGIS</a>, <a class="reference external" href="https://www.openstreetmap.org/">OpenStreetMap</a>, <a class="reference external" href="http://mapnik.org/">Mapnik</a>, <a class="reference external" href="http://www.gdal.org/">GDAL</a>, <a class="reference external" href="https://grass.osgeo.org/">GRASS</a>, …).</p>
+<p>I’m using Ubuntu Bionic Beaver (18.04).</p>
+<section id="recognize-garmin-gps-as-a-readable-usb-device">
+<h2>Recognize Garmin GPS as a readable USB device<a class="headerlink" href="#recognize-garmin-gps-as-a-readable-usb-device" title="Permalink to this headline">¶</a></h2>
+<p>A little searching in the Ubuntu forums found this incredibly useful post:</p>
+<p><a class="reference external" href="https://ubuntuforums.org/showthread.php?t=2391983">Garmin etrex Vista HCx in Ubuntu 16.04</a></p>
+<p>I pretty much just followed it step by step and learned a bunch of good stuff
+about Ubuntu Linux along the way. The author of the post gives credit to
+a bunch of other posts that helped the author figure all this out.</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://wiki.openstreetmap.org/wiki/USB_Garmin_on_GNU/Linux">https://wiki.openstreetmap.org/wiki/USB_Garmin_on_GNU/Linux</a></p></li>
+<li><p><a class="reference external" href="https://forum.siduction.org/index.php?topic=4990.0">https://forum.siduction.org/index.php?topic=4990.0</a></p></li>
+<li><p><a class="reference external" href="https://www.gpsbabel.org/index.html">https://www.gpsbabel.org/index.html</a></p></li>
+</ul>
+<section id="get-info-about-usb-devices">
+<h3>Get info about USB devices<a class="headerlink" href="#get-info-about-usb-devices" title="Permalink to this headline">¶</a></h3>
+<p>I connected my Garmin via a USB cable to my laptop and turned on the Garmin (told it to stop looking for satellites in the house).</p>
+<p>The <a class="reference external" href="https://www.systutorials.com/docs/linux/man/8-lsusb/">lsusb</a> command displays information about USB buses and connected devices on your machine.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>$lsusb
+</pre></div>
+</div>
+<p>The key line in the output was:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>Bus 001 Device 027: ID 091e:0003 Garmin International GPS (various models)
+</pre></div>
+</div>
+<p>Great. My laptop sees the Garmin GPS unit. The bus, device and ID entries will end up being useful.</p>
+<p>We can also use the <a class="reference external" href="https://en.wikipedia.org/wiki/Dmesg">dmesg</a> command to get detailed information about driver and device loading, unloading, and related errors.</p>
+<blockquote>
+<div><p>dmesg (Display message or driver message) is a command which will show Kernel ring buffers. These messages contain valuable information about device drivers loaded into the kernel at the time of booting as well as when we connect a hardware to the system on the fly. In other words dmesg will give us details about hardware drivers connected to, disconnected from a machine and any errors when hardware driver is loaded into the kernel. These messages are helpful in diagnosing or debugging hardware and device driver issues.</p>
+</div></blockquote>
+<p>Let’s try it.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>$dmesg
+</pre></div>
+</div>
+<p>Tons of output.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>$dmesg | grep &#39;New USB&#39;
+</pre></div>
+</div>
+<p>Output included:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>[42024.658060] usb 1-1: New USB device found, idVendor=091e, idProduct=0003
+</pre></div>
+</div>
+<p>Now we see what those ID related entries in the <code class="docutils literal notranslate"><span class="pre">lsusb</span></code> output mean.</p>
+</section>
+<section id="make-sure-garmin-gps-module-is-not-loaded">
+<h3>Make sure <cite>garmin_gps</cite> module is NOT loaded<a class="headerlink" href="#make-sure-garmin-gps-module-is-not-loaded" title="Permalink to this headline">¶</a></h3>
+<p>As you’ll see, we are going to use the venerable <a class="reference external" href="https://www.gpsbabel.org/index.html">GPSBabel</a> program
+to facilitate the actual interaction between the computer and the Garmin. They (GPSBabel) strongly
+suggest making sure the <cite>garmin_gps</cite> module that is included with many Linux distros is
+NOT allowed to load due to problematic behavior. To check if <cite>garmin_gps</cite> is loaded as
+a Linux kernel module, we can use the <cite>lsmod</cite> command.</p>
+<p>From <a class="reference external" href="https://www.computerhope.com/unix/lsmod.htm">Computer Hope</a>:</p>
+<blockquote>
+<div><p>Linux kernel modules (LKMs) are pieces of code which can be loaded into the kernel much like a hot-swappable piece of hardware: they can be inserted into the kernel and activated without the system needing to be rebooted.</p>
+<p>lsmod is a very simple program with no options: it nicely formats the contents of the file /proc/modules, which contains information about the status of all currently-loaded LKMs.</p>
+</div></blockquote>
+<p>Next command should give no output</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>$lsmod | grep gps
+</pre></div>
+</div>
+<p>If it does, can remove the module with</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>$sudo modeprobe - r garmin_gps
+</pre></div>
+</div>
+<p>and permanently prevent it from being loaded by blacklisting it. See
+Step 2 in <a class="reference external" href="https://ubuntuforums.org/showthread.php?t=2391983">Garmin etrex Vista HCx in Ubuntu 16.04</a>.</p>
+<p>I confirmed that <code class="docutils literal notranslate"><span class="pre">garmin_gps</span></code> was not loaded. So far, so good.</p>
+<p>Now we need to make sure we have sufficient permissions to access the
+Garmin GPS via USB.</p>
+</section>
+<section id="check-and-change-permissions-of-new-dev-point">
+<h3>Check and change permissions of new <cite>/dev</cite> point<a class="headerlink" href="#check-and-change-permissions-of-new-dev-point" title="Permalink to this headline">¶</a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">/dev</span></code> directory contains device related files - everything in Linux
+is a file or directory. For our GPS unit, the key file will be <code class="docutils literal notranslate"><span class="pre">/dev/bus/usb/&lt;*bus*&gt;/&lt;*device*&gt;</span></code>,
+where <em>bus</em> and <em>device</em> numbers are the ones we found earlier using <code class="docutils literal notranslate"><span class="pre">lsusb</span></code>. So, let’s
+list all the files in the <code class="docutils literal notranslate"><span class="pre">/dev/bus/usb/001/</span></code> directory.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>$ls -al /dev/bus/usb/001/*
+</pre></div>
+</div>
+<p>Results in</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>crw-rw-r-- 1 root root 189,  0 Jul 10 07:04 /dev/bus/usb/001/001
+crw-rw-r-- 1 root root 189,  1 Jul 10 07:04 /dev/bus/usb/001/002
+crw-rw-r-- 1 root root 189,  2 Jul 10 07:04 /dev/bus/usb/001/003
+crw-rw-r-- 1 root root 189,  4 Jul 10 07:04 /dev/bus/usb/001/005
+crw-rw-r-- 1 root root 189, 25 Jul 10 19:34 /dev/bus/usb/001/026
+crw-rw-r-- 1 root root 189, 26 Jul 10 19:46 /dev/bus/usb/001/027
+</pre></div>
+</div>
+<p>The “c” in the first position of the permissions specification means
+it’s a character device file. Clearly, it’s the last line that
+corresponds to the Garmin GPS. Notice that “everyone” has only
+read access to the Garmin. We need write access to be able
+to interact with it via GPSBabel. To do this we need to create something called a <a class="reference external" href="https://wiki.debian.org/udev">udev rule</a>.</p>
+<p>Create a udev rule that gives you permission to access the device automatically when mounted:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>$sudo nano /etc/udev/rules.d/51-garmin.rules
+</pre></div>
+</div>
+<p>In this text file, enter the following line:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>SUBSYSTEM==&quot;usb&quot;, ATTR{idVendor}==&quot;091e&quot;, ATTRS{idProduct}==&quot;0003&quot; MODE=&quot;0666&quot;, GROUP=&quot;plugdev&quot;
+</pre></div>
+</div>
+<p>Obviously, the idVendor and idProduct correspond to our Garmin. The MODE gives the
+necessary <a class="reference external" href="https://www.computerhope.com/unix/uchmod.htm">read and write permissions</a> and the plugdev
+group is the one that allows users to mount and unmount certain devices.</p>
+<p>Now reload the udev rules:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>$sudo udevadm control --reload-rules
+</pre></div>
+</div>
+<p>Unplug and replugin the GPS. Rerun <code class="docutils literal notranslate"><span class="pre">lsusb</span></code> (note that the device number might
+change). The output included:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>Bus 001 Device 029: ID 091e:0003 Garmin International GPS (various models)
+</pre></div>
+</div>
+<p>Recheck the permissions</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>$ls -al /dev/bus/usb/001/*
+
+crw-rw-rw- 1 root plugdev 189, 28 Jul 10 20:36 /dev/bus/usb/001/029
+</pre></div>
+</div>
+<p>Check to see that you, the user, are in the plugdev group.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>$groups
+</pre></div>
+</div>
+<p>If not,</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>$sudo adduser USERNAME plugdev
+</pre></div>
+</div>
+<p>Now we are ready to transfer data? Almost. One more bit of trickiness.</p>
+</section>
+<section id="blacklist-the-garmin-gps-in-the-power-settings-file">
+<h3>Blacklist the Garmin GPS in the power settings file<a class="headerlink" href="#blacklist-the-garmin-gps-in-the-power-settings-file" title="Permalink to this headline">¶</a></h3>
+<p>According to the post I was following, this was the hardest thing
+to figure out. We need to make sure the GPS doesn’t get powered off
+by a power management setting.</p>
+<p>Add the following line to <cite>/etc/default/tlp</cite></p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>USB_BLACKLIST=&quot;091e:0003&quot;
+</pre></div>
+</div>
+<p>Again, using nano as my editor:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>$sudo nano /etc/default/tlp
+</pre></div>
+</div>
+<p>Unplug and replugin the GPS unit. Done. Ready for data.</p>
+</section>
+</section>
+<section id="use-gpsbabel-to-transfer-data-from-gps-to-computer">
+<h2>Use GPSBabel to transfer data from GPS to computer<a class="headerlink" href="#use-gpsbabel-to-transfer-data-from-gps-to-computer" title="Permalink to this headline">¶</a></h2>
+<p>Directly from the <a class="reference external" href="https://www.gpsbabel.org/index.html">GPSBabel home page</a></p>
+<blockquote>
+<div><p>GPSBabel converts waypoints, tracks, and routes between popular GPS receivers such as Garmin or Magellan and mapping programs like Google Earth or Basecamp. Literally hundreds of GPS receivers and programs are supported. It also has powerful manipulation tools for such data. such as filtering duplicates points or simplifying tracks. It has been downloaded and used tens of millions of times since it was first created in 2001, so it’s stable and trusted.</p>
+<p>By flattening the Tower of Babel that the authors of various programs for manipulating GPS data have imposed upon us, GPSBabel returns to us the ability to freely move our own waypoint data between the programs and hardware we choose to use.</p>
+<p>It contains extensive data manipulation abilities making it a convenient for server-side processing or as the backend for other tools.</p>
+<p>GPSBabel does not convert, transfer, send, or manipulate maps. We process data that may (or may not be) placed on a map, such as waypoints, tracks, and routes.</p>
+</div></blockquote>
+<p>The program has been a lifesaver for many a GPS user. It’s multiplatform
+and has both command line and GUI versions. So, I installed it.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>$sudo apt-get install gpsbabel gpsbabel-gui
+</pre></div>
+</div>
+<p>Let’s make sure we can access the Garmin GPS unit</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>$gpsbabel -i garmin -f usb:-1
+
+0 3030130100 315 Etrex Vista C Software Version 2.70
+</pre></div>
+</div>
+<p>Run the GUI version of gpsbabel:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>$gpsbabelfe
+</pre></div>
+</div>
+<p>You’ll see that it recognizes the Garmin as a USB device.</p>
+<blockquote>
+<div><img alt="../../_images/gpsbabel_1.png" src="../../_images/gpsbabel_1.png" />
+</div></blockquote>
+<p>There are tons of file formats supported (both input and output). A
+common format supported by pretty much all GIS related software is
+GPX XML.</p>
+<blockquote>
+<div><img alt="../../_images/gpsbabel_2.png" src="../../_images/gpsbabel_2.png" />
+</div></blockquote>
+<p>After doing the transfer, you can see the associated command line
+version in the lower window.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>$gpsbabel -t -i garmin -f usb: -o gpx -F /home/path to destination/garmin_dump.gpx
+</pre></div>
+</div>
+<p>I created a GPX version as well as a KML version (Keyhole Markup Language).</p>
+<p>Here’s a look at <cite>garmin_dump.gpx</cite>. Notice it’s just a bunch of latitude,
+longitude, and elevation triplets.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;gpx version=&quot;1.0&quot; creator=&quot;GPSBabel - http://www.gpsbabel.org&quot; xmlns=&quot;http://www.topografix.com/GPX/1/0&quot;&gt;
+&lt;time&gt;2018-07-13T15:10:21.975Z&lt;/time&gt;
+&lt;bounds minlat=&quot;42.679782249&quot; minlon=&quot;-83.376512658&quot; maxlat=&quot;44.432340385&quot; maxlon=&quot;-83.104858194&quot;/&gt;
+&lt;trk&gt;
+  &lt;name&gt;18-MAR-07&lt;/name&gt;
+  &lt;trkseg&gt;
+    &lt;trkpt lat=&quot;42.750791553&quot; lon=&quot;-83.309133975&quot;&gt;
+      &lt;ele&gt;252.002808&lt;/ele&gt;
+    &lt;/trkpt&gt;
+    &lt;trkpt lat=&quot;42.750793817&quot; lon=&quot;-83.309133220&quot;&gt;
+      &lt;ele&gt;252.002808&lt;/ele&gt;
+    &lt;/trkpt&gt;
+    &lt;trkpt lat=&quot;42.750795996&quot; lon=&quot;-83.309132466&quot;&gt;
+      &lt;ele&gt;255.367310&lt;/ele&gt;
+    &lt;/trkpt&gt;
+    ...
+</pre></div>
+</div>
+</section>
+<section id="edit-track-data-and-create-a-simple-map-using-viking">
+<h2>Edit track data and create a simple map using Viking<a class="headerlink" href="#edit-track-data-and-create-a-simple-map-using-viking" title="Permalink to this headline">¶</a></h2>
+<p>I knew I had a bunch of old tracks on my Garmin in addition to the
+current track I wanted to map of a recent hike near the Au Sable River
+in northeast Michigan. So, now I needed a tool for reading a GPX file
+and editing the resulting track information. While there are several
+powerful GIS tools that can handle this, I decided to start with a
+simple GPS data editor known as <a class="reference external" href="https://github.com/viking-gps/viking">Viking</a>.</p>
+<blockquote>
+<div><p>Viking is a free/open source program to manage GPS data. You can import, plot and create tracks, routes and waypoints, show OSM, Bing Aerial and other maps, geotag images, see real-time GPS position (not in Windows), make maps using Mapnik (not in Windows), control items, etc.
+It is written in mostly in C (with some C++) &amp; the GTK+2 toolkit.</p>
+</div></blockquote>
+<p>At this point, Viking does not have a “drawing layer” for annotations
+and general map editing. It’s not designed for that though there is
+a feature request for such a drawing layer.</p>
+<p>Viking is available from Ubuntu software center but, after installing
+it that way, it efused to run. Installed using command line instead and then worked fine.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>$sudo apt-get install viking
+</pre></div>
+</div>
+<section id="default-map-layers">
+<h3>Default map layers<a class="headerlink" href="#default-map-layers" title="Permalink to this headline">¶</a></h3>
+<p>For a long time, OSM (MapQuest) was (is) the default map source but
+that <a class="reference external" href="https://sourceforge.net/p/viking/bugs/134/">service was discontinued in 2016</a>.
+I created a map layer using <a class="reference external" href="http://caltopo.com">CalTopo</a> maps
+(which uses USGS 7.5” Topo) and that worked well. These are based
+on publicly available USGS topo maps and the licensing <a class="reference external" href="https://www.mail-archive.com/viking-devel&#64;lists.sourceforge.net/msg00741.html">seems
+to not be an issue</a>.</p>
+<p>The <a class="reference external" href="http://caltopo.com">CalTopo</a> site is a web based tool for creating maps primarily focused on backcountry
+travel and search and rescue. It’s a very powerful and easy to use tool and there are some super
+<a class="reference external" href="http://caltopo.blogspot.com">interesting posts</a> (especially related to wildfires in California) at their blog.
+See a <a class="reference external" href="https://douchepacker.com/2016/04/28/quick-and-dirty-guide-to-making-a-map-in-caltopo/">quick and dirty guide to making a map in CalTopo</a> for a user perspective.</p>
+<p>For other non-topo maps, I switched the default to OSM (Mapnik). Nice.
+<a class="reference external" href="https://github.com/mapnik/mapnik/wiki/About-Mapnik">Mapnik is a map rendering toolkit</a> which can be used for desktop mappling apps as well as by web based mapping services such as OpenStreetMap. To learn more about Mapnik check out its <a class="reference external" href="https://github.com/mapnik/mapnik/wiki/About-Mapnik">wiki at GitHub</a>.</p>
+<p>Some other useful links related to sources for topo maps include:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://www.usgs.gov/products/maps/gis-data">https://www.usgs.gov/products/maps/gis-data</a></p></li>
+<li><p><a class="reference external" href="https://ngmdb.usgs.gov/topoview/">https://ngmdb.usgs.gov/topoview/</a></p></li>
+<li><p><a class="reference external" href="https://ngmdb.usgs.gov/ngmdb/ngmdb_home.html">https://ngmdb.usgs.gov/ngmdb/ngmdb_home.html</a></p></li>
+<li><p><a class="reference external" href="https://nationalmap.gov/ustopo/quickstart.pdf">https://nationalmap.gov/ustopo/quickstart.pdf</a></p></li>
+<li><p><a class="reference external" href="http://www.opentopography.org/about">http://www.opentopography.org/about</a></p></li>
+</ul>
+</section>
+<section id="editing-track-data">
+<h3>Editing track data<a class="headerlink" href="#editing-track-data" title="Permalink to this headline">¶</a></h3>
+<p>I started Viking and</p>
+<ul>
+<li><p>added a new map layer based on CalTopo,</p></li>
+<li><p>opened the <cite>garmin_dump.gpx</cite> file created with GPSBabel,</p></li>
+<li><p>zoomed the screen to find the track I was interested in editing.</p>
+<blockquote>
+<div><img alt="../../_images/viking_1.png" src="../../_images/viking_1.png" />
+</div></blockquote>
+</li>
+</ul>
+<p>Made things look a little better by</p>
+<ul>
+<li><p>deleted a few old tracks I had forgotten to delete,</p></li>
+<li><p>I renamed the track ACTIVE LOG to EagleRun_LoopC,</p></li>
+<li><p>changed the color of the EagleRun_LoopC track by right-click | Properties,</p></li>
+<li><p>changed the thickness of the track by right-clicking on the garmin_dump.gpx layer and going to Track Advanced properties tab,</p></li>
+<li><p>zoomed in.</p>
+<blockquote>
+<div><img alt="../../_images/viking_2.png" src="../../_images/viking_2.png" />
+</div></blockquote>
+</li>
+</ul>
+<p>Viking has some built in plots related to each track that you can get to
+through the same track Properties dialog box. Here’s one of them - something
+strange going on.</p>
+<blockquote>
+<div><img alt="../../_images/viking_3.png" src="../../_images/viking_3.png" />
+</div></blockquote>
+<p>So, looked at the Statistics tab in that same dialog box.</p>
+<blockquote>
+<div><img alt="../../_images/viking_4.png" src="../../_images/viking_4.png" />
+</div></blockquote>
+<p>Oops, look like track was never saved and thus was active for many days. These
+are the kinds of common simple edits that I wanted a tool like Viking for.</p>
+<ul>
+<li><p>right-click on track name, Split | Split by time…</p></li>
+<li><p>picked 1 hour (any adjacent track points with greater than 1 hour between timestamps will force track to split there)</p></li>
+<li><p>deleted the resulting extraneous tracks.</p>
+<blockquote>
+<div><img alt="../../_images/viking_5.png" src="../../_images/viking_5.png" />
+</div></blockquote>
+</li>
+</ul>
+<p>Now, I’m ready to design a nice map with things like legends, scale bars and text/graphic annotations.
+Viking really isn’t the tool for this. So, I’m going to export the cleaned up route to a new GPX file
+and then move on to exploring the open source GIS tool known as QGIS.</p>
+</section>
+</section>
+</section>
+
+<div class="section">
+    
+
+<div class="section">
+  <span style="float: left">
+     Previous:
+    
+    <a href="../blogging_pelican_rmd/">
+       Blogging with Pelican and R Markdown
+    </a>
+    
+  </span>
+  <span>&nbsp;</span>
+  <span style="float: right">
+     Next: 
+    <a href="../../.doctrees/nbsphinx/.doctrees/nbsphinx/blog/daily_averages_cycleshare/">
+      Computing daily averages from transaction data using pandas can be tricky - Part 1 
+    </a>
+    
+  </span>
+</div>
+  
+</div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../">misken</a></h1>
+
+
+
+
+
+
+
+
+  
+<h2>
+   
+  13 July 2018 
+</h2>
+
+<ul>
+   
+<li id="author">
+  <span
+    >Author:</span
+  >
+   
+  <a href="../author/misken/">misken</a>  
+</li>
+    
+<li id="tags">
+  <span
+    >Tags: </span
+  >
+   
+  <a href="../tag/gis/">gis</a>   
+  <a href="../tag/hiking/">hiking</a>  
+</li>
+ 
+</ul>
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../about/">About misken</a></li>
+</ul>
+
+
+<h3>
+  <a href="../">Recent Posts</a>
+</h3>
+<ul>
+   
+  <li>
+    <a href="../../.doctrees/nbsphinx/.doctrees/nbsphinx/blog/simpy_getting_started_vaccine_clinic/"
+      >04 April - Using SimPy to simulate a vaccine clinic - Part 1: an introductory tutorial</a
+    >
+  </li>
+  
+  <li>
+    <a href="../../.doctrees/nbsphinx/blog/simpy_getting_started_vaccine_clinic/"
+      >04 April - Using SimPy to simulate a vaccine clinic - Part 1: an introductory tutorial</a
+    >
+  </li>
+  
+  <li>
+    <a href="../simpy_getting_started_vaccine_clinic/"
+      >04 April - Using SimPy to simulate a vaccine clinic - Part 1: an introductory tutorial</a
+    >
+  </li>
+  
+  <li>
+    <a href="../use_jupyter_conda_envs/"
+      >03 April - Using different conda environments with Jupyter Lab</a
+    >
+  </li>
+  
+  <li>
+    <a href="../../.doctrees/nbsphinx/.doctrees/nbsphinx/blog/hello_world/"
+      >02 April - Hello world from ablog blogging with JupyterLab</a
+    >
+  </li>
+  
+</ul>
+
+<h3><a href="../tag/">Tags</a></h3>
+<style type="text/css">
+  ul.ablog-cloud {
+    list-style: none;
+    overflow: auto;
+  }
+  ul.ablog-cloud li {
+    float: left;
+    height: 20pt;
+    line-height: 18pt;
+    margin-right: 5px;
+  }
+  ul.ablog-cloud a {
+    text-decoration: none;
+    vertical-align: middle;
+  }
+  li.ablog-cloud-1 {
+    font-size: 80%;
+  }
+  li.ablog-cloud-2 {
+    font-size: 95%;
+  }
+  li.ablog-cloud-3 {
+    font-size: 110%;
+  }
+  li.ablog-cloud-4 {
+    font-size: 125%;
+  }
+  li.ablog-cloud-5 {
+    font-size: 140%;
+  }
+</style>
+<ul class="ablog-cloud">
+   
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/github/">GitHub</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/r/">R</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-2">
+    <a href="../tag/ablog/">ablog</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/bikeshare/">bikeshare</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/birding/">birding</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/blogging/">blogging</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/conda/">conda</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/datetime/">datetime</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/dplyr/">dplyr</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/ebird/">ebird</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/ecology/">ecology</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-2">
+    <a href="../tag/excel/">excel</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/ggplot2/">ggplot2</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/gis/">gis</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/git/">git</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/hiking/">hiking</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/hillmaker/">hillmaker</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-2">
+    <a href="../tag/jupyter/">jupyter</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/occupancy-analysis/">occupancy analysis</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/pandas/">pandas</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-5">
+    <a href="../tag/python/">python</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/r/">r</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/sphinx/">sphinx</a>
+  </li>
+   
+</ul>
+
+<h3>
+  <a href="../archive/">Archives</a>
+</h3>
+<ul>
+   
+  <li>
+    <a href="../2022/">2022 (9)</a>
+  </li>
+    
+  <li>
+    <a href="../2021/">2021 (12)</a>
+  </li>
+    
+  <li>
+    <a href="../2020/">2020 (2)</a>
+  </li>
+    
+  <li>
+    <a href="../2019/">2019 (11)</a>
+  </li>
+    
+  <li>
+    <a href="../2018/">2018 (8)</a>
+  </li>
+    
+  <li>
+    <a href="../2016/">2016 (1)</a>
+  </li>
+    
+  <li>
+    <a href="../2014/">2014 (3)</a>
+  </li>
+   
+</ul>
+
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search/" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2022, misken.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.3.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../../_sources/blog/garmin-ubuntu-viking.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

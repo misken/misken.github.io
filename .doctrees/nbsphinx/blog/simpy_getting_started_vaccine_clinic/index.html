@@ -884,6 +884,8 @@ Patient 9 created at time 24.44267577471252
 <li><p>Create a new process function for our extended model that incorporates the new delays and resource contention,</p></li>
 <li><p>Modify the arrival process to create a vaccination event for each patient arrival,</p></li>
 </ul>
+<section id="Acquiring-and-releasing-resources">
+<h3>Acquiring and releasing resources<a class="headerlink" href="#Acquiring-and-releasing-resources" title="Permalink to this headline">¶</a></h3>
 <p>For the actual vaccination stage, we’ll use a common code block pattern:</p>
 <ul class="simple">
 <li><p>attempt to acquire a certain type of staff resource using a <a class="reference external" href="https://dbader.org/blog/python-context-managers-and-with-statement">Python context manager</a>,</p></li>
@@ -1062,6 +1064,7 @@ Patient10 got vaccinator at 45.3688
 </div>
 <p>Now that you’ve got a little better idea of how to go about creating very simple SimPy models, let’s tackle a more complex vaccine clinic model. Again, for our first version, we’ll make a number of simplifying assumptions and simplifying software design decisions. Later versions will be better.</p>
 </section>
+</section>
 <section id="Model-3:-The-vaccine-clinic-model---version-0.01">
 <h2>Model 3: The vaccine clinic model - version 0.01<a class="headerlink" href="#Model-3:-The-vaccine-clinic-model---version-0.01" title="Permalink to this headline">¶</a></h2>
 <p>Here’s the basic vaccination process we’ll model.</p>
@@ -1152,8 +1155,8 @@ Patient10 got vaccinator at 45.3688
 <li><p>the percentage of patients that are there for their first dose,</p></li>
 <li><p>the random number generator.</p></li>
 </ul>
-<section id="Acquiring-and-releasing-resources">
-<h4>Acquiring and releasing resources<a class="headerlink" href="#Acquiring-and-releasing-resources" title="Permalink to this headline">¶</a></h4>
+<section id="id1">
+<h4>Acquiring and releasing resources<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h4>
 <p>For each step in the vaccination process, you’ll find a sequence of code blocks in which we:</p>
 <ul class="simple">
 <li><p>attempt to acquire a certain type of staff resource,</p></li>
@@ -3497,22 +3500,37 @@ simply running more replications (and getting a more precise estimate of our mea
 <section id="More-SimPy-resources">
 <h2>More SimPy resources<a class="headerlink" href="#More-SimPy-resources" title="Permalink to this headline">¶</a></h2>
 <p>I suggest taking a look at some the following resources to get a sense of different ways of building SimPy models.</p>
+<section id="From-the-SimPy-docs:">
+<h3>From the SimPy docs:<a class="headerlink" href="#From-the-SimPy-docs:" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li><p><a class="reference external" href="https://simpy.readthedocs.io/en/latest/simpy_intro/index.html">SimPy in 10 Minutes</a> - the “Hello, world” of SimPy</p></li>
 <li><p><a class="reference external" href="https://simpy.readthedocs.io/en/latest/examples/index.html#all-examples">Example models from the SimPy documentation</a> - demonstrates various features of SimPy through relatively simple models</p></li>
 </ul>
+</section>
+<section id="From-Real-Python:">
+<h3>From Real Python:<a class="headerlink" href="#From-Real-Python:" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li><p><a class="reference external" href="https://realpython.com/simpy-simulating-with-python/">SimPy: Simulating Real-World Processes With Python</a> - a very good introductory tutorial</p></li>
 </ul>
+</section>
+<section id="From-a-healthcare-modeling-workshop">
+<h3>From a healthcare modeling workshop<a class="headerlink" href="#From-a-healthcare-modeling-workshop" title="Permalink to this headline">¶</a></h3>
 <p>These are long but quite good. The modeling approach they use is similar to what I cover in our session. * <a class="reference external" href="https://www.youtube.com/watch?v=jXDjrWKcu6w">Session 5B: Building a DES model with SimPy</a> - this is a YouTube vid from a healthcare modeling workshop and they go through models very similar to this clinic model. They use a non-OO approach but many things are the same. * <a class="reference external" href="https://www.youtube.com/watch?v=QV-pJnKrGuc">Session 5C: Object-oriented SimPy</a> - follow up to the video above.</p>
+</section>
+<section id="From-a-few-of-my-blog-posts:">
+<h3>From a few of my blog posts:<a class="headerlink" href="#From-a-few-of-my-blog-posts:" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li><p><a class="reference external" href="http://hselab.org/simpy-getting-started-patient-flow-modeling.html">Getting started with SimPy for patient flow modeling</a> - one of my blog posts on SimPy modeling using a process focused approach</p></li>
 <li><p><a class="reference external" href="http://hselab.org/simpy-first-oo-patflow-model.html">An object oriented SimPy patient flow simulation model</a> - one of my blog posts on SimPy modeling using an object oriented approach</p></li>
 </ul>
+</section>
+<section id="Some-computer-network-based-examples:">
+<h3>Some computer network based examples:<a class="headerlink" href="#Some-computer-network-based-examples:" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li><p><a class="reference external" href="https://www.grotto-networking.com/DiscreteEventPython.html#Intro">Basic Network Simulations and Beyond in Python</a> - good examples of network simulation models, building components to extend SimPy components. I found this site very helpful when I was building the patient flow models in the above two blog posts.</p></li>
 </ul>
 <!-- empty raw cell --></section>
+</section>
 </section>
 
 <div class="section">
@@ -3522,15 +3540,15 @@ simply running more replications (and getting a more precise estimate of our mea
   <span style="float: left">
      Previous:
     
-    <a href="../../../../blog/use_jupyter_conda_envs/">
-       Using different conda environments with Jupyter Lab
+    <a href="../../.doctrees/nbsphinx/blog/simpy_getting_started_vaccine_clinic/">
+       Using SimPy to simulate a vaccine clinic - Part 1: an introductory tutorial
     </a>
     
   </span>
   <span>&nbsp;</span>
   <span style="float: right">
      Next: 
-    <a href="../../../../_website/blog/simpy_getting_started_vaccine_clinic/">
+    <a href="../../../../blog/simpy_getting_started_vaccine_clinic/">
       Using SimPy to simulate a vaccine clinic - Part 1: an introductory tutorial 
     </a>
     
@@ -3592,7 +3610,7 @@ simply running more replications (and getting a more precise estimate of our mea
 <ul>
    
   <li>
-    <a href="../../../../_website/blog/simpy_getting_started_vaccine_clinic/"
+    <a href="../../.doctrees/nbsphinx/blog/simpy_getting_started_vaccine_clinic/"
       >04 April - Using SimPy to simulate a vaccine clinic - Part 1: an introductory tutorial</a
     >
   </li>
@@ -3610,7 +3628,7 @@ simply running more replications (and getting a more precise estimate of our mea
   </li>
   
   <li>
-    <a href="../../../../blog/hello_world/"
+    <a href="../../.doctrees/nbsphinx/blog/hello_world/"
       >02 April - Hello world from ablog blogging with JupyterLab</a
     >
   </li>
@@ -3678,6 +3696,10 @@ simply running more replications (and getting a more precise estimate of our mea
   </li>
     
   <li class="ablog-cloud ablog-cloud-1">
+    <a href="../../../../blog/tag/blogging/">blogging</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
     <a href="../../../../blog/tag/conda/">conda</a>
   </li>
     
@@ -3706,7 +3728,15 @@ simply running more replications (and getting a more precise estimate of our mea
   </li>
     
   <li class="ablog-cloud ablog-cloud-1">
+    <a href="../../../../blog/tag/gis/">gis</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
     <a href="../../../../blog/tag/git/">git</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../../../../blog/tag/hiking/">hiking</a>
   </li>
     
   <li class="ablog-cloud ablog-cloud-1">
@@ -3730,6 +3760,10 @@ simply running more replications (and getting a more precise estimate of our mea
   </li>
     
   <li class="ablog-cloud ablog-cloud-1">
+    <a href="../../../../blog/tag/r/">r</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
     <a href="../../../../blog/tag/sphinx/">sphinx</a>
   </li>
    
@@ -3741,11 +3775,11 @@ simply running more replications (and getting a more precise estimate of our mea
 <ul>
    
   <li>
-    <a href="../../../../blog/2022/">2022 (10)</a>
+    <a href="../../../../blog/2022/">2022 (9)</a>
   </li>
     
   <li>
-    <a href="../../../../blog/2021/">2021 (16)</a>
+    <a href="../../../../blog/2021/">2021 (12)</a>
   </li>
     
   <li>
@@ -3753,7 +3787,7 @@ simply running more replications (and getting a more precise estimate of our mea
   </li>
     
   <li>
-    <a href="../../../../blog/2019/">2019 (13)</a>
+    <a href="../../../../blog/2019/">2019 (11)</a>
   </li>
     
   <li>
@@ -3765,7 +3799,7 @@ simply running more replications (and getting a more precise estimate of our mea
   </li>
     
   <li>
-    <a href="../../../../blog/2014/">2014 (4)</a>
+    <a href="../../../../blog/2014/">2014 (3)</a>
   </li>
    
 </ul>

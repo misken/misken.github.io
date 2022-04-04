@@ -2,7 +2,7 @@
 blogpost: true
 date: Apr 04, 2016
 author: misken
-tags: R, python, birding, dplyr, ggplot2, ebird
+tags: r, python, birding, dplyr, ggplot2, ebird
 ---
 
 # Wednesday OT Birders - Using the ebird API, Python, and R to analyze data for our birding group

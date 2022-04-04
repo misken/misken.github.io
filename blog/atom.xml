@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en">
   <id>https://misken.github.io/</id>
   <title>Bits of analytics</title>
-  <updated>2022-04-04T13:08:36.758163+00:00</updated>
+  <updated>2022-04-04T13:57:04.583884+00:00</updated>
   <link href="https://misken.github.io/"/>
   <link href="https://misken.github.io/blog/atom.xml" rel="self"/>
   <generator uri="https://ablog.readthedocs.org/" version="0.10.23">ABlog</generator>
@@ -24,6 +24,40 @@
     <published>2014-06-25T00:00:00-04:00</published>
   </entry>
   <entry>
+    <id>https://misken.github.io/.doctrees/nbsphinx/blog/datetime_exploring/</id>
+    <title>Exploring dates and times in Python</title>
+    <updated>2014-06-25T00:00:00-04:00</updated>
+    <author>
+      <name>misken</name>
+    </author>
+    <content type="html">&lt;div class="ablog-post-excerpt docutils container"&gt;
+&lt;p&gt;Fun with dates and times in Python&lt;/p&gt;
+&lt;/div&gt;
+</content>
+    <link href="https://misken.github.io/.doctrees/nbsphinx/blog/datetime_exploring/" rel="alternate"/>
+    <summary>Fun with dates and times in Python</summary>
+    <category term="python" label="python"/>
+    <category term="datetime" label="datetime"/>
+    <published>2014-06-25T00:00:00-04:00</published>
+  </entry>
+  <entry>
+    <id>https://misken.github.io/.doctrees/nbsphinx/.doctrees/nbsphinx/blog/datetime_exploring/</id>
+    <title>Exploring dates and times in Python</title>
+    <updated>2014-06-25T00:00:00-04:00</updated>
+    <author>
+      <name>misken</name>
+    </author>
+    <content type="html">&lt;div class="ablog-post-excerpt docutils container"&gt;
+&lt;p&gt;Fun with dates and times in Python&lt;/p&gt;
+&lt;/div&gt;
+</content>
+    <link href="https://misken.github.io/.doctrees/nbsphinx/.doctrees/nbsphinx/blog/datetime_exploring/" rel="alternate"/>
+    <summary>Fun with dates and times in Python</summary>
+    <category term="python" label="python"/>
+    <category term="datetime" label="datetime"/>
+    <published>2014-06-25T00:00:00-04:00</published>
+  </entry>
+  <entry>
     <id>https://misken.github.io/blog/otbirders_1_ebirdapi_python_1/</id>
     <title>Wednesday OT Birders - Using the ebird API, Python, and R to analyze data for our birding group</title>
     <updated>2016-04-04T00:00:00-04:00</updated>
@@ -36,13 +70,60 @@
 </content>
     <link href="https://misken.github.io/blog/otbirders_1_ebirdapi_python_1/" rel="alternate"/>
     <summary>Using the eBird API from Python, we downloaded birding lists submitted by our Wednesday morning birding group. R was then used to create some basic plots showing the top species sighted each year. More analysis to follow.</summary>
-    <category term="R" label="R"/>
+    <category term="r" label="r"/>
     <category term="python" label="python"/>
     <category term="birding" label="birding"/>
     <category term="dplyr" label="dplyr"/>
     <category term="ggplot2" label="ggplot2"/>
     <category term="ebird" label="ebird"/>
     <published>2016-04-04T00:00:00-04:00</published>
+  </entry>
+  <entry>
+    <id>https://misken.github.io/blog/blogging_pelican_rmd/</id>
+    <title>Blogging with Pelican and R Markdown</title>
+    <updated>2018-04-19T00:00:00-04:00</updated>
+    <author>
+      <name>misken</name>
+    </author>
+    <content type="html">&lt;div class="ablog-post-excerpt docutils container"&gt;
+&lt;p&gt;Documenting process for blogging with Pelican and R Markdown with a focus on figures.&lt;/p&gt;
+&lt;/div&gt;
+</content>
+    <link href="https://misken.github.io/blog/blogging_pelican_rmd/" rel="alternate"/>
+    <summary>Documenting process for blogging with Pelican and R Markdown with a focus on figures.</summary>
+    <category term="blogging" label="blogging"/>
+    <category term="python" label="python"/>
+    <category term="r" label="r"/>
+    <published>2018-04-19T00:00:00-04:00</published>
+  </entry>
+  <entry>
+    <id>https://misken.github.io/blog/garmin-ubuntu-viking/</id>
+    <title>Using Ubuntu to acquire and manage GPS data from Garmin eTrex</title>
+    <updated>2018-07-13T00:00:00-04:00</updated>
+    <author>
+      <name>misken</name>
+    </author>
+    <content type="html">&lt;div class="ablog-post-excerpt docutils container"&gt;
+&lt;p&gt;I’ve had a Garmin eTrex Vista C GPS unit for about 10 years. Yes, phones
+now have GPS capabilties but my trusty Garmin has terrific battery life,
+is light, durable and has great functionality. It came with Windows
+based software that allowed me to download track and waypoint data
+via a USB connection and then plot my hiking route on a map. Now that I use Linux almost exclusively, I
+wanted to be able to download data directly from the Garmin to my laptop
+using software available for Ubuntu. My initial goals were:&lt;/p&gt;
+&lt;/div&gt;
+</content>
+    <link href="https://misken.github.io/blog/garmin-ubuntu-viking/" rel="alternate"/>
+    <summary>I’ve had a Garmin eTrex Vista C GPS unit for about 10 years. Yes, phones
+now have GPS capabilties but my trusty Garmin has terrific battery life,
+is light, durable and has great functionality. It came with Windows
+based software that allowed me to download track and waypoint data
+via a USB connection and then plot my hiking route on a map. Now that I use Linux almost exclusively, I
+wanted to be able to download data directly from the Garmin to my laptop
+using software available for Ubuntu. My initial goals were:</summary>
+    <category term="gis" label="gis"/>
+    <category term="hiking" label="hiking"/>
+    <published>2018-07-13T00:00:00-04:00</published>
   </entry>
   <entry>
     <id>https://misken.github.io/blog/daily_averages_cycleshare/</id>
@@ -56,6 +137,42 @@
 &lt;/div&gt;
 </content>
     <link href="https://misken.github.io/blog/daily_averages_cycleshare/" rel="alternate"/>
+    <summary>Our goal is to compute statistics such as the average number of bikes rented per day in the Pronto CycleShare dataset, both overall and for individual stations. Seems easy. We’ll see.</summary>
+    <category term="python" label="python"/>
+    <category term="occupancyanalysis" label="occupancy analysis"/>
+    <category term="pandas" label="pandas"/>
+    <published>2018-07-17T00:00:00-04:00</published>
+  </entry>
+  <entry>
+    <id>https://misken.github.io/.doctrees/nbsphinx/blog/daily_averages_cycleshare/</id>
+    <title>Computing daily averages from transaction data using pandas can be tricky - Part 1</title>
+    <updated>2018-07-17T00:00:00-04:00</updated>
+    <author>
+      <name>misken</name>
+    </author>
+    <content type="html">&lt;div class="ablog-post-excerpt docutils container"&gt;
+&lt;p&gt;Our goal is to compute statistics such as the average number of bikes rented per day in the Pronto CycleShare dataset, both overall and for individual stations. Seems easy. We’ll see.&lt;/p&gt;
+&lt;/div&gt;
+</content>
+    <link href="https://misken.github.io/.doctrees/nbsphinx/blog/daily_averages_cycleshare/" rel="alternate"/>
+    <summary>Our goal is to compute statistics such as the average number of bikes rented per day in the Pronto CycleShare dataset, both overall and for individual stations. Seems easy. We’ll see.</summary>
+    <category term="python" label="python"/>
+    <category term="occupancyanalysis" label="occupancy analysis"/>
+    <category term="pandas" label="pandas"/>
+    <published>2018-07-17T00:00:00-04:00</published>
+  </entry>
+  <entry>
+    <id>https://misken.github.io/.doctrees/nbsphinx/.doctrees/nbsphinx/blog/daily_averages_cycleshare/</id>
+    <title>Computing daily averages from transaction data using pandas can be tricky - Part 1</title>
+    <updated>2018-07-17T00:00:00-04:00</updated>
+    <author>
+      <name>misken</name>
+    </author>
+    <content type="html">&lt;div class="ablog-post-excerpt docutils container"&gt;
+&lt;p&gt;Our goal is to compute statistics such as the average number of bikes rented per day in the Pronto CycleShare dataset, both overall and for individual stations. Seems easy. We’ll see.&lt;/p&gt;
+&lt;/div&gt;
+</content>
+    <link href="https://misken.github.io/.doctrees/nbsphinx/.doctrees/nbsphinx/blog/daily_averages_cycleshare/" rel="alternate"/>
     <summary>Our goal is to compute statistics such as the average number of bikes rented per day in the Pronto CycleShare dataset, both overall and for individual stations. Seems easy. We’ll see.</summary>
     <category term="python" label="python"/>
     <category term="occupancyanalysis" label="occupancy analysis"/>
@@ -81,6 +198,42 @@
     <published>2018-07-18T00:00:00-04:00</published>
   </entry>
   <entry>
+    <id>https://misken.github.io/.doctrees/nbsphinx/blog/daily_averages_cycleshare_part2/</id>
+    <title>Computing daily averages from transaction data - Part 2 (using pandas and some R magic)</title>
+    <updated>2018-07-18T00:00:00-04:00</updated>
+    <author>
+      <name>misken</name>
+    </author>
+    <content type="html">&lt;div class="ablog-post-excerpt docutils container"&gt;
+&lt;p&gt;In Part 2 of this post, we’ll extend this to cases in which we might want to group by an additional field (e.g. station_id for the bike share example) and see how this problem is just one part of the general problem of doing occupancy analysis based on transaction data.&lt;/p&gt;
+&lt;/div&gt;
+</content>
+    <link href="https://misken.github.io/.doctrees/nbsphinx/blog/daily_averages_cycleshare_part2/" rel="alternate"/>
+    <summary>In Part 2 of this post, we’ll extend this to cases in which we might want to group by an additional field (e.g. station_id for the bike share example) and see how this problem is just one part of the general problem of doing occupancy analysis based on transaction data.</summary>
+    <category term="python" label="python"/>
+    <category term="occupancyanalysis" label="occupancy analysis"/>
+    <category term="pandas" label="pandas"/>
+    <published>2018-07-18T00:00:00-04:00</published>
+  </entry>
+  <entry>
+    <id>https://misken.github.io/.doctrees/nbsphinx/.doctrees/nbsphinx/blog/daily_averages_cycleshare_part2/</id>
+    <title>Computing daily averages from transaction data - Part 2 (using pandas and some R magic)</title>
+    <updated>2018-07-18T00:00:00-04:00</updated>
+    <author>
+      <name>misken</name>
+    </author>
+    <content type="html">&lt;div class="ablog-post-excerpt docutils container"&gt;
+&lt;p&gt;In Part 2 of this post, we’ll extend this to cases in which we might want to group by an additional field (e.g. station_id for the bike share example) and see how this problem is just one part of the general problem of doing occupancy analysis based on transaction data.&lt;/p&gt;
+&lt;/div&gt;
+</content>
+    <link href="https://misken.github.io/.doctrees/nbsphinx/.doctrees/nbsphinx/blog/daily_averages_cycleshare_part2/" rel="alternate"/>
+    <summary>In Part 2 of this post, we’ll extend this to cases in which we might want to group by an additional field (e.g. station_id for the bike share example) and see how this problem is just one part of the general problem of doing occupancy analysis based on transaction data.</summary>
+    <category term="python" label="python"/>
+    <category term="occupancyanalysis" label="occupancy analysis"/>
+    <category term="pandas" label="pandas"/>
+    <published>2018-07-18T00:00:00-04:00</published>
+  </entry>
+  <entry>
     <id>https://misken.github.io/blog/basic_usage_cycleshare/</id>
     <title>Analyzing bike usage by time of day and day of week</title>
     <updated>2019-01-01T00:00:00-05:00</updated>
@@ -98,9 +251,77 @@
     <published>2019-01-01T00:00:00-05:00</published>
   </entry>
   <entry>
-    <id>https://misken.github.io/blog/logmetrics/</id>
+    <id>https://misken.github.io/.doctrees/nbsphinx/blog/basic_usage_cycleshare/</id>
+    <title>Analyzing bike usage by time of day and day of week</title>
+    <updated>2019-01-01T00:00:00-05:00</updated>
+    <author>
+      <name>misken</name>
+    </author>
+    <content type="html">&lt;div class="ablog-post-excerpt docutils container"&gt;
+&lt;p&gt;Using hillmaker for datetime analysis of cycle share data&lt;/p&gt;
+&lt;/div&gt;
+</content>
+    <link href="https://misken.github.io/.doctrees/nbsphinx/blog/basic_usage_cycleshare/" rel="alternate"/>
+    <summary>Using hillmaker for datetime analysis of cycle share data</summary>
+    <category term="jupyter" label="jupyter"/>
+    <category term="ablog" label="ablog"/>
+    <published>2019-01-01T00:00:00-05:00</published>
+  </entry>
+  <entry>
+    <id>https://misken.github.io/.doctrees/nbsphinx/.doctrees/nbsphinx/blog/basic_usage_cycleshare/</id>
+    <title>Analyzing bike usage by time of day and day of week</title>
+    <updated>2019-01-01T00:00:00-05:00</updated>
+    <author>
+      <name>misken</name>
+    </author>
+    <content type="html">&lt;div class="ablog-post-excerpt docutils container"&gt;
+&lt;p&gt;Using hillmaker for datetime analysis of cycle share data&lt;/p&gt;
+&lt;/div&gt;
+</content>
+    <link href="https://misken.github.io/.doctrees/nbsphinx/.doctrees/nbsphinx/blog/basic_usage_cycleshare/" rel="alternate"/>
+    <summary>Using hillmaker for datetime analysis of cycle share data</summary>
+    <category term="jupyter" label="jupyter"/>
+    <category term="ablog" label="ablog"/>
+    <published>2019-01-01T00:00:00-05:00</published>
+  </entry>
+  <entry>
+    <id>https://misken.github.io/.doctrees/nbsphinx/blog/logmetrics/</id>
     <title>Firewood math and metrics</title>
     <updated>2019-01-01T00:00:00-05:00</updated>
+    <author>
+      <name>misken</name>
+    </author>
+    <content type="html">&lt;div class="ablog-post-excerpt docutils container"&gt;
+&lt;p&gt;Firewood metrics and simulating firewood use&lt;/p&gt;
+&lt;/div&gt;
+</content>
+    <link href="https://misken.github.io/.doctrees/nbsphinx/blog/logmetrics/" rel="alternate"/>
+    <summary>Firewood metrics and simulating firewood use</summary>
+    <category term="jupyter" label="jupyter"/>
+    <category term="ablog" label="ablog"/>
+    <published>2019-01-01T00:00:00-05:00</published>
+  </entry>
+  <entry>
+    <id>https://misken.github.io/.doctrees/nbsphinx/.doctrees/nbsphinx/blog/logmetrics/</id>
+    <title>Firewood math and metrics</title>
+    <updated>2019-01-01T00:00:00-05:00</updated>
+    <author>
+      <name>misken</name>
+    </author>
+    <content type="html">&lt;div class="ablog-post-excerpt docutils container"&gt;
+&lt;p&gt;Firewood metrics and simulating firewood use&lt;/p&gt;
+&lt;/div&gt;
+</content>
+    <link href="https://misken.github.io/.doctrees/nbsphinx/.doctrees/nbsphinx/blog/logmetrics/" rel="alternate"/>
+    <summary>Firewood metrics and simulating firewood use</summary>
+    <category term="jupyter" label="jupyter"/>
+    <category term="ablog" label="ablog"/>
+    <published>2019-01-01T00:00:00-05:00</published>
+  </entry>
+  <entry>
+    <id>https://misken.github.io/blog/logmetrics/</id>
+    <title>Firewood math and metrics</title>
+    <updated>2019-01-02T00:00:00-05:00</updated>
     <author>
       <name>misken</name>
     </author>
@@ -112,7 +333,7 @@
     <summary>Firewood metrics and simulating firewood use</summary>
     <category term="jupyter" label="jupyter"/>
     <category term="ablog" label="ablog"/>
-    <published>2019-01-01T00:00:00-05:00</published>
+    <published>2019-01-02T00:00:00-05:00</published>
   </entry>
   <entry>
     <id>https://misken.github.io/blog/eda_post_balance_func_sfcs/</id>
@@ -145,7 +366,7 @@
 </content>
     <link href="https://misken.github.io/blog/otbirders_2_stats_2018/" rel="alternate"/>
     <summary>Using the eBird API from Python, we downloaded birding lists submitted by our Wednesday morning birding group. R was then used to produce various plots relating to counts of birds sighted and frequency of list appearance, by species.</summary>
-    <category term="R" label="R"/>
+    <category term="r" label="r"/>
     <category term="python" label="python"/>
     <category term="birding" label="birding"/>
     <category term="dplyr" label="dplyr"/>
@@ -258,6 +479,40 @@
     <published>2021-02-12T00:00:00-05:00</published>
   </entry>
   <entry>
+    <id>https://misken.github.io/.doctrees/nbsphinx/blog/what_if_1_model_datatable/</id>
+    <title>Excel “what if?” analysis with Python - Part 1: Models and Data Tables</title>
+    <updated>2021-02-12T00:00:00-05:00</updated>
+    <author>
+      <name>misken</name>
+    </author>
+    <content type="html">&lt;div class="ablog-post-excerpt docutils container"&gt;
+&lt;p&gt;Build spreadsheet type models using Python.&lt;/p&gt;
+&lt;/div&gt;
+</content>
+    <link href="https://misken.github.io/.doctrees/nbsphinx/blog/what_if_1_model_datatable/" rel="alternate"/>
+    <summary>Build spreadsheet type models using Python.</summary>
+    <category term="python" label="python"/>
+    <category term="excel" label="excel"/>
+    <published>2021-02-12T00:00:00-05:00</published>
+  </entry>
+  <entry>
+    <id>https://misken.github.io/.doctrees/nbsphinx/.doctrees/nbsphinx/blog/what_if_1_model_datatable/</id>
+    <title>Excel “what if?” analysis with Python - Part 1: Models and Data Tables</title>
+    <updated>2021-02-12T00:00:00-05:00</updated>
+    <author>
+      <name>misken</name>
+    </author>
+    <content type="html">&lt;div class="ablog-post-excerpt docutils container"&gt;
+&lt;p&gt;Build spreadsheet type models using Python.&lt;/p&gt;
+&lt;/div&gt;
+</content>
+    <link href="https://misken.github.io/.doctrees/nbsphinx/.doctrees/nbsphinx/blog/what_if_1_model_datatable/" rel="alternate"/>
+    <summary>Build spreadsheet type models using Python.</summary>
+    <category term="python" label="python"/>
+    <category term="excel" label="excel"/>
+    <published>2021-02-12T00:00:00-05:00</published>
+  </entry>
+  <entry>
     <id>https://misken.github.io/blog/what_if_2_goalseek/</id>
     <title>Excel “what if?” analysis with Python - Part 2: Goal seek</title>
     <updated>2021-02-13T00:00:00-05:00</updated>
@@ -269,6 +524,40 @@
 &lt;/div&gt;
 </content>
     <link href="https://misken.github.io/blog/what_if_2_goalseek/" rel="alternate"/>
+    <summary>Implement a spreadsheet type goal-seek function in Python.</summary>
+    <category term="python" label="python"/>
+    <category term="excel" label="excel"/>
+    <published>2021-02-13T00:00:00-05:00</published>
+  </entry>
+  <entry>
+    <id>https://misken.github.io/.doctrees/nbsphinx/blog/what_if_2_goalseek/</id>
+    <title>Excel “what if?” analysis with Python - Part 2: Goal seek</title>
+    <updated>2021-02-13T00:00:00-05:00</updated>
+    <author>
+      <name>misken</name>
+    </author>
+    <content type="html">&lt;div class="ablog-post-excerpt docutils container"&gt;
+&lt;p&gt;Implement a spreadsheet type goal-seek function in Python.&lt;/p&gt;
+&lt;/div&gt;
+</content>
+    <link href="https://misken.github.io/.doctrees/nbsphinx/blog/what_if_2_goalseek/" rel="alternate"/>
+    <summary>Implement a spreadsheet type goal-seek function in Python.</summary>
+    <category term="python" label="python"/>
+    <category term="excel" label="excel"/>
+    <published>2021-02-13T00:00:00-05:00</published>
+  </entry>
+  <entry>
+    <id>https://misken.github.io/.doctrees/nbsphinx/.doctrees/nbsphinx/blog/what_if_2_goalseek/</id>
+    <title>Excel “what if?” analysis with Python - Part 2: Goal seek</title>
+    <updated>2021-02-13T00:00:00-05:00</updated>
+    <author>
+      <name>misken</name>
+    </author>
+    <content type="html">&lt;div class="ablog-post-excerpt docutils container"&gt;
+&lt;p&gt;Implement a spreadsheet type goal-seek function in Python.&lt;/p&gt;
+&lt;/div&gt;
+</content>
+    <link href="https://misken.github.io/.doctrees/nbsphinx/.doctrees/nbsphinx/blog/what_if_2_goalseek/" rel="alternate"/>
     <summary>Implement a spreadsheet type goal-seek function in Python.</summary>
     <category term="python" label="python"/>
     <category term="excel" label="excel"/>
@@ -292,6 +581,40 @@
     <published>2021-02-21T00:00:00-05:00</published>
   </entry>
   <entry>
+    <id>https://misken.github.io/.doctrees/nbsphinx/blog/what_if_3_simulation/</id>
+    <title>Excel “what if?” analysis with Python - Part 3: Simulation</title>
+    <updated>2021-02-21T00:00:00-05:00</updated>
+    <author>
+      <name>misken</name>
+    </author>
+    <content type="html">&lt;div class="ablog-post-excerpt docutils container"&gt;
+&lt;p&gt;Do Monte-Carlo simulation in Python.&lt;/p&gt;
+&lt;/div&gt;
+</content>
+    <link href="https://misken.github.io/.doctrees/nbsphinx/blog/what_if_3_simulation/" rel="alternate"/>
+    <summary>Do Monte-Carlo simulation in Python.</summary>
+    <category term="python" label="python"/>
+    <category term="excel" label="excel"/>
+    <published>2021-02-21T00:00:00-05:00</published>
+  </entry>
+  <entry>
+    <id>https://misken.github.io/.doctrees/nbsphinx/.doctrees/nbsphinx/blog/what_if_3_simulation/</id>
+    <title>Excel “what if?” analysis with Python - Part 3: Simulation</title>
+    <updated>2021-02-21T00:00:00-05:00</updated>
+    <author>
+      <name>misken</name>
+    </author>
+    <content type="html">&lt;div class="ablog-post-excerpt docutils container"&gt;
+&lt;p&gt;Do Monte-Carlo simulation in Python.&lt;/p&gt;
+&lt;/div&gt;
+</content>
+    <link href="https://misken.github.io/.doctrees/nbsphinx/.doctrees/nbsphinx/blog/what_if_3_simulation/" rel="alternate"/>
+    <summary>Do Monte-Carlo simulation in Python.</summary>
+    <category term="python" label="python"/>
+    <category term="excel" label="excel"/>
+    <published>2021-02-21T00:00:00-05:00</published>
+  </entry>
+  <entry>
     <id>https://misken.github.io/blog/what_if_4_project_packaging/</id>
     <title>Excel “what if?” analysis with Python - Part 4: Project structure and packaging</title>
     <updated>2021-03-11T00:00:00-05:00</updated>
@@ -303,6 +626,40 @@
 &lt;/div&gt;
 </content>
     <link href="https://misken.github.io/blog/what_if_4_project_packaging/" rel="alternate"/>
+    <summary>Create a Python package of our spreadsheet like modeling tools.</summary>
+    <category term="python" label="python"/>
+    <category term="excel" label="excel"/>
+    <published>2021-03-11T00:00:00-05:00</published>
+  </entry>
+  <entry>
+    <id>https://misken.github.io/.doctrees/nbsphinx/blog/what_if_4_project_packaging/</id>
+    <title>Excel “what if?” analysis with Python - Part 4: Project structure and packaging</title>
+    <updated>2021-03-11T00:00:00-05:00</updated>
+    <author>
+      <name>misken</name>
+    </author>
+    <content type="html">&lt;div class="ablog-post-excerpt docutils container"&gt;
+&lt;p&gt;Create a Python package of our spreadsheet like modeling tools.&lt;/p&gt;
+&lt;/div&gt;
+</content>
+    <link href="https://misken.github.io/.doctrees/nbsphinx/blog/what_if_4_project_packaging/" rel="alternate"/>
+    <summary>Create a Python package of our spreadsheet like modeling tools.</summary>
+    <category term="python" label="python"/>
+    <category term="excel" label="excel"/>
+    <published>2021-03-11T00:00:00-05:00</published>
+  </entry>
+  <entry>
+    <id>https://misken.github.io/.doctrees/nbsphinx/.doctrees/nbsphinx/blog/what_if_4_project_packaging/</id>
+    <title>Excel “what if?” analysis with Python - Part 4: Project structure and packaging</title>
+    <updated>2021-03-11T00:00:00-05:00</updated>
+    <author>
+      <name>misken</name>
+    </author>
+    <content type="html">&lt;div class="ablog-post-excerpt docutils container"&gt;
+&lt;p&gt;Create a Python package of our spreadsheet like modeling tools.&lt;/p&gt;
+&lt;/div&gt;
+</content>
+    <link href="https://misken.github.io/.doctrees/nbsphinx/.doctrees/nbsphinx/blog/what_if_4_project_packaging/" rel="alternate"/>
     <summary>Create a Python package of our spreadsheet like modeling tools.</summary>
     <category term="python" label="python"/>
     <category term="excel" label="excel"/>
@@ -358,6 +715,40 @@
     <published>2022-04-02T00:00:00-04:00</published>
   </entry>
   <entry>
+    <id>https://misken.github.io/.doctrees/nbsphinx/blog/hello_world/</id>
+    <title>Hello world from ablog blogging with JupyterLab</title>
+    <updated>2022-04-02T00:00:00-04:00</updated>
+    <author>
+      <name>misken</name>
+    </author>
+    <content type="html">&lt;div class="ablog-post-excerpt docutils container"&gt;
+&lt;p&gt;Hello world, this is a markdown cell in a Jupyter notebook I’m using to test blogging from notebooks using the &lt;a class="reference external" href="https://ablog.readthedocs.io/en/latest/"&gt;ablog&lt;/a&gt; package.&lt;/p&gt;
+&lt;/div&gt;
+</content>
+    <link href="https://misken.github.io/.doctrees/nbsphinx/blog/hello_world/" rel="alternate"/>
+    <summary>Hello world, this is a markdown cell in a Jupyter notebook I’m using to test blogging from notebooks using the ablog package.</summary>
+    <category term="jupyter" label="jupyter"/>
+    <category term="ablog" label="ablog"/>
+    <published>2022-04-02T00:00:00-04:00</published>
+  </entry>
+  <entry>
+    <id>https://misken.github.io/.doctrees/nbsphinx/.doctrees/nbsphinx/blog/hello_world/</id>
+    <title>Hello world from ablog blogging with JupyterLab</title>
+    <updated>2022-04-02T00:00:00-04:00</updated>
+    <author>
+      <name>misken</name>
+    </author>
+    <content type="html">&lt;div class="ablog-post-excerpt docutils container"&gt;
+&lt;p&gt;Hello world, this is a markdown cell in a Jupyter notebook I’m using to test blogging from notebooks using the &lt;a class="reference external" href="https://ablog.readthedocs.io/en/latest/"&gt;ablog&lt;/a&gt; package.&lt;/p&gt;
+&lt;/div&gt;
+</content>
+    <link href="https://misken.github.io/.doctrees/nbsphinx/.doctrees/nbsphinx/blog/hello_world/" rel="alternate"/>
+    <summary>Hello world, this is a markdown cell in a Jupyter notebook I’m using to test blogging from notebooks using the ablog package.</summary>
+    <category term="jupyter" label="jupyter"/>
+    <category term="ablog" label="ablog"/>
+    <published>2022-04-02T00:00:00-04:00</published>
+  </entry>
+  <entry>
     <id>https://misken.github.io/blog/use_jupyter_conda_envs/</id>
     <title>Using different conda environments with Jupyter Lab</title>
     <updated>2022-04-03T00:00:00-04:00</updated>
@@ -386,6 +777,40 @@
 &lt;/div&gt;
 </content>
     <link href="https://misken.github.io/blog/simpy_getting_started_vaccine_clinic/" rel="alternate"/>
+    <summary>Discrete event simulation (DES) is a well established technique for building simulation models of systems characterized by:</summary>
+    <category term="jupyter" label="jupyter"/>
+    <category term="ablog" label="ablog"/>
+    <published>2022-04-04T00:00:00-04:00</published>
+  </entry>
+  <entry>
+    <id>https://misken.github.io/.doctrees/nbsphinx/blog/simpy_getting_started_vaccine_clinic/</id>
+    <title>Using SimPy to simulate a vaccine clinic - Part 1: an introductory tutorial</title>
+    <updated>2022-04-04T00:00:00-04:00</updated>
+    <author>
+      <name>misken</name>
+    </author>
+    <content type="html">&lt;div class="ablog-post-excerpt docutils container"&gt;
+&lt;p&gt;Discrete event simulation (DES) is a well established technique for building simulation models of systems characterized by:&lt;/p&gt;
+&lt;/div&gt;
+</content>
+    <link href="https://misken.github.io/.doctrees/nbsphinx/blog/simpy_getting_started_vaccine_clinic/" rel="alternate"/>
+    <summary>Discrete event simulation (DES) is a well established technique for building simulation models of systems characterized by:</summary>
+    <category term="jupyter" label="jupyter"/>
+    <category term="ablog" label="ablog"/>
+    <published>2022-04-04T00:00:00-04:00</published>
+  </entry>
+  <entry>
+    <id>https://misken.github.io/.doctrees/nbsphinx/.doctrees/nbsphinx/blog/simpy_getting_started_vaccine_clinic/</id>
+    <title>Using SimPy to simulate a vaccine clinic - Part 1: an introductory tutorial</title>
+    <updated>2022-04-04T00:00:00-04:00</updated>
+    <author>
+      <name>misken</name>
+    </author>
+    <content type="html">&lt;div class="ablog-post-excerpt docutils container"&gt;
+&lt;p&gt;Discrete event simulation (DES) is a well established technique for building simulation models of systems characterized by:&lt;/p&gt;
+&lt;/div&gt;
+</content>
+    <link href="https://misken.github.io/.doctrees/nbsphinx/.doctrees/nbsphinx/blog/simpy_getting_started_vaccine_clinic/" rel="alternate"/>
     <summary>Discrete event simulation (DES) is a well established technique for building simulation models of systems characterized by:</summary>
     <category term="jupyter" label="jupyter"/>
     <category term="ablog" label="ablog"/>

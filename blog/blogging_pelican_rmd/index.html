@@ -1,0 +1,601 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>Blogging with Pelican and R Markdown &#8212; misken 0,1,0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css" />
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <link rel="author" title="About these documents" href="../../about/" />
+    <link rel="index" title="Index" href="../../genindex/" />
+    <link rel="search" title="Search" href="../../search/" /> 
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+ 
+<link
+  rel="alternate"
+  type="application/atom+xml"
+  href="../../blog/atom.xml"
+  title="Bits of analytics"
+/>
+ 
+<style type="text/css">
+  ul.ablog-archive {
+    list-style: none;
+    overflow: auto;
+    margin-left: 0px;
+  }
+  ul.ablog-archive li {
+    float: left;
+    margin-right: 5px;
+    font-size: 80%;
+  }
+  ul.postlist a {
+    font-style: italic;
+  }
+  ul.postlist-style-disc {
+    list-style-type: disc;
+  }
+  ul.postlist-style-none {
+    list-style-type: none;
+  }
+  ul.postlist-style-circle {
+    list-style-type: circle;
+  }
+</style>
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+             <section id="blogging-with-pelican-and-r-markdown">
+<h1>Blogging with Pelican and R Markdown<a class="headerlink" href="#blogging-with-pelican-and-r-markdown" title="Permalink to this headline">¶</a></h1>
+<p>Documenting process for blogging with Pelican and R Markdown with a focus on figures.</p>
+<p>This blog is powered by Pelican and many of the posts are written using
+reStructuredText. Often, these posts take the form of tutorials developed
+using Jupyter notebooks or R Markdown documents. My less than super frequent
+posting schedule results in me constantly refiguring out exactly how to include
+the Jupyter notebook or R Markdown content. Dealing with things like included
+images or plots generated from ggplot2 or matplotlib is often troublesome. It
+would really make sense if I just carefully documented the workflow for doing
+these things and publish it as its own blog post. So, here it is. Hopefully
+this will save me (and others) time and frustration in the future.</p>
+<p>I will use the famous <a class="reference external" href="https://en.wikipedia.org/wiki/Iris_flower_data_set">Iris dataset</a> (of course).</p>
+<section id="r-markdown-blogging">
+<h2>R Markdown blogging<a class="headerlink" href="#r-markdown-blogging" title="Permalink to this headline">¶</a></h2>
+<p>I had done various ad-hoc things to do R related blog posts using R Markdown.
+Then I found an approach described in <a class="reference external" href="http://michaeltoth.me/how-to-write-pelican-blog-posts-using-rmarkdown-knitr-20.html">Michael Toth’s data science blog</a>. The basic approach is to use run an R script from the command line using the
+<code class="docutils literal notranslate"><span class="pre">Rscript</span></code> program that uses knitr commands to:</p>
+<ul class="simple">
+<li><p>convert the Rmd blog post to a plain Markdown file that Pelican can handle,</p></li>
+<li><p>put generated md file into your main Pelican content folder,</p></li>
+<li><p>put generated plots and other images into an appropriate folder so that
+Pelican can find them and generate your blog post correctly, both locally and
+in the published version.,</p></li>
+<li><p>then do your Pelican blog post processing as you normally do to publish your
+new post.</p></li>
+</ul>
+<p>It’s those last two steps that were causing me grief. Images and plots weren’t
+showing up on the local devserver. I’d hack fix it by publishing to my host and
+then manually uploading image files to the “right place” based on the URL’s in
+the generated HTML. I’m sure it’s something dumb I’m doing but time to get it
+sorted out, fixed and documented.</p>
+<p>Here’s the R script that I borrowed (from Toth’s post):</p>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="c1">#!/usr/bin/Rscript --vanilla</span>
+
+<span class="c1"># compiles all .Rmd files in _R directory into .md files in blog directory,</span>
+<span class="c1"># if the input file is older than the output file.</span>
+
+<span class="c1"># run ./knitpages.R to update all knitr files that need to be updated.</span>
+<span class="c1"># run this script from your base content directory</span>
+
+<span class="nf">library</span><span class="p">(</span><span class="n">knitr</span><span class="p">)</span>
+
+<span class="n">KnitPost</span> <span class="o">&lt;-</span> <span class="nf">function</span><span class="p">(</span><span class="n">input</span><span class="p">,</span> <span class="n">outfile</span><span class="p">,</span> <span class="n">figsfolder</span><span class="p">,</span> <span class="n">cachefolder</span><span class="p">,</span> <span class="n">base.url</span><span class="o">=</span><span class="s">&quot;/&quot;</span><span class="p">)</span> <span class="p">{</span>
+  <span class="n">opts_knit</span><span class="o">$</span><span class="nf">set</span><span class="p">(</span><span class="n">base.url</span> <span class="o">=</span> <span class="n">base.url</span><span class="p">)</span>
+  <span class="n">fig.path</span> <span class="o">&lt;-</span> <span class="nf">paste0</span><span class="p">(</span><span class="n">figsfolder</span><span class="p">,</span> <span class="nf">sub</span><span class="p">(</span><span class="s">&quot;.Rmd$&quot;</span><span class="p">,</span> <span class="s">&quot;&quot;</span><span class="p">,</span> <span class="nf">basename</span><span class="p">(</span><span class="n">input</span><span class="p">)),</span> <span class="s">&quot;/&quot;</span><span class="p">)</span>
+  <span class="n">cache.path</span> <span class="o">&lt;-</span> <span class="nf">file.path</span><span class="p">(</span><span class="n">cachefolder</span><span class="p">,</span> <span class="nf">sub</span><span class="p">(</span><span class="s">&quot;.Rmd$&quot;</span><span class="p">,</span> <span class="s">&quot;&quot;</span><span class="p">,</span> <span class="nf">basename</span><span class="p">(</span><span class="n">input</span><span class="p">)),</span> <span class="s">&quot;/&quot;</span><span class="p">)</span>
+
+  <span class="n">opts_chunk</span><span class="o">$</span><span class="nf">set</span><span class="p">(</span><span class="n">fig.path</span> <span class="o">=</span> <span class="n">fig.path</span><span class="p">)</span>
+  <span class="n">opts_chunk</span><span class="o">$</span><span class="nf">set</span><span class="p">(</span><span class="n">cache.path</span> <span class="o">=</span> <span class="n">cache.path</span><span class="p">)</span>
+  <span class="n">opts_chunk</span><span class="o">$</span><span class="nf">set</span><span class="p">(</span><span class="n">fig.cap</span> <span class="o">=</span> <span class="s">&quot;center&quot;</span><span class="p">)</span>
+  <span class="nf">render_markdown</span><span class="p">()</span>
+  <span class="nf">knit</span><span class="p">(</span><span class="n">input</span><span class="p">,</span> <span class="n">outfile</span><span class="p">,</span> <span class="n">envir</span> <span class="o">=</span> <span class="nf">parent.frame</span><span class="p">())</span>
+<span class="p">}</span>
+
+<span class="n">knit_folder</span> <span class="o">&lt;-</span> <span class="nf">function</span><span class="p">(</span><span class="n">infolder</span><span class="p">,</span> <span class="n">outfolder</span><span class="p">,</span> <span class="n">figsfolder</span><span class="p">,</span> <span class="n">cachefolder</span><span class="p">,</span> <span class="n">force</span> <span class="o">=</span> <span class="bp">F</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nf">for </span><span class="p">(</span><span class="n">infile</span> <span class="n">in</span> <span class="nf">list.files</span><span class="p">(</span><span class="n">infolder</span><span class="p">,</span> <span class="n">pattern</span> <span class="o">=</span> <span class="s">&quot;*.Rmd&quot;</span><span class="p">,</span> <span class="n">full.names</span> <span class="o">=</span> <span class="kc">TRUE</span><span class="p">))</span> <span class="p">{</span>
+
+    <span class="nf">print</span><span class="p">(</span><span class="n">infile</span><span class="p">)</span>
+    <span class="n">outfile</span> <span class="o">=</span> <span class="nf">paste0</span><span class="p">(</span><span class="n">outfolder</span><span class="p">,</span> <span class="s">&quot;/&quot;</span><span class="p">,</span> <span class="nf">sub</span><span class="p">(</span><span class="s">&quot;.Rmd$&quot;</span><span class="p">,</span> <span class="s">&quot;.md&quot;</span><span class="p">,</span> <span class="nf">basename</span><span class="p">(</span><span class="n">infile</span><span class="p">)))</span>
+    <span class="nf">print</span><span class="p">(</span><span class="n">outfile</span><span class="p">)</span>
+
+    <span class="c1"># knit only if the input file is the last one modified</span>
+    <span class="nf">if </span><span class="p">(</span><span class="o">!</span><span class="nf">file.exists</span><span class="p">(</span><span class="n">outfile</span><span class="p">)</span> <span class="o">|</span> <span class="nf">file.info</span><span class="p">(</span><span class="n">infile</span><span class="p">)</span><span class="o">$</span><span class="n">mtime</span> <span class="o">&gt;</span> <span class="nf">file.info</span><span class="p">(</span><span class="n">outfile</span><span class="p">)</span><span class="o">$</span><span class="n">mtime</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nf">KnitPost</span><span class="p">(</span><span class="n">infile</span><span class="p">,</span> <span class="n">outfile</span><span class="p">,</span> <span class="n">figsfolder</span><span class="p">,</span> <span class="n">cachefolder</span><span class="p">)</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="c1">#knit_folder(&quot;_R&quot;, &quot;blog&quot;, &quot;figures/&quot;, &quot;_caches&quot;)</span>
+<span class="nf">knit_folder</span><span class="p">(</span><span class="s">&quot;_R&quot;</span><span class="p">,</span> <span class="s">&quot;content&quot;</span><span class="p">,</span> <span class="s">&quot;images/&quot;</span><span class="p">,</span> <span class="s">&quot;cache&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The only changes I made were in that last line and just made to match my
+blogging folder structure. The subfolders inside the <code class="docutils literal notranslate"><span class="pre">images/</span></code> folder were
+created by the <code class="docutils literal notranslate"><span class="pre">knitpages.R</span></code> script above.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>.
+├── cache
+├── content
+│   ├── extra
+│   ├── images
+│   ├── literalhtml
+│   └── pages
+├── images
+│   ├── obsim_caret_part1
+│   ├── obsim_caret_part2
+│   ├── obsim_caret_part3
+│   ├── otbirders_1_ebirdapi_python_1
+│   ├── post_metamods_pp_1
+│   └── simmer-getting-started
+├── output
+├── __pycache__
+└── _R
+    ├── data
+    ├── images
+    └── images
+
+36 directories
+</pre></div>
+</div>
+<p>Um, as I write this I realize one source of my problems. The only <code class="docutils literal notranslate"><span class="pre">images/</span></code> folder
+I should have should be inside the <code class="docutils literal notranslate"><span class="pre">content/</span></code> folder. Furthermore, it’s the
+<code class="docutils literal notranslate"><span class="pre">base.url</span></code> parameter in the R script, which is defaulted to ‘/’, that is
+causing the script to generate subfolders inside <code class="docutils literal notranslate"><span class="pre">images/</span></code> instead of
+<code class="docutils literal notranslate"><span class="pre">content/images/</span></code>. Perhaps Toth’s Pelican powered site is structured
+slightly differently than mine in terms of where the <code class="docutils literal notranslate"><span class="pre">images/</span></code> folder resides.
+So, I changed the R script to default the <code class="docutils literal notranslate"><span class="pre">base.url</span></code> to <code class="docutils literal notranslate"><span class="pre">./</span></code>. That fixed one
+whole set of issues of the R generated plots not having correct paths
+generated in the markdown and html files. Now, folder structure looks like this.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>├── cache
+├── content
+│   ├── extra
+│   ├── images
+│   │   ├── obsim_caret_part1
+│   │   ├── obsim_caret_part2
+│   │   ├── obsim_caret_part3
+│   │   ├── otbirders_1_ebirdapi_python_1
+│   │   ├── post_metamods_pp_1
+│   │   └── simmer-getting-started
+│   ├── literalhtml
+│   └── pages
+├── output
+├── __pycache__
+└── _R
+    ├── data
+    └── images
+</pre></div>
+</div>
+</section>
+<section id="irises">
+<h2>Irises<a class="headerlink" href="#irises" title="Permalink to this headline">¶</a></h2>
+<p>Let’s take a look at the famous iris dataset.</p>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="n">GGally</span><span class="o">::</span><span class="nf">ggpairs</span><span class="p">(</span><span class="n">iris</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><img alt="center" src="../../_images/ggpairsplot-1.png" /></p>
+<p>What do those irises look like? So, should I use the main blog’s
+<code class="docutils literal notranslate"><span class="pre">images/</span></code> folder or should I use a subfolder of the folder
+containing this Rmd file? Up till now, I’ve been doing the latter. I should
+do both. This ensures the published site will have correct links to images
+and will allow me to use knitr inside R Studio while writing the post to check
+out how things will look.</p>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="n">knitr</span><span class="o">::</span><span class="nf">include_graphics</span><span class="p">(</span><span class="s">&#39;images/iris_setosa.jpg&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><img alt="center" src="../../_images/iris_setosa.jpg" /></p>
+</section>
+<section id="creating-the-post">
+<h2>Creating the post<a class="headerlink" href="#creating-the-post" title="Permalink to this headline">¶</a></h2>
+<p>Ok, so this is getting a little self-referential. But, after the above
+chunk, I went to my blog’s main folder and ran</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>$ ./knitpages.R
+</pre></div>
+</div>
+<p>Then I went and looked at the <code class="docutils literal notranslate"><span class="pre">blogging_pelican_rmd.md</span></code> file that was generated and placed
+into the <code class="docutils literal notranslate"><span class="pre">content/</span></code> folder. The Markdown generated to display the
+pairs plot is:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>![center](./images/blogging_pelican_rmd/ggpairsplot-1.png)
+</pre></div>
+</div>
+<p>and, for the iris image:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>![center](./images/iris_setosa.jpg)
+</pre></div>
+</div>
+<p>Now generate the site locally:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>$ make devserver
+</pre></div>
+</div>
+<p>and viewed the post in the local server and, yep, both the generated pairs
+plot and the jpg Iris image appear.</p>
+<p>Now generate the site to publish remotely:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>$ make publish
+</pre></div>
+</div>
+<p>Yep, both images appear.</p>
+</section>
+<section id="bottom-line">
+<h2>Bottom line<a class="headerlink" href="#bottom-line" title="Permalink to this headline">¶</a></h2>
+<p>For R Markdown blogging with Pelican, I need to do the following:</p>
+<ul class="simple">
+<li><p>put non-generated images into the <code class="docutils literal notranslate"><span class="pre">content/images</span></code> folder as well as the <code class="docutils literal notranslate"><span class="pre">_R/images</span></code> folder (the latter not necessary but a nicety if knitting from R Studio for testing).</p></li>
+<li><p>make sure that knitpages.R uses <code class="docutils literal notranslate"><span class="pre">&quot;./&quot;</span></code> for <code class="docutils literal notranslate"><span class="pre">base.url</span></code></p></li>
+<li><p>make sure that knitpages.R specifies <code class="docutils literal notranslate"><span class="pre">images/</span></code> for output folder for images.</p></li>
+<li><p>for external images use the following</p></li>
+</ul>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="n">knitr</span><span class="o">::</span><span class="nf">include_graphics</span><span class="p">(</span><span class="s">&#39;images/iris_setosa.jpg&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Here’s working version of knitpages.R.</p>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="c1">#!/usr/bin/Rscript --vanilla</span>
+
+<span class="c1"># compiles all .Rmd files in _R directory into .md files in blog directory,</span>
+<span class="c1"># if the input file is older than the output file.</span>
+
+<span class="c1"># run ./knitpages.R to update all knitr files that need to be updated.</span>
+<span class="c1"># run this script from your base content directory</span>
+
+<span class="nf">library</span><span class="p">(</span><span class="n">knitr</span><span class="p">)</span>
+
+<span class="n">KnitPost</span> <span class="o">&lt;-</span> <span class="nf">function</span><span class="p">(</span><span class="n">input</span><span class="p">,</span> <span class="n">outfile</span><span class="p">,</span> <span class="n">figsfolder</span><span class="p">,</span> <span class="n">cachefolder</span><span class="p">,</span> <span class="n">base.url</span><span class="o">=</span><span class="s">&quot;/&quot;</span><span class="p">)</span> <span class="p">{</span>
+  <span class="n">opts_knit</span><span class="o">$</span><span class="nf">set</span><span class="p">(</span><span class="n">base.url</span> <span class="o">=</span> <span class="n">base.url</span><span class="p">)</span>
+  <span class="n">fig.path</span> <span class="o">&lt;-</span> <span class="nf">paste0</span><span class="p">(</span><span class="n">figsfolder</span><span class="p">,</span> <span class="nf">sub</span><span class="p">(</span><span class="s">&quot;.Rmd$&quot;</span><span class="p">,</span> <span class="s">&quot;&quot;</span><span class="p">,</span> <span class="nf">basename</span><span class="p">(</span><span class="n">input</span><span class="p">)),</span> <span class="s">&quot;/&quot;</span><span class="p">)</span>
+  <span class="n">cache.path</span> <span class="o">&lt;-</span> <span class="nf">file.path</span><span class="p">(</span><span class="n">cachefolder</span><span class="p">,</span> <span class="nf">sub</span><span class="p">(</span><span class="s">&quot;.Rmd$&quot;</span><span class="p">,</span> <span class="s">&quot;&quot;</span><span class="p">,</span> <span class="nf">basename</span><span class="p">(</span><span class="n">input</span><span class="p">)),</span> <span class="s">&quot;/&quot;</span><span class="p">)</span>
+
+  <span class="n">opts_chunk</span><span class="o">$</span><span class="nf">set</span><span class="p">(</span><span class="n">fig.path</span> <span class="o">=</span> <span class="n">fig.path</span><span class="p">)</span>
+  <span class="n">opts_chunk</span><span class="o">$</span><span class="nf">set</span><span class="p">(</span><span class="n">cache.path</span> <span class="o">=</span> <span class="n">cache.path</span><span class="p">)</span>
+  <span class="n">opts_chunk</span><span class="o">$</span><span class="nf">set</span><span class="p">(</span><span class="n">fig.cap</span> <span class="o">=</span> <span class="s">&quot;center&quot;</span><span class="p">)</span>
+  <span class="nf">render_markdown</span><span class="p">()</span>
+  <span class="nf">knit</span><span class="p">(</span><span class="n">input</span><span class="p">,</span> <span class="n">outfile</span><span class="p">,</span> <span class="n">envir</span> <span class="o">=</span> <span class="nf">parent.frame</span><span class="p">())</span>
+<span class="p">}</span>
+
+<span class="n">knit_folder</span> <span class="o">&lt;-</span> <span class="nf">function</span><span class="p">(</span><span class="n">infolder</span><span class="p">,</span> <span class="n">outfolder</span><span class="p">,</span> <span class="n">figsfolder</span><span class="p">,</span> <span class="n">cachefolder</span><span class="p">,</span> <span class="n">force</span> <span class="o">=</span> <span class="bp">F</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nf">for </span><span class="p">(</span><span class="n">infile</span> <span class="n">in</span> <span class="nf">list.files</span><span class="p">(</span><span class="n">infolder</span><span class="p">,</span> <span class="n">pattern</span> <span class="o">=</span> <span class="s">&quot;*.Rmd&quot;</span><span class="p">,</span> <span class="n">full.names</span> <span class="o">=</span> <span class="kc">TRUE</span><span class="p">))</span> <span class="p">{</span>
+
+    <span class="nf">print</span><span class="p">(</span><span class="n">infile</span><span class="p">)</span>
+    <span class="n">outfile</span> <span class="o">=</span> <span class="nf">paste0</span><span class="p">(</span><span class="n">outfolder</span><span class="p">,</span> <span class="s">&quot;/&quot;</span><span class="p">,</span> <span class="nf">sub</span><span class="p">(</span><span class="s">&quot;.Rmd$&quot;</span><span class="p">,</span> <span class="s">&quot;.md&quot;</span><span class="p">,</span> <span class="nf">basename</span><span class="p">(</span><span class="n">infile</span><span class="p">)))</span>
+    <span class="nf">print</span><span class="p">(</span><span class="n">outfile</span><span class="p">)</span>
+
+    <span class="c1"># knit only if the input file is the last one modified</span>
+    <span class="nf">if </span><span class="p">(</span><span class="o">!</span><span class="nf">file.exists</span><span class="p">(</span><span class="n">outfile</span><span class="p">)</span> <span class="o">|</span> <span class="nf">file.info</span><span class="p">(</span><span class="n">infile</span><span class="p">)</span><span class="o">$</span><span class="n">mtime</span> <span class="o">&gt;</span> <span class="nf">file.info</span><span class="p">(</span><span class="n">outfile</span><span class="p">)</span><span class="o">$</span><span class="n">mtime</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nf">KnitPost</span><span class="p">(</span><span class="n">infile</span><span class="p">,</span> <span class="n">outfile</span><span class="p">,</span> <span class="n">figsfolder</span><span class="p">,</span> <span class="n">cachefolder</span><span class="p">,</span> <span class="s">&quot;./&quot;</span><span class="p">)</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="c1">#knit_folder(&quot;_R&quot;, &quot;blog&quot;, &quot;figures/&quot;, &quot;_caches&quot;)</span>
+<span class="nf">knit_folder</span><span class="p">(</span><span class="s">&quot;_R&quot;</span><span class="p">,</span> <span class="s">&quot;content&quot;</span><span class="p">,</span> <span class="s">&quot;images/&quot;</span><span class="p">,</span> <span class="s">&quot;cache&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+
+<div class="section">
+    
+
+<div class="section">
+  <span style="float: left">
+     Previous:
+    
+    <a href="../otbirders_1_ebirdapi_python_1/">
+       Wednesday OT Birders - Using the ebird API, Python, and R to analyze data for our birding group
+    </a>
+    
+  </span>
+  <span>&nbsp;</span>
+  <span style="float: right">
+     Next: 
+    <a href="../garmin-ubuntu-viking/">
+      Using Ubuntu to acquire and manage GPS data from Garmin eTrex 
+    </a>
+    
+  </span>
+</div>
+  
+</div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../">misken</a></h1>
+
+
+
+
+
+
+
+
+  
+<h2>
+   
+  19 April 2018 
+</h2>
+
+<ul>
+   
+<li id="author">
+  <span
+    >Author:</span
+  >
+   
+  <a href="../author/misken/">misken</a>  
+</li>
+    
+<li id="tags">
+  <span
+    >Tags: </span
+  >
+   
+  <a href="../tag/blogging/">blogging</a>   
+  <a href="../tag/python/">python</a>   
+  <a href="../tag/r/">r</a>  
+</li>
+ 
+</ul>
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../about/">About misken</a></li>
+</ul>
+
+
+<h3>
+  <a href="../">Recent Posts</a>
+</h3>
+<ul>
+   
+  <li>
+    <a href="../../.doctrees/nbsphinx/.doctrees/nbsphinx/blog/simpy_getting_started_vaccine_clinic/"
+      >04 April - Using SimPy to simulate a vaccine clinic - Part 1: an introductory tutorial</a
+    >
+  </li>
+  
+  <li>
+    <a href="../../.doctrees/nbsphinx/blog/simpy_getting_started_vaccine_clinic/"
+      >04 April - Using SimPy to simulate a vaccine clinic - Part 1: an introductory tutorial</a
+    >
+  </li>
+  
+  <li>
+    <a href="../simpy_getting_started_vaccine_clinic/"
+      >04 April - Using SimPy to simulate a vaccine clinic - Part 1: an introductory tutorial</a
+    >
+  </li>
+  
+  <li>
+    <a href="../use_jupyter_conda_envs/"
+      >03 April - Using different conda environments with Jupyter Lab</a
+    >
+  </li>
+  
+  <li>
+    <a href="../../.doctrees/nbsphinx/.doctrees/nbsphinx/blog/hello_world/"
+      >02 April - Hello world from ablog blogging with JupyterLab</a
+    >
+  </li>
+  
+</ul>
+
+<h3><a href="../tag/">Tags</a></h3>
+<style type="text/css">
+  ul.ablog-cloud {
+    list-style: none;
+    overflow: auto;
+  }
+  ul.ablog-cloud li {
+    float: left;
+    height: 20pt;
+    line-height: 18pt;
+    margin-right: 5px;
+  }
+  ul.ablog-cloud a {
+    text-decoration: none;
+    vertical-align: middle;
+  }
+  li.ablog-cloud-1 {
+    font-size: 80%;
+  }
+  li.ablog-cloud-2 {
+    font-size: 95%;
+  }
+  li.ablog-cloud-3 {
+    font-size: 110%;
+  }
+  li.ablog-cloud-4 {
+    font-size: 125%;
+  }
+  li.ablog-cloud-5 {
+    font-size: 140%;
+  }
+</style>
+<ul class="ablog-cloud">
+   
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/github/">GitHub</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/r/">R</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-2">
+    <a href="../tag/ablog/">ablog</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/bikeshare/">bikeshare</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/birding/">birding</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/blogging/">blogging</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/conda/">conda</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/datetime/">datetime</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/dplyr/">dplyr</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/ebird/">ebird</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/ecology/">ecology</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-2">
+    <a href="../tag/excel/">excel</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/ggplot2/">ggplot2</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/gis/">gis</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/git/">git</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/hiking/">hiking</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/hillmaker/">hillmaker</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-2">
+    <a href="../tag/jupyter/">jupyter</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/occupancy-analysis/">occupancy analysis</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/pandas/">pandas</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-5">
+    <a href="../tag/python/">python</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/r/">r</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/sphinx/">sphinx</a>
+  </li>
+   
+</ul>
+
+<h3>
+  <a href="../archive/">Archives</a>
+</h3>
+<ul>
+   
+  <li>
+    <a href="../2022/">2022 (9)</a>
+  </li>
+    
+  <li>
+    <a href="../2021/">2021 (12)</a>
+  </li>
+    
+  <li>
+    <a href="../2020/">2020 (2)</a>
+  </li>
+    
+  <li>
+    <a href="../2019/">2019 (11)</a>
+  </li>
+    
+  <li>
+    <a href="../2018/">2018 (8)</a>
+  </li>
+    
+  <li>
+    <a href="../2016/">2016 (1)</a>
+  </li>
+    
+  <li>
+    <a href="../2014/">2014 (3)</a>
+  </li>
+   
+</ul>
+
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search/" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2022, misken.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.3.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../../_sources/blog/blogging_pelican_rmd.md.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
