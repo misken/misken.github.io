@@ -1,0 +1,10 @@
+Title: An object oriented SimPy patient flow simulation model
+Slug:  simpy-first-oo-patflow-model
+Date:  2017-07-11 17:01
+Category:
+Tags:  python, simpy, simulation, healthcare, patient flow
+Author: mark
+Summary: In Part 2 of this series we build a simple object oriented SimPy model for simulating inpatient obsetrics patient flow.
+
+{% notebook ./simpy-first-oo-patflow-model.ipynb %}
+

@@ -1,0 +1,10 @@
+Title: Getting started with SimPy for patient flow modeling
+Slug:  simpy-getting-started-patient-flow-modeling
+Date:  2017-07-11 17:01
+Category:
+Tags:  python, simpy, simulation, healthcare, patient flow
+Author: mark
+Summary: Building simple patient flow simulation models with SimPy. Part 1 of a multipart series.
+
+{% notebook ./simpy-getting-started.ipynb %}
+
