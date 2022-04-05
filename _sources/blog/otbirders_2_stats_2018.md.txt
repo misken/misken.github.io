@@ -2,7 +2,7 @@
 blogpost: true
 date: Feb 04, 2019
 author: misken
-tags: r, python, birding, dplyr, ggplot2, ebird
+tags: R, python, birding, dplyr, ggplot2, ebird
 ---
 
 # Wednesday Birders - 2018 stats and historical analysis using R

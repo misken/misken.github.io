@@ -316,7 +316,6 @@ div.rendered_html tbody tr:hover {
 </style>
 <section id="Computing-daily-averages-from-transaction-data---Part-2-(using-pandas-and-some-R-magic)">
 <h1>Computing daily averages from transaction data - Part 2 (using pandas and some R magic)<a class="headerlink" href="#Computing-daily-averages-from-transaction-data---Part-2-(using-pandas-and-some-R-magic)" title="Permalink to this headline">¶</a></h1>
-<p>In Part 2 of this post, we’ll extend this to cases in which we might want to group by an additional field (e.g. station_id for the bike share example) and see how this problem is just one part of the general problem of doing occupancy analysis based on transaction data.</p>
 <p>In <a class="reference external" href="http://hselab.org/daily-averages-1.html">Part 1 of this post</a>, we discuss the importance of taking into account days with zero activity as well as carefully specifiying the date range for analysis when computing things like the average number of bike trips by day in a bike share system. Obviously, this applies more generally to computing averages number of events per day. We showed an approach to dealing with these complications.</p>
 <p>In Part 2 of this post, we’ll extend this to cases in which we might want to group by an additional field (e.g. station_id for the bike share example) and see how this problem is just one part of the general problem of doing occupancy analysis based on transaction data. We’ll see how the <a class="reference external" href="https://github.com/misken/hillmaker">hillmaker</a> package can make these types of analyses easier.</p>
 <div class="nbinput nblast docutils container">
@@ -3395,7 +3394,7 @@ BT-01           2014-10-13         20
     <a href="../tag/github/">GitHub</a>
   </li>
     
-  <li class="ablog-cloud ablog-cloud-1">
+  <li class="ablog-cloud ablog-cloud-3">
     <a href="../tag/r/">R</a>
   </li>
     
@@ -3413,6 +3412,10 @@ BT-01           2014-10-13         20
     
   <li class="ablog-cloud ablog-cloud-1">
     <a href="../tag/blogging/">blogging</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/caret/">caret</a>
   </li>
     
   <li class="ablog-cloud ablog-cloud-1">
@@ -3451,7 +3454,7 @@ BT-01           2014-10-13         20
     <a href="../tag/git/">git</a>
   </li>
     
-  <li class="ablog-cloud ablog-cloud-1">
+  <li class="ablog-cloud ablog-cloud-2">
     <a href="../tag/healthcare/">healthcare</a>
   </li>
     
@@ -3468,6 +3471,10 @@ BT-01           2014-10-13         20
   </li>
     
   <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/metamodeling/">metamodeling</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
     <a href="../tag/occupancy-analysis/">occupancy analysis</a>
   </li>
     
@@ -3481,10 +3488,6 @@ BT-01           2014-10-13         20
     
   <li class="ablog-cloud ablog-cloud-5">
     <a href="../tag/python/">python</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/r/">r</a>
   </li>
     
   <li class="ablog-cloud ablog-cloud-1">
@@ -3523,7 +3526,7 @@ BT-01           2014-10-13         20
   </li>
     
   <li>
-    <a href="../2018/">2018 (4)</a>
+    <a href="../2018/">2018 (5)</a>
   </li>
     
   <li>
@@ -3531,7 +3534,7 @@ BT-01           2014-10-13         20
   </li>
     
   <li>
-    <a href="../2016/">2016 (1)</a>
+    <a href="../2016/">2016 (4)</a>
   </li>
     
   <li>

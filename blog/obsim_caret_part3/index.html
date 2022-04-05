@@ -1,0 +1,1112 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>Comparing predictive model performance using caret - Part 3: Put it all together &#8212; misken 0,1,0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css" />
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <link rel="author" title="About these documents" href="../../about/" />
+    <link rel="index" title="Index" href="../../genindex/" />
+    <link rel="search" title="Search" href="../../search/" /> 
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+ 
+<link
+  rel="alternate"
+  type="application/atom+xml"
+  href="../../blog/atom.xml"
+  title="Bits of analytics"
+/>
+ 
+<style type="text/css">
+  ul.ablog-archive {
+    list-style: none;
+    overflow: auto;
+    margin-left: 0px;
+  }
+  ul.ablog-archive li {
+    float: left;
+    margin-right: 5px;
+    font-size: 80%;
+  }
+  ul.postlist a {
+    font-style: italic;
+  }
+  ul.postlist-style-disc {
+    list-style-type: disc;
+  }
+  ul.postlist-style-none {
+    list-style-type: none;
+  }
+  ul.postlist-style-circle {
+    list-style-type: circle;
+  }
+</style>
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+             <section id="comparing-predictive-model-performance-using-caret-part-3-put-it-all-together">
+<h1>Comparing predictive model performance using caret - Part 3: Put it all together<a class="headerlink" href="#comparing-predictive-model-performance-using-caret-part-3-put-it-all-together" title="Permalink to this headline">¶</a></h1>
+<p>In <a class="reference external" href="http://hselab.org/comparing-predictive-models-for-obstetrical-unit-occupancy-using-caret-part-1.html">Part 1</a> of this series of posts, we used <code class="docutils literal notranslate"><span class="pre">caret</span></code> to train and test a few simulation metamodels
+using data from a series of simulation experiments on a simplified obstetrical patient flow
+network. In doing so, a number of questions popped up which suggested we needed a way to
+easily automate a number of partition, train, predict, summarize cycles with <code class="docutils literal notranslate"><span class="pre">caret</span></code>.</p>
+<p>In <a class="reference external" href="http://hselab.org/comparing-predictive-model-performance-using-caret-part-2-a-simple-caret-automation-function.html">Part 2</a> we created a simple function named <code class="docutils literal notranslate"><span class="pre">caret_ptps</span></code> to facilitate automating the process of partitioning a dataset, training a model, making predictions and summarizing the results. This function
+takes a number of arguments related to the dataframe to use, a model formula, a modeling method, and values to control the model training and testing phases.</p>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="n">caret_ptps</span> <span class="o">&lt;-</span> <span class="nf">function</span><span class="p">(</span><span class="n">model_formula</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="n">scenario</span><span class="o">=</span><span class="s">&quot;&quot;</span><span class="p">,</span> 
+                       <span class="n">pct_train_val</span><span class="o">=</span><span class="m">0.6</span><span class="p">,</span> <span class="n">partition.times</span><span class="o">=</span><span class="m">1</span><span class="p">,</span>
+                       <span class="n">control</span><span class="o">=</span><span class="nf">trainControl</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s">&quot;None&quot;</span><span class="p">),</span>
+                       <span class="n">seed.partition</span><span class="o">=</span><span class="kc">NULL</span><span class="p">,</span> <span class="n">seed.resample</span><span class="o">=</span><span class="kc">NULL</span><span class="p">,</span>
+                       <span class="kc">...</span><span class="p">){</span>
+  
+  <span class="c1"># Container list for results</span>
+  <span class="n">listsize</span> <span class="o">&lt;-</span> <span class="nf">length</span><span class="p">(</span><span class="n">pct_train_val</span><span class="p">)</span> <span class="o">*</span> <span class="n">partition.times</span>
+  <span class="n">results_for_df</span> <span class="o">&lt;-</span> <span class="nf">vector</span><span class="p">(</span><span class="s">&quot;list&quot;</span><span class="p">,</span> <span class="n">listsize</span><span class="p">)</span> 
+  <span class="n">results_objs</span> <span class="o">&lt;-</span> <span class="nf">vector</span><span class="p">(</span><span class="s">&quot;list&quot;</span><span class="p">,</span> <span class="n">listsize</span><span class="p">)</span> 
+  
+  <span class="c1"># Get y variable name from formula object. The ~ is [[1]], LHS is [[2]] and RHS[[3]].</span>
+  <span class="n">y.name</span> <span class="o">&lt;-</span> <span class="nf">deparse</span><span class="p">(</span><span class="n">model_formula</span><span class="p">[[</span><span class="m">2</span><span class="p">]])</span>
+  
+  <span class="c1"># Outer loop for training set size</span>
+  <span class="n">itemnum</span> <span class="o">&lt;-</span> <span class="m">0</span>
+  <span class="nf">for </span><span class="p">(</span><span class="n">pct_train</span> <span class="n">in</span> <span class="n">pct_train_val</span><span class="p">){</span>
+    
+    <span class="c1"># Create partitions for this pct_train. </span>
+    <span class="n">trainrecs</span> <span class="o">&lt;-</span> <span class="nf">createDataPartition</span><span class="p">(</span><span class="n">data</span><span class="p">[[</span><span class="n">y.name</span><span class="p">]],</span> <span class="n">p</span> <span class="o">=</span> <span class="n">pct_train</span><span class="p">,</span> 
+                                     <span class="n">list</span> <span class="o">=</span> <span class="kc">FALSE</span><span class="p">,</span> <span class="n">times</span> <span class="o">=</span> <span class="n">partition.times</span><span class="p">)</span>
+    
+    <span class="c1"># Loop over data partitions</span>
+    <span class="nf">for </span><span class="p">(</span><span class="n">s</span> <span class="n">in</span> <span class="nf">seq</span><span class="p">(</span><span class="m">1</span><span class="p">,</span><span class="n">partition.times</span><span class="p">)){</span>
+      <span class="n">modeling_test_df</span> <span class="o">&lt;-</span> <span class="n">data</span><span class="p">[</span><span class="o">-</span><span class="n">trainrecs</span><span class="p">[,</span><span class="n">s</span><span class="p">],</span> <span class="p">]</span>
+      <span class="n">modeling_train_df</span> <span class="o">&lt;-</span> <span class="n">data</span><span class="p">[</span><span class="n">trainrecs</span><span class="p">[,</span><span class="n">s</span><span class="p">],</span> <span class="p">]</span>
+      
+      <span class="c1"># Train the model</span>
+      <span class="n">fit</span> <span class="o">&lt;-</span> <span class="nf">train</span><span class="p">(</span><span class="n">model_formula</span><span class="p">,</span> 
+                   <span class="n">data</span> <span class="o">=</span> <span class="n">modeling_train_df</span><span class="p">,</span> 
+                   <span class="n">method</span> <span class="o">=</span> <span class="n">method</span><span class="p">,</span> 
+                   <span class="n">trControl</span> <span class="o">=</span> <span class="n">control</span><span class="p">,</span>
+                   <span class="kc">...</span><span class="p">)</span>
+      
+      <span class="c1"># Make predictions for the test set</span>
+      <span class="n">pred</span> <span class="o">&lt;-</span> <span class="nf">predict</span><span class="p">(</span><span class="n">fit</span><span class="p">,</span> <span class="n">newdata</span><span class="o">=</span><span class="n">modeling_test_df</span><span class="p">)</span>
+
+      <span class="c1"># Gather actual and predicted values</span>
+      <span class="n">train_y_actual</span> <span class="o">&lt;-</span> <span class="n">fit</span><span class="o">$</span><span class="n">trainingData</span><span class="o">$</span><span class="n">.outcome</span>
+      <span class="n">train_y_pred</span> <span class="o">&lt;-</span> <span class="nf">fitted.values</span><span class="p">(</span><span class="n">fit</span><span class="p">)</span>
+      
+      <span class="n">test_y_actual</span> <span class="o">&lt;-</span> <span class="n">modeling_test_df</span><span class="p">[,</span> <span class="n">y.name</span><span class="p">]</span>
+      <span class="n">test_y_pred</span> <span class="o">&lt;-</span> <span class="n">pred</span>
+      
+      <span class="c1"># Compute RMSE for train and test</span>
+      <span class="n">rmse_train</span> <span class="o">&lt;-</span> <span class="nf">rmse</span><span class="p">(</span><span class="n">train_y_actual</span><span class="p">,</span> <span class="n">train_y_pred</span><span class="p">)</span>
+      <span class="n">rmse_test</span> <span class="o">&lt;-</span> <span class="nf">rmse</span><span class="p">(</span><span class="n">test_y_actual</span><span class="p">,</span> <span class="n">test_y_pred</span><span class="p">)</span>
+      
+      <span class="c1"># Store key items in lists for later processing</span>
+      <span class="n">itemnum</span> <span class="o">&lt;-</span> <span class="n">itemnum</span> <span class="o">+</span> <span class="m">1</span>
+      
+      <span class="n">result_for_df</span> <span class="o">&lt;-</span> <span class="nf">list</span><span class="p">(</span><span class="n">ptrain</span> <span class="o">=</span> <span class="n">pct_train</span><span class="p">,</span> <span class="n">sample</span> <span class="o">=</span> <span class="n">s</span><span class="p">,</span> <span class="n">scenario</span> <span class="o">=</span> <span class="n">scenario</span><span class="p">,</span> 
+                     <span class="n">rmse_train</span> <span class="o">=</span> <span class="n">rmse_train</span><span class="p">,</span>
+                     <span class="n">rmse_test</span> <span class="o">=</span> <span class="n">rmse_test</span><span class="p">)</span>
+      
+      <span class="n">results_for_df</span><span class="p">[[</span><span class="n">itemnum</span><span class="p">]]</span> <span class="o">&lt;-</span> <span class="n">result_for_df</span>
+      
+      
+      <span class="n">result_objs</span> <span class="o">&lt;-</span> <span class="nf">list</span><span class="p">(</span><span class="n">test_y_actual</span> <span class="o">=</span> <span class="n">test_y_actual</span><span class="p">,</span>
+                          <span class="n">test_y_pred</span> <span class="o">=</span> <span class="n">test_y_pred</span><span class="p">,</span>
+                          <span class="n">trained_model</span> <span class="o">=</span> <span class="n">fit</span><span class="p">)</span>
+      
+      <span class="n">results_objs</span><span class="p">[[</span><span class="n">itemnum</span><span class="p">]]</span> <span class="o">&lt;-</span> <span class="n">result_objs</span>
+      
+    <span class="p">}</span>
+    
+  <span class="p">}</span>
+  
+  <span class="n">results_list</span> <span class="o">&lt;-</span> <span class="nf">list</span><span class="p">(</span><span class="n">rmse</span><span class="o">=</span><span class="n">results_for_df</span><span class="p">,</span> <span class="n">fitpred</span><span class="o">=</span><span class="n">results_objs</span><span class="p">)</span>
+  <span class="nf">return</span><span class="p">(</span><span class="n">results_list</span><span class="p">)</span> 
+
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Now we are ready to use this function as we iterate over a dataframe of scenarios to analyze with <code class="docutils literal notranslate"><span class="pre">caret</span></code>. Part 1 ended with:</p>
+<blockquote>
+<div><p>Just this little bit of copy, paste, editing was frought with errors and tediously repititious. &gt; &gt; Clearly we need to encapsulate this process in one or more functions. Ideally I also wanted to
+be able to create analysis scenarios defined by a bunch of attributes that I could store in a
+metadata file. To make this concrete, here’s a little csv file illustrating what I wanted to do.</p>
+</div></blockquote>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="n">scenarios_test_df</span> <span class="o">&lt;-</span> <span class="nf">read.csv</span><span class="p">(</span><span class="n">file</span><span class="o">=</span><span class="s">&quot;http://hselab.org/files/scenarios_test.csv&quot;</span><span class="p">)</span>
+<span class="n">knitr</span><span class="o">::</span><span class="nf">kable</span><span class="p">(</span><span class="n">scenarios_test_df</span><span class="p">)</span>
+</pre></div>
+</div>
+<table class="colwidths-auto docutils align-default">
+<thead>
+<tr class="row-odd"><th class="text-align:right head"><p>scen</p></th>
+<th class="text-align:left head"><p>model_formula</p></th>
+<th class="text-align:left head"><p>data</p></th>
+<th class="text-align:left head"><p>method</p></th>
+<th class="text-align:left head"><p>scenario</p></th>
+<th class="text-align:left head"><p>pct_train_val</p></th>
+<th class="text-align:right head"><p>partition.times</p></th>
+<th class="text-align:left head"><p>control</p></th>
+<th class="text-align:right head"><p>seed.partition</p></th>
+<th class="text-align:right head"><p>seed.resample</p></th>
+<th class="text-align:left head"><p>extra_args</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-align:right"><p>1</p></td>
+<td class="text-align:left"><p>occmean_pp ~ load_pp</p></td>
+<td class="text-align:left"><p>obsim_df</p></td>
+<td class="text-align:left"><p>lm</p></td>
+<td class="text-align:left"><p>occmean_pp_load1</p></td>
+<td class="text-align:left"><p>seq(0.5,0.9,0.1)</p></td>
+<td class="text-align:right"><p>10</p></td>
+<td class="text-align:left"><p>fitControl</p></td>
+<td class="text-align:right"><p>231</p></td>
+<td class="text-align:right"><p>37</p></td>
+<td class="text-align:left"><p></p></td>
+</tr>
+<tr class="row-odd"><td class="text-align:right"><p>2</p></td>
+<td class="text-align:left"><p>occmean_pp ~ lam_pp + alos_pp + cap_pp + tot_c_rate</p></td>
+<td class="text-align:left"><p>obsim_df</p></td>
+<td class="text-align:left"><p>lmStepAIC</p></td>
+<td class="text-align:left"><p>occmean_pp_lmstep1</p></td>
+<td class="text-align:left"><p>seq(0.5,0.9,0.1)</p></td>
+<td class="text-align:right"><p>10</p></td>
+<td class="text-align:left"><p>fitControl</p></td>
+<td class="text-align:right"><p>231</p></td>
+<td class="text-align:right"><p>37</p></td>
+<td class="text-align:left"><p></p></td>
+</tr>
+<tr class="row-even"><td class="text-align:right"><p>3</p></td>
+<td class="text-align:left"><p>occmean_pp ~ lam_pp + alos_pp + cap_pp + tot_c_rate</p></td>
+<td class="text-align:left"><p>obsim_df</p></td>
+<td class="text-align:left"><p>nnet</p></td>
+<td class="text-align:left"><p>occmean_pp_nnet1</p></td>
+<td class="text-align:left"><p>seq(0.5,0.9,0.1)</p></td>
+<td class="text-align:right"><p>10</p></td>
+<td class="text-align:left"><p>fitControl</p></td>
+<td class="text-align:right"><p>231</p></td>
+<td class="text-align:right"><p>37</p></td>
+<td class="text-align:left"><p>linout=TRUE</p></td>
+</tr>
+<tr class="row-odd"><td class="text-align:right"><p>4</p></td>
+<td class="text-align:left"><p>occmean_pp ~ lam_pp + alos_pp + cap_pp + tot_c_rate</p></td>
+<td class="text-align:left"><p>obsim_df</p></td>
+<td class="text-align:left"><p>rf</p></td>
+<td class="text-align:left"><p>occmean_pp_rf1</p></td>
+<td class="text-align:left"><p>seq(0.5,0.9,0.1)</p></td>
+<td class="text-align:right"><p>10</p></td>
+<td class="text-align:left"><p>fitControl</p></td>
+<td class="text-align:right"><p>231</p></td>
+<td class="text-align:right"><p>37</p></td>
+<td class="text-align:left"><p></p></td>
+</tr>
+<tr class="row-even"><td class="text-align:right"><p>5</p></td>
+<td class="text-align:left"><p>occmean_pp ~ lam_pp + alos_pp + cap_pp + tot_c_rate</p></td>
+<td class="text-align:left"><p>obsim_df</p></td>
+<td class="text-align:left"><p>knn</p></td>
+<td class="text-align:left"><p>occmean_pp_knn1</p></td>
+<td class="text-align:left"><p>seq(0.5,0.9,0.1)</p></td>
+<td class="text-align:right"><p>10</p></td>
+<td class="text-align:left"><p>fitControl</p></td>
+<td class="text-align:right"><p>231</p></td>
+<td class="text-align:right"><p>37</p></td>
+<td class="text-align:left"><p>preProcess=c(‘center’, ‘scale’)</p></td>
+</tr>
+<tr class="row-odd"><td class="text-align:right"><p>6</p></td>
+<td class="text-align:left"><p>occmean_pp ~ lam_pp + alos_pp + cap_pp + tot_c_rate</p></td>
+<td class="text-align:left"><p>obsim_df</p></td>
+<td class="text-align:left"><p>gamSpline</p></td>
+<td class="text-align:left"><p>occmean_pp_spline1</p></td>
+<td class="text-align:left"><p>seq(0.5,0.9,0.1)</p></td>
+<td class="text-align:right"><p>10</p></td>
+<td class="text-align:left"><p>fitControl</p></td>
+<td class="text-align:right"><p>231</p></td>
+<td class="text-align:right"><p>37</p></td>
+<td class="text-align:left"><p></p></td>
+</tr>
+</tbody>
+</table>
+<p>Obviously, when we read this csv file into an R dataframe, we are going to end up with
+some numeric fields and some string fields. Well, the string fields will come in as
+factors by default but we can use the <code class="docutils literal notranslate"><span class="pre">stringsAsFactors=FALSE</span></code> argument to prevent this.</p>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="n">scenarios_test_df</span> <span class="o">&lt;-</span> <span class="nf">read.csv</span><span class="p">(</span><span class="n">file</span><span class="o">=</span><span class="s">&quot;http://hselab.org/files/scenarios_test.csv&quot;</span><span class="p">,</span>
+                              <span class="n">stringsAsFactors</span> <span class="o">=</span> <span class="kc">FALSE</span><span class="p">)</span>
+<span class="nf">str</span><span class="p">(</span><span class="n">scenarios_test_df</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">## &#39;data.frame&#39;:	6 obs. of  11 variables:</span>
+<span class="c1">##  $ scen           : int  1 2 3 4 5 6</span>
+<span class="c1">##  $ model_formula  : chr  &quot;occmean_pp ~ load_pp&quot; &quot;occmean_pp ~ lam_pp + alos_pp + cap_pp + tot_c_rate&quot; &quot;occmean_pp ~ lam_pp + alos_pp + cap_pp + tot_c_rate&quot; &quot;occmean_pp ~ lam_pp + alos_pp + cap_pp + tot_c_rate&quot; ...</span>
+<span class="c1">##  $ data           : chr  &quot;obsim_df&quot; &quot;obsim_df&quot; &quot;obsim_df&quot; &quot;obsim_df&quot; ...</span>
+<span class="c1">##  $ method         : chr  &quot;lm&quot; &quot;lmStepAIC&quot; &quot;nnet&quot; &quot;rf&quot; ...</span>
+<span class="c1">##  $ scenario       : chr  &quot;occmean_pp_load1&quot; &quot;occmean_pp_lmstep1&quot; &quot;occmean_pp_nnet1&quot; &quot;occmean_pp_rf1&quot; ...</span>
+<span class="c1">##  $ pct_train_val  : chr  &quot;seq(0.5,0.9,0.1)&quot; &quot;seq(0.5,0.9,0.1)&quot; &quot;seq(0.5,0.9,0.1)&quot; &quot;seq(0.5,0.9,0.1)&quot; ...</span>
+<span class="c1">##  $ partition.times: int  10 10 10 10 10 10</span>
+<span class="c1">##  $ control        : chr  &quot;fitControl&quot; &quot;fitControl&quot; &quot;fitControl&quot; &quot;fitControl&quot; ...</span>
+<span class="c1">##  $ seed.partition : int  231 231 231 231 231 231</span>
+<span class="c1">##  $ seed.resample  : int  37 37 37 37 37 37</span>
+<span class="c1">##  $ extra_args     : chr  &quot;&quot; &quot;&quot; &quot;linout=TRUE&quot; &quot;&quot; ...</span>
+</pre></div>
+</div>
+<p>One of our primary challenges will be to use string representations or names of things like formulas, dataframes, control objects and R expressions within R code to get at the actual
+underlying objects. Let’s start by considering a few specific cases.</p>
+<p>First, let’s read in the dataset needed for the rest of this post.</p>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="n">obsim_df</span> <span class="o">&lt;-</span> <span class="nf">read.csv</span><span class="p">(</span><span class="n">file</span><span class="o">=</span><span class="s">&quot;http://hselab.org/files/obsim_example.csv&quot;</span><span class="p">)</span>
+<span class="nf">names</span><span class="p">(</span><span class="n">obsim_df</span><span class="p">)[</span><span class="m">1</span><span class="p">]</span> <span class="o">&lt;-</span> <span class="s">&quot;scenario&quot;</span>
+<span class="c1"># Shorten a few column names</span>
+<span class="nf">names</span><span class="p">(</span><span class="n">obsim_df</span><span class="p">)[</span><span class="m">13</span><span class="p">]</span> <span class="o">&lt;-</span> <span class="s">&quot;occmean_ldr&quot;</span>
+<span class="nf">names</span><span class="p">(</span><span class="n">obsim_df</span><span class="p">)[</span><span class="m">14</span><span class="p">]</span> <span class="o">&lt;-</span> <span class="s">&quot;occp95_ldr&quot;</span>
+<span class="nf">names</span><span class="p">(</span><span class="n">obsim_df</span><span class="p">)[</span><span class="m">15</span><span class="p">]</span> <span class="o">&lt;-</span> <span class="s">&quot;occmean_pp&quot;</span>
+<span class="nf">names</span><span class="p">(</span><span class="n">obsim_df</span><span class="p">)[</span><span class="m">16</span><span class="p">]</span> <span class="o">&lt;-</span> <span class="s">&quot;occp95_pp&quot;</span>
+</pre></div>
+</div>
+<p>Load some libraries.</p>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="nf">library</span><span class="p">(</span><span class="n">ggplot2</span><span class="p">)</span>
+<span class="nf">library</span><span class="p">(</span><span class="n">dplyr</span><span class="p">)</span>
+<span class="nf">library</span><span class="p">(</span><span class="n">Metrics</span><span class="p">)</span>
+<span class="nf">library</span><span class="p">(</span><span class="n">caret</span><span class="p">)</span>
+</pre></div>
+</div>
+<section id="r-formulas-to-text-and-back">
+<h2>R formulas to text and back<a class="headerlink" href="#r-formulas-to-text-and-back" title="Permalink to this headline">¶</a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">scenarios_test_df</span></code> dataframe has text values that look like R formula objects.</p>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="n">simple_formula_str</span> <span class="o">&lt;-</span> <span class="n">scenarios_test_df</span><span class="o">$</span><span class="n">model_formula</span><span class="p">[</span><span class="m">1</span><span class="p">]</span>
+<span class="n">simple_formula_str</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">## [1] &quot;occmean_pp ~ load_pp&quot;</span>
+</pre></div>
+</div>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="nf">class</span><span class="p">(</span><span class="n">simple_formula_str</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">## [1] &quot;character&quot;</span>
+</pre></div>
+</div>
+<p>An R formula object is not a string. It’s an R formula object.</p>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="n">simple_formula</span> <span class="o">&lt;-</span> <span class="n">occmean_pp</span> <span class="o">~</span> <span class="n">load_pp</span>
+<span class="n">simple_formula</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">## occmean_pp ~ load_pp</span>
+<span class="c1">## &lt;environment: 0x1640188&gt;</span>
+</pre></div>
+</div>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="nf">class</span><span class="p">(</span><span class="n">simple_formula</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">## [1] &quot;formula&quot;</span>
+</pre></div>
+</div>
+<p>Many R functions take formula objects as arguments. For example, <code class="docutils literal notranslate"><span class="pre">lm</span></code>:</p>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="nf">lm</span><span class="p">(</span><span class="n">simple_formula</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">obsim_df</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">## </span>
+<span class="c1">## Call:</span>
+<span class="c1">## lm(formula = simple_formula, data = obsim_df)</span>
+<span class="c1">## </span>
+<span class="c1">## Coefficients:</span>
+<span class="c1">## (Intercept)      load_pp  </span>
+<span class="c1">##     0.01363      1.00295</span>
+</pre></div>
+</div>
+<p>As you might have guessed, <code class="docutils literal notranslate"><span class="pre">lm</span></code> probably will do the right thing if we pass in a
+string that can be coerced to a valid R formula.</p>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="nf">lm</span><span class="p">(</span><span class="n">simple_formula_str</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">obsim_df</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">## </span>
+<span class="c1">## Call:</span>
+<span class="c1">## lm(formula = simple_formula_str, data = obsim_df)</span>
+<span class="c1">## </span>
+<span class="c1">## Coefficients:</span>
+<span class="c1">## (Intercept)      load_pp  </span>
+<span class="c1">##     0.01363      1.00295</span>
+</pre></div>
+</div>
+<p>Great. However, we are using <code class="docutils literal notranslate"><span class="pre">caret</span></code> which supports over 200 different modeling techniques. Will <code class="docutils literal notranslate"><span class="pre">caret</span></code> work if its <code class="docutils literal notranslate"><span class="pre">train</span></code> function is given a formula string instead of the formula it expects?</p>
+<p>First we need to partition the dataset and setup our training control object.</p>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="n">train_test_seed</span> <span class="o">&lt;-</span> <span class="m">233</span>
+<span class="n">resample_seed</span> <span class="o">&lt;-</span> <span class="m">67</span>
+
+<span class="n">pct_train</span> <span class="o">&lt;-</span> <span class="m">125</span><span class="o">/</span><span class="m">150</span>
+<span class="nf">set.seed</span><span class="p">(</span><span class="n">train_test_seed</span><span class="p">)</span>
+<span class="n">trainrecs</span> <span class="o">&lt;-</span> <span class="nf">createDataPartition</span><span class="p">(</span><span class="n">obsim_df</span><span class="o">$</span><span class="n">occmean_pp</span><span class="p">,</span> <span class="n">p</span> <span class="o">=</span> <span class="n">pct_train</span><span class="p">,</span> 
+                                         <span class="n">list</span> <span class="o">=</span> <span class="kc">FALSE</span><span class="p">,</span> <span class="n">times</span> <span class="o">=</span> <span class="m">1</span><span class="p">)</span>
+
+<span class="n">obsim_train_df</span> <span class="o">&lt;-</span> <span class="n">obsim_df</span><span class="p">[</span><span class="n">trainrecs</span><span class="p">,</span> <span class="p">]</span>
+<span class="n">obsim_test_df</span> <span class="o">&lt;-</span> <span class="n">obsim_df</span><span class="p">[</span><span class="o">-</span><span class="n">trainrecs</span><span class="p">,</span> <span class="p">]</span>
+
+<span class="n">fitControl</span> <span class="o">&lt;-</span> <span class="nf">trainControl</span><span class="p">(</span><span class="c1">## 5-fold CV</span>
+  <span class="n">method</span> <span class="o">=</span> <span class="s">&quot;repeatedcv&quot;</span><span class="p">,</span>
+  <span class="n">number</span> <span class="o">=</span> <span class="m">5</span><span class="p">,</span>
+  <span class="c1">## repeated ten times</span>
+  <span class="n">repeats</span> <span class="o">=</span> <span class="m">10</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>First we’ll explicitly pass in a formula object to make sure everything is working fine.</p>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="nf">set.seed</span><span class="p">(</span><span class="n">resample_seed</span><span class="p">)</span>
+<span class="n">train_load1</span> <span class="o">&lt;-</span> <span class="nf">train</span><span class="p">(</span><span class="n">occmean_pp</span> <span class="o">~</span> <span class="n">load_pp</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">obsim_train_df</span><span class="p">,</span> 
+                 <span class="n">method</span> <span class="o">=</span> <span class="s">&quot;lm&quot;</span><span class="p">,</span> 
+                 <span class="n">trControl</span> <span class="o">=</span> <span class="n">fitControl</span><span class="p">)</span>
+
+<span class="nf">coef</span><span class="p">(</span><span class="nf">summary</span><span class="p">(</span><span class="n">train_load1</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">##               Estimate   Std. Error     t value   Pr(&gt;|t|)</span>
+<span class="c1">## (Intercept) 0.01324359 0.0067156390    1.972052 0.05082951</span>
+<span class="c1">## load_pp     1.00299005 0.0001896324 5289.128771 0.00000000</span>
+</pre></div>
+</div>
+<p>Now confirm that we can pass in a formula object variable. Of course we can.</p>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="nf">set.seed</span><span class="p">(</span><span class="n">resample_seed</span><span class="p">)</span>
+<span class="n">train_load1</span> <span class="o">&lt;-</span> <span class="nf">train</span><span class="p">(</span><span class="n">simple_formula</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">obsim_train_df</span><span class="p">,</span> 
+                 <span class="n">method</span> <span class="o">=</span> <span class="s">&quot;lm&quot;</span><span class="p">,</span> 
+                 <span class="n">trControl</span> <span class="o">=</span> <span class="n">fitControl</span><span class="p">)</span>
+
+<span class="nf">coef</span><span class="p">(</span><span class="nf">summary</span><span class="p">(</span><span class="n">train_load1</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">##               Estimate   Std. Error     t value   Pr(&gt;|t|)</span>
+<span class="c1">## (Intercept) 0.01324359 0.0067156390    1.972052 0.05082951</span>
+<span class="c1">## load_pp     1.00299005 0.0001896324 5289.128771 0.00000000</span>
+</pre></div>
+</div>
+<p>What if we pass in the string version of the formula?</p>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="nf">set.seed</span><span class="p">(</span><span class="n">resample_seed</span><span class="p">)</span>
+<span class="n">train_load1_str</span> <span class="o">&lt;-</span> <span class="nf">train</span><span class="p">(</span><span class="n">simple_formula_str</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">obsim_train_df</span><span class="p">,</span> 
+                 <span class="n">method</span> <span class="o">=</span> <span class="s">&quot;lm&quot;</span><span class="p">,</span> 
+                 <span class="n">trControl</span> <span class="o">=</span> <span class="n">fitControl</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">## Error in train.default(simple_formula_str, data = obsim_train_df, method = &quot;lm&quot;, : argument &quot;y&quot; is missing, with no default</span>
+</pre></div>
+</div>
+<p>Does not work.</p>
+<p>Turns out to be simple to be simple to create a formula object from a string using
+R’s <code class="docutils literal notranslate"><span class="pre">as.formula</span></code> function.</p>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="n">simple_formula_from_str</span> <span class="o">&lt;-</span> <span class="nf">as.formula</span><span class="p">(</span><span class="n">simple_formula_str</span><span class="p">)</span>
+<span class="nf">class</span><span class="p">(</span><span class="n">simple_formula_from_str</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">## [1] &quot;formula&quot;</span>
+</pre></div>
+</div>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="nf">set.seed</span><span class="p">(</span><span class="n">resample_seed</span><span class="p">)</span>
+<span class="n">train_load1</span> <span class="o">&lt;-</span> <span class="nf">train</span><span class="p">(</span><span class="n">simple_formula_from_str</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">obsim_train_df</span><span class="p">,</span> 
+                 <span class="n">method</span> <span class="o">=</span> <span class="s">&quot;lm&quot;</span><span class="p">,</span> 
+                 <span class="n">trControl</span> <span class="o">=</span> <span class="n">fitControl</span><span class="p">)</span>
+
+<span class="nf">coef</span><span class="p">(</span><span class="nf">summary</span><span class="p">(</span><span class="n">train_load1</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">##               Estimate   Std. Error     t value   Pr(&gt;|t|)</span>
+<span class="c1">## (Intercept) 0.01324359 0.0067156390    1.972052 0.05082951</span>
+<span class="c1">## load_pp     1.00299005 0.0001896324 5289.128771 0.00000000</span>
+</pre></div>
+</div>
+<p>Success. What about the other direction: formula –&gt; string. While that feels like it should be simple, there are complications. Let’s try the obvious thing, the <code class="docutils literal notranslate"><span class="pre">as.character</span></code> function.</p>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="nf">as.character</span><span class="p">(</span><span class="n">simple_formula</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">## [1] &quot;~&quot;          &quot;occmean_pp&quot; &quot;load_pp&quot;</span>
+</pre></div>
+</div>
+<p>Looks like we get a vector of strings. Interesting. The left hand side of the equation is the second
+element and the right hand side, the third. That will come in handy later when we need to pluck the
+response variable name from a formula. Doesn’t solve the immediate problem, but useful.</p>
+<p>A little searching led to the R <code class="docutils literal notranslate"><span class="pre">deparse</span></code> function. For example, see <a class="reference external" href="https://stackoverflow.com/questions/14671172/how-to-convert-r-formula-to-text">https://stackoverflow.com/questions/14671172/how-to-convert-r-formula-to-text</a>.</p>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="nf">deparse</span><span class="p">(</span><span class="n">simple_formula</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">## [1] &quot;occmean_pp ~ load_pp&quot;</span>
+</pre></div>
+</div>
+<p>You do need to be a little careful in that the default behavior for <code class="docutils literal notranslate"><span class="pre">deparse</span></code> will
+start inserting line breaks after 60 characters. No problem, we can specify a larger limit before
+line breaking using the <code class="docutils literal notranslate"><span class="pre">width.cutoff</span></code> argument. There’s also an <code class="docutils literal notranslate"><span class="pre">nlines</span></code> argument that specifies
+the maximum number of lines to produce.</p>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="nf">deparse</span><span class="p">(</span><span class="n">simple_formula</span><span class="p">,</span> <span class="n">width.cutoff</span> <span class="o">=</span> <span class="m">500</span><span class="p">,</span> <span class="n">nlines</span> <span class="o">=</span> <span class="m">1</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">## [1] &quot;occmean_pp ~ load_pp&quot;</span>
+</pre></div>
+</div>
+</section>
+<section id="r-dataframes-from-string-version-of-their-variable-name">
+<h2>R dataframes from string version of their variable name<a class="headerlink" href="#r-dataframes-from-string-version-of-their-variable-name" title="Permalink to this headline">¶</a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">scenarios_test_df</span></code> dataframe has a column containing the name of the dataframe we want to use for
+our <code class="docutils literal notranslate"><span class="pre">caret</span></code> work.</p>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="n">dfname_str</span> <span class="o">&lt;-</span> <span class="n">scenarios_test_df</span><span class="o">$</span><span class="n">data</span><span class="p">[</span><span class="m">1</span><span class="p">]</span>
+<span class="n">dfname_str</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">## [1] &quot;obsim_df&quot;</span>
+</pre></div>
+</div>
+<p>Let’s play a similar game with <code class="docutils literal notranslate"><span class="pre">lm</span></code> as we did with the formula.</p>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="nf">lm</span><span class="p">(</span><span class="n">simple_formula</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">dfname_str</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">## Error in eval(predvars, data, env): invalid &#39;envir&#39; argument of type &#39;character&#39;</span>
+</pre></div>
+</div>
+<p>Not that we really expected R to coerce a string that just happens to coincide with a dataframe name
+in the current environment, but worth a try. Instead, we must use the <code class="docutils literal notranslate"><span class="pre">get</span></code> function.</p>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="nf">lm</span><span class="p">(</span><span class="n">simple_formula</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="nf">get</span><span class="p">(</span><span class="n">dfname_str</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">## </span>
+<span class="c1">## Call:</span>
+<span class="c1">## lm(formula = simple_formula, data = get(dfname_str))</span>
+<span class="c1">## </span>
+<span class="c1">## Coefficients:</span>
+<span class="c1">## (Intercept)      load_pp  </span>
+<span class="c1">##     0.01363      1.00295</span>
+</pre></div>
+</div>
+</section>
+<section id="r-expressions-from-strings">
+<h2>R expressions from strings<a class="headerlink" href="#r-expressions-from-strings" title="Permalink to this headline">¶</a></h2>
+<p>One of the things we want to experiment with is the percentage of cases to
+allocate to the training data set. In the example here, we see that the <code class="docutils literal notranslate"><span class="pre">pct_train_val</span></code> column contains the following string representing a sequence.</p>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="n">scenarios_test_df</span><span class="o">$</span><span class="n">pct_train_val</span><span class="p">[</span><span class="m">1</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">## [1] &quot;seq(0.5,0.9,0.1)&quot;</span>
+</pre></div>
+</div>
+<p>So, how can we generate the actual sequence from this string?</p>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="nf">seq</span><span class="p">(</span><span class="m">0.5</span><span class="p">,</span><span class="m">0.9</span><span class="p">,</span><span class="m">0.1</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">## [1] 0.5 0.6 0.7 0.8 0.9</span>
+</pre></div>
+</div>
+<p>One approach, though seemingly frowned upon, relies on a combination of the
+<code class="docutils literal notranslate"><span class="pre">parse</span></code> and <code class="docutils literal notranslate"><span class="pre">eval</span></code> functions. We use <code class="docutils literal notranslate"><span class="pre">parse</span></code> to create an R expression from
+a string and <code class="docutils literal notranslate"><span class="pre">eval</span></code> to evaluate it. Note that <code class="docutils literal notranslate"><span class="pre">parse</span></code> is usually used with
+files and so we need to use the <code class="docutils literal notranslate"><span class="pre">text=</span></code> argument to give it a string to parse.</p>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="n">seq_str</span> <span class="o">&lt;-</span> <span class="s">&quot;seq(0.5,0.9,0.1)&quot;</span>
+<span class="nf">parse</span><span class="p">(</span><span class="n">text</span> <span class="o">=</span> <span class="n">seq_str</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">## expression(seq(0.5, 0.9, 0.1))</span>
+</pre></div>
+</div>
+<p>Now, evaluate it.</p>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="nf">eval</span><span class="p">(</span><span class="nf">parse</span><span class="p">(</span><span class="n">text</span> <span class="o">=</span> <span class="n">seq_str</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">## [1] 0.5 0.6 0.7 0.8 0.9</span>
+</pre></div>
+</div>
+<p>See <a class="reference external" href="https://stackoverflow.com/questions/7836972/use-character-string-as-function-argument">https://stackoverflow.com/questions/7836972/use-character-string-as-function-argument</a> for some discussion of this. One of the answers includes this gem:</p>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="nf">library</span><span class="p">(</span><span class="n">fortunes</span><span class="p">)</span>
+<span class="nf">fortune</span><span class="p">(</span><span class="m">106</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">## </span>
+<span class="c1">## If the answer is parse() you should usually rethink the question.</span>
+<span class="c1">##    -- Thomas Lumley</span>
+<span class="c1">##       R-help (February 2005)</span>
+</pre></div>
+</div>
+</section>
+<section id="calling-functions-with-list-of-arguments">
+<h2>Calling functions with list of arguments<a class="headerlink" href="#calling-functions-with-list-of-arguments" title="Permalink to this headline">¶</a></h2>
+<p>Now we want to call the <code class="docutils literal notranslate"><span class="pre">caret_ptps</span></code> function using the arguments stored in a row
+of the dataframe <code class="docutils literal notranslate"><span class="pre">scenarios_test_df</span></code>. Consider the first scenario.</p>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="nf">print</span><span class="p">(</span><span class="n">scenarios_test_df</span><span class="p">[</span><span class="m">1</span><span class="p">,])</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">##   scen        model_formula     data method         scenario</span>
+<span class="c1">## 1    1 occmean_pp ~ load_pp obsim_df     lm occmean_pp_load1</span>
+<span class="c1">##      pct_train_val partition.times    control seed.partition seed.resample</span>
+<span class="c1">## 1 seq(0.5,0.9,0.1)              10 fitControl            231            37</span>
+<span class="c1">##   extra_args</span>
+<span class="c1">## 1</span>
+</pre></div>
+</div>
+<p>Let’s put these values from the first scenario row into a set of variables. For some
+of the fields we’ll use one of the techniques discussed above to convert it from a string
+to an R object or R expression.</p>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="c1"># Grab first row</span>
+<span class="n">argdf</span> <span class="o">&lt;-</span> <span class="n">scenarios_test_df</span><span class="p">[</span><span class="m">1</span><span class="p">,]</span>
+
+<span class="n">model_formula</span> <span class="o">&lt;-</span> <span class="nf">as.formula</span><span class="p">(</span><span class="n">argdf</span><span class="o">$</span><span class="n">model_formula</span><span class="p">)</span>
+<span class="n">data</span> <span class="o">&lt;-</span> <span class="nf">get</span><span class="p">(</span><span class="n">argdf</span><span class="o">$</span><span class="n">data</span><span class="p">)</span>
+<span class="n">method</span> <span class="o">&lt;-</span> <span class="n">argdf</span><span class="o">$</span><span class="n">method</span>
+<span class="n">scenario</span> <span class="o">&lt;-</span> <span class="n">argdf</span><span class="o">$</span><span class="n">scenario</span>
+<span class="n">pct_train_val</span> <span class="o">&lt;-</span> <span class="nf">eval</span><span class="p">(</span><span class="nf">parse</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="n">argdf</span><span class="o">$</span><span class="n">pct_train_val</span><span class="p">))</span>
+<span class="n">partition.times</span> <span class="o">&lt;-</span> <span class="n">argdf</span><span class="o">$</span><span class="n">partition.times</span>
+<span class="n">control</span> <span class="o">&lt;-</span> <span class="nf">get</span><span class="p">(</span><span class="n">argdf</span><span class="o">$</span><span class="n">control</span><span class="p">)</span>
+<span class="n">seed.partition</span> <span class="o">&lt;-</span> <span class="n">argdf</span><span class="o">$</span><span class="n">seed.partition</span>
+<span class="n">seed.resample</span> <span class="o">&lt;-</span> <span class="n">argdf</span><span class="o">$</span><span class="n">seed.resample</span>
+
+<span class="c1"># For now, extra_args is left as a string. We&#39;ll deal with this complication later in</span>
+<span class="c1"># this post.</span>
+<span class="n">extra_args</span> <span class="o">&lt;-</span> <span class="nf">ifelse</span><span class="p">(</span><span class="nf">length</span><span class="p">(</span><span class="n">argdf</span><span class="o">$</span><span class="n">extra_args</span><span class="p">)</span><span class="o">&gt;</span><span class="m">0</span><span class="p">,</span> <span class="n">argdf</span><span class="o">$</span><span class="n">extra_args</span><span class="p">,</span> <span class="kc">NULL</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Now we can use the R function <code class="docutils literal notranslate"><span class="pre">do.call</span></code> to call <code class="docutils literal notranslate"><span class="pre">caret_ptps</span></code> with a list of named
+elements corresponding to the function arguments. Pretty powerful. See the <a class="reference external" href="https://www.rdocumentation.org/packages/base/versions/3.4.0/topics/do.call">documentation</a> for more info. Start by creating a list containing the arguments to pass.</p>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="n">arglist</span> <span class="o">&lt;-</span> <span class="nf">list</span><span class="p">(</span><span class="n">model_formula</span><span class="o">=</span><span class="n">model_formula</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">,</span> <span class="n">scenario</span><span class="o">=</span><span class="n">scenario</span><span class="p">,</span> 
+                <span class="n">pct_train_val</span><span class="o">=</span><span class="n">pct_train_val</span><span class="p">,</span> <span class="n">partition.times</span><span class="o">=</span><span class="n">partition.times</span><span class="p">,</span> 
+                <span class="n">control</span><span class="o">=</span><span class="n">control</span><span class="p">,</span> <span class="n">seed.partition</span><span class="o">=</span><span class="n">seed.partition</span><span class="p">,</span> 
+                <span class="n">seed.resample</span><span class="o">=</span><span class="n">seed.resample</span><span class="p">)</span>
+<span class="nf">str</span><span class="p">(</span><span class="n">arglist</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">## List of 9</span>
+<span class="c1">##  $ model_formula  :Class &#39;formula&#39;  language occmean_pp ~ load_pp</span>
+<span class="c1">##   .. ..- attr(*, &quot;.Environment&quot;)=&lt;environment: 0x1640188&gt; </span>
+<span class="c1">##  $ data           :&#39;data.frame&#39;:	150 obs. of  16 variables:</span>
+<span class="c1">##   ..$ scenario   : int [1:150] 1 2 3 4 5 6 7 8 9 10 ...</span>
+<span class="c1">##   ..$ lam_ldr    : num [1:150] 2.74 2.74 2.74 2.74 2.74 ...</span>
+<span class="c1">##   ..$ alos_ldr   : num [1:150] 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 ...</span>
+<span class="c1">##   ..$ cap_ldr    : int [1:150] 4 4 4 3 3 3 2 2 2 8 ...</span>
+<span class="c1">##   ..$ load_ldr   : num [1:150] 1.37 1.37 1.37 1.37 1.37 ...</span>
+<span class="c1">##   ..$ rho_ldr    : num [1:150] 0.342 0.342 0.342 0.457 0.457 ...</span>
+<span class="c1">##   ..$ lam_pp     : num [1:150] 2.74 2.74 2.74 2.74 2.74 ...</span>
+<span class="c1">##   ..$ alos_pp    : num [1:150] 2.2 2.2 2.2 2.2 2.2 2.2 2.2 2.2 2.2 2.2 ...</span>
+<span class="c1">##   ..$ cap_pp     : int [1:150] 12 10 9 12 10 9 12 10 9 29 ...</span>
+<span class="c1">##   ..$ load_pp    : num [1:150] 6.03 6.03 6.03 6.03 6.03 ...</span>
+<span class="c1">##   ..$ rho_pp     : num [1:150] 0.502 0.603 0.67 0.502 0.603 ...</span>
+<span class="c1">##   ..$ tot_c_rate : num [1:150] 0.2 0.2 0.2 0.2 0.2 0.2 0.2 0.2 0.2 0.2 ...</span>
+<span class="c1">##   ..$ occmean_ldr: num [1:150] 1.37 1.43 1.52 1.32 1.36 ...</span>
+<span class="c1">##   ..$ occp95_ldr : num [1:150] 3.68 3.99 4 3 3 ...</span>
+<span class="c1">##   ..$ occmean_pp : num [1:150] 6.05 6.02 6.02 6.02 6.03 ...</span>
+<span class="c1">##   ..$ occp95_pp  : num [1:150] 10.2 10 9 10.2 10 ...</span>
+<span class="c1">##  $ method         : chr &quot;lm&quot;</span>
+<span class="c1">##  $ scenario       : chr &quot;occmean_pp_load1&quot;</span>
+<span class="c1">##  $ pct_train_val  : num [1:5] 0.5 0.6 0.7 0.8 0.9</span>
+<span class="c1">##  $ partition.times: int 10</span>
+<span class="c1">##  $ control        :List of 26</span>
+<span class="c1">##   ..$ method           : chr &quot;repeatedcv&quot;</span>
+<span class="c1">##   ..$ number           : num 5</span>
+<span class="c1">##   ..$ repeats          : num 10</span>
+<span class="c1">##   ..$ search           : chr &quot;grid&quot;</span>
+<span class="c1">##   ..$ p                : num 0.75</span>
+<span class="c1">##   ..$ initialWindow    : NULL</span>
+<span class="c1">##   ..$ horizon          : num 1</span>
+<span class="c1">##   ..$ fixedWindow      : logi TRUE</span>
+<span class="c1">##   ..$ verboseIter      : logi FALSE</span>
+<span class="c1">##   ..$ returnData       : logi TRUE</span>
+<span class="c1">##   ..$ returnResamp     : chr &quot;final&quot;</span>
+<span class="c1">##   ..$ savePredictions  : logi FALSE</span>
+<span class="c1">##   ..$ classProbs       : logi FALSE</span>
+<span class="c1">##   ..$ summaryFunction  :function (data, lev = NULL, model = NULL)  </span>
+<span class="c1">##   ..$ selectionFunction: chr &quot;best&quot;</span>
+<span class="c1">##   ..$ preProcOptions   :List of 3</span>
+<span class="c1">##   .. ..$ thresh : num 0.95</span>
+<span class="c1">##   .. ..$ ICAcomp: num 3</span>
+<span class="c1">##   .. ..$ k      : num 5</span>
+<span class="c1">##   ..$ sampling         : NULL</span>
+<span class="c1">##   ..$ index            : NULL</span>
+<span class="c1">##   ..$ indexOut         : NULL</span>
+<span class="c1">##   ..$ indexFinal       : NULL</span>
+<span class="c1">##   ..$ timingSamps      : num 0</span>
+<span class="c1">##   ..$ predictionBounds : logi [1:2] FALSE FALSE</span>
+<span class="c1">##   ..$ seeds            : logi NA</span>
+<span class="c1">##   ..$ adaptive         :List of 4</span>
+<span class="c1">##   .. ..$ min     : num 5</span>
+<span class="c1">##   .. ..$ alpha   : num 0.05</span>
+<span class="c1">##   .. ..$ method  : chr &quot;gls&quot;</span>
+<span class="c1">##   .. ..$ complete: logi TRUE</span>
+<span class="c1">##   ..$ trim             : logi FALSE</span>
+<span class="c1">##   ..$ allowParallel    : logi TRUE</span>
+<span class="c1">##  $ seed.partition : int 231</span>
+<span class="c1">##  $ seed.resample  : int 37</span>
+</pre></div>
+</div>
+<p>Now we can call <code class="docutils literal notranslate"><span class="pre">caret_ptps</span></code>.</p>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="n">results_scenario1</span> <span class="o">&lt;-</span> <span class="nf">do.call</span><span class="p">(</span><span class="n">caret_ptps</span><span class="p">,</span> <span class="n">arglist</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Pull out the first element and convert to a dataframe. Display the head and tail
+of the results summary.</p>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="n">results_for_df</span> <span class="o">&lt;-</span> <span class="n">results_scenario1</span><span class="p">[[</span><span class="m">1</span><span class="p">]]</span>
+<span class="n">results_df</span> <span class="o">&lt;-</span> <span class="nf">do.call</span><span class="p">(</span><span class="n">rbind</span><span class="p">,</span><span class="nf">lapply</span><span class="p">(</span><span class="n">results_for_df</span><span class="p">,</span> <span class="n">data.frame</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="nf">print</span><span class="p">(</span><span class="nf">head</span><span class="p">(</span><span class="n">results_df</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">##   ptrain sample         scenario rmse_train  rmse_test</span>
+<span class="c1">## 1    0.5      1 occmean_pp_load1 0.03235569 0.04107803</span>
+<span class="c1">## 2    0.5      2 occmean_pp_load1 0.03145381 0.04147086</span>
+<span class="c1">## 3    0.5      3 occmean_pp_load1 0.03713965 0.03612767</span>
+<span class="c1">## 4    0.5      4 occmean_pp_load1 0.03503569 0.03825939</span>
+<span class="c1">## 5    0.5      5 occmean_pp_load1 0.03663228 0.03691576</span>
+<span class="c1">## 6    0.5      6 occmean_pp_load1 0.03609778 0.03719239</span>
+</pre></div>
+</div>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="nf">print</span><span class="p">(</span><span class="nf">tail</span><span class="p">(</span><span class="n">results_df</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">##    ptrain sample         scenario rmse_train  rmse_test</span>
+<span class="c1">## 45    0.9      5 occmean_pp_load1 0.03607652 0.04242421</span>
+<span class="c1">## 46    0.9      6 occmean_pp_load1 0.03713654 0.02999180</span>
+<span class="c1">## 47    0.9      7 occmean_pp_load1 0.03656720 0.03718645</span>
+<span class="c1">## 48    0.9      8 occmean_pp_load1 0.03673756 0.03520638</span>
+<span class="c1">## 49    0.9      9 occmean_pp_load1 0.03587340 0.04446830</span>
+<span class="c1">## 50    0.9     10 occmean_pp_load1 0.03788447 0.01594970</span>
+</pre></div>
+</div>
+<p>Here’s a quick box plot of the test RMSE distribution by the percentage of
+cases allocated to the training data.</p>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="nf">ggplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">results_df</span><span class="p">)</span> <span class="o">+</span> <span class="nf">geom_boxplot</span><span class="p">(</span><span class="nf">aes</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="nf">as.factor</span><span class="p">(</span><span class="n">ptrain</span><span class="p">),</span> <span class="n">y</span><span class="o">=</span><span class="n">rmse_test</span><span class="p">),</span> <span class="n">colour</span><span class="o">=</span><span class="s">&quot;tan2&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="nf">ggtitle</span><span class="p">(</span><span class="n">scenario</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><img alt="center" src="../../_images/boxplot_scen1-1.png" /></p>
+<p>For convenience, I created a helper function to create a list of named arguments from
+a single row of a dataframe. At the bottom of the function you’ll see that it includes
+code to deal with one extra argument to be passed on to the <code class="docutils literal notranslate"><span class="pre">caret</span></code> train function. For
+example, for the <code class="docutils literal notranslate"><span class="pre">nnet</span></code> method we need to give the extra argument <code class="docutils literal notranslate"><span class="pre">linout=TRUE</span></code> to
+tell <code class="docutils literal notranslate"><span class="pre">nnet</span></code> to create regression output instead of classification output. Similarly,
+for <code class="docutils literal notranslate"><span class="pre">knn</span></code> we need <code class="docutils literal notranslate"><span class="pre">preProcess=c('center',</span> <span class="pre">'scale')</span></code>. It would be easy to extend our
+function to handle any number of additional arguments.</p>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="n">caret_ptps_arglister</span> <span class="o">&lt;-</span> <span class="nf">function</span><span class="p">(</span><span class="n">df</span><span class="p">){</span>
+  
+  <span class="c1"># Just using the first row, no matter how many rows in data passed in.</span>
+  <span class="c1"># Hacky but fine for now.</span>
+  <span class="n">argdf</span> <span class="o">&lt;-</span> <span class="n">df</span><span class="p">[</span><span class="m">1</span><span class="p">,]</span>
+  
+  <span class="n">model_formula</span> <span class="o">&lt;-</span> <span class="nf">as.formula</span><span class="p">(</span><span class="n">argdf</span><span class="o">$</span><span class="n">model_formula</span><span class="p">)</span>
+  <span class="n">data</span> <span class="o">&lt;-</span> <span class="nf">get</span><span class="p">(</span><span class="n">argdf</span><span class="o">$</span><span class="n">data</span><span class="p">)</span>
+  <span class="n">method</span> <span class="o">&lt;-</span> <span class="n">argdf</span><span class="o">$</span><span class="n">method</span>
+  <span class="n">scenario</span> <span class="o">&lt;-</span> <span class="n">argdf</span><span class="o">$</span><span class="n">scenario</span>
+  <span class="n">pct_train_val</span> <span class="o">&lt;-</span> <span class="nf">eval</span><span class="p">(</span><span class="nf">parse</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="n">argdf</span><span class="o">$</span><span class="n">pct_train_val</span><span class="p">))</span>
+  <span class="n">partition.times</span> <span class="o">&lt;-</span> <span class="n">argdf</span><span class="o">$</span><span class="n">partition.times</span>
+  <span class="n">control</span> <span class="o">&lt;-</span> <span class="nf">get</span><span class="p">(</span><span class="n">argdf</span><span class="o">$</span><span class="n">control</span><span class="p">)</span>
+  <span class="n">seed.partition</span> <span class="o">&lt;-</span> <span class="n">argdf</span><span class="o">$</span><span class="n">seed.partition</span>
+  <span class="n">seed.resample</span> <span class="o">&lt;-</span> <span class="n">argdf</span><span class="o">$</span><span class="n">seed.resample</span>
+  <span class="n">extra_args</span> <span class="o">&lt;-</span> <span class="nf">ifelse</span><span class="p">(</span><span class="nf">length</span><span class="p">(</span><span class="n">argdf</span><span class="o">$</span><span class="n">extra_args</span><span class="p">)</span><span class="o">&gt;</span><span class="m">0</span><span class="p">,</span> <span class="n">argdf</span><span class="o">$</span><span class="n">extra_args</span><span class="p">,</span> <span class="kc">NULL</span><span class="p">)</span>
+  
+  <span class="n">arglist</span> <span class="o">&lt;-</span> <span class="nf">list</span><span class="p">(</span><span class="n">model_formula</span><span class="o">=</span><span class="n">model_formula</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> 
+                  <span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">,</span> <span class="n">scenario</span><span class="o">=</span><span class="n">scenario</span><span class="p">,</span> 
+                  <span class="n">pct_train_val</span><span class="o">=</span><span class="n">pct_train_val</span><span class="p">,</span> <span class="n">partition.times</span><span class="o">=</span><span class="n">partition.times</span><span class="p">,</span> 
+                  <span class="n">control</span><span class="o">=</span><span class="n">control</span><span class="p">,</span> <span class="n">seed.partition</span><span class="o">=</span><span class="n">seed.partition</span><span class="p">,</span> 
+                  <span class="n">seed.resample</span><span class="o">=</span><span class="n">seed.resample</span><span class="p">)</span>
+  
+  <span class="c1"># For now assuming only one additional argument specified.</span>
+  
+  <span class="nf">if </span><span class="p">(</span><span class="o">!</span><span class="nf">is.null</span><span class="p">(</span><span class="n">extra_args</span><span class="p">))</span>  <span class="p">{</span>
+    <span class="n">arg</span> <span class="o">&lt;-</span> <span class="nf">strsplit</span><span class="p">(</span><span class="n">extra_args</span><span class="p">,</span> <span class="s">&quot;=&quot;</span><span class="p">)</span>
+    <span class="n">argname</span> <span class="o">&lt;-</span> <span class="n">arg</span><span class="p">[[</span><span class="m">1</span><span class="p">]][</span><span class="m">1</span><span class="p">]</span>
+    <span class="n">argval</span> <span class="o">&lt;-</span> <span class="nf">eval</span><span class="p">(</span><span class="nf">parse</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="n">arg</span><span class="p">[[</span><span class="m">1</span><span class="p">]][</span><span class="m">2</span><span class="p">]))</span>
+    
+    <span class="n">arglist</span><span class="p">[[</span><span class="n">argname</span><span class="p">]]</span> <span class="o">&lt;-</span> <span class="n">argval</span>
+  <span class="p">}</span> 
+  
+  <span class="nf">return</span><span class="p">(</span><span class="n">arglist</span><span class="p">)</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
+<section id="put-it-all-together">
+<h2>Put it all together<a class="headerlink" href="#put-it-all-together" title="Permalink to this headline">¶</a></h2>
+<p>Let’s use a simple loop to drive the process.</p>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create an empty list to hold the results. Avoiding doing appends to a list.</span>
+
+<span class="n">maxlistsize</span> <span class="o">&lt;-</span> <span class="nf">nrow</span><span class="p">(</span><span class="n">scenarios_test_df</span><span class="p">)</span>
+<span class="n">results_list</span> <span class="o">&lt;-</span> <span class="nf">vector</span><span class="p">(</span><span class="s">&quot;list&quot;</span><span class="p">,</span> <span class="n">maxlistsize</span><span class="p">)</span>
+
+
+<span class="c1"># Iterate over rows in scenario dataframe</span>
+<span class="nf">for </span><span class="p">(</span><span class="n">i</span> <span class="n">in</span> <span class="m">1</span><span class="o">:</span><span class="nf">nrow</span><span class="p">(</span><span class="n">scenarios_test_df</span><span class="p">))</span> <span class="p">{</span>
+  <span class="c1"># Grab current row</span>
+  <span class="n">row</span> <span class="o">&lt;-</span> <span class="n">scenarios_test_df</span><span class="p">[</span><span class="n">i</span><span class="p">,]</span>
+  <span class="c1"># Create argument list corresponding to current scenario row</span>
+  <span class="n">arglist</span> <span class="o">&lt;-</span> <span class="nf">caret_ptps_arglister</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+  <span class="c1"># Partition, train, predict, summarize for current scenario row</span>
+  <span class="n">results</span> <span class="o">&lt;-</span> <span class="nf">do.call</span><span class="p">(</span><span class="n">caret_ptps</span><span class="p">,</span> <span class="n">arglist</span><span class="p">)</span>
+  <span class="c1"># We&#39;ll just save the RMSE and scenario values for this example</span>
+  <span class="n">results_df</span> <span class="o">&lt;-</span> <span class="nf">do.call</span><span class="p">(</span><span class="n">rbind</span><span class="p">,</span><span class="nf">lapply</span><span class="p">(</span><span class="n">results</span><span class="p">[[</span><span class="m">1</span><span class="p">]],</span> <span class="n">data.frame</span><span class="p">,</span> <span class="n">stringsAsFactors</span><span class="o">=</span><span class="kc">FALSE</span><span class="p">))</span>
+  <span class="c1"># Save results dataframe to list</span>
+  <span class="n">results_list</span><span class="p">[[</span><span class="n">i</span><span class="p">]]</span> <span class="o">&lt;-</span> <span class="n">results_df</span>
+  <span class="p">}</span>
+</pre></div>
+</div>
+<p>Now lets turn this list of dataframes into a single dataframe and make
+some summary plots. See <a class="reference external" href="https://stackoverflow.com/questions/2851327/convert-a-list-of-data-frames-into-one-data-frame">https://stackoverflow.com/questions/2851327/convert-a-list-of-data-frames-into-one-data-frame</a> for good discussion of various approaches to this common task. I’m
+going to use <code class="docutils literal notranslate"><span class="pre">bind_rows</span></code> from the <code class="docutils literal notranslate"><span class="pre">dplyr</span></code> package.</p>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="n">results_df</span> <span class="o">&lt;-</span> <span class="nf">as.data.frame</span><span class="p">(</span><span class="nf">bind_rows</span><span class="p">(</span><span class="n">results_list</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>Now we can visualize the distribution of RMSE for the different models and different training
+set sizes.</p>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="nf">ggplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">results_df</span><span class="p">)</span> <span class="o">+</span> <span class="nf">geom_boxplot</span><span class="p">(</span><span class="nf">aes</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="nf">as.factor</span><span class="p">(</span><span class="n">ptrain</span><span class="p">),</span> <span class="n">y</span><span class="o">=</span><span class="n">rmse_test</span><span class="p">),</span> <span class="n">colour</span><span class="o">=</span><span class="s">&quot;tan2&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="nf">facet_wrap</span><span class="p">(</span><span class="o">~</span><span class="n">scenario</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><img alt="center" src="../../_images/boxplots-1.png" /></p>
+<p>Let’s replot without knn.</p>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="nf">ggplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">results_df</span><span class="p">[</span><span class="n">results_df</span><span class="o">$</span><span class="n">scenario</span> <span class="o">!=</span> <span class="s">&#39;occmean_pp_knn1&#39;</span><span class="p">,])</span> <span class="o">+</span> <span class="nf">geom_boxplot</span><span class="p">(</span><span class="nf">aes</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="nf">as.factor</span><span class="p">(</span><span class="n">ptrain</span><span class="p">),</span> <span class="n">y</span><span class="o">=</span><span class="n">rmse_test</span><span class="p">),</span> <span class="n">colour</span><span class="o">=</span><span class="s">&quot;tan2&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="nf">facet_wrap</span><span class="p">(</span><span class="o">~</span><span class="n">scenario</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><img alt="center" src="../../_images/boxplots_noknn-1.png" /></p>
+</section>
+<section id="next-steps">
+<h2>Next steps<a class="headerlink" href="#next-steps" title="Permalink to this headline">¶</a></h2>
+<p>Now that I’ve got the basic idea working, I’ll build on this as I work on the research
+project and address the questions that originally prompted this series of posts. While
+working on this approach, I was talking to a former student of mine who is now working
+in the healthcare analytics field. As I was describing this, he said “that’s the kind of
+thing I did in my capstone project in the <a class="reference external" href="https://www.ischool.berkeley.edu/programs/mids">Master of Information and Data Science program at UC-Berkeley</a>”. His team’s project resulted in
+a tool called <a class="reference external" href="http://autocaret.info/">autoCaret</a> that strives to make it easier to get
+started with machine learning projects by wrapping and automating some of the steps. They
+focused on binary classification problems and also included a nice GUI in addition to the
+R package itself. And, it’s freely available on GitHub at <a class="reference external" href="https://github.com/gregce/autoCaret">https://github.com/gregce/autoCaret</a>.</p>
+</section>
+</section>
+
+<div class="section">
+    
+
+<div class="section">
+  <span style="float: left">
+     Previous:
+    
+    <a href="../obsim_caret_part2/">
+       Comparing predictive model performance using caret - Part 2: A simple caret automation function
+    </a>
+    
+  </span>
+  <span>&nbsp;</span>
+  <span style="float: right">
+     Next: 
+    <a href="../simpy-getting-started/">
+      Getting started with SimPy for patient flow modeling 
+    </a>
+    
+  </span>
+</div>
+  
+</div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../">misken</a></h1>
+
+
+
+
+
+
+
+
+  
+<h2>
+   
+  30 June 2016 
+</h2>
+
+<ul>
+   
+<li id="author">
+  <span
+    >Author:</span
+  >
+   
+  <a href="../author/misken/">misken</a>  
+</li>
+    
+<li id="tags">
+  <span
+    >Tags: </span
+  >
+   
+  <a href="../tag/caret/">caret</a>   
+  <a href="../tag/healthcare/">healthcare</a>   
+  <a href="../tag/r/">R</a>   
+  <a href="../tag/metamodeling/">metamodeling</a>  
+</li>
+ 
+</ul>
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../about/">About misken</a></li>
+</ul>
+
+
+<h3>
+  <a href="../">Recent Posts</a>
+</h3>
+<ul>
+   
+  <li>
+    <a href="../simpy_getting_started_vaccine_clinic/"
+      >04 April - Using SimPy to simulate a vaccine clinic - Part 1: an introductory tutorial</a
+    >
+  </li>
+  
+  <li>
+    <a href="../use_jupyter_conda_envs/"
+      >03 April - Using different conda environments with Jupyter Lab</a
+    >
+  </li>
+  
+  <li>
+    <a href="../hello_world/"
+      >02 April - Hello world from ablog blogging with JupyterLab</a
+    >
+  </li>
+  
+  <li>
+    <a href="../first-post/"
+      >01 April - First Post at new blogging site</a
+    >
+  </li>
+  
+  <li>
+    <a href="../pip_with_conda_local_dev/"
+      >15 March - Using pip with conda for local development projects</a
+    >
+  </li>
+  
+</ul>
+
+<h3><a href="../tag/">Tags</a></h3>
+<style type="text/css">
+  ul.ablog-cloud {
+    list-style: none;
+    overflow: auto;
+  }
+  ul.ablog-cloud li {
+    float: left;
+    height: 20pt;
+    line-height: 18pt;
+    margin-right: 5px;
+  }
+  ul.ablog-cloud a {
+    text-decoration: none;
+    vertical-align: middle;
+  }
+  li.ablog-cloud-1 {
+    font-size: 80%;
+  }
+  li.ablog-cloud-2 {
+    font-size: 95%;
+  }
+  li.ablog-cloud-3 {
+    font-size: 110%;
+  }
+  li.ablog-cloud-4 {
+    font-size: 125%;
+  }
+  li.ablog-cloud-5 {
+    font-size: 140%;
+  }
+</style>
+<ul class="ablog-cloud">
+   
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/github/">GitHub</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-3">
+    <a href="../tag/r/">R</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/ablog/">ablog</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/bikeshare/">bikeshare</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/birding/">birding</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/blogging/">blogging</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/caret/">caret</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/conda/">conda</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/datetime/">datetime</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/dplyr/">dplyr</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/ebird/">ebird</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/ecology/">ecology</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/excel/">excel</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/ggplot2/">ggplot2</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/gis/">gis</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/git/">git</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-2">
+    <a href="../tag/healthcare/">healthcare</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/hiking/">hiking</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/hillmaker/">hillmaker</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-2">
+    <a href="../tag/jupyter/">jupyter</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/metamodeling/">metamodeling</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/occupancy-analysis/">occupancy analysis</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/pandas/">pandas</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/patient-flow/">patient flow</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-5">
+    <a href="../tag/python/">python</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/simpy/">simpy</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/simulation/">simulation</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/sphinx/">sphinx</a>
+  </li>
+   
+</ul>
+
+<h3>
+  <a href="../archive/">Archives</a>
+</h3>
+<ul>
+   
+  <li>
+    <a href="../2022/">2022 (5)</a>
+  </li>
+    
+  <li>
+    <a href="../2021/">2021 (4)</a>
+  </li>
+    
+  <li>
+    <a href="../2020/">2020 (2)</a>
+  </li>
+    
+  <li>
+    <a href="../2019/">2019 (7)</a>
+  </li>
+    
+  <li>
+    <a href="../2018/">2018 (5)</a>
+  </li>
+    
+  <li>
+    <a href="../2017/">2017 (2)</a>
+  </li>
+    
+  <li>
+    <a href="../2016/">2016 (4)</a>
+  </li>
+    
+  <li>
+    <a href="../2014/">2014 (1)</a>
+  </li>
+   
+</ul>
+
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search/" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2022, misken.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.3.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../../_sources/blog/obsim_caret_part3.md.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

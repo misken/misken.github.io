@@ -2,7 +2,7 @@
 blogpost: true
 date: Apr 19, 2018
 author: misken
-tags: blogging, python, r
+tags: blogging, python, R
 ---
 
 # Blogging with Pelican and R Markdown

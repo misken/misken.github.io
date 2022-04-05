@@ -1,0 +1,1179 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>Comparing predictive models for obstetrical unit occupancy using caret - Part 1 &#8212; misken 0,1,0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css" />
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <link rel="author" title="About these documents" href="../../about/" />
+    <link rel="index" title="Index" href="../../genindex/" />
+    <link rel="search" title="Search" href="../../search/" /> 
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+ 
+<link
+  rel="alternate"
+  type="application/atom+xml"
+  href="../../blog/atom.xml"
+  title="Bits of analytics"
+/>
+ 
+<style type="text/css">
+  ul.ablog-archive {
+    list-style: none;
+    overflow: auto;
+    margin-left: 0px;
+  }
+  ul.ablog-archive li {
+    float: left;
+    margin-right: 5px;
+    font-size: 80%;
+  }
+  ul.postlist a {
+    font-style: italic;
+  }
+  ul.postlist-style-disc {
+    list-style-type: disc;
+  }
+  ul.postlist-style-none {
+    list-style-type: none;
+  }
+  ul.postlist-style-circle {
+    list-style-type: circle;
+  }
+</style>
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+             <section id="comparing-predictive-models-for-obstetrical-unit-occupancy-using-caret-part-1">
+<h1>Comparing predictive models for obstetrical unit occupancy using caret - Part 1<a class="headerlink" href="#comparing-predictive-models-for-obstetrical-unit-occupancy-using-caret-part-1" title="Permalink to this headline">¶</a></h1>
+<p>Simulation metamodeling involves building predictive models based on outputs of designed simulation experiments. In this series of posts we’ll share our experience with using the R package <code class="docutils literal notranslate"><span class="pre">caret</span></code> for building and comparing several predictive modeling based metamodels including linear models, neural networks, random forests, k-nearest neighbor, and cubic splines.</p>
+<section id="simulating-hospital-inpatient-obstetrical-units-for-capacity-planning">
+<h2>Simulating hospital inpatient obstetrical units for capacity planning<a class="headerlink" href="#simulating-hospital-inpatient-obstetrical-units-for-capacity-planning" title="Permalink to this headline">¶</a></h2>
+<p>A typical configuration of hospital units which provide care for women about to give birth
+might include an observation unit, a labor, delivery and recovery unit (LDR) and a
+postpartum (PP) unit. Matching the capacity of these units to demand placed on them
+is important for maintaining smooth patient flow. For example, there should be
+sufficient capacity in a PP unit so that there is a relatively small probability that a post-delivery patient is <em>blocked</em> in the LDR due to lack of a bed in PP. Of course, complicating the capacity planning process is the fact that there are numerous sources
+of uncertainty in obstetrical patient care processes. These include the number and timing
+of patient arrivals, whether or not the patient requires a C-section and the length of stay in each of the three units.</p>
+<p><img alt="OB flow diagram" src="../../_images/obflow.png" /></p>
+<p>I’m working on a research project involving capacity planning models for these systems. One phase involves building what are known as <em>simulation metamodels</em>. The main components are:</p>
+<ul class="simple">
+<li><p>built a discrete event simulation model of a simplified queueing network model of typical obstetrical patient flow system.</p></li>
+<li><p>designed and ran a set of simulation experiments involving a range patient volumes, percentages of patients requiring c-section, and unit sizes (numbers of beds). There
+were 150 scenarios simulated.</p></li>
+<li><p>post-processed the output using both R and Python to compute several performance
+measures related to unit occupancy and patient delays.</p></li>
+<li><p>now working on building and comparing a number of different statistical/machine learning
+techniques for predicting occupancy and delay related peformance measures using the
+experimental inputs (volume, % c-section, unit sizes). This is where <code class="docutils literal notranslate"><span class="pre">caret</span></code> comes in.</p></li>
+</ul>
+<p>In the simulation world, this last step is known as <em>simulation metamodeling</em>. It has a long history. See any good discrete event simulation text such as <a class="reference external" href="https://www.amazon.com/Simulation-McGraw-Hill-Industrial-Engineering-Management/dp/0073401323">Simulation modeling and analysis by Law and Kelton</a> for an overview. There’s also a <a class="reference external" href="http://www.informs-sim.org/wsc15papers/185.pdf">nice overview done by R. Barton and available as a free pdf from the Proceedings of the 2015 Winter Simulation Conference</a>. Typically, techniques s any predictive modeling technique capable of producing real valued output such as neural networks, regression trees, k-nearest neighbor or any number of advanced regression techniques.
+As this was my first significant project using <code class="docutils literal notranslate"><span class="pre">caret</span></code>, I thought it would be helpful to
+write up some of the challenges faced and share some of the techniques I used to make
+it easier to compare different models. In this first post we will use <code class="docutils literal notranslate"><span class="pre">caret</span></code> to train a few
+models, make predictions, summarize their performance and motivate the need for a way
+to automate this workflow to make it easier to compare a number of modeling techniques and
+associated meta-settings such as the relative size of the training and test datasets.</p>
+</section>
+<section id="read-in-the-data">
+<h2>Read in the data.<a class="headerlink" href="#read-in-the-data" title="Permalink to this headline">¶</a></h2>
+<p>As mentioned above, there are 150 scenarios (rows) and a number of input and output columns. For this series of posts, I’ve created an example file containing a limited number of the output related columns.</p>
+<p>Let’s read in the data.</p>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="n">obsim_df</span> <span class="o">&lt;-</span> <span class="nf">read.csv</span><span class="p">(</span><span class="n">file</span><span class="o">=</span><span class="s">&quot;http://hselab.org/files/obsim_example.csv&quot;</span><span class="p">)</span>
+<span class="nf">names</span><span class="p">(</span><span class="n">obsim_df</span><span class="p">)[</span><span class="m">1</span><span class="p">]</span> <span class="o">&lt;-</span> <span class="s">&quot;scenario&quot;</span>
+<span class="c1"># Shorten a few column names</span>
+<span class="nf">names</span><span class="p">(</span><span class="n">obsim_df</span><span class="p">)[</span><span class="m">13</span><span class="p">]</span> <span class="o">&lt;-</span> <span class="s">&quot;occmean_ldr&quot;</span>
+<span class="nf">names</span><span class="p">(</span><span class="n">obsim_df</span><span class="p">)[</span><span class="m">14</span><span class="p">]</span> <span class="o">&lt;-</span> <span class="s">&quot;occp95_ldr&quot;</span>
+<span class="nf">names</span><span class="p">(</span><span class="n">obsim_df</span><span class="p">)[</span><span class="m">15</span><span class="p">]</span> <span class="o">&lt;-</span> <span class="s">&quot;occmean_pp&quot;</span>
+<span class="nf">names</span><span class="p">(</span><span class="n">obsim_df</span><span class="p">)[</span><span class="m">16</span><span class="p">]</span> <span class="o">&lt;-</span> <span class="s">&quot;occp95_pp&quot;</span>
+</pre></div>
+</div>
+<p>Here are the input variables and the first few rows:</p>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="n">knitr</span><span class="o">::</span><span class="nf">kable</span><span class="p">(</span><span class="nf">head</span><span class="p">(</span><span class="n">obsim_df</span><span class="p">[,</span><span class="m">2</span><span class="o">:</span><span class="m">12</span><span class="p">]),</span><span class="n">digits</span><span class="o">=</span><span class="m">2</span><span class="p">)</span>
+</pre></div>
+</div>
+<table class="colwidths-auto docutils align-default">
+<thead>
+<tr class="row-odd"><th class="text-align:right head"><p>lam_ldr</p></th>
+<th class="text-align:right head"><p>alos_ldr</p></th>
+<th class="text-align:right head"><p>cap_ldr</p></th>
+<th class="text-align:right head"><p>load_ldr</p></th>
+<th class="text-align:right head"><p>rho_ldr</p></th>
+<th class="text-align:right head"><p>lam_pp</p></th>
+<th class="text-align:right head"><p>alos_pp</p></th>
+<th class="text-align:right head"><p>cap_pp</p></th>
+<th class="text-align:right head"><p>load_pp</p></th>
+<th class="text-align:right head"><p>rho_pp</p></th>
+<th class="text-align:right head"><p>tot_c_rate</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-align:right"><p>2.74</p></td>
+<td class="text-align:right"><p>0.5</p></td>
+<td class="text-align:right"><p>4</p></td>
+<td class="text-align:right"><p>1.37</p></td>
+<td class="text-align:right"><p>0.34</p></td>
+<td class="text-align:right"><p>2.74</p></td>
+<td class="text-align:right"><p>2.2</p></td>
+<td class="text-align:right"><p>12</p></td>
+<td class="text-align:right"><p>6.03</p></td>
+<td class="text-align:right"><p>0.50</p></td>
+<td class="text-align:right"><p>0.2</p></td>
+</tr>
+<tr class="row-odd"><td class="text-align:right"><p>2.74</p></td>
+<td class="text-align:right"><p>0.5</p></td>
+<td class="text-align:right"><p>4</p></td>
+<td class="text-align:right"><p>1.37</p></td>
+<td class="text-align:right"><p>0.34</p></td>
+<td class="text-align:right"><p>2.74</p></td>
+<td class="text-align:right"><p>2.2</p></td>
+<td class="text-align:right"><p>10</p></td>
+<td class="text-align:right"><p>6.03</p></td>
+<td class="text-align:right"><p>0.60</p></td>
+<td class="text-align:right"><p>0.2</p></td>
+</tr>
+<tr class="row-even"><td class="text-align:right"><p>2.74</p></td>
+<td class="text-align:right"><p>0.5</p></td>
+<td class="text-align:right"><p>4</p></td>
+<td class="text-align:right"><p>1.37</p></td>
+<td class="text-align:right"><p>0.34</p></td>
+<td class="text-align:right"><p>2.74</p></td>
+<td class="text-align:right"><p>2.2</p></td>
+<td class="text-align:right"><p>9</p></td>
+<td class="text-align:right"><p>6.03</p></td>
+<td class="text-align:right"><p>0.67</p></td>
+<td class="text-align:right"><p>0.2</p></td>
+</tr>
+<tr class="row-odd"><td class="text-align:right"><p>2.74</p></td>
+<td class="text-align:right"><p>0.5</p></td>
+<td class="text-align:right"><p>3</p></td>
+<td class="text-align:right"><p>1.37</p></td>
+<td class="text-align:right"><p>0.46</p></td>
+<td class="text-align:right"><p>2.74</p></td>
+<td class="text-align:right"><p>2.2</p></td>
+<td class="text-align:right"><p>12</p></td>
+<td class="text-align:right"><p>6.03</p></td>
+<td class="text-align:right"><p>0.50</p></td>
+<td class="text-align:right"><p>0.2</p></td>
+</tr>
+<tr class="row-even"><td class="text-align:right"><p>2.74</p></td>
+<td class="text-align:right"><p>0.5</p></td>
+<td class="text-align:right"><p>3</p></td>
+<td class="text-align:right"><p>1.37</p></td>
+<td class="text-align:right"><p>0.46</p></td>
+<td class="text-align:right"><p>2.74</p></td>
+<td class="text-align:right"><p>2.2</p></td>
+<td class="text-align:right"><p>10</p></td>
+<td class="text-align:right"><p>6.03</p></td>
+<td class="text-align:right"><p>0.60</p></td>
+<td class="text-align:right"><p>0.2</p></td>
+</tr>
+<tr class="row-odd"><td class="text-align:right"><p>2.74</p></td>
+<td class="text-align:right"><p>0.5</p></td>
+<td class="text-align:right"><p>3</p></td>
+<td class="text-align:right"><p>1.37</p></td>
+<td class="text-align:right"><p>0.46</p></td>
+<td class="text-align:right"><p>2.74</p></td>
+<td class="text-align:right"><p>2.2</p></td>
+<td class="text-align:right"><p>9</p></td>
+<td class="text-align:right"><p>6.03</p></td>
+<td class="text-align:right"><p>0.67</p></td>
+<td class="text-align:right"><p>0.2</p></td>
+</tr>
+</tbody>
+</table>
+<p>… and the output variables</p>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="n">knitr</span><span class="o">::</span><span class="nf">kable</span><span class="p">(</span><span class="nf">head</span><span class="p">(</span><span class="n">obsim_df</span><span class="p">[,</span><span class="m">13</span><span class="o">:</span><span class="m">16</span><span class="p">]),</span> <span class="n">digits</span><span class="o">=</span><span class="m">3</span><span class="p">)</span>
+</pre></div>
+</div>
+<table class="colwidths-auto docutils align-default">
+<thead>
+<tr class="row-odd"><th class="text-align:right head"><p>occmean_ldr</p></th>
+<th class="text-align:right head"><p>occp95_ldr</p></th>
+<th class="text-align:right head"><p>occmean_pp</p></th>
+<th class="text-align:right head"><p>occp95_pp</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-align:right"><p>1.371</p></td>
+<td class="text-align:right"><p>3.680</p></td>
+<td class="text-align:right"><p>6.051</p></td>
+<td class="text-align:right"><p>10.183</p></td>
+</tr>
+<tr class="row-odd"><td class="text-align:right"><p>1.426</p></td>
+<td class="text-align:right"><p>3.987</p></td>
+<td class="text-align:right"><p>6.017</p></td>
+<td class="text-align:right"><p>10.000</p></td>
+</tr>
+<tr class="row-even"><td class="text-align:right"><p>1.518</p></td>
+<td class="text-align:right"><p>4.000</p></td>
+<td class="text-align:right"><p>6.020</p></td>
+<td class="text-align:right"><p>9.000</p></td>
+</tr>
+<tr class="row-odd"><td class="text-align:right"><p>1.319</p></td>
+<td class="text-align:right"><p>3.000</p></td>
+<td class="text-align:right"><p>6.021</p></td>
+<td class="text-align:right"><p>10.231</p></td>
+</tr>
+<tr class="row-even"><td class="text-align:right"><p>1.362</p></td>
+<td class="text-align:right"><p>3.000</p></td>
+<td class="text-align:right"><p>6.031</p></td>
+<td class="text-align:right"><p>10.000</p></td>
+</tr>
+<tr class="row-odd"><td class="text-align:right"><p>1.431</p></td>
+<td class="text-align:right"><p>3.000</p></td>
+<td class="text-align:right"><p>6.033</p></td>
+<td class="text-align:right"><p>9.000</p></td>
+</tr>
+</tbody>
+</table>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="nf">str</span><span class="p">(</span><span class="n">obsim_df</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">## &#39;data.frame&#39;:	150 obs. of  16 variables:</span>
+<span class="c1">##  $ scenario   : int  1 2 3 4 5 6 7 8 9 10 ...</span>
+<span class="c1">##  $ lam_ldr    : num  2.74 2.74 2.74 2.74 2.74 ...</span>
+<span class="c1">##  $ alos_ldr   : num  0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 ...</span>
+<span class="c1">##  $ cap_ldr    : int  4 4 4 3 3 3 2 2 2 8 ...</span>
+<span class="c1">##  $ load_ldr   : num  1.37 1.37 1.37 1.37 1.37 ...</span>
+<span class="c1">##  $ rho_ldr    : num  0.342 0.342 0.342 0.457 0.457 ...</span>
+<span class="c1">##  $ lam_pp     : num  2.74 2.74 2.74 2.74 2.74 ...</span>
+<span class="c1">##  $ alos_pp    : num  2.2 2.2 2.2 2.2 2.2 2.2 2.2 2.2 2.2 2.2 ...</span>
+<span class="c1">##  $ cap_pp     : int  12 10 9 12 10 9 12 10 9 29 ...</span>
+<span class="c1">##  $ load_pp    : num  6.03 6.03 6.03 6.03 6.03 ...</span>
+<span class="c1">##  $ rho_pp     : num  0.502 0.603 0.67 0.502 0.603 ...</span>
+<span class="c1">##  $ tot_c_rate : num  0.2 0.2 0.2 0.2 0.2 0.2 0.2 0.2 0.2 0.2 ...</span>
+<span class="c1">##  $ occmean_ldr: num  1.37 1.43 1.52 1.32 1.36 ...</span>
+<span class="c1">##  $ occp95_ldr : num  3.68 3.99 4 3 3 ...</span>
+<span class="c1">##  $ occmean_pp : num  6.05 6.02 6.02 6.02 6.03 ...</span>
+<span class="c1">##  $ occp95_pp  : num  10.2 10 9 10.2 10 ...</span>
+</pre></div>
+</div>
+<section id="input-variables">
+<h3>Input Variables<a class="headerlink" href="#input-variables" title="Permalink to this headline">¶</a></h3>
+<table class="colwidths-auto docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p><strong>Name</strong></p></th>
+<th class="head"><p><strong>Math</strong></p></th>
+<th class="head"><p><strong>Description</strong></p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">lam_ldr</span></code></p></td>
+<td><p><span class="math notranslate nohighlight">\(\lambda_L\)</span></p></td>
+<td><p>Arrival rate of patients to LDR unit</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">alos_ldr</span></code></p></td>
+<td><p><span class="math notranslate nohighlight">\(B_L\)</span></p></td>
+<td><p>Average length of stay in LDR</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">cap_ldr</span></code></p></td>
+<td><p><span class="math notranslate nohighlight">\(c_L\)</span></p></td>
+<td><p>Number of beds in LDR</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">load_ldr</span></code></p></td>
+<td><p><span class="math notranslate nohighlight">\(\lambda_L B_L\)</span></p></td>
+<td><p>Arrival rate times average length of stay; a measure of workload submitted to the LDR</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">rho_ldr</span></code></p></td>
+<td><p><span class="math notranslate nohighlight">\(\rho_L=\lambda_L B_L/c_L\)</span></p></td>
+<td><p>Traffic intensity; a measure of congestion of LDR</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">lam_pp</span></code></p></td>
+<td><p><span class="math notranslate nohighlight">\(\lambda_P\)</span></p></td>
+<td><p>Arrival rate of patients to postpartum (PP) unit</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">alos_pp</span></code></p></td>
+<td><p><span class="math notranslate nohighlight">\(B_P\)</span></p></td>
+<td><p>Average length of stay in PP</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">cap_pp</span></code></p></td>
+<td><p><span class="math notranslate nohighlight">\(c_P\)</span></p></td>
+<td><p>Number of beds in PP</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">load_pp</span></code></p></td>
+<td><p><span class="math notranslate nohighlight">\(\lambda_P B_P\)</span></p></td>
+<td><p>Arrival rate times average length of stay; a measure of workload submitted to the PP</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">rho_pp</span></code></p></td>
+<td><p><span class="math notranslate nohighlight">\(\rho_P=\lambda_P B_P/c_P\)</span></p></td>
+<td><p>Traffic intensity; a measure of congestion of PP</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">tot_c_rate</span></code></p></td>
+<td><p><span class="math notranslate nohighlight">\(\gamma\)</span></p></td>
+<td><p>Percentage of patients requiring c-section</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="response-variables">
+<h3>Response Variables<a class="headerlink" href="#response-variables" title="Permalink to this headline">¶</a></h3>
+<table class="colwidths-auto docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p><strong>Name</strong></p></th>
+<th class="head"><p><strong>Description</strong></p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">occmean_ldr</span></code></p></td>
+<td><p>Mean occupancy (number of patients) in LDR unit</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">occp95_ldr</span></code></p></td>
+<td><p>95th percentile of occupancy (number of patients) in LDR unit</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">occmean_pp</span></code></p></td>
+<td><p>Mean occupancy (number of patients) in PP unit</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">occp95_pp</span></code></p></td>
+<td><p>95th percentile of occupancy (number of patients) in PP unit</p></td>
+</tr>
+</tbody>
+</table>
+<p>There are other important response variables such as the probability that a patient gets
+blocked in the LDR due to the PP unit being full and the amount of time (mean, percentiles) that
+such blocked patients wait for a PP bed to become available. We’ll explore those variables in
+subsequent posts. For now, we’ll just focus on the mean and 95th percentile of occupancy
+in the LDR and PP units.</p>
+</section>
+</section>
+<section id="metamodel-1-mean-occupancy-of-pp">
+<h2>Metamodel 1 - Mean occupancy of PP<a class="headerlink" href="#metamodel-1-mean-occupancy-of-pp" title="Permalink to this headline">¶</a></h2>
+<p>This is the simplest case since the PP unit behaves like an <span class="math notranslate nohighlight">\(M/G/c\)</span> queueing system for
+which mean occupancy is simply the load placed on the unit, <span class="math notranslate nohighlight">\(\lambda_P B_P\)</span>. While the
+details of the simulation model are outside the scope of this first post, we will note that
+the length of stay in the PP unit is the mixture of two different distributions - one for patients requiring a c-section and one for those not requiring one. More on queueing
+models and simulation details in later posts.</p>
+<p>It would seem
+that pretty much any technique such as a linear model, neural net, or random forest
+should be able to produce reasonable predictions. We’ll use this simple case to illustrate the
+basics of using the <a class="reference external" href="https://topepo.github.io/caret/index.html">caret</a> package to compare a few different models.</p>
+<p>This isn’t meant to be a comprehensive tutorial on the basics of <code class="docutils literal notranslate"><span class="pre">caret</span></code>. There are plenty of those
+available and the <a class="reference external" href="http://topepo.github.io/caret/index.html">documentation</a> is a good place to start. Instead, we’ll use this simple
+example to motivate our desire to come up with a simple scheme for automating a bunch of
+<code class="docutils literal notranslate"><span class="pre">caret</span></code> runs for different models and values of experimental hyperparameters.</p>
+</section>
+<section id="load-libraries">
+<h2>Load libraries<a class="headerlink" href="#load-libraries" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="nf">library</span><span class="p">(</span><span class="n">ggplot2</span><span class="p">)</span>
+<span class="nf">library</span><span class="p">(</span><span class="n">Metrics</span><span class="p">)</span> <span class="c1"># Just to use its rmse() function</span>
+<span class="nf">library</span><span class="p">(</span><span class="n">caret</span><span class="p">)</span>
+<span class="nf">library</span><span class="p">(</span><span class="n">randomForest</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="the-analysis-plan-getting-started-with-caret">
+<h2>The analysis plan - getting started with caret<a class="headerlink" href="#the-analysis-plan-getting-started-with-caret" title="Permalink to this headline">¶</a></h2>
+<p>As this was my first time using <code class="docutils literal notranslate"><span class="pre">caret</span></code>, started with a simple cycle of:</p>
+<ul class="simple">
+<li><p>partition data into training and test sets</p></li>
+<li><p>train a few different model types using k-crossfold validation</p></li>
+<li><p>make predictions on the test dataset using the “best” model from each model type tested</p></li>
+<li><p>summarize predictive accuracy using RMSE and plots of actual vs predicted</p></li>
+</ul>
+<p>Along the way I learned a things about <code class="docutils literal notranslate"><span class="pre">caret</span></code> and will share them in the hopes that
+others might find this information useful.</p>
+<section id="random-number-seeds">
+<h3>Random number seeds<a class="headerlink" href="#random-number-seeds" title="Permalink to this headline">¶</a></h3>
+<p>The process of data partitioning as well as the k-crossfold validation done during training
+require random sampling of data. To make the analysis reproducible and to control for random
+variation, I decided to use separate random number seeds for the partitioning process and the
+training process. These seeds were then used by the <code class="docutils literal notranslate"><span class="pre">set.seed()</span></code> function.</p>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="n">train_test_seed</span> <span class="o">&lt;-</span> <span class="m">233</span>
+<span class="n">resample_seed</span> <span class="o">&lt;-</span> <span class="m">67</span>
+</pre></div>
+</div>
+</section>
+<section id="partition-data-into-training-and-test-datasets">
+<h3>Partition data into training and test datasets<a class="headerlink" href="#partition-data-into-training-and-test-datasets" title="Permalink to this headline">¶</a></h3>
+<p>For now, let’s use a proportion <span class="math notranslate nohighlight">\(p=125/150\)</span> for the training set and <span class="math notranslate nohighlight">\(1-p\)</span> for the test set. The
+<code class="docutils literal notranslate"><span class="pre">createDataPartition</span></code> function makes this quite easy. We can specify <span class="math notranslate nohighlight">\(p\)</span> and <code class="docutils literal notranslate"><span class="pre">caret</span></code> will
+automatically create a partition that attempts to balance the cases within percentiles
+subgroups of the response variable. For classification problems, sampled cases are balanced across class values. See the <a class="reference external" href="https://www.rdocumentation.org/packages/caret/versions/6.0-76/topics/createDataPartition">function documentation</a> for more details.</p>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="n">pct_train</span> <span class="o">&lt;-</span> <span class="m">125</span><span class="o">/</span><span class="m">150</span>
+<span class="nf">set.seed</span><span class="p">(</span><span class="n">train_test_seed</span><span class="p">)</span>
+<span class="n">trainrecs</span> <span class="o">&lt;-</span> <span class="nf">createDataPartition</span><span class="p">(</span><span class="n">obsim_df</span><span class="o">$</span><span class="n">occmean_pp</span><span class="p">,</span> <span class="n">p</span> <span class="o">=</span> <span class="n">pct_train</span><span class="p">,</span> 
+                                         <span class="n">list</span> <span class="o">=</span> <span class="kc">FALSE</span><span class="p">,</span> <span class="n">times</span> <span class="o">=</span> <span class="m">1</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>A few things to note:</p>
+<ul class="simple">
+<li><p>the first argument is the response variable of interest,</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">list</span> <span class="pre">=</span> <span class="pre">FALSE</span></code> will result in the results being returned in a matrix instead of a list,</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">times</span> <span class="pre">=</span> <span class="pre">1</span></code> means we’ll get back a matrix with one column representing one partitioning of the data. Specifying a value greater than one does the obvious things - we get multiple partitions of our data and each is returned as a column in the matrix.</p></li>
+</ul>
+<p>Let’s look at <code class="docutils literal notranslate"><span class="pre">trainrecs</span></code>.</p>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="n">trainrecs</span><span class="p">[</span><span class="m">1</span><span class="o">:</span><span class="m">20</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">##  [1]  1  2  3  4  6  7  9 10 11 12 13 14 15 16 17 18 20 21 22 23</span>
+</pre></div>
+</div>
+<p>Different random number seed, different results (most likely).</p>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="nf">set.seed</span><span class="p">(</span><span class="n">train_test_seed</span> <span class="o">+</span> <span class="m">1</span><span class="p">)</span> <span class="c1"># Use a different seed</span>
+<span class="n">trainrecs2</span> <span class="o">&lt;-</span> <span class="nf">createDataPartition</span><span class="p">(</span><span class="n">obsim_df</span><span class="o">$</span><span class="n">occmean_pp</span><span class="p">,</span> <span class="n">p</span> <span class="o">=</span> <span class="n">pct_train</span><span class="p">,</span> 
+                                         <span class="n">list</span> <span class="o">=</span> <span class="kc">FALSE</span><span class="p">,</span> <span class="n">times</span> <span class="o">=</span> <span class="m">1</span><span class="p">)</span>
+<span class="n">trainrecs2</span><span class="p">[</span><span class="m">1</span><span class="o">:</span><span class="m">20</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">##  [1]  1  2  3  5  7  8  9 10 11 13 14 15 16 17 18 19 20 21 22 23</span>
+</pre></div>
+</div>
+<p>While doing this, you might ask yourself, what value of <span class="math notranslate nohighlight">\(p\)</span> should be used? Good question and
+no easy answer. Similarly, you might wonder how much variation there will be in our
+prediction errors if we created multiple partition samples (i.e. <code class="docutils literal notranslate"><span class="pre">times</span></code> &gt; 1). Another good question. Happily, <code class="docutils literal notranslate"><span class="pre">createDataPartition</span></code> will make such an exploration pretty easy. But, for now,
+let’s use <span class="math notranslate nohighlight">\(p=125/150\)</span> and <code class="docutils literal notranslate"><span class="pre">times=1</span></code>.</p>
+<p>Use <code class="docutils literal notranslate"><span class="pre">trainrecs</span></code> to partition the dataset.</p>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="n">obsim_train_df</span> <span class="o">&lt;-</span> <span class="n">obsim_df</span><span class="p">[</span><span class="n">trainrecs</span><span class="p">,</span> <span class="p">]</span>
+<span class="n">obsim_test_df</span> <span class="o">&lt;-</span> <span class="n">obsim_df</span><span class="p">[</span><span class="o">-</span><span class="n">trainrecs</span><span class="p">,</span> <span class="p">]</span>
+</pre></div>
+</div>
+</section>
+<section id="set-parameters-for-training-process">
+<h3>Set parameters for training process<a class="headerlink" href="#set-parameters-for-training-process" title="Permalink to this headline">¶</a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">caret</span></code> package provides a full featured <code class="docutils literal notranslate"><span class="pre">trainControl</span></code> function for controlling
+a myriad of parameters related to the model training process. It returns a control object that will get passed along to the function that actually does the training. In our case, we want
+to do repeated k-crossfold validation. We will use <span class="math notranslate nohighlight">\(k=5\)</span> and repeat the entire
+resampling and training process 10 times.</p>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="n">fitControl</span> <span class="o">&lt;-</span> <span class="nf">trainControl</span><span class="p">(</span><span class="c1">## 5-fold CV</span>
+                           <span class="n">method</span> <span class="o">=</span> <span class="s">&quot;repeatedcv&quot;</span><span class="p">,</span>
+                           <span class="n">number</span> <span class="o">=</span> <span class="m">5</span><span class="p">,</span>
+                           <span class="c1">## repeated ten times</span>
+                           <span class="n">repeats</span> <span class="o">=</span> <span class="m">10</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Check out the structure of <code class="docutils literal notranslate"><span class="pre">fitControl</span></code>. Many dials and switches. See the <a class="reference external" href="https://www.rdocumentation.org/packages/caret/versions/6.0-76/topics/trainControl">documentation</a>.</p>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="nf">str</span><span class="p">(</span><span class="n">fitControl</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">## List of 26</span>
+<span class="c1">##  $ method           : chr &quot;repeatedcv&quot;</span>
+<span class="c1">##  $ number           : num 5</span>
+<span class="c1">##  $ repeats          : num 10</span>
+<span class="c1">##  $ search           : chr &quot;grid&quot;</span>
+<span class="c1">##  $ p                : num 0.75</span>
+<span class="c1">##  $ initialWindow    : NULL</span>
+<span class="c1">##  $ horizon          : num 1</span>
+<span class="c1">##  $ fixedWindow      : logi TRUE</span>
+<span class="c1">##  $ verboseIter      : logi FALSE</span>
+<span class="c1">##  $ returnData       : logi TRUE</span>
+<span class="c1">##  $ returnResamp     : chr &quot;final&quot;</span>
+<span class="c1">##  $ savePredictions  : logi FALSE</span>
+<span class="c1">##  $ classProbs       : logi FALSE</span>
+<span class="c1">##  $ summaryFunction  :function (data, lev = NULL, model = NULL)  </span>
+<span class="c1">##  $ selectionFunction: chr &quot;best&quot;</span>
+<span class="c1">##  $ preProcOptions   :List of 3</span>
+<span class="c1">##   ..$ thresh : num 0.95</span>
+<span class="c1">##   ..$ ICAcomp: num 3</span>
+<span class="c1">##   ..$ k      : num 5</span>
+<span class="c1">##  $ sampling         : NULL</span>
+<span class="c1">##  $ index            : NULL</span>
+<span class="c1">##  $ indexOut         : NULL</span>
+<span class="c1">##  $ indexFinal       : NULL</span>
+<span class="c1">##  $ timingSamps      : num 0</span>
+<span class="c1">##  $ predictionBounds : logi [1:2] FALSE FALSE</span>
+<span class="c1">##  $ seeds            : logi NA</span>
+<span class="c1">##  $ adaptive         :List of 4</span>
+<span class="c1">##   ..$ min     : num 5</span>
+<span class="c1">##   ..$ alpha   : num 0.05</span>
+<span class="c1">##   ..$ method  : chr &quot;gls&quot;</span>
+<span class="c1">##   ..$ complete: logi TRUE</span>
+<span class="c1">##  $ trim             : logi FALSE</span>
+<span class="c1">##  $ allowParallel    : logi TRUE</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="train-a-simple-model">
+<h2>Train a simple model<a class="headerlink" href="#train-a-simple-model" title="Permalink to this headline">¶</a></h2>
+<p>Since basic queueing theory tells us that the estimated (from the simulation model output) mean occupancy of PP should be closely approximated by the load placed on the unit, let’s fit a simple linear regression model. In this case, there’s no real “training” or “tuning parameters” to optimize, we will simply use <code class="docutils literal notranslate"><span class="pre">lm()</span></code> to fit a linear model using least squares. This model will be called <strong>load1</strong>.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">caret</span></code> package supports a huge number (&gt;200) of modeling techniques. The <code class="docutils literal notranslate"><span class="pre">train</span></code> function takes a <code class="docutils literal notranslate"><span class="pre">method</span></code> argument for specifying the model to fit. Valid values
+of the <code class="docutils literal notranslate"><span class="pre">method</span></code> argument can be found in the <code class="docutils literal notranslate"><span class="pre">caret</span></code> <a class="reference external" href="https://topepo.github.io/caret/available-models.html">documentation of available models</a>.</p>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="nf">set.seed</span><span class="p">(</span><span class="n">resample_seed</span><span class="p">)</span>
+<span class="n">train_load1</span> <span class="o">&lt;-</span> <span class="nf">train</span><span class="p">(</span><span class="n">occmean_pp</span> <span class="o">~</span> <span class="n">load_pp</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">obsim_train_df</span><span class="p">,</span> 
+                 <span class="n">method</span> <span class="o">=</span> <span class="s">&quot;lm&quot;</span><span class="p">,</span> 
+                 <span class="n">trControl</span> <span class="o">=</span> <span class="n">fitControl</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The object returned by <code class="docutils literal notranslate"><span class="pre">train</span></code> contains quite a few attributes that let you dig into all the details of the training process. It also includes a <code class="docutils literal notranslate"><span class="pre">finalModel</span></code> object that contains the final model resulting from optimization over
+any tuning parameters and refitting based on the entire training dataset (remember our training involved k-crossfold validation).</p>
+<p><strong>Be careful</strong>, this <code class="docutils literal notranslate"><span class="pre">finalModel</span></code> object seems to cause confusion (I was confused too) when it comes to creating predictions for new data (e.g. our test data partition). I’ll say more about this after we create the predictions for <code class="docutils literal notranslate"><span class="pre">train_load1</span></code>.</p>
+<p>To see a summary of the final model, yep…</p>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="nf">summary</span><span class="p">(</span><span class="n">train_load1</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">## </span>
+<span class="c1">## Call:</span>
+<span class="c1">## lm(formula = .outcome ~ ., data = dat)</span>
+<span class="c1">## </span>
+<span class="c1">## Residuals:</span>
+<span class="c1">##       Min        1Q    Median        3Q       Max </span>
+<span class="c1">## -0.113873 -0.020498 -0.001935  0.015035  0.097856 </span>
+<span class="c1">## </span>
+<span class="c1">## Coefficients:</span>
+<span class="c1">##              Estimate Std. Error  t value Pr(&gt;|t|)    </span>
+<span class="c1">## (Intercept) 0.0132436  0.0067156    1.972   0.0508 .  </span>
+<span class="c1">## load_pp     1.0029901  0.0001896 5289.129   &lt;2e-16 ***</span>
+<span class="c1">## ---</span>
+<span class="c1">## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</span>
+<span class="c1">## </span>
+<span class="c1">## Residual standard error: 0.03679 on 124 degrees of freedom</span>
+<span class="c1">## Multiple R-squared:      1,	Adjusted R-squared:      1 </span>
+<span class="c1">## F-statistic: 2.797e+07 on 1 and 124 DF,  p-value: &lt; 2.2e-16</span>
+</pre></div>
+</div>
+<p>A few things to note from the summary output:</p>
+<ul class="simple">
+<li><p>as expected (from queueing theory), the intercept is essentially 0, the slope is 1 and <span class="math notranslate nohighlight">\(R^2=1\)</span>. Mean occupancy is indeed equal to the load.</p></li>
+<li><p>the final model is based on the entire training dataset (see degrees of freedom). In other words,
+after doing the k-cross fold validation and optimizing over any algorithm tuning parameters, <code class="docutils literal notranslate"><span class="pre">caret</span></code>
+refits the model on the entire training dataset.</p></li>
+</ul>
+</section>
+<section id="make-predictions-for-new-data">
+<h2>Make predictions for new data<a class="headerlink" href="#make-predictions-for-new-data" title="Permalink to this headline">¶</a></h2>
+<p>In standard R fashion, to make predictions you just use <code class="docutils literal notranslate"><span class="pre">predict</span></code>, pass in a
+“model” and specify the input data for the predictions. I put model in quotes because unlike, say, making predictions for a model fit with <code class="docutils literal notranslate"><span class="pre">lm()</span></code>, in <code class="docutils literal notranslate"><span class="pre">caret</span></code> we pass a <code class="docutils literal notranslate"><span class="pre">train</span></code> object as the first argument to <code class="docutils literal notranslate"><span class="pre">predict</span></code>. Internally, <code class="docutils literal notranslate"><span class="pre">caret</span></code> uses the <code class="docutils literal notranslate"><span class="pre">finalModel</span></code> object to make predictions. One might think, as I first did, that doing the following would be perfectly fine.</p>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="c1"># DON&#39;T DO THIS!</span>
+<span class="n">pred_load1_BAD</span> <span class="o">&lt;-</span> <span class="nf">predict</span><span class="p">(</span><span class="n">train_load1</span><span class="o">$</span><span class="n">finalModel</span><span class="p">,</span> <span class="n">newdata</span> <span class="o">=</span> <span class="n">obsim_test_df</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>And actually this was working until I fit a linear model with interaction terms and all of a sudden the above would not work. I surmised that it was likely due to a mismatch between the trained model which included new variable names (for the interaction terms) that were not in the test dataset. Some Googling confirmed this but unearthed the deeper lesson - you should <strong>not</strong> pass a <code class="docutils literal notranslate"><span class="pre">finalModel</span></code> object to <code class="docutils literal notranslate"><span class="pre">predict</span></code> but should instead pass the <code class="docutils literal notranslate"><span class="pre">train</span></code> object. In this way we let <code class="docutils literal notranslate"><span class="pre">caret</span></code> handle any preliminary steps it needs to do before calling <code class="docutils literal notranslate"><span class="pre">predict.train</span></code> on the <code class="docutils literal notranslate"><span class="pre">finalModel</span></code>. See <a class="reference external" href="https://stackoverflow.com/questions/21096909/difference-between-predictmodel-and-predictmodelfinalmodel-using-caret-for">https://stackoverflow.com/questions/21096909/difference-between-predictmodel-and-predictmodelfinalmodel-using-caret-for</a>.</p>
+<p>Make predictions on the test data.</p>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="n">pred_load1</span> <span class="o">&lt;-</span> <span class="nf">predict</span><span class="p">(</span><span class="n">train_load1</span><span class="p">,</span> <span class="n">newdata</span> <span class="o">=</span> <span class="n">obsim_test_df</span><span class="p">)</span>
+<span class="n">pred_load1</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">##         5         8        19        28        41        42        48 </span>
+<span class="c1">##  6.058663  6.058663 30.240341 42.331180 54.422019 54.422019  6.196059 </span>
+<span class="c1">##        51        58        64        68        70        74        87 </span>
+<span class="c1">##  6.196059 18.561690 30.927320 30.927320 30.927320 43.292951 55.658582 </span>
+<span class="c1">##        89        94        97       106       107       109       111 </span>
+<span class="c1">## 55.658582  6.333455  6.333455 18.973877 18.973877 31.614300 31.614300 </span>
+<span class="c1">##       113       129       135 </span>
+<span class="c1">## 31.614300 56.895145 56.895145</span>
+</pre></div>
+</div>
+</section>
+<section id="evaluate-predictions">
+<h2>Evaluate predictions<a class="headerlink" href="#evaluate-predictions" title="Permalink to this headline">¶</a></h2>
+<p>Let’s compute the root mean squared error and also plot actual vs predicted values for the test dataset. Might as well do it for the training data too. Performance should be similar since we have a known theory based relationship between mean occupancy and load. Results will be gathered into a set of variable to illustrate how to extract them from our existing R objects.</p>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="c1"># Training actual and predicted</span>
+<span class="n">train_y_actual</span> <span class="o">&lt;-</span> <span class="n">train_load1</span><span class="o">$</span><span class="n">trainingData</span><span class="o">$</span><span class="n">.outcome</span>
+<span class="n">train_y_pred_load1</span> <span class="o">&lt;-</span> <span class="nf">fitted.values</span><span class="p">(</span><span class="n">train_load1</span><span class="p">)</span>
+
+<span class="c1"># Test actual and predicted</span>
+<span class="n">test_y_actual</span> <span class="o">&lt;-</span> <span class="n">obsim_test_df</span><span class="p">[,</span> <span class="s">&quot;occmean_pp&quot;</span><span class="p">]</span>
+<span class="n">test_y_pred_load1</span> <span class="o">&lt;-</span> <span class="n">pred_load1</span>
+
+<span class="c1"># Use rmse() function from Metrics package</span>
+<span class="n">rmse_train_load1</span> <span class="o">&lt;-</span> <span class="nf">rmse</span><span class="p">(</span><span class="n">train_y_actual</span><span class="p">,</span> <span class="n">train_y_pred_load1</span><span class="p">)</span>
+<span class="n">rmse_test_load1</span> <span class="o">&lt;-</span> <span class="nf">rmse</span><span class="p">(</span><span class="n">test_y_actual</span><span class="p">,</span> <span class="n">test_y_pred_load1</span><span class="p">)</span>
+
+<span class="c1"># Print them out</span>
+<span class="nf">cat</span><span class="p">(</span><span class="nf">sprintf</span><span class="p">(</span><span class="s">&quot;rmse_train_load1 = %0.5f\nrmse_test_load1  = %0.5f \n&quot;</span><span class="p">,</span> 
+            <span class="n">rmse_train_load1</span><span class="p">,</span> <span class="n">rmse_test_load1</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">## rmse_train_load1 = 0.03650</span>
+<span class="c1">## rmse_test_load1  = 0.03733</span>
+</pre></div>
+</div>
+<p>For the scatter plots we’ll use <code class="docutils literal notranslate"><span class="pre">ggplot</span></code>.</p>
+<p>Create dataframes with relevant columns - <code class="docutils literal notranslate"><span class="pre">ggplot</span></code> likes dataframes.</p>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="n">plot_df_train_load1</span> <span class="o">&lt;-</span> <span class="nf">data.frame</span><span class="p">(</span><span class="n">train_y_actual</span><span class="p">,</span> <span class="n">train_y_pred_load1</span><span class="p">)</span>
+
+<span class="n">plot_df_test_load1</span> <span class="o">&lt;-</span> <span class="nf">data.frame</span><span class="p">(</span><span class="n">test_y_actual</span><span class="p">,</span> <span class="n">test_y_pred_load1</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Scatter actual vs predicted for training data and then for test data.</p>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="nf">ggplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">plot_df_train_load1</span><span class="p">)</span> <span class="o">+</span> <span class="nf">aes</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">train_y_actual</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">train_y_pred_load1</span><span class="p">)</span> <span class="o">+</span> <span class="nf">geom_point</span><span class="p">()</span> <span class="o">+</span> <span class="nf">geom_abline</span><span class="p">()</span> <span class="o">+</span> <span class="nf">ggtitle</span><span class="p">(</span><span class="s">&quot;Actual vs Predicted for load1 training&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><img alt="center" src="../../_images/xy_train_load1-1.png" /></p>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="nf">ggplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">plot_df_test_load1</span><span class="p">)</span> <span class="o">+</span> <span class="nf">aes</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">test_y_actual</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">test_y_pred_load1</span><span class="p">)</span> <span class="o">+</span> <span class="nf">geom_point</span><span class="p">()</span> <span class="o">+</span> <span class="nf">geom_abline</span><span class="p">()</span> <span class="o">+</span> <span class="nf">ggtitle</span><span class="p">(</span><span class="s">&quot;Actual vs Predicted for load1 test&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><img alt="center" src="../../_images/xy_test_load1-1.png" /></p>
+<p>Of course we already knew what these were going to look like.</p>
+</section>
+<section id="fitting-more-models">
+<h2>Fitting more models<a class="headerlink" href="#fitting-more-models" title="Permalink to this headline">¶</a></h2>
+<p>Now let’s fit two more models, a random forest and a k-nearest neighbor (kNN), to really see how
+<code class="docutils literal notranslate"><span class="pre">caret</span></code> can facilitate rapid modeling. Both of these techniques have tuning parameters that
+we’ll let <code class="docutils literal notranslate"><span class="pre">caret</span></code> optimize. In addition, kNN requires data preprocessing since it relies on computing a distance between data points. Again, this isn’t meant to be an in-depth <code class="docutils literal notranslate"><span class="pre">caret</span></code> tutorial - we just want to show a few simple examples and then show how we can both automate
+and make the modeling process metadata driven.</p>
+<p>For both of these techniques, let’s use a more general formula for the model. We will
+assume that the analyst is sufficiently knowledgeable of <em>process physics</em> that they
+incude the load and traffic intensity variables in addition to the arrival rate,
+average length of stay and capacity variables for the PP unit only.</p>
+<section id="random-forest">
+<h3>Random forest<a class="headerlink" href="#random-forest" title="Permalink to this headline">¶</a></h3>
+<p>I’m just repeating (copy, paste, edit) what we did for the <strong>load1</strong> model. Note that we are reusing the partitioned data as well as the <code class="docutils literal notranslate"><span class="pre">trainControl</span></code> object.</p>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="c1"># Train a random forest</span>
+<span class="nf">set.seed</span><span class="p">(</span><span class="n">resample_seed</span><span class="p">)</span>
+<span class="n">train_rf1</span> <span class="o">&lt;-</span> <span class="nf">train</span><span class="p">(</span><span class="n">occmean_pp</span> <span class="o">~</span> <span class="n">lam_pp</span> <span class="o">+</span> <span class="n">alos_pp</span> <span class="o">+</span> <span class="n">cap_pp</span> <span class="o">+</span> <span class="n">load_pp</span> <span class="o">+</span> <span class="n">rho_pp</span><span class="p">,</span> 
+                   <span class="n">data</span> <span class="o">=</span> <span class="n">obsim_train_df</span><span class="p">,</span> 
+                   <span class="n">method</span> <span class="o">=</span> <span class="s">&quot;rf&quot;</span><span class="p">,</span> 
+                   <span class="n">trControl</span> <span class="o">=</span> <span class="n">fitControl</span><span class="p">)</span>
+
+<span class="c1"># Make predictions</span>
+<span class="n">pred_rf1</span> <span class="o">&lt;-</span> <span class="nf">predict</span><span class="p">(</span><span class="n">train_rf1</span><span class="p">,</span> <span class="n">newdata</span> <span class="o">=</span> <span class="n">obsim_test_df</span><span class="p">)</span>
+
+<span class="c1"># Summarize results</span>
+<span class="n">train_y_actual</span> <span class="o">&lt;-</span> <span class="n">train_rf1</span><span class="o">$</span><span class="n">trainingData</span><span class="o">$</span><span class="n">.outcome</span>
+<span class="n">train_y_pred_rf1</span> <span class="o">&lt;-</span> <span class="nf">fitted.values</span><span class="p">(</span><span class="n">train_rf1</span><span class="p">)</span>
+
+<span class="n">test_y_actual</span> <span class="o">&lt;-</span> <span class="n">obsim_test_df</span><span class="p">[,</span> <span class="s">&quot;occmean_pp&quot;</span><span class="p">]</span>
+<span class="n">test_y_pred_rf1</span> <span class="o">&lt;-</span> <span class="n">pred_rf1</span>
+
+<span class="n">rmse_train_rf1</span> <span class="o">&lt;-</span> <span class="nf">rmse</span><span class="p">(</span><span class="n">train_y_actual</span><span class="p">,</span> <span class="n">train_y_pred_rf1</span><span class="p">)</span>
+<span class="n">rmse_test_rf1</span> <span class="o">&lt;-</span> <span class="nf">rmse</span><span class="p">(</span><span class="n">test_y_actual</span><span class="p">,</span> <span class="n">test_y_pred_rf1</span><span class="p">)</span>
+
+<span class="n">plot_df_train_rf1</span> <span class="o">&lt;-</span> <span class="nf">data.frame</span><span class="p">(</span><span class="n">train_y_actual</span><span class="p">,</span> <span class="n">train_y_pred_rf1</span><span class="p">)</span>
+<span class="n">plot_df_test_rf1</span> <span class="o">&lt;-</span> <span class="nf">data.frame</span><span class="p">(</span><span class="n">test_y_actual</span><span class="p">,</span> <span class="n">test_y_pred_rf1</span><span class="p">)</span>
+
+<span class="nf">cat</span><span class="p">(</span><span class="nf">sprintf</span><span class="p">(</span><span class="s">&quot;rmse_train_rf1 = %0.5f\nrmse_test_rf1  = %0.5f \n&quot;</span><span class="p">,</span> 
+            <span class="n">rmse_train_rf1</span><span class="p">,</span> <span class="n">rmse_test_rf1</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">## rmse_train_rf1 = 0.06760</span>
+<span class="c1">## rmse_test_rf1  = 0.03202</span>
+</pre></div>
+</div>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="nf">ggplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">plot_df_train_rf1</span><span class="p">)</span> <span class="o">+</span> <span class="nf">aes</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">train_y_actual</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">train_y_pred_rf1</span><span class="p">)</span> <span class="o">+</span> <span class="nf">geom_point</span><span class="p">()</span> <span class="o">+</span> <span class="nf">geom_abline</span><span class="p">()</span> <span class="o">+</span> <span class="nf">ggtitle</span><span class="p">(</span><span class="s">&quot;Actual vs Predicted for rf1 training&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><img alt="center" src="../../_images/xy_train_rf1-1.png" /></p>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="nf">ggplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">plot_df_test_rf1</span><span class="p">)</span> <span class="o">+</span> <span class="nf">aes</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">test_y_actual</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">test_y_pred_rf1</span><span class="p">)</span> <span class="o">+</span> <span class="nf">geom_point</span><span class="p">()</span> <span class="o">+</span> <span class="nf">geom_abline</span><span class="p">()</span> <span class="o">+</span> <span class="nf">ggtitle</span><span class="p">(</span><span class="s">&quot;Actual vs Predicted for rf1 test&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><img alt="center" src="../../_images/xy_test_rf1-1.png" /></p>
+<p>Hmm, that’s odd to get performance on test data that is better than on the training data. More
+on that later.</p>
+<p>Let’s see what the best values of the tuning parameters optimized by <code class="docutils literal notranslate"><span class="pre">caret</span></code>. For the
+<code class="docutils literal notranslate"><span class="pre">randomForest</span></code> package, <code class="docutils literal notranslate"><span class="pre">caret</span></code> tries to find a good value for the <code class="docutils literal notranslate"><span class="pre">mtry</span></code> parameter (number
+of input variables “randomly sampled as candidates at each split”)</p>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="n">train_rf1</span><span class="o">$</span><span class="n">bestTune</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">##   mtry</span>
+<span class="c1">## 3    5</span>
+</pre></div>
+</div>
+</section>
+<section id="k-nearest-neighbors">
+<h3>k nearest neighbors<a class="headerlink" href="#k-nearest-neighbors" title="Permalink to this headline">¶</a></h3>
+<p>I’m just repeating (copy, paste, edit) what we did for the <strong>rf1</strong> model. However, we need
+specify one additional argument to the <code class="docutils literal notranslate"><span class="pre">train</span></code> function to tell <code class="docutils literal notranslate"><span class="pre">caret</span></code> to center and scale
+the data before fitting a kNN model. For kNN, <code class="docutils literal notranslate"><span class="pre">caret</span></code> will try to find a good value for <span class="math notranslate nohighlight">\(k\)</span>.</p>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="c1"># Train a kNN model</span>
+<span class="nf">set.seed</span><span class="p">(</span><span class="n">resample_seed</span><span class="p">)</span>
+<span class="n">train_knn1</span> <span class="o">&lt;-</span> <span class="nf">train</span><span class="p">(</span><span class="n">occmean_pp</span> <span class="o">~</span> <span class="n">lam_pp</span> <span class="o">+</span> <span class="n">alos_pp</span> <span class="o">+</span> <span class="n">cap_pp</span> <span class="o">+</span> <span class="n">load_pp</span> <span class="o">+</span> <span class="n">rho_pp</span><span class="p">,</span> 
+                   <span class="n">data</span> <span class="o">=</span> <span class="n">obsim_train_df</span><span class="p">,</span> 
+                   <span class="n">method</span> <span class="o">=</span> <span class="s">&quot;knn&quot;</span><span class="p">,</span> 
+                   <span class="n">trControl</span> <span class="o">=</span> <span class="n">fitControl</span><span class="p">,</span>
+                   <span class="n">preProcess</span><span class="o">=</span><span class="nf">c</span><span class="p">(</span><span class="s">&quot;center&quot;</span><span class="p">,</span> <span class="s">&quot;scale&quot;</span><span class="p">))</span>
+
+<span class="c1"># Make predictions</span>
+<span class="n">pred_knn1</span> <span class="o">&lt;-</span> <span class="nf">predict</span><span class="p">(</span><span class="n">train_knn1</span><span class="p">,</span> <span class="n">newdata</span> <span class="o">=</span> <span class="n">obsim_test_df</span><span class="p">)</span>
+
+<span class="c1"># Summarize results</span>
+<span class="n">train_y_actual</span> <span class="o">&lt;-</span> <span class="n">train_knn1</span><span class="o">$</span><span class="n">trainingData</span><span class="o">$</span><span class="n">.outcome</span>
+<span class="n">train_y_pred_knn1</span> <span class="o">&lt;-</span> <span class="nf">fitted.values</span><span class="p">(</span><span class="n">train_knn1</span><span class="p">)</span>
+
+<span class="n">test_y_actual</span> <span class="o">&lt;-</span> <span class="n">obsim_test_df</span><span class="p">[,</span> <span class="s">&quot;occmean_pp&quot;</span><span class="p">]</span>
+<span class="n">test_y_pred_knn1</span> <span class="o">&lt;-</span> <span class="n">pred_knn1</span>
+
+<span class="n">rmse_train_knn1</span> <span class="o">&lt;-</span> <span class="nf">rmse</span><span class="p">(</span><span class="n">train_y_actual</span><span class="p">,</span> <span class="n">train_y_pred_knn1</span><span class="p">)</span>
+<span class="n">rmse_test_knn1</span> <span class="o">&lt;-</span> <span class="nf">rmse</span><span class="p">(</span><span class="n">test_y_actual</span><span class="p">,</span> <span class="n">test_y_pred_knn1</span><span class="p">)</span>
+
+<span class="n">plot_df_train_knn1</span> <span class="o">&lt;-</span> <span class="nf">data.frame</span><span class="p">(</span><span class="n">train_y_actual</span><span class="p">,</span> <span class="n">train_y_pred_knn1</span><span class="p">)</span>
+<span class="n">plot_df_test_knn1</span> <span class="o">&lt;-</span> <span class="nf">data.frame</span><span class="p">(</span><span class="n">test_y_actual</span><span class="p">,</span> <span class="n">test_y_pred_knn1</span><span class="p">)</span>
+
+<span class="nf">cat</span><span class="p">(</span><span class="nf">sprintf</span><span class="p">(</span><span class="s">&quot;rmse_train_knn1 = %0.5f\nrmse_test_knn1  = %0.5f \n&quot;</span><span class="p">,</span> 
+            <span class="n">rmse_train_knn1</span><span class="p">,</span> <span class="n">rmse_test_knn1</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">## rmse_train_knn1 = 1.21841</span>
+<span class="c1">## rmse_test_knn1  = 0.04479</span>
+</pre></div>
+</div>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="nf">ggplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">plot_df_train_knn1</span><span class="p">)</span> <span class="o">+</span> <span class="nf">aes</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">train_y_actual</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">train_y_pred_knn1</span><span class="p">)</span> <span class="o">+</span> <span class="nf">geom_point</span><span class="p">()</span> <span class="o">+</span> <span class="nf">geom_abline</span><span class="p">()</span> <span class="o">+</span> <span class="nf">ggtitle</span><span class="p">(</span><span class="s">&quot;Actual vs Predicted for knn1 training&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><img alt="center" src="../../_images/xy_train_knn1-1.png" /></p>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="nf">ggplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">plot_df_test_knn1</span><span class="p">)</span> <span class="o">+</span> <span class="nf">aes</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">test_y_actual</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">test_y_pred_knn1</span><span class="p">)</span> <span class="o">+</span> <span class="nf">geom_point</span><span class="p">()</span> <span class="o">+</span> <span class="nf">geom_abline</span><span class="p">()</span> <span class="o">+</span> <span class="nf">ggtitle</span><span class="p">(</span><span class="s">&quot;Actual vs Predicted for knn1 test&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><img alt="center" src="../../_images/xy_test_knn1-1.png" /></p>
+<p>Again, strange to get better performance on test data then on training data. Makes me
+start to wonder about other things like:</p>
+<ul class="simple">
+<li><p>impact of different values for the number of folds and repeats in the k-crossfold process,</p></li>
+<li><p>training set size vs validation set size and on intervalidation set variability,</p></li>
+<li><p>impact of more modeling techniques such as neural networks and splines,</p></li>
+<li><p>impact of a “naive analyst” who might not think to include engineered features like load and traffic intensity,</p></li>
+<li><p>repeating the process for the other response variables,</p></li>
+<li><p>repeating all of this for the LDR unit,</p></li>
+<li><p>… and bunch more questions that are bound to be raised.</p></li>
+</ul>
+<p>Just this little bit of copy, paste, editing was frought with errors and tediously repititious. Clearly we need to encapsulate this process in one or more functions. Ideally I also wanted to
+be able to create analysis scenarios defined by a bunch of attributes that I could store in a
+metadata file. To make this concrete, here’s a little csv file illustrating what I wanted to do.</p>
+<p><img alt="scenarios" src="../../_images/scenarios_test.png" />
+Here’s the actual csv file:</p>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="n">scenarios_test_df</span> <span class="o">&lt;-</span> <span class="nf">read.csv</span><span class="p">(</span><span class="n">file</span><span class="o">=</span><span class="s">&quot;http://hselab.org/files/scenarios_test.csv&quot;</span><span class="p">)</span>
+<span class="n">knitr</span><span class="o">::</span><span class="nf">kable</span><span class="p">(</span><span class="n">scenarios_test_df</span><span class="p">)</span>
+</pre></div>
+</div>
+<table class="colwidths-auto docutils align-default">
+<thead>
+<tr class="row-odd"><th class="text-align:right head"><p>scen</p></th>
+<th class="text-align:left head"><p>model_formula</p></th>
+<th class="text-align:left head"><p>data</p></th>
+<th class="text-align:left head"><p>method</p></th>
+<th class="text-align:left head"><p>scenario</p></th>
+<th class="text-align:left head"><p>pct_train_val</p></th>
+<th class="text-align:right head"><p>partition.times</p></th>
+<th class="text-align:left head"><p>control</p></th>
+<th class="text-align:right head"><p>seed.partition</p></th>
+<th class="text-align:right head"><p>seed.resample</p></th>
+<th class="text-align:left head"><p>extra_args</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-align:right"><p>1</p></td>
+<td class="text-align:left"><p>occmean_pp ~ load_pp</p></td>
+<td class="text-align:left"><p>obsim_df</p></td>
+<td class="text-align:left"><p>lm</p></td>
+<td class="text-align:left"><p>occmean_pp_load1</p></td>
+<td class="text-align:left"><p>seq(0.5,0.9,0.1)</p></td>
+<td class="text-align:right"><p>10</p></td>
+<td class="text-align:left"><p>fitControl</p></td>
+<td class="text-align:right"><p>231</p></td>
+<td class="text-align:right"><p>37</p></td>
+<td class="text-align:left"><p></p></td>
+</tr>
+<tr class="row-odd"><td class="text-align:right"><p>2</p></td>
+<td class="text-align:left"><p>occmean_pp ~ lam_pp + alos_pp + cap_pp + tot_c_rate</p></td>
+<td class="text-align:left"><p>obsim_df</p></td>
+<td class="text-align:left"><p>lmStepAIC</p></td>
+<td class="text-align:left"><p>occmean_pp_lmstep1</p></td>
+<td class="text-align:left"><p>seq(0.5,0.9,0.1)</p></td>
+<td class="text-align:right"><p>10</p></td>
+<td class="text-align:left"><p>fitControl</p></td>
+<td class="text-align:right"><p>231</p></td>
+<td class="text-align:right"><p>37</p></td>
+<td class="text-align:left"><p></p></td>
+</tr>
+<tr class="row-even"><td class="text-align:right"><p>3</p></td>
+<td class="text-align:left"><p>occmean_pp ~ lam_pp + alos_pp + cap_pp + tot_c_rate</p></td>
+<td class="text-align:left"><p>obsim_df</p></td>
+<td class="text-align:left"><p>nnet</p></td>
+<td class="text-align:left"><p>occmean_pp_nnet1</p></td>
+<td class="text-align:left"><p>seq(0.5,0.9,0.1)</p></td>
+<td class="text-align:right"><p>10</p></td>
+<td class="text-align:left"><p>fitControl</p></td>
+<td class="text-align:right"><p>231</p></td>
+<td class="text-align:right"><p>37</p></td>
+<td class="text-align:left"><p>linout=TRUE</p></td>
+</tr>
+<tr class="row-odd"><td class="text-align:right"><p>4</p></td>
+<td class="text-align:left"><p>occmean_pp ~ lam_pp + alos_pp + cap_pp + tot_c_rate</p></td>
+<td class="text-align:left"><p>obsim_df</p></td>
+<td class="text-align:left"><p>rf</p></td>
+<td class="text-align:left"><p>occmean_pp_rf1</p></td>
+<td class="text-align:left"><p>seq(0.5,0.9,0.1)</p></td>
+<td class="text-align:right"><p>10</p></td>
+<td class="text-align:left"><p>fitControl</p></td>
+<td class="text-align:right"><p>231</p></td>
+<td class="text-align:right"><p>37</p></td>
+<td class="text-align:left"><p></p></td>
+</tr>
+<tr class="row-even"><td class="text-align:right"><p>5</p></td>
+<td class="text-align:left"><p>occmean_pp ~ lam_pp + alos_pp + cap_pp + tot_c_rate</p></td>
+<td class="text-align:left"><p>obsim_df</p></td>
+<td class="text-align:left"><p>knn</p></td>
+<td class="text-align:left"><p>occmean_pp_knn1</p></td>
+<td class="text-align:left"><p>seq(0.5,0.9,0.1)</p></td>
+<td class="text-align:right"><p>10</p></td>
+<td class="text-align:left"><p>fitControl</p></td>
+<td class="text-align:right"><p>231</p></td>
+<td class="text-align:right"><p>37</p></td>
+<td class="text-align:left"><p>preProcess=c(‘center’, ‘scale’)</p></td>
+</tr>
+<tr class="row-odd"><td class="text-align:right"><p>6</p></td>
+<td class="text-align:left"><p>occmean_pp ~ lam_pp + alos_pp + cap_pp + tot_c_rate</p></td>
+<td class="text-align:left"><p>obsim_df</p></td>
+<td class="text-align:left"><p>gamSpline</p></td>
+<td class="text-align:left"><p>occmean_pp_spline1</p></td>
+<td class="text-align:left"><p>seq(0.5,0.9,0.1)</p></td>
+<td class="text-align:right"><p>10</p></td>
+<td class="text-align:left"><p>fitControl</p></td>
+<td class="text-align:right"><p>231</p></td>
+<td class="text-align:right"><p>37</p></td>
+<td class="text-align:left"><p></p></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="next-steps">
+<h2>Next steps<a class="headerlink" href="#next-steps" title="Permalink to this headline">¶</a></h2>
+<p>I want to iterate through the rows of this dataframe and use the values to drive a
+set of model partition, train, predict and summarize cycles. What could possibly be
+so hard about that? Part 2 coming soon.</p>
+</section>
+</section>
+
+<div class="section">
+    
+
+<div class="section">
+  <span style="float: left">
+     Previous:
+    
+    <a href="../otbirders_1_ebirdapi_python_1/">
+       Wednesday OT Birders - Using the ebird API, Python, and R to analyze data for our birding group
+    </a>
+    
+  </span>
+  <span>&nbsp;</span>
+  <span style="float: right">
+     Next: 
+    <a href="../obsim_caret_part2/">
+      Comparing predictive model performance using caret - Part 2: A simple caret automation function 
+    </a>
+    
+  </span>
+</div>
+  
+</div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../">misken</a></h1>
+
+
+
+
+
+
+
+
+  
+<h2>
+   
+  24 June 2016 
+</h2>
+
+<ul>
+   
+<li id="author">
+  <span
+    >Author:</span
+  >
+   
+  <a href="../author/misken/">misken</a>  
+</li>
+    
+<li id="tags">
+  <span
+    >Tags: </span
+  >
+   
+  <a href="../tag/caret/">caret</a>   
+  <a href="../tag/healthcare/">healthcare</a>   
+  <a href="../tag/r/">R</a>   
+  <a href="../tag/metamodeling/">metamodeling</a>  
+</li>
+ 
+</ul>
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../about/">About misken</a></li>
+</ul>
+
+
+<h3>
+  <a href="../">Recent Posts</a>
+</h3>
+<ul>
+   
+  <li>
+    <a href="../simpy_getting_started_vaccine_clinic/"
+      >04 April - Using SimPy to simulate a vaccine clinic - Part 1: an introductory tutorial</a
+    >
+  </li>
+  
+  <li>
+    <a href="../use_jupyter_conda_envs/"
+      >03 April - Using different conda environments with Jupyter Lab</a
+    >
+  </li>
+  
+  <li>
+    <a href="../hello_world/"
+      >02 April - Hello world from ablog blogging with JupyterLab</a
+    >
+  </li>
+  
+  <li>
+    <a href="../first-post/"
+      >01 April - First Post at new blogging site</a
+    >
+  </li>
+  
+  <li>
+    <a href="../pip_with_conda_local_dev/"
+      >15 March - Using pip with conda for local development projects</a
+    >
+  </li>
+  
+</ul>
+
+<h3><a href="../tag/">Tags</a></h3>
+<style type="text/css">
+  ul.ablog-cloud {
+    list-style: none;
+    overflow: auto;
+  }
+  ul.ablog-cloud li {
+    float: left;
+    height: 20pt;
+    line-height: 18pt;
+    margin-right: 5px;
+  }
+  ul.ablog-cloud a {
+    text-decoration: none;
+    vertical-align: middle;
+  }
+  li.ablog-cloud-1 {
+    font-size: 80%;
+  }
+  li.ablog-cloud-2 {
+    font-size: 95%;
+  }
+  li.ablog-cloud-3 {
+    font-size: 110%;
+  }
+  li.ablog-cloud-4 {
+    font-size: 125%;
+  }
+  li.ablog-cloud-5 {
+    font-size: 140%;
+  }
+</style>
+<ul class="ablog-cloud">
+   
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/github/">GitHub</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-3">
+    <a href="../tag/r/">R</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/ablog/">ablog</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/bikeshare/">bikeshare</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/birding/">birding</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/blogging/">blogging</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/caret/">caret</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/conda/">conda</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/datetime/">datetime</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/dplyr/">dplyr</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/ebird/">ebird</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/ecology/">ecology</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/excel/">excel</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/ggplot2/">ggplot2</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/gis/">gis</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/git/">git</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-2">
+    <a href="../tag/healthcare/">healthcare</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/hiking/">hiking</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/hillmaker/">hillmaker</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-2">
+    <a href="../tag/jupyter/">jupyter</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/metamodeling/">metamodeling</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/occupancy-analysis/">occupancy analysis</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/pandas/">pandas</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/patient-flow/">patient flow</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-5">
+    <a href="../tag/python/">python</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/simpy/">simpy</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/simulation/">simulation</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/sphinx/">sphinx</a>
+  </li>
+   
+</ul>
+
+<h3>
+  <a href="../archive/">Archives</a>
+</h3>
+<ul>
+   
+  <li>
+    <a href="../2022/">2022 (5)</a>
+  </li>
+    
+  <li>
+    <a href="../2021/">2021 (4)</a>
+  </li>
+    
+  <li>
+    <a href="../2020/">2020 (2)</a>
+  </li>
+    
+  <li>
+    <a href="../2019/">2019 (7)</a>
+  </li>
+    
+  <li>
+    <a href="../2018/">2018 (5)</a>
+  </li>
+    
+  <li>
+    <a href="../2017/">2017 (2)</a>
+  </li>
+    
+  <li>
+    <a href="../2016/">2016 (4)</a>
+  </li>
+    
+  <li>
+    <a href="../2014/">2014 (1)</a>
+  </li>
+   
+</ul>
+
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search/" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2022, misken.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.3.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../../_sources/blog/obsim_caret_part1.md.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

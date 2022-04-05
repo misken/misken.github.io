@@ -17,6 +17,7 @@
     ".. post:: Jul 10, 2017\n",
     "   :author: misken\n",
     "   :tags: python, simpy, simulation, healthcare, patient flow\n",
+    "   :exclude:\n",
     "   \n",
     "   Building simple patient flow simulation models with SimPy. Part 1 of a multipart series."
    ]

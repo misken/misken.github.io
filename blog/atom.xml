@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en">
   <id>https://misken.github.io/</id>
   <title>Bits of analytics</title>
-  <updated>2022-04-05T14:00:30.523107+00:00</updated>
+  <updated>2022-04-05T15:12:46.557454+00:00</updated>
   <link href="https://misken.github.io/"/>
   <link href="https://misken.github.io/blog/atom.xml" rel="self"/>
   <generator uri="https://ablog.readthedocs.org/" version="0.10.23">ABlog</generator>
@@ -13,10 +13,6 @@
     <author>
       <name>misken</name>
     </author>
-    <content type="html">&lt;div class="ablog-post-excerpt docutils container"&gt;
-&lt;p&gt;Fun with dates and times in Python&lt;/p&gt;
-&lt;/div&gt;
-</content>
     <link href="https://misken.github.io/blog/datetime_exploring/" rel="alternate"/>
     <summary>Fun with dates and times in Python</summary>
     <category term="python" label="python"/>
@@ -30,19 +26,63 @@
     <author>
       <name>misken</name>
     </author>
-    <content type="html">&lt;div class="ablog-post-excerpt docutils container"&gt;
-&lt;p&gt;Using the eBird API from Python, we downloaded birding lists submitted by our Wednesday morning birding group. R was then used to create some basic plots showing the top species sighted each year. More analysis to follow.&lt;/p&gt;
-&lt;/div&gt;
-</content>
     <link href="https://misken.github.io/blog/otbirders_1_ebirdapi_python_1/" rel="alternate"/>
-    <summary>Using the eBird API from Python, we downloaded birding lists submitted by our Wednesday morning birding group. R was then used to create some basic plots showing the top species sighted each year. More analysis to follow.</summary>
-    <category term="r" label="r"/>
+    <summary>Using the eBird API from Python, we downloaded birding lists submitted by our Wednesday morning birding group. R was then used to create some basic plots showing the top species sighted each year.</summary>
     <category term="python" label="python"/>
     <category term="birding" label="birding"/>
     <category term="dplyr" label="dplyr"/>
     <category term="ggplot2" label="ggplot2"/>
     <category term="ebird" label="ebird"/>
+    <category term="R" label="R"/>
     <published>2016-04-04T00:00:00-04:00</published>
+  </entry>
+  <entry>
+    <id>https://misken.github.io/blog/obsim_caret_part1/</id>
+    <title>Comparing predictive models for obstetrical unit occupancy using caret - Part 1</title>
+    <updated>2016-06-24T00:00:00-04:00</updated>
+    <author>
+      <name>misken</name>
+    </author>
+    <link href="https://misken.github.io/blog/obsim_caret_part1/" rel="alternate"/>
+    <summary>Simulation metamodeling involves building predictive models based on outputs of designed simulation experiments. In this series of posts we’ll share our experience with using the R package caret for building and comparing several predictive modeling based metamodels including linear models, neural networks, random forests, k-nearest neighbor, and cubic splines.</summary>
+    <category term="caret" label="caret"/>
+    <category term="healthcare" label="healthcare"/>
+    <category term="R" label="R"/>
+    <category term="metamodeling" label="metamodeling"/>
+    <published>2016-06-24T00:00:00-04:00</published>
+  </entry>
+  <entry>
+    <id>https://misken.github.io/blog/obsim_caret_part2/</id>
+    <title>Comparing predictive model performance using caret - Part 2: A simple caret automation function</title>
+    <updated>2016-06-27T00:00:00-04:00</updated>
+    <author>
+      <name>misken</name>
+    </author>
+    <link href="https://misken.github.io/blog/obsim_caret_part2/" rel="alternate"/>
+    <summary>Wrap several caret steps in a simple function.</summary>
+    <category term="caret" label="caret"/>
+    <category term="healthcare" label="healthcare"/>
+    <category term="R" label="R"/>
+    <category term="metamodeling" label="metamodeling"/>
+    <published>2016-06-27T00:00:00-04:00</published>
+  </entry>
+  <entry>
+    <id>https://misken.github.io/blog/obsim_caret_part3/</id>
+    <title>Comparing predictive model performance using caret - Part 3: Put it all together</title>
+    <updated>2016-06-30T00:00:00-04:00</updated>
+    <author>
+      <name>misken</name>
+    </author>
+    <link href="https://misken.github.io/blog/obsim_caret_part3/" rel="alternate"/>
+    <summary>In Part 1 of this series of posts, we used caret to train and test a few simulation metamodels
+using data from a series of simulation experiments on a simplified obstetrical patient flow
+network. In doing so, a number of questions popped up which suggested we needed a way to
+easily automate a number of partition, train, predict, summarize cycles with caret.</summary>
+    <category term="caret" label="caret"/>
+    <category term="healthcare" label="healthcare"/>
+    <category term="R" label="R"/>
+    <category term="metamodeling" label="metamodeling"/>
+    <published>2016-06-30T00:00:00-04:00</published>
   </entry>
   <entry>
     <id>https://misken.github.io/blog/simpy-getting-started/</id>
@@ -51,10 +91,6 @@
     <author>
       <name>misken</name>
     </author>
-    <content type="html">&lt;div class="ablog-post-excerpt docutils container"&gt;
-&lt;p&gt;Building simple patient flow simulation models with SimPy. Part 1 of a multipart series.&lt;/p&gt;
-&lt;/div&gt;
-</content>
     <link href="https://misken.github.io/blog/simpy-getting-started/" rel="alternate"/>
     <summary>Building simple patient flow simulation models with SimPy. Part 1 of a multipart series.</summary>
     <category term="python" label="python"/>
@@ -71,10 +107,6 @@
     <author>
       <name>misken</name>
     </author>
-    <content type="html">&lt;div class="ablog-post-excerpt docutils container"&gt;
-&lt;p&gt;In Part 2 of this series we build a simple object oriented SimPy model for simulating inpatient obsetrics patient flow.&lt;/p&gt;
-&lt;/div&gt;
-</content>
     <link href="https://misken.github.io/blog/simpy-first-oo-patflow-model/" rel="alternate"/>
     <summary>In Part 2 of this series we build a simple object oriented SimPy model for simulating inpatient obsetrics patient flow.</summary>
     <category term="python" label="python"/>
@@ -85,21 +117,31 @@
     <published>2017-07-11T00:00:00-04:00</published>
   </entry>
   <entry>
+    <id>https://misken.github.io/blog/post_metamods_pp_1/</id>
+    <title>Exploration of metamodels for simulation models of patient flow systems (Part 1)</title>
+    <updated>2018-02-05T00:00:00-05:00</updated>
+    <author>
+      <name>misken</name>
+    </author>
+    <link href="https://misken.github.io/blog/post_metamods_pp_1/" rel="alternate"/>
+    <summary>Simulation metamodeling involves building predictive models based on outputs of designed simulation experiments. In this series of posts we’ll share our experience with using the R package caret for building and comparing several predictive modeling based metamodels including linear models, neural networks, random forests, k-nearest neighbor, and cubic splines.</summary>
+    <category term="R" label="R"/>
+    <category term="metamodeling" label="metamodeling"/>
+    <category term="healthcare" label="healthcare"/>
+    <published>2018-02-05T00:00:00-05:00</published>
+  </entry>
+  <entry>
     <id>https://misken.github.io/blog/blogging_pelican_rmd/</id>
     <title>Blogging with Pelican and R Markdown</title>
     <updated>2018-04-19T00:00:00-04:00</updated>
     <author>
       <name>misken</name>
     </author>
-    <content type="html">&lt;div class="ablog-post-excerpt docutils container"&gt;
-&lt;p&gt;Documenting process for blogging with Pelican and R Markdown with a focus on figures.&lt;/p&gt;
-&lt;/div&gt;
-</content>
     <link href="https://misken.github.io/blog/blogging_pelican_rmd/" rel="alternate"/>
     <summary>Documenting process for blogging with Pelican and R Markdown with a focus on figures.</summary>
     <category term="blogging" label="blogging"/>
     <category term="python" label="python"/>
-    <category term="r" label="r"/>
+    <category term="R" label="R"/>
     <published>2018-04-19T00:00:00-04:00</published>
   </entry>
   <entry>
@@ -109,16 +151,6 @@
     <author>
       <name>misken</name>
     </author>
-    <content type="html">&lt;div class="ablog-post-excerpt docutils container"&gt;
-&lt;p&gt;I’ve had a Garmin eTrex Vista C GPS unit for about 10 years. Yes, phones
-now have GPS capabilties but my trusty Garmin has terrific battery life,
-is light, durable and has great functionality. It came with Windows
-based software that allowed me to download track and waypoint data
-via a USB connection and then plot my hiking route on a map. Now that I use Linux almost exclusively, I
-wanted to be able to download data directly from the Garmin to my laptop
-using software available for Ubuntu. My initial goals were:&lt;/p&gt;
-&lt;/div&gt;
-</content>
     <link href="https://misken.github.io/blog/garmin-ubuntu-viking/" rel="alternate"/>
     <summary>I’ve had a Garmin eTrex Vista C GPS unit for about 10 years. Yes, phones
 now have GPS capabilties but my trusty Garmin has terrific battery life,
@@ -138,10 +170,6 @@ using software available for Ubuntu. My initial goals were:</summary>
     <author>
       <name>misken</name>
     </author>
-    <content type="html">&lt;div class="ablog-post-excerpt docutils container"&gt;
-&lt;p&gt;Our goal is to compute statistics such as the average number of bikes rented per day in the Pronto CycleShare dataset, both overall and for individual stations. Seems easy. We’ll see.&lt;/p&gt;
-&lt;/div&gt;
-</content>
     <link href="https://misken.github.io/blog/daily_averages_cycleshare/" rel="alternate"/>
     <summary>Our goal is to compute statistics such as the average number of bikes rented per day in the Pronto CycleShare dataset, both overall and for individual stations. Seems easy. We’ll see.</summary>
     <category term="python" label="python"/>
@@ -156,10 +184,6 @@ using software available for Ubuntu. My initial goals were:</summary>
     <author>
       <name>misken</name>
     </author>
-    <content type="html">&lt;div class="ablog-post-excerpt docutils container"&gt;
-&lt;p&gt;In Part 2 of this post, we’ll extend this to cases in which we might want to group by an additional field (e.g. station_id for the bike share example) and see how this problem is just one part of the general problem of doing occupancy analysis based on transaction data.&lt;/p&gt;
-&lt;/div&gt;
-</content>
     <link href="https://misken.github.io/blog/daily_averages_cycleshare_part2/" rel="alternate"/>
     <summary>In Part 2 of this post, we’ll extend this to cases in which we might want to group by an additional field (e.g. station_id for the bike share example) and see how this problem is just one part of the general problem of doing occupancy analysis based on transaction data.</summary>
     <category term="python" label="python"/>
@@ -174,10 +198,6 @@ using software available for Ubuntu. My initial goals were:</summary>
     <author>
       <name>misken</name>
     </author>
-    <content type="html">&lt;div class="ablog-post-excerpt docutils container"&gt;
-&lt;p&gt;Using hillmaker for datetime analysis of cycle share data&lt;/p&gt;
-&lt;/div&gt;
-</content>
     <link href="https://misken.github.io/blog/basic_usage_cycleshare/" rel="alternate"/>
     <summary>Using hillmaker for datetime analysis of cycle share data</summary>
     <category term="jupyter" label="jupyter"/>
@@ -191,10 +211,6 @@ using software available for Ubuntu. My initial goals were:</summary>
     <author>
       <name>misken</name>
     </author>
-    <content type="html">&lt;div class="ablog-post-excerpt docutils container"&gt;
-&lt;p&gt;Firewood metrics and simulating firewood use&lt;/p&gt;
-&lt;/div&gt;
-</content>
     <link href="https://misken.github.io/blog/logmetrics/" rel="alternate"/>
     <summary>Firewood metrics and simulating firewood use</summary>
     <category term="jupyter" label="jupyter"/>
@@ -208,10 +224,6 @@ using software available for Ubuntu. My initial goals were:</summary>
     <author>
       <name>misken</name>
     </author>
-    <content type="html">&lt;div class="ablog-post-excerpt docutils container"&gt;
-&lt;p&gt;Creating a function to analyze events by date which takes “zero days” into account&lt;/p&gt;
-&lt;/div&gt;
-</content>
     <link href="https://misken.github.io/blog/eda_post_balance_func_sfcs/" rel="alternate"/>
     <summary>Creating a function to analyze events by date which takes “zero days” into account</summary>
     <category term="R" label="R"/>
@@ -226,13 +238,9 @@ using software available for Ubuntu. My initial goals were:</summary>
     <author>
       <name>misken</name>
     </author>
-    <content type="html">&lt;div class="ablog-post-excerpt docutils container"&gt;
-&lt;p&gt;Using the eBird API from Python, we downloaded birding lists submitted by our Wednesday morning birding group. R was then used to produce various plots relating to counts of birds sighted and frequency of list appearance, by species.&lt;/p&gt;
-&lt;/div&gt;
-</content>
     <link href="https://misken.github.io/blog/otbirders_2_stats_2018/" rel="alternate"/>
     <summary>Using the eBird API from Python, we downloaded birding lists submitted by our Wednesday morning birding group. R was then used to produce various plots relating to counts of birds sighted and frequency of list appearance, by species.</summary>
-    <category term="r" label="r"/>
+    <category term="R" label="R"/>
     <category term="python" label="python"/>
     <category term="birding" label="birding"/>
     <category term="dplyr" label="dplyr"/>
@@ -247,10 +255,6 @@ using software available for Ubuntu. My initial goals were:</summary>
     <author>
       <name>misken</name>
     </author>
-    <content type="html">&lt;div class="ablog-post-excerpt docutils container"&gt;
-&lt;p&gt;Recover from a common git error.&lt;/p&gt;
-&lt;/div&gt;
-</content>
     <link href="https://misken.github.io/blog/git_newbie_error/" rel="alternate"/>
     <summary>Recover from a common git error.</summary>
     <category term="git" label="git"/>
@@ -264,10 +268,6 @@ using software available for Ubuntu. My initial goals were:</summary>
     <author>
       <name>misken</name>
     </author>
-    <content type="html">&lt;div class="ablog-post-excerpt docutils container"&gt;
-&lt;p&gt;Python based hillmaker is called from R using reticulate.&lt;/p&gt;
-&lt;/div&gt;
-</content>
     <link href="https://misken.github.io/blog/hillmaker_r_sfcs/" rel="alternate"/>
     <summary>Python based hillmaker is called from R using reticulate.</summary>
     <category term="R" label="R"/>
@@ -282,10 +282,6 @@ using software available for Ubuntu. My initial goals were:</summary>
     <author>
       <name>misken</name>
     </author>
-    <content type="html">&lt;div class="ablog-post-excerpt docutils container"&gt;
-&lt;p&gt;This year we have seen record or near record high water levels in all of the Great Lakes. While plots of historical water levels are available on the web, I thought it would be interesting create my own plots using R. In this post I will summarize the steps for using R to:&lt;/p&gt;
-&lt;/div&gt;
-</content>
     <link href="https://misken.github.io/blog/getandplot_gl_water_levels/" rel="alternate"/>
     <summary>This year we have seen record or near record high water levels in all of the Great Lakes. While plots of historical water levels are available on the web, I thought it would be interesting create my own plots using R. In this post I will summarize the steps for using R to:</summary>
     <category term="ecology" label="ecology"/>
@@ -299,10 +295,6 @@ using software available for Ubuntu. My initial goals were:</summary>
     <author>
       <name>misken</name>
     </author>
-    <content type="html">&lt;div class="ablog-post-excerpt docutils container"&gt;
-&lt;p&gt;Some updates to hillmaker&lt;/p&gt;
-&lt;/div&gt;
-</content>
     <link href="https://misken.github.io/blog/hillmaker_020_released/" rel="alternate"/>
     <summary>Some updates to hillmaker</summary>
     <category term="python" label="python"/>
@@ -317,10 +309,6 @@ using software available for Ubuntu. My initial goals were:</summary>
     <author>
       <name>misken</name>
     </author>
-    <content type="html">&lt;div class="ablog-post-excerpt docutils container"&gt;
-&lt;p&gt;Create course websites with Sphinx.&lt;/p&gt;
-&lt;/div&gt;
-</content>
     <link href="https://misken.github.io/blog/sphinx_coursewebs/" rel="alternate"/>
     <summary>Create course websites with Sphinx.</summary>
     <category term="python" label="python"/>
@@ -334,12 +322,8 @@ using software available for Ubuntu. My initial goals were:</summary>
     <author>
       <name>misken</name>
     </author>
-    <content type="html">&lt;div class="ablog-post-excerpt docutils container"&gt;
-&lt;p&gt;Build spreadsheet type models using Python.&lt;/p&gt;
-&lt;/div&gt;
-</content>
     <link href="https://misken.github.io/blog/what_if_1_model_datatable/" rel="alternate"/>
-    <summary>Build spreadsheet type models using Python.</summary>
+    <summary>Build spreadsheet type models using Python</summary>
     <category term="python" label="python"/>
     <category term="excel" label="excel"/>
     <published>2021-02-12T00:00:00-05:00</published>
@@ -351,12 +335,8 @@ using software available for Ubuntu. My initial goals were:</summary>
     <author>
       <name>misken</name>
     </author>
-    <content type="html">&lt;div class="ablog-post-excerpt docutils container"&gt;
-&lt;p&gt;Implement a spreadsheet type goal-seek function in Python.&lt;/p&gt;
-&lt;/div&gt;
-</content>
     <link href="https://misken.github.io/blog/what_if_2_goalseek/" rel="alternate"/>
-    <summary>Implement a spreadsheet type goal-seek function in Python.</summary>
+    <summary>Implement a spreadsheet type goal-seek function in Python</summary>
     <category term="python" label="python"/>
     <category term="excel" label="excel"/>
     <published>2021-02-13T00:00:00-05:00</published>
@@ -368,12 +348,8 @@ using software available for Ubuntu. My initial goals were:</summary>
     <author>
       <name>misken</name>
     </author>
-    <content type="html">&lt;div class="ablog-post-excerpt docutils container"&gt;
-&lt;p&gt;Do Monte-Carlo simulation in Python.&lt;/p&gt;
-&lt;/div&gt;
-</content>
     <link href="https://misken.github.io/blog/what_if_3_simulation/" rel="alternate"/>
-    <summary>Do Monte-Carlo simulation in Python.</summary>
+    <summary>Do Monte-Carlo simulation in Python</summary>
     <category term="python" label="python"/>
     <category term="excel" label="excel"/>
     <published>2021-02-21T00:00:00-05:00</published>
@@ -385,12 +361,8 @@ using software available for Ubuntu. My initial goals were:</summary>
     <author>
       <name>misken</name>
     </author>
-    <content type="html">&lt;div class="ablog-post-excerpt docutils container"&gt;
-&lt;p&gt;Create a Python package of our spreadsheet like modeling tools.&lt;/p&gt;
-&lt;/div&gt;
-</content>
     <link href="https://misken.github.io/blog/what_if_4_project_packaging/" rel="alternate"/>
-    <summary>Create a Python package of our spreadsheet like modeling tools.</summary>
+    <summary>Create a Python package of our spreadsheet like modeling tools</summary>
     <category term="python" label="python"/>
     <category term="excel" label="excel"/>
     <published>2021-03-11T00:00:00-05:00</published>
@@ -402,10 +374,6 @@ using software available for Ubuntu. My initial goals were:</summary>
     <author>
       <name>misken</name>
     </author>
-    <content type="html">&lt;div class="ablog-post-excerpt docutils container"&gt;
-&lt;p&gt;Use the right pip when installing into conda envs&lt;/p&gt;
-&lt;/div&gt;
-</content>
     <link href="https://misken.github.io/blog/pip_with_conda_local_dev/" rel="alternate"/>
     <summary>Use the right pip when installing into conda envs</summary>
     <category term="python" label="python"/>
@@ -419,10 +387,6 @@ using software available for Ubuntu. My initial goals were:</summary>
     <author>
       <name>misken</name>
     </author>
-    <content type="html">&lt;div class="ablog-post-excerpt docutils container"&gt;
-&lt;p&gt;hselab.org has moved&lt;/p&gt;
-&lt;/div&gt;
-</content>
     <link href="https://misken.github.io/blog/first-post/" rel="alternate"/>
     <summary>hselab.org has moved</summary>
     <published>2022-04-01T00:00:00-04:00</published>
@@ -434,12 +398,8 @@ using software available for Ubuntu. My initial goals were:</summary>
     <author>
       <name>misken</name>
     </author>
-    <content type="html">&lt;div class="ablog-post-excerpt docutils container"&gt;
-&lt;p&gt;Hello world, this is a markdown cell in a Jupyter notebook I’m using to test blogging from notebooks using the &lt;a class="reference external" href="https://ablog.readthedocs.io/en/latest/"&gt;ablog&lt;/a&gt; package.&lt;/p&gt;
-&lt;/div&gt;
-</content>
     <link href="https://misken.github.io/blog/hello_world/" rel="alternate"/>
-    <summary>Hello world, this is a markdown cell in a Jupyter notebook I’m using to test blogging from notebooks using the ablog package.</summary>
+    <summary>Testing out ablog Sphinx extension for blogging</summary>
     <category term="jupyter" label="jupyter"/>
     <category term="ablog" label="ablog"/>
     <published>2022-04-02T00:00:00-04:00</published>
@@ -451,10 +411,6 @@ using software available for Ubuntu. My initial goals were:</summary>
     <author>
       <name>misken</name>
     </author>
-    <content type="html">&lt;div class="ablog-post-excerpt docutils container"&gt;
-&lt;p&gt;Run Jupyter lab from base and toggle between conda envs&lt;/p&gt;
-&lt;/div&gt;
-</content>
     <link href="https://misken.github.io/blog/use_jupyter_conda_envs/" rel="alternate"/>
     <summary>Run Jupyter lab from base and toggle between conda envs</summary>
     <category term="jupyter" label="jupyter"/>
@@ -468,12 +424,8 @@ using software available for Ubuntu. My initial goals were:</summary>
     <author>
       <name>misken</name>
     </author>
-    <content type="html">&lt;div class="ablog-post-excerpt docutils container"&gt;
-&lt;p&gt;Discrete event simulation (DES) is a well established technique for building simulation models of systems characterized by:&lt;/p&gt;
-&lt;/div&gt;
-</content>
     <link href="https://misken.github.io/blog/simpy_getting_started_vaccine_clinic/" rel="alternate"/>
-    <summary>Discrete event simulation (DES) is a well established technique for building simulation models of systems characterized by:</summary>
+    <summary>Build a simple vaccine clinic model with SimPy</summary>
     <category term="jupyter" label="jupyter"/>
     <category term="simpy" label="simpy"/>
     <category term="simulation" label="simulation"/>

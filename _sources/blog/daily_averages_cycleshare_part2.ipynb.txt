@@ -17,6 +17,7 @@
     ".. post:: Jul 18, 2018\n",
     "   :author: misken\n",
     "   :tags: python, occupancy analysis, pandas\n",
+    "   :exclude:\n",
     "   \n",
     "   In Part 2 of this post, we'll extend this to cases in which we might want to group by an additional field (e.g. station_id for the bike share example) and see how this problem is just one part of the general problem of doing occupancy analysis based on transaction data.\n",
     "\n"

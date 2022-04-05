@@ -316,7 +316,6 @@ div.rendered_html tbody tr:hover {
 </style>
 <section id="Excel-“what-if?”-analysis-with-Python---Part-3:-Simulation">
 <h1>Excel “what if?” analysis with Python - Part 3: Simulation<a class="headerlink" href="#Excel-“what-if?”-analysis-with-Python---Part-3:-Simulation" title="Permalink to this headline">¶</a></h1>
-<p>Do Monte-Carlo simulation in Python.</p>
 <p>In the <a class="reference external" href="http://hselab.org/excel-to-python-1-models-datatables.html">first part of this series</a>, I introduced the general idea of exploring using Python for typical spreadsheet modeling activities. We built both object-oriented (OO) and non-OO versions of a basic business model (the Bookstore Model - it’s repeated below for convenience) and learned a few things about doing OOP in Python. Then we designed and created a <code class="docutils literal notranslate"><span class="pre">data_table</span></code> function to do sensitivity analysis much like Excel’s Data
 Table tool (though our Python version can handle an arbitrary number of both input and output variables). In <a class="reference external" href="http://hselab.org/excel-to-python-2-goalseek.html">part 2 we created a goal_seek function</a> that is reminiscent of Excel’s Goal Seek tool.</p>
 <p>Now it’s time to add Monte-Carlo simulation capabilities to our little library of functions. We’ll stick with the same example. We are getting to the point where it would be convenient to package up our <code class="docutils literal notranslate"><span class="pre">BookstoreModel</span></code> class along with the <code class="docutils literal notranslate"><span class="pre">data_table</span></code> and <code class="docutils literal notranslate"><span class="pre">goal_seek</span></code> functions so that we could import them and use them here. I’ll hold off on that until the next installment. For now, I’ve just included the code. In the spirit of consistency with the first two posts, we’ll once again look
@@ -1724,7 +1723,7 @@ dict_keys([&#39;scenario_base_vals&#39;, &#39;scenario_num&#39;, &#39;scenario_v
     <a href="../tag/github/">GitHub</a>
   </li>
     
-  <li class="ablog-cloud ablog-cloud-1">
+  <li class="ablog-cloud ablog-cloud-3">
     <a href="../tag/r/">R</a>
   </li>
     
@@ -1742,6 +1741,10 @@ dict_keys([&#39;scenario_base_vals&#39;, &#39;scenario_num&#39;, &#39;scenario_v
     
   <li class="ablog-cloud ablog-cloud-1">
     <a href="../tag/blogging/">blogging</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/caret/">caret</a>
   </li>
     
   <li class="ablog-cloud ablog-cloud-1">
@@ -1780,7 +1783,7 @@ dict_keys([&#39;scenario_base_vals&#39;, &#39;scenario_num&#39;, &#39;scenario_v
     <a href="../tag/git/">git</a>
   </li>
     
-  <li class="ablog-cloud ablog-cloud-1">
+  <li class="ablog-cloud ablog-cloud-2">
     <a href="../tag/healthcare/">healthcare</a>
   </li>
     
@@ -1797,6 +1800,10 @@ dict_keys([&#39;scenario_base_vals&#39;, &#39;scenario_num&#39;, &#39;scenario_v
   </li>
     
   <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/metamodeling/">metamodeling</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
     <a href="../tag/occupancy-analysis/">occupancy analysis</a>
   </li>
     
@@ -1810,10 +1817,6 @@ dict_keys([&#39;scenario_base_vals&#39;, &#39;scenario_num&#39;, &#39;scenario_v
     
   <li class="ablog-cloud ablog-cloud-5">
     <a href="../tag/python/">python</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/r/">r</a>
   </li>
     
   <li class="ablog-cloud ablog-cloud-1">
@@ -1852,7 +1855,7 @@ dict_keys([&#39;scenario_base_vals&#39;, &#39;scenario_num&#39;, &#39;scenario_v
   </li>
     
   <li>
-    <a href="../2018/">2018 (4)</a>
+    <a href="../2018/">2018 (5)</a>
   </li>
     
   <li>
@@ -1860,7 +1863,7 @@ dict_keys([&#39;scenario_base_vals&#39;, &#39;scenario_num&#39;, &#39;scenario_v
   </li>
     
   <li>
-    <a href="../2016/">2016 (1)</a>
+    <a href="../2016/">2016 (4)</a>
   </li>
     
   <li>
