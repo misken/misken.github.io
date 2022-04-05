@@ -317,8 +317,8 @@ ggplot(num_out_station_date) + geom_bar(aes(x=start_station_id)) +
 
 In a series of recent posts,
 
-- [http://hselab.org/daily-averages-1.html](http://hselab.org/daily-averages-1.html),
-- [http://hselab.org/daily-averages-2.html](http://hselab.org/daily-averages-2.html),
+- [https://misken.github.io/blog/daily_averages_cycleshare/](https://misken.github.io/blog/daily_averages_cycleshare/),
+- [https://misken.github.io/blog/daily_averages_cycleshare_part2/](https://misken.github.io/blog/daily_averages_cycleshare_part2/),
 
 I showed how to deal with the zero days issue using
 Python with heavy use of the pandas package. The second post ends with a little

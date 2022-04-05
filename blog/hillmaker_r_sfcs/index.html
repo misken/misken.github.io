@@ -67,7 +67,7 @@
              <section id="using-hillmaker-from-r-with-reticulate-to-analyze-time-of-day-patterns-in-bike-share-data">
 <h1>Using hillmaker from R with reticulate to analyze time of day patterns in bike share data<a class="headerlink" href="#using-hillmaker-from-r-with-reticulate-to-analyze-time-of-day-patterns-in-bike-share-data" title="Permalink to this headline">¶</a></h1>
 <p>Python based hillmaker is called from R using reticulate.</p>
-<p>In a previous post, <a class="reference external" href="http://hselab.org/cycle-share-hills-1.html">Analyzing Pronto Cycle Share data with hillmaker</a>, we showed how the Python <a class="reference external" href="https://github.com/misken/hillmaker">hillmaker</a> module can be used to create statistical summaries by time of day and day of week for bike share system usage. As an everyday user of both Python and R, I’ve been wanting to test out the <a class="reference external" href="https://github.com/rstudio/reticulate">reticulate</a> R package that makes it possible to use Python from within R. Let’s see if we can use hillmaker from R.</p>
+<p>In a previous post, <a class="reference external" href="https://misken.github.io/blog/basic_usage_cycleshare/">Analyzing Pronto Cycle Share data with hillmaker</a>, we showed how the Python <a class="reference external" href="https://github.com/misken/hillmaker">hillmaker</a> module can be used to create statistical summaries by time of day and day of week for bike share system usage. As an everyday user of both Python and R, I’ve been wanting to test out the <a class="reference external" href="https://github.com/rstudio/reticulate">reticulate</a> R package that makes it possible to use Python from within R. Let’s see if we can use hillmaker from R.</p>
 <div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="nf">library</span><span class="p">(</span><span class="n">dplyr</span><span class="p">)</span>
 <span class="nf">library</span><span class="p">(</span><span class="n">ggplot2</span><span class="p">)</span>
 <span class="nf">library</span><span class="p">(</span><span class="n">lubridate</span><span class="p">)</span>
@@ -114,7 +114,7 @@
 </section>
 <section id="the-data-analysis-problem">
 <h2>The data analysis problem<a class="headerlink" href="#the-data-analysis-problem" title="Permalink to this headline">¶</a></h2>
-<p>To test out reticulate with hillmaker, let’s assume we are interested in obtaining statistics on the total number of bikes in use by time of day and day of week for 2014 in the San Francisco bike share system. We’ll use the anonymized <a class="reference external" href="https://www.kaggle.com/benhamner/sf-bay-area-bike-share">trip data available from Kaggle</a>. In a <a class="reference external" href="http://hselab.org/use-r-to-explore-station-balance-in-bike-share-systems-and-learn-a-little-dplyr-programming.html">previous post exploring station balance in this system</a> I described some data prep done to facilitate analysis. I’m going to reuse that prepped data for this analysis.</p>
+<p>To test out reticulate with hillmaker, let’s assume we are interested in obtaining statistics on the total number of bikes in use by time of day and day of week for 2014 in the San Francisco bike share system. We’ll use the anonymized <a class="reference external" href="https://www.kaggle.com/benhamner/sf-bay-area-bike-share">trip data available from Kaggle</a>. In a <a class="reference external" href="https://misken.github.io/blog/eda_post_balance_func_sfcs/">previous post exploring station balance in this system</a> I described some data prep done to facilitate analysis. I’m going to reuse that prepped data for this analysis.</p>
 <div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="nf">load</span><span class="p">(</span><span class="s">&quot;data/processed/sfcs_prepped.Rdata&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -1011,7 +1011,7 @@
     <a href="../tag/hillmaker/">hillmaker</a>
   </li>
     
-  <li class="ablog-cloud ablog-cloud-2">
+  <li class="ablog-cloud ablog-cloud-1">
     <a href="../tag/jupyter/">jupyter</a>
   </li>
     

@@ -102,7 +102,7 @@ associated meta-settings such as the relative size of the training and test data
 <h2>Read in the data.<a class="headerlink" href="#read-in-the-data" title="Permalink to this headline">¶</a></h2>
 <p>As mentioned above, there are 150 scenarios (rows) and a number of input and output columns. For this series of posts, I’ve created an example file containing a limited number of the output related columns.</p>
 <p>Let’s read in the data.</p>
-<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="n">obsim_df</span> <span class="o">&lt;-</span> <span class="nf">read.csv</span><span class="p">(</span><span class="n">file</span><span class="o">=</span><span class="s">&quot;http://hselab.org/files/obsim_example.csv&quot;</span><span class="p">)</span>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="n">obsim_df</span> <span class="o">&lt;-</span> <span class="nf">read.csv</span><span class="p">(</span><span class="n">file</span><span class="o">=</span><span class="s">&quot;data/obsim_example.csv&quot;</span><span class="p">)</span>
 <span class="nf">names</span><span class="p">(</span><span class="n">obsim_df</span><span class="p">)[</span><span class="m">1</span><span class="p">]</span> <span class="o">&lt;-</span> <span class="s">&quot;scenario&quot;</span>
 <span class="c1"># Shorten a few column names</span>
 <span class="nf">names</span><span class="p">(</span><span class="n">obsim_df</span><span class="p">)[</span><span class="m">13</span><span class="p">]</span> <span class="o">&lt;-</span> <span class="s">&quot;occmean_ldr&quot;</span>
@@ -745,7 +745,7 @@ be able to create analysis scenarios defined by a bunch of attributes that I cou
 metadata file. To make this concrete, here’s a little csv file illustrating what I wanted to do.</p>
 <p><img alt="scenarios" src="../../_images/scenarios_test.png" />
 Here’s the actual csv file:</p>
-<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="n">scenarios_test_df</span> <span class="o">&lt;-</span> <span class="nf">read.csv</span><span class="p">(</span><span class="n">file</span><span class="o">=</span><span class="s">&quot;http://hselab.org/files/scenarios_test.csv&quot;</span><span class="p">)</span>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="n">scenarios_test_df</span> <span class="o">&lt;-</span> <span class="nf">read.csv</span><span class="p">(</span><span class="n">file</span><span class="o">=</span><span class="s">&quot;data/scenarios_test.csv&quot;</span><span class="p">)</span>
 <span class="n">knitr</span><span class="o">::</span><span class="nf">kable</span><span class="p">(</span><span class="n">scenarios_test_df</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -1069,7 +1069,7 @@ so hard about that? Part 2 coming soon.</p>
     <a href="../tag/hillmaker/">hillmaker</a>
   </li>
     
-  <li class="ablog-cloud ablog-cloud-2">
+  <li class="ablog-cloud ablog-cloud-1">
     <a href="../tag/jupyter/">jupyter</a>
   </li>
     

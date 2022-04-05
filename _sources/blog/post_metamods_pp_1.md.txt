@@ -58,9 +58,9 @@ helpful to write up some of the challenges faced and share some of the
 techniques I used to make it easier to compare different models. This resulted
 in three blog posts:
 
-* [Comparing predictive models for obstetrical unit occupancy using caret - Part 1](http://hselab.org/comparing-predictive-models-for-obstetrical-unit-occupancy-using-caret-part-1.html)
-* [Comparing predictive model performance using caret - Part 2> A simple caret automation function](http://hselab.org/comparing-predictive-model-performance-using-caret-part-2-a-simple-caret-automation-function.html)
-* [Comparing predictive model performance using caret - Part 3> Automate](http://hselab.org/comparing-predictive-model-performance-using-caret-part-3-automate.html)
+* [Comparing predictive models for obstetrical unit occupancy using caret - Part 1](https://misken.github.io/blog/obsim_caret_part1/)
+* [Comparing predictive model performance using caret - Part 2: A simple caret automation function](https://misken.github.io/blog/obsim_caret_part2/)
+* [Comparing predictive model performance using caret - Part 3: Automate](https://misken.github.io/blog/obsim_caret_part3/)
 
 ## Analysis of patient flow networks
 

@@ -48,7 +48,7 @@ Let's read in the data.
 
 
 ```r
-obsim_df <- read.csv(file="http://hselab.org/files/obsim_example.csv")
+obsim_df <- read.csv(file="data/obsim_example.csv")
 names(obsim_df)[1] <- "scenario"
 # Shorten a few column names
 names(obsim_df)[13] <- "occmean_ldr"
@@ -625,7 +625,7 @@ Here's the actual csv file:
 
 
 ```r
-scenarios_test_df <- read.csv(file="http://hselab.org/files/scenarios_test.csv")
+scenarios_test_df <- read.csv(file="data/scenarios_test.csv")
 knitr::kable(scenarios_test_df)
 ```
 

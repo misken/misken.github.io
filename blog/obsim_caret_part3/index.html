@@ -66,11 +66,11 @@
           <div class="body" role="main">
              <section id="comparing-predictive-model-performance-using-caret-part-3-put-it-all-together">
 <h1>Comparing predictive model performance using caret - Part 3: Put it all together<a class="headerlink" href="#comparing-predictive-model-performance-using-caret-part-3-put-it-all-together" title="Permalink to this headline">¶</a></h1>
-<p>In <a class="reference external" href="http://hselab.org/comparing-predictive-models-for-obstetrical-unit-occupancy-using-caret-part-1.html">Part 1</a> of this series of posts, we used <code class="docutils literal notranslate"><span class="pre">caret</span></code> to train and test a few simulation metamodels
+<p>In <a class="reference external" href="https://misken.github.io/blog/obsim_caret_part1/">Part 1</a> of this series of posts, we used <code class="docutils literal notranslate"><span class="pre">caret</span></code> to train and test a few simulation metamodels
 using data from a series of simulation experiments on a simplified obstetrical patient flow
 network. In doing so, a number of questions popped up which suggested we needed a way to
 easily automate a number of partition, train, predict, summarize cycles with <code class="docutils literal notranslate"><span class="pre">caret</span></code>.</p>
-<p>In <a class="reference external" href="http://hselab.org/comparing-predictive-model-performance-using-caret-part-2-a-simple-caret-automation-function.html">Part 2</a> we created a simple function named <code class="docutils literal notranslate"><span class="pre">caret_ptps</span></code> to facilitate automating the process of partitioning a dataset, training a model, making predictions and summarizing the results. This function
+<p>In <a class="reference external" href="https://misken.github.io/blog/obsim_caret_part2/">Part 2</a> we created a simple function named <code class="docutils literal notranslate"><span class="pre">caret_ptps</span></code> to facilitate automating the process of partitioning a dataset, training a model, making predictions and summarizing the results. This function
 takes a number of arguments related to the dataframe to use, a model formula, a modeling method, and values to control the model training and testing phases.</p>
 <div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="n">caret_ptps</span> <span class="o">&lt;-</span> <span class="nf">function</span><span class="p">(</span><span class="n">model_formula</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="n">scenario</span><span class="o">=</span><span class="s">&quot;&quot;</span><span class="p">,</span> 
                        <span class="n">pct_train_val</span><span class="o">=</span><span class="m">0.6</span><span class="p">,</span> <span class="n">partition.times</span><span class="o">=</span><span class="m">1</span><span class="p">,</span>
@@ -152,7 +152,7 @@ takes a number of arguments related to the dataframe to use, a model formula, a 
 be able to create analysis scenarios defined by a bunch of attributes that I could store in a
 metadata file. To make this concrete, here’s a little csv file illustrating what I wanted to do.</p>
 </div></blockquote>
-<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="n">scenarios_test_df</span> <span class="o">&lt;-</span> <span class="nf">read.csv</span><span class="p">(</span><span class="n">file</span><span class="o">=</span><span class="s">&quot;http://hselab.org/files/scenarios_test.csv&quot;</span><span class="p">)</span>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="n">scenarios_test_df</span> <span class="o">&lt;-</span> <span class="nf">read.csv</span><span class="p">(</span><span class="n">file</span><span class="o">=</span><span class="s">&quot;data/scenarios_test.csv&quot;</span><span class="p">)</span>
 <span class="n">knitr</span><span class="o">::</span><span class="nf">kable</span><span class="p">(</span><span class="n">scenarios_test_df</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -249,7 +249,7 @@ metadata file. To make this concrete, here’s a little csv file illustrating wh
 <p>Obviously, when we read this csv file into an R dataframe, we are going to end up with
 some numeric fields and some string fields. Well, the string fields will come in as
 factors by default but we can use the <code class="docutils literal notranslate"><span class="pre">stringsAsFactors=FALSE</span></code> argument to prevent this.</p>
-<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="n">scenarios_test_df</span> <span class="o">&lt;-</span> <span class="nf">read.csv</span><span class="p">(</span><span class="n">file</span><span class="o">=</span><span class="s">&quot;http://hselab.org/files/scenarios_test.csv&quot;</span><span class="p">,</span>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="n">scenarios_test_df</span> <span class="o">&lt;-</span> <span class="nf">read.csv</span><span class="p">(</span><span class="n">file</span><span class="o">=</span><span class="s">&quot;data/scenarios_test.csv&quot;</span><span class="p">,</span>
                               <span class="n">stringsAsFactors</span> <span class="o">=</span> <span class="kc">FALSE</span><span class="p">)</span>
 <span class="nf">str</span><span class="p">(</span><span class="n">scenarios_test_df</span><span class="p">)</span>
 </pre></div>
@@ -271,7 +271,7 @@ factors by default but we can use the <code class="docutils literal notranslate"
 <p>One of our primary challenges will be to use string representations or names of things like formulas, dataframes, control objects and R expressions within R code to get at the actual
 underlying objects. Let’s start by considering a few specific cases.</p>
 <p>First, let’s read in the dataset needed for the rest of this post.</p>
-<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="n">obsim_df</span> <span class="o">&lt;-</span> <span class="nf">read.csv</span><span class="p">(</span><span class="n">file</span><span class="o">=</span><span class="s">&quot;http://hselab.org/files/obsim_example.csv&quot;</span><span class="p">)</span>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="n">obsim_df</span> <span class="o">&lt;-</span> <span class="nf">read.csv</span><span class="p">(</span><span class="n">file</span><span class="o">=</span><span class="s">&quot;data/obsim_example.csv&quot;</span><span class="p">)</span>
 <span class="nf">names</span><span class="p">(</span><span class="n">obsim_df</span><span class="p">)[</span><span class="m">1</span><span class="p">]</span> <span class="o">&lt;-</span> <span class="s">&quot;scenario&quot;</span>
 <span class="c1"># Shorten a few column names</span>
 <span class="nf">names</span><span class="p">(</span><span class="n">obsim_df</span><span class="p">)[</span><span class="m">13</span><span class="p">]</span> <span class="o">&lt;-</span> <span class="s">&quot;occmean_ldr&quot;</span>
@@ -1002,7 +1002,7 @@ R package itself. And, it’s freely available on GitHub at <a class="reference 
     <a href="../tag/hillmaker/">hillmaker</a>
   </li>
     
-  <li class="ablog-cloud ablog-cloud-2">
+  <li class="ablog-cloud ablog-cloud-1">
     <a href="../tag/jupyter/">jupyter</a>
   </li>
     

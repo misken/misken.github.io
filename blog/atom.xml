@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en">
   <id>https://misken.github.io/</id>
   <title>Bits of analytics</title>
-  <updated>2022-04-05T15:12:46.557454+00:00</updated>
+  <updated>2022-04-05T17:01:42.717161+00:00</updated>
   <link href="https://misken.github.io/"/>
   <link href="https://misken.github.io/blog/atom.xml" rel="self"/>
   <generator uri="https://ablog.readthedocs.org/" version="0.10.23">ABlog</generator>
@@ -199,9 +199,10 @@ using software available for Ubuntu. My initial goals were:</summary>
       <name>misken</name>
     </author>
     <link href="https://misken.github.io/blog/basic_usage_cycleshare/" rel="alternate"/>
-    <summary>Using hillmaker for datetime analysis of cycle share data</summary>
-    <category term="jupyter" label="jupyter"/>
-    <category term="ablog" label="ablog"/>
+    <summary>Using hillmaker for occupancy analysis of cycle share data</summary>
+    <category term="python" label="python"/>
+    <category term="hillmaker" label="hillmaker"/>
+    <category term="occupancyanalysis" label="occupancy analysis"/>
     <published>2019-01-01T00:00:00-05:00</published>
   </entry>
   <entry>

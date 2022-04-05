@@ -9,7 +9,7 @@ tags: R, python, hillmaker
 
 Python based hillmaker is called from R using reticulate.
 
-In a previous post, [Analyzing Pronto Cycle Share data with hillmaker](http://hselab.org/cycle-share-hills-1.html), we showed how the Python [hillmaker](https://github.com/misken/hillmaker) module can be used to create statistical summaries by time of day and day of week for bike share system usage. As an everyday user of both Python and R, I've been wanting to test out the [reticulate](https://github.com/rstudio/reticulate) R package that makes it possible to use Python from within R. Let's see if we can use hillmaker from R.
+In a previous post, [Analyzing Pronto Cycle Share data with hillmaker](https://misken.github.io/blog/basic_usage_cycleshare/), we showed how the Python [hillmaker](https://github.com/misken/hillmaker) module can be used to create statistical summaries by time of day and day of week for bike share system usage. As an everyday user of both Python and R, I've been wanting to test out the [reticulate](https://github.com/rstudio/reticulate) R package that makes it possible to use Python from within R. Let's see if we can use hillmaker from R.
 
 ``` r
 library(dplyr)
@@ -68,7 +68,7 @@ print("Hello {}!".format(who))
 The data analysis problem
 -------------------------
 
-To test out reticulate with hillmaker, let's assume we are interested in obtaining statistics on the total number of bikes in use by time of day and day of week for 2014 in the San Francisco bike share system. We'll use the anonymized [trip data available from Kaggle](https://www.kaggle.com/benhamner/sf-bay-area-bike-share). In a [previous post exploring station balance in this system](http://hselab.org/use-r-to-explore-station-balance-in-bike-share-systems-and-learn-a-little-dplyr-programming.html) I described some data prep done to facilitate analysis. I'm going to reuse that prepped data for this analysis.
+To test out reticulate with hillmaker, let's assume we are interested in obtaining statistics on the total number of bikes in use by time of day and day of week for 2014 in the San Francisco bike share system. We'll use the anonymized [trip data available from Kaggle](https://www.kaggle.com/benhamner/sf-bay-area-bike-share). In a [previous post exploring station balance in this system](https://misken.github.io/blog/eda_post_balance_func_sfcs/) I described some data prep done to facilitate analysis. I'm going to reuse that prepped data for this analysis.
 
 ``` r
 load("data/processed/sfcs_prepped.Rdata")

@@ -12,7 +12,7 @@ Using the eBird API from Python, we downloaded birding lists submitted by our We
 
 ## The Wednesday Birders
 
-In a [previous post](http://hselab.org/wednesday-ot-birders-using-the-ebird-api-python-and-r-to-analyze-data-for-our-birding-group.html) I described how I used a mix of Python and R to acquire, clean, and analyze [eBird](https://ebird.org/home) data from our birding group's weekly walks. In this post, I'll add plots for 2018 and do a little more analysis.
+In a [previous post](https://misken.github.io/blog/otbirders_1_ebirdapi_python_1/) I described how I used a mix of Python and R to acquire, clean, and analyze [eBird](https://ebird.org/home) data from our birding group's weekly walks. In this post, I'll add plots for 2018 and do a little more analysis.
 
 To summarize the basic approach (described in the first post), we:
 

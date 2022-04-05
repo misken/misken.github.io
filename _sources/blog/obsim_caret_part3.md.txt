@@ -7,12 +7,12 @@ tags: caret, healthcare, R, metamodeling
 
 # Comparing predictive model performance using caret - Part 3: Put it all together
 
-In [Part 1](http://hselab.org/comparing-predictive-models-for-obstetrical-unit-occupancy-using-caret-part-1.html) of this series of posts, we used `caret` to train and test a few simulation metamodels 
+In [Part 1](https://misken.github.io/blog/obsim_caret_part1/) of this series of posts, we used `caret` to train and test a few simulation metamodels 
 using data from a series of simulation experiments on a simplified obstetrical patient flow 
 network. In doing so, a number of questions popped up which suggested we needed a way to 
 easily automate a number of partition, train, predict, summarize cycles with `caret`. 
 
-In [Part 2](http://hselab.org/comparing-predictive-model-performance-using-caret-part-2-a-simple-caret-automation-function.html) we created a simple function named `caret_ptps` to facilitate automating the process of partitioning a dataset, training a model, making predictions and summarizing the results. This function
+In [Part 2](https://misken.github.io/blog/obsim_caret_part2/) we created a simple function named `caret_ptps` to facilitate automating the process of partitioning a dataset, training a model, making predictions and summarizing the results. This function
 takes a number of arguments related to the dataframe to use, a model formula, a modeling method, and values to control the model training and testing phases.
 
 
@@ -101,7 +101,7 @@ Now we are ready to use this function as we iterate over a dataframe of scenario
 
 
 ```r
-scenarios_test_df <- read.csv(file="http://hselab.org/files/scenarios_test.csv")
+scenarios_test_df <- read.csv(file="data/scenarios_test.csv")
 knitr::kable(scenarios_test_df)
 ```
 
@@ -122,7 +122,7 @@ factors by default but we can use the `stringsAsFactors=FALSE` argument to preve
 
 
 ```r
-scenarios_test_df <- read.csv(file="http://hselab.org/files/scenarios_test.csv",
+scenarios_test_df <- read.csv(file="data/scenarios_test.csv",
                               stringsAsFactors = FALSE)
 str(scenarios_test_df)
 ```
@@ -149,7 +149,7 @@ First, let's read in the dataset needed for the rest of this post.
 
 
 ```r
-obsim_df <- read.csv(file="http://hselab.org/files/obsim_example.csv")
+obsim_df <- read.csv(file="data/obsim_example.csv")
 names(obsim_df)[1] <- "scenario"
 # Shorten a few column names
 names(obsim_df)[13] <- "occmean_ldr"

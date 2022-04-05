@@ -10,7 +10,7 @@ tags: caret, healthcare, R, metamodeling
 
 Wrap several caret steps in a simple function.
 
-In [Part 1](http://hselab.org/comparing-predictive-models-for-obstetrical-unit-occupancy-using-caret-part-1.html) of this series of posts, we used `caret` to train and test a few simulation metamodels 
+In [Part 1](https://misken.github.io/blog/obsim_caret_part1/) of this series of posts, we used `caret` to train and test a few simulation metamodels 
 using data from a series of simulation experiments on a simplified obstetrical patient flow 
 network. In doing so, a number of questions popped up which suggested we needed a way to 
 easily automate a number of partition, train, predict, summarize cycles with `caret`. These questions include:
@@ -33,7 +33,7 @@ Part 1 ended with:
 
 
 ```r
-scenarios_test_df <- read.csv(file="http://hselab.org/files/scenarios_test.csv")
+scenarios_test_df <- read.csv(file="data/scenarios_test.csv")
 knitr::kable(scenarios_test_df)
 ```
 
@@ -58,7 +58,7 @@ factors by default but we can use the `stringsAsFactors=FALSE` argument to preve
 
 
 ```r
-scenarios_test_df <- read.csv(file="http://hselab.org/files/scenarios_test.csv",
+scenarios_test_df <- read.csv(file="data/scenarios_test.csv",
                               stringsAsFactors = FALSE)
 str(scenarios_test_df)
 ```
@@ -225,7 +225,7 @@ Read in the data.
 
 
 ```r
-obsim_df <- read.csv(file="http://hselab.org/files/obsim_example.csv")
+obsim_df <- read.csv(file="data/obsim_example.csv")
 names(obsim_df)[1] <- "scenario"
 # Shorten a few column names
 names(obsim_df)[13] <- "occmean_ldr"

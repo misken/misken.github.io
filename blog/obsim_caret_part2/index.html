@@ -67,7 +67,7 @@
              <section id="comparing-predictive-model-performance-using-caret-part-2-a-simple-caret-automation-function">
 <h1>Comparing predictive model performance using caret - Part 2: A simple caret automation function<a class="headerlink" href="#comparing-predictive-model-performance-using-caret-part-2-a-simple-caret-automation-function" title="Permalink to this headline">¶</a></h1>
 <p>Wrap several caret steps in a simple function.</p>
-<p>In <a class="reference external" href="http://hselab.org/comparing-predictive-models-for-obstetrical-unit-occupancy-using-caret-part-1.html">Part 1</a> of this series of posts, we used <code class="docutils literal notranslate"><span class="pre">caret</span></code> to train and test a few simulation metamodels
+<p>In <a class="reference external" href="https://misken.github.io/blog/obsim_caret_part1/">Part 1</a> of this series of posts, we used <code class="docutils literal notranslate"><span class="pre">caret</span></code> to train and test a few simulation metamodels
 using data from a series of simulation experiments on a simplified obstetrical patient flow
 network. In doing so, a number of questions popped up which suggested we needed a way to
 easily automate a number of partition, train, predict, summarize cycles with <code class="docutils literal notranslate"><span class="pre">caret</span></code>. These questions include:</p>
@@ -87,7 +87,7 @@ Clearly we need to encapsulate this process in one or more functions. Ideally I 
 be able to create analysis scenarios defined by a bunch of attributes that I could store in a
 metadata file. To make this concrete, here’s a little csv file illustrating what I wanted to do.</p>
 </div></blockquote>
-<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="n">scenarios_test_df</span> <span class="o">&lt;-</span> <span class="nf">read.csv</span><span class="p">(</span><span class="n">file</span><span class="o">=</span><span class="s">&quot;http://hselab.org/files/scenarios_test.csv&quot;</span><span class="p">)</span>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="n">scenarios_test_df</span> <span class="o">&lt;-</span> <span class="nf">read.csv</span><span class="p">(</span><span class="n">file</span><span class="o">=</span><span class="s">&quot;data/scenarios_test.csv&quot;</span><span class="p">)</span>
 <span class="n">knitr</span><span class="o">::</span><span class="nf">kable</span><span class="p">(</span><span class="n">scenarios_test_df</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -189,7 +189,7 @@ so hard about that?</p>
 <p>Obviously, when we read this csv file into an R dataframe, we are going to end up with
 some numeric fields and some string fields. Well, the string fields will come in as
 factors by default but we can use the <code class="docutils literal notranslate"><span class="pre">stringsAsFactors=FALSE</span></code> argument to prevent this.</p>
-<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="n">scenarios_test_df</span> <span class="o">&lt;-</span> <span class="nf">read.csv</span><span class="p">(</span><span class="n">file</span><span class="o">=</span><span class="s">&quot;http://hselab.org/files/scenarios_test.csv&quot;</span><span class="p">,</span>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="n">scenarios_test_df</span> <span class="o">&lt;-</span> <span class="nf">read.csv</span><span class="p">(</span><span class="n">file</span><span class="o">=</span><span class="s">&quot;data/scenarios_test.csv&quot;</span><span class="p">,</span>
                               <span class="n">stringsAsFactors</span> <span class="o">=</span> <span class="kc">FALSE</span><span class="p">)</span>
 <span class="nf">str</span><span class="p">(</span><span class="n">scenarios_test_df</span><span class="p">)</span>
 </pre></div>
@@ -368,7 +368,7 @@ able to easily create summary tables and plots.</p>
 </pre></div>
 </div>
 <p>Read in the data.</p>
-<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="n">obsim_df</span> <span class="o">&lt;-</span> <span class="nf">read.csv</span><span class="p">(</span><span class="n">file</span><span class="o">=</span><span class="s">&quot;http://hselab.org/files/obsim_example.csv&quot;</span><span class="p">)</span>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="n">obsim_df</span> <span class="o">&lt;-</span> <span class="nf">read.csv</span><span class="p">(</span><span class="n">file</span><span class="o">=</span><span class="s">&quot;data/obsim_example.csv&quot;</span><span class="p">)</span>
 <span class="nf">names</span><span class="p">(</span><span class="n">obsim_df</span><span class="p">)[</span><span class="m">1</span><span class="p">]</span> <span class="o">&lt;-</span> <span class="s">&quot;scenario&quot;</span>
 <span class="c1"># Shorten a few column names</span>
 <span class="nf">names</span><span class="p">(</span><span class="n">obsim_df</span><span class="p">)[</span><span class="m">13</span><span class="p">]</span> <span class="o">&lt;-</span> <span class="s">&quot;occmean_ldr&quot;</span>
@@ -673,7 +673,7 @@ automating the whole process. On to Part 3.</p>
     <a href="../tag/hillmaker/">hillmaker</a>
   </li>
     
-  <li class="ablog-cloud ablog-cloud-2">
+  <li class="ablog-cloud ablog-cloud-1">
     <a href="../tag/jupyter/">jupyter</a>
   </li>
     
