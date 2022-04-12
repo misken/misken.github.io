@@ -1,0 +1,2620 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>Computing occupancy statistics with Python - Part 1 of 3 &#8212; misken 0,1,0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css" />
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <link rel="author" title="About these documents" href="../../about/" />
+    <link rel="index" title="Index" href="../../genindex/" />
+    <link rel="search" title="Search" href="../../search/" /> 
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+ 
+<link
+  rel="alternate"
+  type="application/atom+xml"
+  href="../../blog/atom.xml"
+  title="Bits of analytics"
+/>
+ 
+<style type="text/css">
+  ul.ablog-archive {
+    list-style: none;
+    overflow: auto;
+    margin-left: 0px;
+  }
+  ul.ablog-archive li {
+    float: left;
+    margin-right: 5px;
+    font-size: 80%;
+  }
+  ul.postlist a {
+    font-style: italic;
+  }
+  ul.postlist-style-disc {
+    list-style-type: disc;
+  }
+  ul.postlist-style-none {
+    list-style-type: none;
+  }
+  ul.postlist-style-circle {
+    list-style-type: circle;
+  }
+</style>
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+             
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt *,
+div.nbinput.container div.input_area pre,
+div.nboutput.container div.output_area pre,
+div.nbinput.container div.input_area .highlight,
+div.nboutput.container div.output_area .highlight {
+    border: none;
+    padding: 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+div.nbinput.container > div[class*=highlight],
+div.nboutput.container > div[class*=highlight] {
+    margin: 0;
+}
+
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt * {
+    background: none;
+}
+
+div.nboutput.container div.output_area .highlight,
+div.nboutput.container div.output_area pre {
+    background: unset;
+}
+
+div.nboutput.container div.output_area div.highlight {
+    color: unset;  /* override Pygments text color */
+}
+
+/* avoid gaps between output lines */
+div.nboutput.container div[class*=highlight] pre {
+    line-height: normal;
+}
+
+/* input/output containers */
+div.nbinput.container,
+div.nboutput.container {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+    width: 100%;
+}
+@media (max-width: 540px) {
+    div.nbinput.container,
+    div.nboutput.container {
+        flex-direction: column;
+    }
+}
+
+/* input container */
+div.nbinput.container {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast.container {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput.container div.prompt pre {
+    color: #307FC1;
+}
+
+/* output prompt */
+div.nboutput.container div.prompt pre {
+    color: #BF5B3D;
+}
+
+/* all prompts */
+div.nbinput.container div.prompt,
+div.nboutput.container div.prompt {
+    width: 4.5ex;
+    padding-top: 5px;
+    position: relative;
+    user-select: none;
+}
+
+div.nbinput.container div.prompt > div,
+div.nboutput.container div.prompt > div {
+    position: absolute;
+    right: 0;
+    margin-right: 0.3ex;
+}
+
+@media (max-width: 540px) {
+    div.nbinput.container div.prompt,
+    div.nboutput.container div.prompt {
+        width: unset;
+        text-align: left;
+        padding: 0.4em;
+    }
+    div.nboutput.container div.prompt.empty {
+        padding: 0;
+    }
+
+    div.nbinput.container div.prompt > div,
+    div.nboutput.container div.prompt > div {
+        position: unset;
+    }
+}
+
+/* disable scrollbars on prompts */
+div.nbinput.container div.prompt pre,
+div.nboutput.container div.prompt pre {
+    overflow: hidden;
+}
+
+/* input/output area */
+div.nbinput.container div.input_area,
+div.nboutput.container div.output_area {
+    -webkit-flex: 1;
+    flex: 1;
+    overflow: auto;
+}
+@media (max-width: 540px) {
+    div.nbinput.container div.input_area,
+    div.nboutput.container div.output_area {
+        width: 100%;
+    }
+}
+
+/* input area */
+div.nbinput.container div.input_area {
+    border: 1px solid #e0e0e0;
+    border-radius: 2px;
+    /*background: #f5f5f5;*/
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput.container div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.imgmath center alignment in output cells */
+div.nboutput.container div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput.container div.output_area.stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-default-inverse-fg { color: #FFFFFF; }
+.ansi-default-inverse-bg { background-color: #000000; }
+
+.ansi-bold { font-weight: bold; }
+.ansi-underline { text-decoration: underline; }
+
+
+div.nbinput.container div.input_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight].math,
+div.nboutput.container div.output_area.rendered_html,
+div.nboutput.container div.output_area > div.output_javascript,
+div.nboutput.container div.output_area:not(.rendered_html) > img{
+    padding: 5px;
+    margin: 0;
+}
+
+/* fix copybtn overflow problem in chromium (needed for 'sphinx_copybutton') */
+div.nbinput.container div.input_area > div[class^='highlight'],
+div.nboutput.container div.output_area > div[class^='highlight']{
+    overflow-y: hidden;
+}
+
+/* hide copybtn icon on prompts (needed for 'sphinx_copybutton') */
+.prompt .copybtn {
+    display: none;
+}
+
+/* Some additional styling taken form the Jupyter notebook CSS */
+div.rendered_html table {
+  border: none;
+  border-collapse: collapse;
+  border-spacing: 0;
+  color: black;
+  font-size: 12px;
+  table-layout: fixed;
+}
+div.rendered_html thead {
+  border-bottom: 1px solid black;
+  vertical-align: bottom;
+}
+div.rendered_html tr,
+div.rendered_html th,
+div.rendered_html td {
+  text-align: right;
+  vertical-align: middle;
+  padding: 0.5em 0.5em;
+  line-height: normal;
+  white-space: normal;
+  max-width: none;
+  border: none;
+}
+div.rendered_html th {
+  font-weight: bold;
+}
+div.rendered_html tbody tr:nth-child(odd) {
+  background: #f5f5f5;
+}
+div.rendered_html tbody tr:hover {
+  background: rgba(66, 165, 245, 0.2);
+}
+</style>
+<section id="Computing-occupancy-statistics-with-Python---Part-1-of-3">
+<h1>Computing occupancy statistics with Python - Part 1 of 3<a class="headerlink" href="#Computing-occupancy-statistics-with-Python---Part-1-of-3" title="Permalink to this headline">¶</a></h1>
+<p>Many years ago I created an MS Access add-in called Hillmaker for doing time of day and day of week based occupancy analysis in health care delivery systems. A typical use would be to find the mean and 95th percentile of occupancy in a set of nursing units or an emergency department. <a class="reference external" href="http://sourceforge.net/projects/hillmaker/">Hillmaker</a> was released as an open source project back in 2005 and has gotten quite a bit of use. However, I never really did any more development on it even though
+there were a number of enhancements that I (and many others) would like to have seen. The only attention it has gotten from me was in response to the object library problems caused by new releases of MS Office. No fun.</p>
+<p>While VBA is fine, I’ve always wanted to make Hillmaker less MS-centric and to decouple it from MS Access. Installing Access add-ins can be a hassle as they require changes to the Windows registry and some corporate settings frown on this. So, I hacked together a proof of concept version using Python with the pandas module for some of the number crunching and with matplotlib for plotting. Seems to work. Seems to be fast. Made it work with text files, Excel, Access and SQL Server based data. For
+this tutorial, I’ll call it HillPy.</p>
+<p>In this tutorial I’ll focus on the basic ideas behind computing occupancy statistics with Python. The data is fictitious data from a hospital short stay unit. Patients flow through a short stay unit for a variety of procedures, tests or therapies. Let’s assume patients can be classified into one of five categories of patient types: ART (arterialgram), CAT (post cardiac-cath), MYE (myelogram), IVT (IV therapy), and OTH (other). From one of our hospital information systems we were able to get raw
+data about the entry and exit times of each patient. For simplicity, the data is in a csv file. Let’s start by importing a bunch of modules we’ll need.</p>
+<section id="Preliminaries">
+<h2>Preliminaries<a class="headerlink" href="#Preliminaries" title="Permalink to this headline">¶</a></h2>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">## General imports</span>
+<span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">izip</span>
+
+<span class="c1">## Import datetime related moudles</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">timedelta</span>
+<span class="kn">from</span> <span class="nn">dateutil.parser</span> <span class="kn">import</span> <span class="n">parse</span>
+<span class="kn">import</span> <span class="nn">time</span>
+
+<span class="c1">## Pandas setup</span>
+<span class="kn">from</span> <span class="nn">pandas</span> <span class="kn">import</span> <span class="n">DataFrame</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+</pre></div>
+</div>
+</div>
+<p>I created a module to house some functions specific to HillPy. The details will be discussed when we encounter these functions.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">## HillPy library</span>
+<span class="kn">import</span> <span class="nn">hillpylib</span> <span class="k">as</span> <span class="nn">hlib</span>
+</pre></div>
+</div>
+</div>
+<p>The original Hillmaker application has a bunch of key input parameters. For this demo, I’m just going to hard code them.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">## Input parameters - just hard coding them for demonstration purposes</span>
+
+<span class="c1">## The name of the csv file containing the raw stop record data</span>
+<span class="n">file_stopdata</span> <span class="o">=</span> <span class="s1">&#39;data/ShortStay.csv&#39;</span>
+
+<span class="c1">## A string scenario identifier. It gets appended to output filenames.</span>
+<span class="n">scenario_name</span> <span class="o">=</span> <span class="s1">&#39;shortstay_csv&#39;</span>
+
+<span class="c1">## The field in the raw data file corresponding to the category by which statistics are computed.</span>
+<span class="n">cat_fld_name</span> <span class="o">=</span> <span class="s1">&#39;PatType&#39;</span>
+
+<span class="c1">## A string used as the category name for the overall total occupancy statistics.</span>
+<span class="n">cat_total_str</span> <span class="o">=</span> <span class="s1">&#39;Total&#39;</span>
+
+<span class="c1">## The field in the raw data file with the timestamp of the patient entry time.</span>
+<span class="n">in_fld_name</span> <span class="o">=</span> <span class="s1">&#39;InRoomTS&#39;</span>
+
+<span class="c1">## The field in the raw data file with the timestamp of the patient exit time.</span>
+<span class="n">out_fld_name</span> <span class="o">=</span> <span class="s1">&#39;OutRoomTS&#39;</span>
+
+<span class="c1">## Each day is broken up into time bins. This is the bin size in minutes. Typical</span>
+<span class="c1">## values are 15, 30, 60, 120, 240, or 480.</span>
+<span class="n">binsize_mins</span> <span class="o">=</span> <span class="mi">30</span>
+
+<span class="c1">## We need a date range for the analysis. More on this below.</span>
+<span class="n">start_analysis</span> <span class="o">=</span> <span class="s1">&#39;1/2/1996&#39;</span>
+<span class="n">end_analysis</span> <span class="o">=</span> <span class="s1">&#39;3/31/1996 23:45&#39;</span>
+<span class="c1">## Convert string dates to actual datetimes</span>
+<span class="n">start_analysis_dt</span> <span class="o">=</span> <span class="n">parse</span><span class="p">(</span><span class="n">start_analysis</span><span class="p">)</span>
+<span class="n">end_analysis_dt</span> <span class="o">=</span> <span class="n">parse</span><span class="p">(</span><span class="n">end_analysis</span><span class="p">)</span>
+<span class="n">analysis_range</span> <span class="o">=</span> <span class="p">[</span><span class="n">start_analysis_dt</span><span class="p">,</span><span class="n">end_analysis_dt</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="The-stop-records">
+<h2>The stop records<a class="headerlink" href="#The-stop-records" title="Permalink to this headline">¶</a></h2>
+<p>It’s important that you choose an analysis date range for which you have no missing data. It’s also important to take system ‘warm up’ issues into account. This issue is discussed in a paper I wrote a bunch of years ago:</p>
+<p>Isken, M.W. (2002) “Modeling and Analysis of Occupancy Data: A Healthcare Capacity Planning Application,” International Journal of Information Technology and Decision Making, 1, 4 (December) 707-729.</p>
+<p>For this example it’s not a big deal since length of stay is on the order of a few hours and many of the patients are scheduled during the standard business day.</p>
+<p>Let’s read in the raw “stop records” from a csv file. We refer to them as stop records since each row is a single stop (with associated entry and exit timestamps) by a single patient.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">## Read sample data set and convert string dates to datetimes</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">file_stopdata</span><span class="p">,</span><span class="n">parse_dates</span><span class="o">=</span><span class="p">[</span><span class="n">in_fld_name</span><span class="p">,</span><span class="n">out_fld_name</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">df</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div style="max-height:1000px;max-width:1500px;overflow:auto;">
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>PatID</th>
+      <th>InRoomTS</th>
+      <th>OutRoomTS</th>
+      <th>PatType</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>0</strong></td>
+      <td> 1</td>
+      <td> 1996-01-01 07:44:00</td>
+      <td> 1996-01-01 08:50:00</td>
+      <td> IVT</td>
+    </tr>
+    <tr>
+      <td><strong>1</strong></td>
+      <td> 2</td>
+      <td> 1996-01-01 08:28:00</td>
+      <td> 1996-01-01 09:20:00</td>
+      <td> IVT</td>
+    </tr>
+    <tr>
+      <td><strong>2</strong></td>
+      <td> 3</td>
+      <td> 1996-01-01 11:44:00</td>
+      <td> 1996-01-01 13:30:00</td>
+      <td> MYE</td>
+    </tr>
+    <tr>
+      <td><strong>3</strong></td>
+      <td> 4</td>
+      <td> 1996-01-01 11:51:00</td>
+      <td> 1996-01-01 12:55:00</td>
+      <td> CAT</td>
+    </tr>
+    <tr>
+      <td><strong>4</strong></td>
+      <td> 5</td>
+      <td> 1996-01-01 12:10:00</td>
+      <td> 1996-01-01 13:00:00</td>
+      <td> IVT</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">df</span><span class="o">.</span><span class="n">tail</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div style="max-height:1000px;max-width:1500px;overflow:auto;">
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>PatID</th>
+      <th>InRoomTS</th>
+      <th>OutRoomTS</th>
+      <th>PatType</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>59872</strong></td>
+      <td> 59873</td>
+      <td> 1996-09-30 19:31:00</td>
+      <td> 1996-09-30 20:15:00</td>
+      <td> IVT</td>
+    </tr>
+    <tr>
+      <td><strong>59873</strong></td>
+      <td> 59874</td>
+      <td> 1996-09-30 20:23:00</td>
+      <td> 1996-09-30 21:30:00</td>
+      <td> IVT</td>
+    </tr>
+    <tr>
+      <td><strong>59874</strong></td>
+      <td> 59875</td>
+      <td> 1996-09-30 21:00:00</td>
+      <td> 1996-09-30 22:45:00</td>
+      <td> CAT</td>
+    </tr>
+    <tr>
+      <td><strong>59875</strong></td>
+      <td> 59876</td>
+      <td> 1996-09-30 21:57:00</td>
+      <td> 1996-09-30 22:40:00</td>
+      <td> IVT</td>
+    </tr>
+    <tr>
+      <td><strong>59876</strong></td>
+      <td> 59877</td>
+      <td> 1996-09-30 22:45:00</td>
+      <td> 1996-09-30 23:35:00</td>
+      <td> CAT</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<p>While we don’t need to compute length of stay to do the occupancy analysis, let’s do it anyway. We usually want to do descriptive statistics on length of stay.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">## Compute LOS - the results is a timedelta value</span>
+<span class="n">df</span><span class="p">[</span><span class="s1">&#39;LOS&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">out_fld_name</span><span class="p">]</span> <span class="o">-</span> <span class="n">df</span><span class="p">[</span><span class="n">in_fld_name</span><span class="p">]</span>
+
+<span class="c1">## Compute LOS in minutes using one of the functions in hillpylib</span>
+<span class="n">df</span><span class="p">[</span><span class="s1">&#39;LOSmins&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">hlib</span><span class="o">.</span><span class="n">vtd_to_mins</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;LOS&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">df</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div style="max-height:1000px;max-width:1500px;overflow:auto;">
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>PatID</th>
+      <th>InRoomTS</th>
+      <th>OutRoomTS</th>
+      <th>PatType</th>
+      <th>LOS</th>
+      <th>LOSmins</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>0</strong></td>
+      <td> 1</td>
+      <td> 1996-01-01 07:44:00</td>
+      <td> 1996-01-01 08:50:00</td>
+      <td> IVT</td>
+      <td> 1:06:00</td>
+      <td>  66</td>
+    </tr>
+    <tr>
+      <td><strong>1</strong></td>
+      <td> 2</td>
+      <td> 1996-01-01 08:28:00</td>
+      <td> 1996-01-01 09:20:00</td>
+      <td> IVT</td>
+      <td> 0:52:00</td>
+      <td>  52</td>
+    </tr>
+    <tr>
+      <td><strong>2</strong></td>
+      <td> 3</td>
+      <td> 1996-01-01 11:44:00</td>
+      <td> 1996-01-01 13:30:00</td>
+      <td> MYE</td>
+      <td> 1:46:00</td>
+      <td> 106</td>
+    </tr>
+    <tr>
+      <td><strong>3</strong></td>
+      <td> 4</td>
+      <td> 1996-01-01 11:51:00</td>
+      <td> 1996-01-01 12:55:00</td>
+      <td> CAT</td>
+      <td> 1:04:00</td>
+      <td>  64</td>
+    </tr>
+    <tr>
+      <td><strong>4</strong></td>
+      <td> 5</td>
+      <td> 1996-01-01 12:10:00</td>
+      <td> 1996-01-01 13:00:00</td>
+      <td> IVT</td>
+      <td> 0:50:00</td>
+      <td>  50</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<p>Here’s what the relevant functions from hillpylib look like:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
+<span class="k">def</span> <span class="nf">td_to_mins</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Converts a timedelta object to minutes</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">x</span><span class="o">.</span><span class="n">days</span> <span class="o">*</span> <span class="mf">24.0</span> <span class="o">*</span> <span class="mi">60</span> <span class="o">+</span> <span class="n">x</span><span class="o">.</span><span class="n">seconds</span> <span class="o">/</span> <span class="mf">60.0</span> <span class="o">+</span> <span class="n">x</span><span class="o">.</span><span class="n">microseconds</span> <span class="o">/</span> <span class="mf">6000.0</span>
+
+<span class="n">vtd_to_mins</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vectorize</span><span class="p">(</span><span class="n">td_to_mins</span><span class="p">)</span> <span class="c1"># Make usable with list like things</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Creating-a-seeded-by-date-table-for-occupancy,-arrivals,-and-departures">
+<h2>Creating a seeded <em>by date</em> table for occupancy, arrivals, and departures<a class="headerlink" href="#Creating-a-seeded-by-date-table-for-occupancy,-arrivals,-and-departures" title="Permalink to this headline">¶</a></h2>
+<p>Now we are ready for the main computational tasks of computing occupancy for every datetime bin and category (PatType in this example) in the analysis date range. In addition to computing occupancy, we’ll also count the number of patient arrivals and departures in each datetime bin. Historically, this table is called the <em>by date</em> table (even though it’s really by datetime bin by category. Our strategy is to first create a “fully seeded” table and then fill in the values by processing the raw
+patient stop records. By fully seeded we mean that there is a record for each combination of datetime bin and category value in the analysis date range and all of the measures (occupancy, arrivals, and departures) are initialized to 0. Let’s start by creating the fully seeded table.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create date and range and convert it from a pandas DateTimeIndex to a</span>
+<span class="c1"># reqular old array of datetimes to try to get around the weird problems</span>
+<span class="c1"># in computing day of week on datetime64 values.</span>
+<span class="n">bin_freq</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">binsize_mins</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;min&#39;</span>
+<span class="n">rng_bydate</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">date_range</span><span class="p">(</span><span class="n">start_analysis_dt</span><span class="p">,</span> <span class="n">end_analysis_dt</span><span class="p">,</span>
+                           <span class="n">freq</span><span class="o">=</span><span class="n">bin_freq</span><span class="p">)</span><span class="o">.</span><span class="n">to_pydatetime</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">rng_bydate</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+array([datetime.datetime(1996, 1, 2, 0, 0),
+       datetime.datetime(1996, 1, 2, 0, 30),
+       datetime.datetime(1996, 1, 2, 1, 0), ...,
+       datetime.datetime(1996, 3, 31, 22, 30),
+       datetime.datetime(1996, 3, 31, 23, 0),
+       datetime.datetime(1996, 3, 31, 23, 30)], dtype=object)
+</pre></div></div>
+</div>
+<p>Now let’s create a list of the unique category values (the PatType column in this example).</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Get the unique category values</span>
+<span class="n">categories</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">df</span><span class="p">[</span><span class="n">cat_fld_name</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">()]</span>
+<span class="n">categories</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[&#39;IVT&#39;, &#39;MYE&#39;, &#39;CAT&#39;, &#39;ART&#39;, &#39;OTH&#39;]
+</pre></div></div>
+</div>
+<p>Create a list of column names for the by date table and then an empty data frame based on these columns.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;category&#39;</span><span class="p">,</span><span class="s1">&#39;datetime&#39;</span><span class="p">,</span><span class="s1">&#39;arrivals&#39;</span><span class="p">,</span><span class="s1">&#39;departures&#39;</span><span class="p">,</span><span class="s1">&#39;occupancy&#39;</span><span class="p">]</span>
+<span class="c1"># Create an empty ByDate data frame</span>
+<span class="n">bydate_df</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">columns</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>Now we’ll build up the seeded by date table a category at a time. Along the way we’ll initialize all the measures to 0.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">len_bydate</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">rng_bydate</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">cat</span> <span class="ow">in</span> <span class="n">categories</span><span class="p">:</span>
+    <span class="n">bydate_data</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;category&#39;</span><span class="p">:[</span><span class="n">cat</span><span class="p">]</span><span class="o">*</span><span class="n">len_bydate</span><span class="p">,</span>
+                   <span class="s1">&#39;datetime&#39;</span><span class="p">:</span><span class="n">rng_bydate</span><span class="p">,</span>
+                   <span class="s1">&#39;arrivals&#39;</span><span class="p">:[</span><span class="mf">0.0</span><span class="p">]</span><span class="o">*</span><span class="n">len_bydate</span><span class="p">,</span>
+                   <span class="s1">&#39;departures&#39;</span><span class="p">:[</span><span class="mf">0.0</span><span class="p">]</span><span class="o">*</span><span class="n">len_bydate</span><span class="p">,</span>
+                   <span class="s1">&#39;occupancy&#39;</span><span class="p">:[</span><span class="mf">0.0</span><span class="p">]</span><span class="o">*</span><span class="n">len_bydate</span><span class="p">,</span>
+                   <span class="p">}</span>
+    <span class="n">bydate_df_cat</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">(</span><span class="n">bydate_data</span><span class="p">,</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;category&#39;</span><span class="p">,</span>
+                   <span class="s1">&#39;datetime&#39;</span><span class="p">,</span>
+                   <span class="s1">&#39;arrivals&#39;</span><span class="p">,</span>
+                   <span class="s1">&#39;departures&#39;</span><span class="p">,</span>
+                   <span class="s1">&#39;occupancy&#39;</span><span class="p">])</span>
+    <span class="n">bydate_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">bydate_df</span><span class="p">,</span><span class="n">bydate_df_cat</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">bydate_df</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div style="max-height:1000px;max-width:1500px;overflow:auto;">
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>category</th>
+      <th>datetime</th>
+      <th>arrivals</th>
+      <th>departures</th>
+      <th>occupancy</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>0</strong></td>
+      <td> IVT</td>
+      <td> 1996-01-02 00:00:00</td>
+      <td> 0</td>
+      <td> 0</td>
+      <td> 0</td>
+    </tr>
+    <tr>
+      <td><strong>1</strong></td>
+      <td> IVT</td>
+      <td> 1996-01-02 00:30:00</td>
+      <td> 0</td>
+      <td> 0</td>
+      <td> 0</td>
+    </tr>
+    <tr>
+      <td><strong>2</strong></td>
+      <td> IVT</td>
+      <td> 1996-01-02 01:00:00</td>
+      <td> 0</td>
+      <td> 0</td>
+      <td> 0</td>
+    </tr>
+    <tr>
+      <td><strong>3</strong></td>
+      <td> IVT</td>
+      <td> 1996-01-02 01:30:00</td>
+      <td> 0</td>
+      <td> 0</td>
+      <td> 0</td>
+    </tr>
+    <tr>
+      <td><strong>4</strong></td>
+      <td> IVT</td>
+      <td> 1996-01-02 02:00:00</td>
+      <td> 0</td>
+      <td> 0</td>
+      <td> 0</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">bydate_df</span><span class="o">.</span><span class="n">tail</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div style="max-height:1000px;max-width:1500px;overflow:auto;">
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>category</th>
+      <th>datetime</th>
+      <th>arrivals</th>
+      <th>departures</th>
+      <th>occupancy</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>4315</strong></td>
+      <td> OTH</td>
+      <td> 1996-03-31 21:30:00</td>
+      <td> 0</td>
+      <td> 0</td>
+      <td> 0</td>
+    </tr>
+    <tr>
+      <td><strong>4316</strong></td>
+      <td> OTH</td>
+      <td> 1996-03-31 22:00:00</td>
+      <td> 0</td>
+      <td> 0</td>
+      <td> 0</td>
+    </tr>
+    <tr>
+      <td><strong>4317</strong></td>
+      <td> OTH</td>
+      <td> 1996-03-31 22:30:00</td>
+      <td> 0</td>
+      <td> 0</td>
+      <td> 0</td>
+    </tr>
+    <tr>
+      <td><strong>4318</strong></td>
+      <td> OTH</td>
+      <td> 1996-03-31 23:00:00</td>
+      <td> 0</td>
+      <td> 0</td>
+      <td> 0</td>
+    </tr>
+    <tr>
+      <td><strong>4319</strong></td>
+      <td> OTH</td>
+      <td> 1996-03-31 23:30:00</td>
+      <td> 0</td>
+      <td> 0</td>
+      <td> 0</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<p>Notice that each row in <code class="docutils literal notranslate"><span class="pre">bdate_df</span></code> corresponds to a half-hour time bin for a specific PatType (category). It’s not readily apparent that we have created duplicate index values in the default pandas index.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">bydate_df</span><span class="p">[</span><span class="mi">4315</span><span class="p">:</span><span class="mi">4330</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div style="max-height:1000px;max-width:1500px;overflow:auto;">
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>category</th>
+      <th>datetime</th>
+      <th>arrivals</th>
+      <th>departures</th>
+      <th>occupancy</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>4315</strong></td>
+      <td> IVT</td>
+      <td> 1996-03-31 21:30:00</td>
+      <td> 0</td>
+      <td> 0</td>
+      <td> 0</td>
+    </tr>
+    <tr>
+      <td><strong>4316</strong></td>
+      <td> IVT</td>
+      <td> 1996-03-31 22:00:00</td>
+      <td> 0</td>
+      <td> 0</td>
+      <td> 0</td>
+    </tr>
+    <tr>
+      <td><strong>4317</strong></td>
+      <td> IVT</td>
+      <td> 1996-03-31 22:30:00</td>
+      <td> 0</td>
+      <td> 0</td>
+      <td> 0</td>
+    </tr>
+    <tr>
+      <td><strong>4318</strong></td>
+      <td> IVT</td>
+      <td> 1996-03-31 23:00:00</td>
+      <td> 0</td>
+      <td> 0</td>
+      <td> 0</td>
+    </tr>
+    <tr>
+      <td><strong>4319</strong></td>
+      <td> IVT</td>
+      <td> 1996-03-31 23:30:00</td>
+      <td> 0</td>
+      <td> 0</td>
+      <td> 0</td>
+    </tr>
+    <tr>
+      <td><strong>0   </strong></td>
+      <td> MYE</td>
+      <td> 1996-01-02 00:00:00</td>
+      <td> 0</td>
+      <td> 0</td>
+      <td> 0</td>
+    </tr>
+    <tr>
+      <td><strong>1   </strong></td>
+      <td> MYE</td>
+      <td> 1996-01-02 00:30:00</td>
+      <td> 0</td>
+      <td> 0</td>
+      <td> 0</td>
+    </tr>
+    <tr>
+      <td><strong>2   </strong></td>
+      <td> MYE</td>
+      <td> 1996-01-02 01:00:00</td>
+      <td> 0</td>
+      <td> 0</td>
+      <td> 0</td>
+    </tr>
+    <tr>
+      <td><strong>3   </strong></td>
+      <td> MYE</td>
+      <td> 1996-01-02 01:30:00</td>
+      <td> 0</td>
+      <td> 0</td>
+      <td> 0</td>
+    </tr>
+    <tr>
+      <td><strong>4   </strong></td>
+      <td> MYE</td>
+      <td> 1996-01-02 02:00:00</td>
+      <td> 0</td>
+      <td> 0</td>
+      <td> 0</td>
+    </tr>
+    <tr>
+      <td><strong>5   </strong></td>
+      <td> MYE</td>
+      <td> 1996-01-02 02:30:00</td>
+      <td> 0</td>
+      <td> 0</td>
+      <td> 0</td>
+    </tr>
+    <tr>
+      <td><strong>6   </strong></td>
+      <td> MYE</td>
+      <td> 1996-01-02 03:00:00</td>
+      <td> 0</td>
+      <td> 0</td>
+      <td> 0</td>
+    </tr>
+    <tr>
+      <td><strong>7   </strong></td>
+      <td> MYE</td>
+      <td> 1996-01-02 03:30:00</td>
+      <td> 0</td>
+      <td> 0</td>
+      <td> 0</td>
+    </tr>
+    <tr>
+      <td><strong>8   </strong></td>
+      <td> MYE</td>
+      <td> 1996-01-02 04:00:00</td>
+      <td> 0</td>
+      <td> 0</td>
+      <td> 0</td>
+    </tr>
+    <tr>
+      <td><strong>9   </strong></td>
+      <td> MYE</td>
+      <td> 1996-01-02 04:30:00</td>
+      <td> 0</td>
+      <td> 0</td>
+      <td> 0</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Now create a hierarchical multiindex to replace the default index (since it</span>
+<span class="c1"># has dups from the concatenation). We keep the columns used in the index as</span>
+<span class="c1"># regular columns as well since it&#39;s hard</span>
+<span class="c1"># to do a column transformation using a specific level of a multiindex.</span>
+<span class="c1"># http://stackoverflow.com/questions/13703720/converting-between-datetime-timestamp-and-datetime64?rq=1</span>
+
+<span class="n">bydate_df</span> <span class="o">=</span> <span class="n">bydate_df</span><span class="o">.</span><span class="n">set_index</span><span class="p">([</span><span class="s1">&#39;category&#39;</span><span class="p">,</span> <span class="s1">&#39;datetime&#39;</span><span class="p">],</span> <span class="n">drop</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">bydate_df</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;class &#39;pandas.core.frame.DataFrame&#39;&gt;
+MultiIndex: 21600 entries, (IVT, 1996-01-02 00:00:00) to (OTH, 1996-03-31 23:30:00)
+Data columns:
+category      21600  non-null values
+datetime      21600  non-null values
+arrivals      21600  non-null values
+departures    21600  non-null values
+occupancy     21600  non-null values
+dtypes: float64(3), object(2)
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">bydate_df</span><span class="p">[</span><span class="mi">4315</span><span class="p">:</span><span class="mi">4330</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div style="max-height:1000px;max-width:1500px;overflow:auto;">
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th></th>
+      <th>category</th>
+      <th>datetime</th>
+      <th>arrivals</th>
+      <th>departures</th>
+      <th>occupancy</th>
+    </tr>
+    <tr>
+      <th>category</th>
+      <th>datetime</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td rowspan="5" valign="top"><strong>IVT</strong></td>
+      <td><strong>1996-03-31 21:30:00</strong></td>
+      <td> IVT</td>
+      <td> 1996-03-31 21:30:00</td>
+      <td> 0</td>
+      <td> 0</td>
+      <td> 0</td>
+    </tr>
+    <tr>
+      <td><strong>1996-03-31 22:00:00</strong></td>
+      <td> IVT</td>
+      <td> 1996-03-31 22:00:00</td>
+      <td> 0</td>
+      <td> 0</td>
+      <td> 0</td>
+    </tr>
+    <tr>
+      <td><strong>1996-03-31 22:30:00</strong></td>
+      <td> IVT</td>
+      <td> 1996-03-31 22:30:00</td>
+      <td> 0</td>
+      <td> 0</td>
+      <td> 0</td>
+    </tr>
+    <tr>
+      <td><strong>1996-03-31 23:00:00</strong></td>
+      <td> IVT</td>
+      <td> 1996-03-31 23:00:00</td>
+      <td> 0</td>
+      <td> 0</td>
+      <td> 0</td>
+    </tr>
+    <tr>
+      <td><strong>1996-03-31 23:30:00</strong></td>
+      <td> IVT</td>
+      <td> 1996-03-31 23:30:00</td>
+      <td> 0</td>
+      <td> 0</td>
+      <td> 0</td>
+    </tr>
+    <tr>
+      <td rowspan="10" valign="top"><strong>MYE</strong></td>
+      <td><strong>1996-01-02 00:00:00</strong></td>
+      <td> MYE</td>
+      <td> 1996-01-02 00:00:00</td>
+      <td> 0</td>
+      <td> 0</td>
+      <td> 0</td>
+    </tr>
+    <tr>
+      <td><strong>1996-01-02 00:30:00</strong></td>
+      <td> MYE</td>
+      <td> 1996-01-02 00:30:00</td>
+      <td> 0</td>
+      <td> 0</td>
+      <td> 0</td>
+    </tr>
+    <tr>
+      <td><strong>1996-01-02 01:00:00</strong></td>
+      <td> MYE</td>
+      <td> 1996-01-02 01:00:00</td>
+      <td> 0</td>
+      <td> 0</td>
+      <td> 0</td>
+    </tr>
+    <tr>
+      <td><strong>1996-01-02 01:30:00</strong></td>
+      <td> MYE</td>
+      <td> 1996-01-02 01:30:00</td>
+      <td> 0</td>
+      <td> 0</td>
+      <td> 0</td>
+    </tr>
+    <tr>
+      <td><strong>1996-01-02 02:00:00</strong></td>
+      <td> MYE</td>
+      <td> 1996-01-02 02:00:00</td>
+      <td> 0</td>
+      <td> 0</td>
+      <td> 0</td>
+    </tr>
+    <tr>
+      <td><strong>1996-01-02 02:30:00</strong></td>
+      <td> MYE</td>
+      <td> 1996-01-02 02:30:00</td>
+      <td> 0</td>
+      <td> 0</td>
+      <td> 0</td>
+    </tr>
+    <tr>
+      <td><strong>1996-01-02 03:00:00</strong></td>
+      <td> MYE</td>
+      <td> 1996-01-02 03:00:00</td>
+      <td> 0</td>
+      <td> 0</td>
+      <td> 0</td>
+    </tr>
+    <tr>
+      <td><strong>1996-01-02 03:30:00</strong></td>
+      <td> MYE</td>
+      <td> 1996-01-02 03:30:00</td>
+      <td> 0</td>
+      <td> 0</td>
+      <td> 0</td>
+    </tr>
+    <tr>
+      <td><strong>1996-01-02 04:00:00</strong></td>
+      <td> MYE</td>
+      <td> 1996-01-02 04:00:00</td>
+      <td> 0</td>
+      <td> 0</td>
+      <td> 0</td>
+    </tr>
+    <tr>
+      <td><strong>1996-01-02 04:30:00</strong></td>
+      <td> MYE</td>
+      <td> 1996-01-02 04:30:00</td>
+      <td> 0</td>
+      <td> 0</td>
+      <td> 0</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<p>Again, for now we aren’t dropping the redundant <strong>category</strong> and <strong>datetime</strong> columns. We are going to compute three additional columns based on the value of <strong>datetime</strong> and it’s easier to do such transformations on a regular data frame column than on a specific level of a multi-index. The three columns we want to add are:</p>
+<ul class="simple">
+<li><p>day of week - 0..6 with 0=Monday</p></li>
+<li><p>bin of day - 0..(num_bins_per_day-1) where num_bins_per_day=48 if binsize_mins=30, num_bins_per_day=24 if binsize_mins=60, etc.</p></li>
+<li><p>bin of week - 0..(num_bins_per_week-1) where num_bins_per_week = 7 * num_bins_per_day</p></li>
+</ul>
+<p>There is a built in <code class="docutils literal notranslate"><span class="pre">weekday()</span></code> function for datetimes. For bin of day and bin of week, we created custom functions in hillpylib. Notice the avoidance of loops via the use of <code class="docutils literal notranslate"><span class="pre">map()</span></code> and a lambda function.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">bydate_df</span><span class="p">[</span><span class="s1">&#39;dayofweek&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">bydate_df</span><span class="p">[</span><span class="s1">&#39;datetime&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">weekday</span><span class="p">())</span>
+<span class="n">bydate_df</span><span class="p">[</span><span class="s1">&#39;binofday&#39;</span><span class="p">]</span> <span class="o">=</span>  <span class="n">bydate_df</span><span class="p">[</span><span class="s1">&#39;datetime&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">hlib</span><span class="o">.</span><span class="n">binofday</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">binsize_mins</span><span class="p">))</span>
+<span class="n">bydate_df</span><span class="p">[</span><span class="s1">&#39;binofweek&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">bydate_df</span><span class="p">[</span><span class="s1">&#39;datetime&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">hlib</span><span class="o">.</span><span class="n">binofweek</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">binsize_mins</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<p>Instead of lambda functions, I did try to use vectorized versions of binofday and binofweek, but pandas didn’t seem to like them. Here are the bin of day and week functions:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[28]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">binofday</span><span class="p">(</span><span class="n">dt</span><span class="p">,</span> <span class="n">binsizemins</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Computes bin of day based on bin size for a datetime.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    dt : datetime.datetime object, default now.</span>
+<span class="sd">    binsizemins : Size of bin in minutes; default 30 minutes.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    0 to (n-1) where n is number of bins per day.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    dt = datetime(2013,1,7,1,45)</span>
+<span class="sd">    bin = binofday(dt,30)</span>
+<span class="sd">    # bin = 3</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">dt</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span> <span class="n">dt</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+
+    <span class="c1"># YES, I know that type checking is NOT Pythonic!!!</span>
+    <span class="c1"># However, the hell that is numpy.datetime64 data types has</span>
+    <span class="c1"># caused me to give up and do it anyway.</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dt</span><span class="p">,</span><span class="n">datetime</span><span class="p">):</span>
+        <span class="n">dt</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Timestamp</span><span class="p">(</span><span class="n">dt</span><span class="p">)</span>
+
+    <span class="n">mins</span> <span class="o">=</span> <span class="p">(</span><span class="n">dt</span><span class="o">.</span><span class="n">hour</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span> <span class="o">+</span> <span class="n">dt</span><span class="o">.</span><span class="n">minute</span>
+    <span class="nb">bin</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">trunc</span><span class="p">(</span><span class="n">mins</span><span class="o">/</span><span class="n">binsizemins</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nb">bin</span>
+
+
+<span class="k">def</span> <span class="nf">binofweek</span><span class="p">(</span><span class="n">dt</span><span class="p">,</span> <span class="n">binsizemins</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Computes bin of week based on bin size for a datetime.</span>
+
+<span class="sd">    Based on .weekday() convention of 0=Monday.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    dt : datetime.datetime object, default now.</span>
+<span class="sd">    binsizemins : Size of bin in minutes; default 30 minutes.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    0 to (n-1) where n is number of bins per week.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    dt = datetime(2013,1,9,1,45)</span>
+<span class="sd">    bin = binofweek(dt,30)</span>
+<span class="sd">    # bin = 99</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">dt</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span> <span class="n">dt</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+
+    <span class="c1"># YES, I know that type checking is NOT Pythonic!!!</span>
+    <span class="c1"># However, the hell that is numpy.datetime64 data types has</span>
+    <span class="c1"># caused me to give up and do it anyway.</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dt</span><span class="p">,</span><span class="n">datetime</span><span class="p">):</span>
+        <span class="n">dt</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Timestamp</span><span class="p">(</span><span class="n">dt</span><span class="p">)</span>
+
+    <span class="n">mins</span> <span class="o">=</span> <span class="p">(</span><span class="n">dt</span><span class="o">.</span><span class="n">weekday</span><span class="p">()</span> <span class="o">*</span> <span class="mi">1440</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="n">dt</span><span class="o">.</span><span class="n">hour</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span> <span class="o">+</span> <span class="n">dt</span><span class="o">.</span><span class="n">minute</span>
+    <span class="nb">bin</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">trunc</span><span class="p">(</span><span class="n">mins</span><span class="o">/</span><span class="n">binsizemins</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nb">bin</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[23]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">bydate_df</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[23]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div style="max-height:1000px;max-width:1500px;overflow:auto;">
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th></th>
+      <th>category</th>
+      <th>datetime</th>
+      <th>arrivals</th>
+      <th>departures</th>
+      <th>occupancy</th>
+      <th>dayofweek</th>
+      <th>binofday</th>
+      <th>binofweek</th>
+    </tr>
+    <tr>
+      <th>category</th>
+      <th>datetime</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td rowspan="5" valign="top"><strong>IVT</strong></td>
+      <td><strong>1996-01-02 00:00:00</strong></td>
+      <td> IVT</td>
+      <td> 1996-01-02 00:00:00</td>
+      <td> 0</td>
+      <td> 0</td>
+      <td> 0</td>
+      <td> 1</td>
+      <td> 0</td>
+      <td> 48</td>
+    </tr>
+    <tr>
+      <td><strong>1996-01-02 00:30:00</strong></td>
+      <td> IVT</td>
+      <td> 1996-01-02 00:30:00</td>
+      <td> 0</td>
+      <td> 0</td>
+      <td> 0</td>
+      <td> 1</td>
+      <td> 1</td>
+      <td> 49</td>
+    </tr>
+    <tr>
+      <td><strong>1996-01-02 01:00:00</strong></td>
+      <td> IVT</td>
+      <td> 1996-01-02 01:00:00</td>
+      <td> 0</td>
+      <td> 0</td>
+      <td> 0</td>
+      <td> 1</td>
+      <td> 2</td>
+      <td> 50</td>
+    </tr>
+    <tr>
+      <td><strong>1996-01-02 01:30:00</strong></td>
+      <td> IVT</td>
+      <td> 1996-01-02 01:30:00</td>
+      <td> 0</td>
+      <td> 0</td>
+      <td> 0</td>
+      <td> 1</td>
+      <td> 3</td>
+      <td> 51</td>
+    </tr>
+    <tr>
+      <td><strong>1996-01-02 02:00:00</strong></td>
+      <td> IVT</td>
+      <td> 1996-01-02 02:00:00</td>
+      <td> 0</td>
+      <td> 0</td>
+      <td> 0</td>
+      <td> 1</td>
+      <td> 4</td>
+      <td> 52</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+</section>
+<section id="Arrival-and-departure-bins-and-occupancy-contributions">
+<h2>Arrival and departure bins and occupancy contributions<a class="headerlink" href="#Arrival-and-departure-bins-and-occupancy-contributions" title="Permalink to this headline">¶</a></h2>
+<p>A few more preliminary concepts are needed before we can churn the crank and process the stop records and fill in the bydate table with occupancy, arrival, and departure info.</p>
+<p>Let’s look at the first few stop records.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[24]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">df</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[24]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div style="max-height:1000px;max-width:1500px;overflow:auto;">
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>PatID</th>
+      <th>InRoomTS</th>
+      <th>OutRoomTS</th>
+      <th>PatType</th>
+      <th>LOS</th>
+      <th>LOSmins</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>0</strong></td>
+      <td> 1</td>
+      <td> 1996-01-01 07:44:00</td>
+      <td> 1996-01-01 08:50:00</td>
+      <td> IVT</td>
+      <td> 1:06:00</td>
+      <td>  66</td>
+    </tr>
+    <tr>
+      <td><strong>1</strong></td>
+      <td> 2</td>
+      <td> 1996-01-01 08:28:00</td>
+      <td> 1996-01-01 09:20:00</td>
+      <td> IVT</td>
+      <td> 0:52:00</td>
+      <td>  52</td>
+    </tr>
+    <tr>
+      <td><strong>2</strong></td>
+      <td> 3</td>
+      <td> 1996-01-01 11:44:00</td>
+      <td> 1996-01-01 13:30:00</td>
+      <td> MYE</td>
+      <td> 1:46:00</td>
+      <td> 106</td>
+    </tr>
+    <tr>
+      <td><strong>3</strong></td>
+      <td> 4</td>
+      <td> 1996-01-01 11:51:00</td>
+      <td> 1996-01-01 12:55:00</td>
+      <td> CAT</td>
+      <td> 1:04:00</td>
+      <td>  64</td>
+    </tr>
+    <tr>
+      <td><strong>4</strong></td>
+      <td> 5</td>
+      <td> 1996-01-01 12:10:00</td>
+      <td> 1996-01-01 13:00:00</td>
+      <td> IVT</td>
+      <td> 0:50:00</td>
+      <td>  50</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[36]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;InRoomTS&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># Entry time for first record</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[36]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+datetime.datetime(1996, 1, 1, 7, 44)
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[37]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;OutRoomTS&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="c1"># Exit time for first record</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[37]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+datetime.datetime(1996, 1, 1, 8, 50)
+</pre></div></div>
+</div>
+<p>So, the first patient arrived in the 30 minute time bin beginning on 1996-01-01 07:30:00 and departed during the bin beginning 1996-01-01 08:30:00. We call 1996-01-01 07:30:00 the <em>arrival bin</em> and 1996-01-01 08:30:00 the <em>departure bin</em>. The first patient was in the system for all or part of 3 time bins:</p>
+<ul class="simple">
+<li><p>1996-01-01 07:30:00 - 1996-01-01 08:00:00 (16 mins –&gt; 16/30 = 0.5333 of bin is the <em>arrival bin fraction</em>)</p></li>
+<li><p>1996-01-01 08:00:00 - 1996-01-01 08:30:00 (30 mins –&gt; 30/30 = 1.0000 of bin)</p></li>
+<li><p>1996-01-01 08:30:00 - 1996-01-01 09:00:00 (20 mins –&gt; 20/30 = 0.6667 of bin is the <em>departure bin fraction</em>)</p></li>
+</ul>
+<p>The standard convention in Hillmaker is to use the arrival (departure) bin fraction as the contribution to occupancy in the arrival (departure) bin. For all bins between the arrival and departure bins, the patient is in the system for the entire bin length and thus the contribution to occupancy for each bin is 1.0. If you want to be more conservative, you could give full credit of 1.0 for the arrival and departure bins (this is an option in Hillmaker).</p>
+<p>So, it seems we just need to step through all the rows in the stop record data frame, <code class="docutils literal notranslate"><span class="pre">df</span></code>, and:</p>
+<ul class="simple">
+<li><p>get the PatType value</p></li>
+<li><p>find the arrival and departure bins</p></li>
+<li><p>compute the arrival and departure bin fractions,</p></li>
+<li><p>and increment the appropriate rows in the <code class="docutils literal notranslate"><span class="pre">bydate_df</span></code> data frame.</p></li>
+</ul>
+</section>
+<section id="Stop-record-types">
+<h2>Stop record types<a class="headerlink" href="#Stop-record-types" title="Permalink to this headline">¶</a></h2>
+<p>Well, it’s almost that easy. There’s one more complication to deal with. Recall that as part of the input parameters we specified start and end dates for the analysis (the <em>analysis date range</em>):</p>
+<p><code class="docutils literal notranslate"><span class="pre">start_analysis</span> <span class="pre">=</span> <span class="pre">'1/2/1996'</span></code></p>
+<p><code class="docutils literal notranslate"><span class="pre">end_analysis</span> <span class="pre">=</span> <span class="pre">'3/31/1996</span> <span class="pre">23:45'</span></code></p>
+<p>Obviously, a patient stop record having an arrival time after <code class="docutils literal notranslate"><span class="pre">end_analysis</span></code> can be ignored as can those patients who departed before <code class="docutils literal notranslate"><span class="pre">start_analysis</span></code>. For those patients whose stop falls strictly between <code class="docutils literal notranslate"><span class="pre">start_analysis</span></code> and <code class="docutils literal notranslate"><span class="pre">end_analysis</span></code>, they will end up with occupancy contributions for all of the time bins corresponding to their stay. However, what about patients who arrive during the analysis date range but depart after <code class="docutils literal notranslate"><span class="pre">end_analysis</span></code> or those who arrive before <code class="docutils literal notranslate"><span class="pre">start_analysis</span></code>
+and depart within the analysis date range. As you’d expect, we simply ignore time bins that fall outside of the analysis date range. Note we are NOT ignoring the entire record. We are simply computing occupancy contributions only for time bins falling within the analysis date range. To make our life easier, we created a function to determine the <em>stop record type</em>. You’ll see in the comments below the function declaration that there is a diagram illustrating the different record types.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">stoprec_analysis_rltnshp</span><span class="p">(</span><span class="n">stoprecrange</span><span class="p">,</span> <span class="n">analysisrange</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Determines relationship type of stop record to analysis date range.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    stoprecrange: list consisting of [rec_in, rec_out]</span>
+<span class="sd">    analysisrange: list consisting of [a_start, a_end]</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    Returns a string, either &#39;inner&#39;, &#39;left&#39;, &#39;right, &#39;outer&#39;,</span>
+<span class="sd">    &#39;backwards&#39;, &#39;none&#39; depending</span>
+<span class="sd">    on the relationship between the stop record being analyzed and the</span>
+<span class="sd">    analysis date range.</span>
+
+<span class="sd">    Type &#39;inner&#39;:</span>
+
+<span class="sd">         |-------------------------|</span>
+<span class="sd">     a_start                     a_end</span>
+<span class="sd">              |--------------|</span>
+<span class="sd">             rec_in         rec_out</span>
+
+<span class="sd">    Type &#39;left&#39;:</span>
+
+<span class="sd">                    |-------------------------|</span>
+<span class="sd">                  a_start                     a_end</span>
+<span class="sd">              |--------------|</span>
+<span class="sd">             rec_in         rec_out</span>
+
+<span class="sd">    Type &#39;right&#39;:</span>
+
+<span class="sd">                    |-------------------------|</span>
+<span class="sd">                  a_start                     a_end</span>
+<span class="sd">                                       |--------------|</span>
+<span class="sd">                                     rec_in         rec_out</span>
+
+<span class="sd">    Type &#39;outer&#39;:</span>
+
+<span class="sd">              |-------------------------|</span>
+<span class="sd">            a_start                     a_end</span>
+<span class="sd">       |-------------------------------------|</span>
+<span class="sd">     rec_in                              rec_out</span>
+
+
+<span class="sd">    Type &#39;backwards&#39;:</span>
+<span class="sd">        The exit time is BEFORE the entry time. This is a BAD record.</span>
+
+<span class="sd">    Type &#39;none&#39;:</span>
+<span class="sd">        Ranges do not overlap</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">rec_in</span> <span class="o">=</span> <span class="n">stoprecrange</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">rec_out</span> <span class="o">=</span> <span class="n">stoprecrange</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">a_start</span> <span class="o">=</span> <span class="n">analysisrange</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">a_end</span> <span class="o">=</span> <span class="n">analysisrange</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">rec_in</span> <span class="o">&gt;</span> <span class="n">rec_out</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s1">&#39;backwards&#39;</span>
+    <span class="k">elif</span> <span class="p">(</span><span class="n">a_start</span> <span class="o">&lt;=</span> <span class="n">rec_in</span> <span class="o">&lt;</span> <span class="n">a_end</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">a_start</span> <span class="o">&lt;=</span> <span class="n">rec_out</span> <span class="o">&lt;</span> <span class="n">a_end</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s1">&#39;inner&#39;</span>
+    <span class="k">elif</span> <span class="p">(</span><span class="n">a_start</span> <span class="o">&lt;=</span> <span class="n">rec_in</span> <span class="o">&lt;</span> <span class="n">a_end</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">rec_out</span> <span class="o">&gt;=</span> <span class="n">a_end</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s1">&#39;right&#39;</span>
+    <span class="k">elif</span> <span class="p">(</span><span class="n">rec_in</span> <span class="o">&lt;</span> <span class="n">a_start</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">a_start</span> <span class="o">&lt;=</span> <span class="n">rec_out</span> <span class="o">&lt;</span> <span class="n">a_end</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s1">&#39;left&#39;</span>
+    <span class="k">elif</span> <span class="p">(</span><span class="n">rec_in</span> <span class="o">&lt;</span> <span class="n">a_start</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">rec_out</span> <span class="o">&gt;=</span> <span class="n">a_end</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s1">&#39;outer&#39;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s1">&#39;none&#39;</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Main-processing-loop">
+<h2>Main processing loop<a class="headerlink" href="#Main-processing-loop" title="Permalink to this headline">¶</a></h2>
+<p>Finally, we can step through the patient stop records and fill in the by date table.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[25]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Main occupancy, arrivals, departures loop. Process each record in the</span>
+<span class="c1"># stop data file.</span>
+
+<span class="k">for</span> <span class="n">intime</span><span class="p">,</span> <span class="n">outtime</span><span class="p">,</span> <span class="n">cat</span> <span class="ow">in</span> <span class="n">izip</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">in_fld_name</span><span class="p">],</span> <span class="n">df</span><span class="p">[</span><span class="n">out_fld_name</span><span class="p">],</span> <span class="n">df</span><span class="p">[</span><span class="n">cat_fld_name</span><span class="p">]):</span>
+    <span class="n">good_rec</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">rectype</span> <span class="o">=</span> <span class="n">hlib</span><span class="o">.</span><span class="n">stoprec_analysis_rltnshp</span><span class="p">([</span><span class="n">intime</span><span class="p">,</span><span class="n">outtime</span><span class="p">],</span><span class="n">analysis_range</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">rectype</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;backwards&#39;</span><span class="p">]:</span>
+        <span class="c1"># print &quot;ERROR_{}: {} {} {}&quot;.format(rectype,intime,outtime,cat)</span>
+        <span class="n">good_rec</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="k">if</span> <span class="n">good_rec</span> <span class="ow">and</span> <span class="n">rectype</span> <span class="o">!=</span> <span class="s1">&#39;none&#39;</span><span class="p">:</span>
+        <span class="n">indtbin</span> <span class="o">=</span> <span class="n">hlib</span><span class="o">.</span><span class="n">rounddownTime</span><span class="p">(</span><span class="n">intime</span><span class="p">,</span><span class="n">binsize_mins</span><span class="p">)</span>
+        <span class="n">outdtbin</span> <span class="o">=</span> <span class="n">hlib</span><span class="o">.</span><span class="n">rounddownTime</span><span class="p">(</span><span class="n">outtime</span><span class="p">,</span><span class="n">binsize_mins</span><span class="p">)</span>
+        <span class="n">inout_occ_frac</span> <span class="o">=</span> <span class="n">hlib</span><span class="o">.</span><span class="n">occ_frac</span><span class="p">([</span><span class="n">intime</span><span class="p">,</span> <span class="n">outtime</span><span class="p">],</span> <span class="n">binsize_mins</span><span class="p">)</span>
+        <span class="c1"># print &quot;{} {} {} {} {:.3f} {:.3f} {:.3f}&quot;.format(intime, outtime, cat,</span>
+        <span class="c1">#    rectype, time.clock(), inout_occ_frac[0], inout_occ_frac[1])</span>
+
+        <span class="k">if</span> <span class="n">rectype</span> <span class="o">==</span> <span class="s1">&#39;inner&#39;</span><span class="p">:</span>
+            <span class="n">bydate_df</span><span class="o">.</span><span class="n">ix</span><span class="p">[(</span><span class="n">cat</span><span class="p">,</span><span class="n">indtbin</span><span class="p">),</span> <span class="s1">&#39;occupancy&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">inout_occ_frac</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">bydate_df</span><span class="o">.</span><span class="n">ix</span><span class="p">[(</span><span class="n">cat</span><span class="p">,</span><span class="n">outdtbin</span><span class="p">),</span> <span class="s1">&#39;occupancy&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">inout_occ_frac</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">bydate_df</span><span class="o">.</span><span class="n">ix</span><span class="p">[(</span><span class="n">cat</span><span class="p">,</span><span class="n">indtbin</span><span class="p">),</span> <span class="s1">&#39;arrivals&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="mf">1.0</span>
+            <span class="n">bydate_df</span><span class="o">.</span><span class="n">ix</span><span class="p">[(</span><span class="n">cat</span><span class="p">,</span><span class="n">outdtbin</span><span class="p">),</span> <span class="s1">&#39;departures&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="mf">1.0</span>
+
+            <span class="k">if</span> <span class="n">hlib</span><span class="o">.</span><span class="n">isgt2bins</span><span class="p">(</span><span class="n">indtbin</span><span class="p">,</span> <span class="n">outdtbin</span><span class="p">,</span> <span class="n">binsize_mins</span><span class="p">):</span>
+                <span class="nb">bin</span> <span class="o">=</span> <span class="n">indtbin</span> <span class="o">+</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">minutes</span><span class="o">=</span><span class="n">binsize_mins</span><span class="p">)</span>
+                <span class="k">while</span> <span class="nb">bin</span> <span class="o">&lt;</span> <span class="n">outdtbin</span><span class="p">:</span>
+                    <span class="n">bydate_df</span><span class="o">.</span><span class="n">ix</span><span class="p">[(</span><span class="n">cat</span><span class="p">,</span><span class="nb">bin</span><span class="p">),</span> <span class="s1">&#39;occupancy&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="mf">1.0</span>
+                    <span class="nb">bin</span> <span class="o">+=</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">minutes</span><span class="o">=</span><span class="n">binsize_mins</span><span class="p">)</span>
+
+
+        <span class="k">elif</span> <span class="n">rectype</span> <span class="o">==</span> <span class="s1">&#39;right&#39;</span><span class="p">:</span>
+            <span class="c1"># departure is outside analysis window</span>
+            <span class="n">bydate_df</span><span class="o">.</span><span class="n">ix</span><span class="p">[(</span><span class="n">cat</span><span class="p">,</span><span class="n">indtbin</span><span class="p">),</span> <span class="s1">&#39;occupancy&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">inout_occ_frac</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">bydate_df</span><span class="o">.</span><span class="n">ix</span><span class="p">[(</span><span class="n">cat</span><span class="p">,</span><span class="n">indtbin</span><span class="p">),</span> <span class="s1">&#39;arrivals&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="mf">1.0</span>
+
+            <span class="k">if</span> <span class="n">hlib</span><span class="o">.</span><span class="n">isgt2bins</span><span class="p">(</span><span class="n">indtbin</span><span class="p">,</span> <span class="n">outdtbin</span><span class="p">,</span> <span class="n">binsize_mins</span><span class="p">):</span>
+                <span class="nb">bin</span> <span class="o">=</span> <span class="n">indtbin</span> <span class="o">+</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">minutes</span><span class="o">=</span><span class="n">binsize_mins</span><span class="p">)</span>
+                <span class="k">while</span> <span class="nb">bin</span> <span class="o">&lt;=</span> <span class="n">end_analysis_dt</span><span class="p">:</span>
+                    <span class="n">bydate_df</span><span class="o">.</span><span class="n">ix</span><span class="p">[(</span><span class="n">cat</span><span class="p">,</span><span class="nb">bin</span><span class="p">),</span> <span class="s1">&#39;occupancy&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="mf">1.0</span>
+                    <span class="nb">bin</span> <span class="o">+=</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">minutes</span><span class="o">=</span><span class="n">binsize_mins</span><span class="p">)</span>
+
+        <span class="k">elif</span> <span class="n">rectype</span> <span class="o">==</span> <span class="s1">&#39;left&#39;</span><span class="p">:</span>
+            <span class="c1"># arrival is outside analysis window</span>
+            <span class="n">bydate_df</span><span class="o">.</span><span class="n">ix</span><span class="p">[(</span><span class="n">cat</span><span class="p">,</span><span class="n">outdtbin</span><span class="p">),</span> <span class="s1">&#39;occupancy&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">inout_occ_frac</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">bydate_df</span><span class="o">.</span><span class="n">ix</span><span class="p">[(</span><span class="n">cat</span><span class="p">,</span><span class="n">outdtbin</span><span class="p">),</span> <span class="s1">&#39;departures&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="mf">1.0</span>
+
+            <span class="k">if</span> <span class="n">hlib</span><span class="o">.</span><span class="n">isgt2bins</span><span class="p">(</span><span class="n">indtbin</span><span class="p">,</span> <span class="n">outdtbin</span><span class="p">,</span> <span class="n">binsize_mins</span><span class="p">):</span>
+                <span class="nb">bin</span> <span class="o">=</span> <span class="n">start_analysis_dt</span> <span class="o">+</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">minutes</span><span class="o">=</span><span class="n">binsize_mins</span><span class="p">)</span>
+                <span class="k">while</span> <span class="nb">bin</span> <span class="o">&lt;</span> <span class="n">outdtbin</span><span class="p">:</span>
+                    <span class="n">bydate_df</span><span class="o">.</span><span class="n">ix</span><span class="p">[(</span><span class="n">cat</span><span class="p">,</span><span class="nb">bin</span><span class="p">),</span> <span class="s1">&#39;occupancy&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="mf">1.0</span>
+                    <span class="nb">bin</span> <span class="o">+=</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">minutes</span><span class="o">=</span><span class="n">binsize_mins</span><span class="p">)</span>
+
+        <span class="k">elif</span> <span class="n">rectype</span> <span class="o">==</span> <span class="s1">&#39;outer&#39;</span><span class="p">:</span>
+            <span class="c1"># arrival and departure sandwich analysis window</span>
+
+            <span class="k">if</span> <span class="n">hlib</span><span class="o">.</span><span class="n">isgt2bins</span><span class="p">(</span><span class="n">indtbin</span><span class="p">,</span> <span class="n">outdtbin</span><span class="p">,</span> <span class="n">binsize_mins</span><span class="p">):</span>
+                <span class="nb">bin</span> <span class="o">=</span> <span class="n">start_analysis_dt</span>
+                <span class="k">while</span> <span class="nb">bin</span> <span class="o">&lt;=</span> <span class="n">end_analysis_dt</span><span class="p">:</span>
+                    <span class="n">bydate_df</span><span class="o">.</span><span class="n">ix</span><span class="p">[(</span><span class="n">cat</span><span class="p">,</span><span class="nb">bin</span><span class="p">),</span> <span class="s1">&#39;occupancy&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="mf">1.0</span>
+                    <span class="nb">bin</span> <span class="o">+=</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">minutes</span><span class="o">=</span><span class="n">binsize_mins</span><span class="p">)</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">pass</span>
+
+<span class="nb">print</span> <span class="s2">&quot;Done processing stop recs: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">clock</span><span class="p">())</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Done processing stop recs: 2.56635211744e-06
+</pre></div></div>
+</div>
+<p>At this point, <code class="docutils literal notranslate"><span class="pre">bydate_df</span></code> contains occupancy, arrival and departure counts for each time bin and category. Here’s a look into the heart of the by date table.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[27]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">bydate_df</span><span class="p">[</span><span class="mi">1320</span><span class="p">:</span><span class="mi">1350</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[27]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div style="max-height:1000px;max-width:1500px;overflow:auto;">
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th></th>
+      <th>category</th>
+      <th>datetime</th>
+      <th>arrivals</th>
+      <th>departures</th>
+      <th>occupancy</th>
+      <th>dayofweek</th>
+      <th>binofday</th>
+      <th>binofweek</th>
+    </tr>
+    <tr>
+      <th>category</th>
+      <th>datetime</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td rowspan="30" valign="top"><strong>IVT</strong></td>
+      <td><strong>1996-01-29 12:00:00</strong></td>
+      <td> IVT</td>
+      <td> 1996-01-29 12:00:00</td>
+      <td>  9</td>
+      <td>  9</td>
+      <td> 21.266667</td>
+      <td> 0</td>
+      <td> 24</td>
+      <td> 24</td>
+    </tr>
+    <tr>
+      <td><strong>1996-01-29 12:30:00</strong></td>
+      <td> IVT</td>
+      <td> 1996-01-29 12:30:00</td>
+      <td>  9</td>
+      <td>  6</td>
+      <td> 22.333333</td>
+      <td> 0</td>
+      <td> 25</td>
+      <td> 25</td>
+    </tr>
+    <tr>
+      <td><strong>1996-01-29 13:00:00</strong></td>
+      <td> IVT</td>
+      <td> 1996-01-29 13:00:00</td>
+      <td> 12</td>
+      <td> 12</td>
+      <td> 22.266667</td>
+      <td> 0</td>
+      <td> 26</td>
+      <td> 26</td>
+    </tr>
+    <tr>
+      <td><strong>1996-01-29 13:30:00</strong></td>
+      <td> IVT</td>
+      <td> 1996-01-29 13:30:00</td>
+      <td>  8</td>
+      <td>  9</td>
+      <td> 23.100000</td>
+      <td> 0</td>
+      <td> 27</td>
+      <td> 27</td>
+    </tr>
+    <tr>
+      <td><strong>1996-01-29 14:00:00</strong></td>
+      <td> IVT</td>
+      <td> 1996-01-29 14:00:00</td>
+      <td>  8</td>
+      <td>  6</td>
+      <td> 22.933333</td>
+      <td> 0</td>
+      <td> 28</td>
+      <td> 28</td>
+    </tr>
+    <tr>
+      <td><strong>1996-01-29 14:30:00</strong></td>
+      <td> IVT</td>
+      <td> 1996-01-29 14:30:00</td>
+      <td>  9</td>
+      <td> 11</td>
+      <td> 22.300000</td>
+      <td> 0</td>
+      <td> 29</td>
+      <td> 29</td>
+    </tr>
+    <tr>
+      <td><strong>1996-01-29 15:00:00</strong></td>
+      <td> IVT</td>
+      <td> 1996-01-29 15:00:00</td>
+      <td>  7</td>
+      <td>  6</td>
+      <td> 23.900000</td>
+      <td> 0</td>
+      <td> 30</td>
+      <td> 30</td>
+    </tr>
+    <tr>
+      <td><strong>1996-01-29 15:30:00</strong></td>
+      <td> IVT</td>
+      <td> 1996-01-29 15:30:00</td>
+      <td>  6</td>
+      <td>  9</td>
+      <td> 22.600000</td>
+      <td> 0</td>
+      <td> 31</td>
+      <td> 31</td>
+    </tr>
+    <tr>
+      <td><strong>1996-01-29 16:00:00</strong></td>
+      <td> IVT</td>
+      <td> 1996-01-29 16:00:00</td>
+      <td>  9</td>
+      <td> 11</td>
+      <td> 19.700000</td>
+      <td> 0</td>
+      <td> 32</td>
+      <td> 32</td>
+    </tr>
+    <tr>
+      <td><strong>1996-01-29 16:30:00</strong></td>
+      <td> IVT</td>
+      <td> 1996-01-29 16:30:00</td>
+      <td>  7</td>
+      <td>  4</td>
+      <td> 19.533333</td>
+      <td> 0</td>
+      <td> 33</td>
+      <td> 33</td>
+    </tr>
+    <tr>
+      <td><strong>1996-01-29 17:00:00</strong></td>
+      <td> IVT</td>
+      <td> 1996-01-29 17:00:00</td>
+      <td>  5</td>
+      <td>  9</td>
+      <td> 18.033333</td>
+      <td> 0</td>
+      <td> 34</td>
+      <td> 34</td>
+    </tr>
+    <tr>
+      <td><strong>1996-01-29 17:30:00</strong></td>
+      <td> IVT</td>
+      <td> 1996-01-29 17:30:00</td>
+      <td>  2</td>
+      <td>  9</td>
+      <td> 13.600000</td>
+      <td> 0</td>
+      <td> 35</td>
+      <td> 35</td>
+    </tr>
+    <tr>
+      <td><strong>1996-01-29 18:00:00</strong></td>
+      <td> IVT</td>
+      <td> 1996-01-29 18:00:00</td>
+      <td>  3</td>
+      <td>  5</td>
+      <td>  9.566667</td>
+      <td> 0</td>
+      <td> 36</td>
+      <td> 36</td>
+    </tr>
+    <tr>
+      <td><strong>1996-01-29 18:30:00</strong></td>
+      <td> IVT</td>
+      <td> 1996-01-29 18:30:00</td>
+      <td>  2</td>
+      <td>  4</td>
+      <td>  7.166667</td>
+      <td> 0</td>
+      <td> 37</td>
+      <td> 37</td>
+    </tr>
+    <tr>
+      <td><strong>1996-01-29 19:00:00</strong></td>
+      <td> IVT</td>
+      <td> 1996-01-29 19:00:00</td>
+      <td>  1</td>
+      <td>  3</td>
+      <td>  5.833333</td>
+      <td> 0</td>
+      <td> 38</td>
+      <td> 38</td>
+    </tr>
+    <tr>
+      <td><strong>1996-01-29 19:30:00</strong></td>
+      <td> IVT</td>
+      <td> 1996-01-29 19:30:00</td>
+      <td>  3</td>
+      <td>  2</td>
+      <td>  6.366667</td>
+      <td> 0</td>
+      <td> 39</td>
+      <td> 39</td>
+    </tr>
+    <tr>
+      <td><strong>1996-01-29 20:00:00</strong></td>
+      <td> IVT</td>
+      <td> 1996-01-29 20:00:00</td>
+      <td>  0</td>
+      <td>  3</td>
+      <td>  4.833333</td>
+      <td> 0</td>
+      <td> 40</td>
+      <td> 40</td>
+    </tr>
+    <tr>
+      <td><strong>1996-01-29 20:30:00</strong></td>
+      <td> IVT</td>
+      <td> 1996-01-29 20:30:00</td>
+      <td>  0</td>
+      <td>  3</td>
+      <td>  1.000000</td>
+      <td> 0</td>
+      <td> 41</td>
+      <td> 41</td>
+    </tr>
+    <tr>
+      <td><strong>1996-01-29 21:00:00</strong></td>
+      <td> IVT</td>
+      <td> 1996-01-29 21:00:00</td>
+      <td>  0</td>
+      <td>  0</td>
+      <td>  0.000000</td>
+      <td> 0</td>
+      <td> 42</td>
+      <td> 42</td>
+    </tr>
+    <tr>
+      <td><strong>1996-01-29 21:30:00</strong></td>
+      <td> IVT</td>
+      <td> 1996-01-29 21:30:00</td>
+      <td>  0</td>
+      <td>  0</td>
+      <td>  0.000000</td>
+      <td> 0</td>
+      <td> 43</td>
+      <td> 43</td>
+    </tr>
+    <tr>
+      <td><strong>1996-01-29 22:00:00</strong></td>
+      <td> IVT</td>
+      <td> 1996-01-29 22:00:00</td>
+      <td>  0</td>
+      <td>  0</td>
+      <td>  0.000000</td>
+      <td> 0</td>
+      <td> 44</td>
+      <td> 44</td>
+    </tr>
+    <tr>
+      <td><strong>1996-01-29 22:30:00</strong></td>
+      <td> IVT</td>
+      <td> 1996-01-29 22:30:00</td>
+      <td>  0</td>
+      <td>  0</td>
+      <td>  0.000000</td>
+      <td> 0</td>
+      <td> 45</td>
+      <td> 45</td>
+    </tr>
+    <tr>
+      <td><strong>1996-01-29 23:00:00</strong></td>
+      <td> IVT</td>
+      <td> 1996-01-29 23:00:00</td>
+      <td>  0</td>
+      <td>  0</td>
+      <td>  0.000000</td>
+      <td> 0</td>
+      <td> 46</td>
+      <td> 46</td>
+    </tr>
+    <tr>
+      <td><strong>1996-01-29 23:30:00</strong></td>
+      <td> IVT</td>
+      <td> 1996-01-29 23:30:00</td>
+      <td>  0</td>
+      <td>  0</td>
+      <td>  0.000000</td>
+      <td> 0</td>
+      <td> 47</td>
+      <td> 47</td>
+    </tr>
+    <tr>
+      <td><strong>1996-01-30 00:00:00</strong></td>
+      <td> IVT</td>
+      <td> 1996-01-30 00:00:00</td>
+      <td>  0</td>
+      <td>  0</td>
+      <td>  0.000000</td>
+      <td> 1</td>
+      <td>  0</td>
+      <td> 48</td>
+    </tr>
+    <tr>
+      <td><strong>1996-01-30 00:30:00</strong></td>
+      <td> IVT</td>
+      <td> 1996-01-30 00:30:00</td>
+      <td>  0</td>
+      <td>  0</td>
+      <td>  0.000000</td>
+      <td> 1</td>
+      <td>  1</td>
+      <td> 49</td>
+    </tr>
+    <tr>
+      <td><strong>1996-01-30 01:00:00</strong></td>
+      <td> IVT</td>
+      <td> 1996-01-30 01:00:00</td>
+      <td>  0</td>
+      <td>  0</td>
+      <td>  0.000000</td>
+      <td> 1</td>
+      <td>  2</td>
+      <td> 50</td>
+    </tr>
+    <tr>
+      <td><strong>1996-01-30 01:30:00</strong></td>
+      <td> IVT</td>
+      <td> 1996-01-30 01:30:00</td>
+      <td>  0</td>
+      <td>  0</td>
+      <td>  0.000000</td>
+      <td> 1</td>
+      <td>  3</td>
+      <td> 51</td>
+    </tr>
+    <tr>
+      <td><strong>1996-01-30 02:00:00</strong></td>
+      <td> IVT</td>
+      <td> 1996-01-30 02:00:00</td>
+      <td>  0</td>
+      <td>  0</td>
+      <td>  0.000000</td>
+      <td> 1</td>
+      <td>  4</td>
+      <td> 52</td>
+    </tr>
+    <tr>
+      <td><strong>1996-01-30 02:30:00</strong></td>
+      <td> IVT</td>
+      <td> 1996-01-30 02:30:00</td>
+      <td>  0</td>
+      <td>  0</td>
+      <td>  0.000000</td>
+      <td> 1</td>
+      <td>  5</td>
+      <td> 53</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+</section>
+<section id="Computing-totals">
+<h2>Computing totals<a class="headerlink" href="#Computing-totals" title="Permalink to this headline">¶</a></h2>
+<p>Before computing statistics such as means and percentiles, we compute the total (over all categories) occupancy, arrivals and departures by time bin.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[52]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Compute totals for arrivals, departures and occupancy by using</span>
+<span class="c1"># Pandas aggregation methods</span>
+<span class="n">bydate_dfgrp1</span> <span class="o">=</span> <span class="n">bydate_df</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="s1">&#39;datetime&#39;</span><span class="p">)</span> <span class="p">[</span><span class="s1">&#39;occupancy&#39;</span><span class="p">,</span><span class="s1">&#39;arrivals&#39;</span><span class="p">,</span><span class="s1">&#39;departures&#39;</span><span class="p">]</span>
+<span class="n">bydate_tot</span> <span class="o">=</span> <span class="n">bydate_dfgrp1</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="c1"># Compute the totals</span>
+
+<span class="n">bydate_tot</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>  <span class="c1"># Moves the index column to a data column</span>
+<span class="n">bydate_tot</span><span class="p">[</span><span class="s1">&#39;category&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cat_total_str</span>  <span class="c1"># Set the category for the total rows</span>
+
+<span class="c1"># Set the index to conform to the main bydate data frame. The inplace=True</span>
+<span class="c1"># avoids creating a new object</span>
+<span class="n">bydate_tot</span><span class="o">.</span><span class="n">set_index</span><span class="p">([</span><span class="s1">&#39;category&#39;</span><span class="p">,</span><span class="s1">&#39;datetime&#39;</span><span class="p">],</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">drop</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+<span class="c1"># Concatenate the totals to the main data frame</span>
+<span class="n">bydate_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">bydate_df</span><span class="p">,</span><span class="n">bydate_tot</span><span class="p">])</span>
+
+<span class="c1"># Update dayofweek, binofday, binofweek</span>
+<span class="n">bydate_df</span><span class="p">[</span><span class="s1">&#39;dayofweek&#39;</span><span class="p">][</span><span class="n">bydate_df</span><span class="p">[</span><span class="s1">&#39;category&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;Total&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">bydate_df</span><span class="p">[</span><span class="s1">&#39;datetime&#39;</span><span class="p">][</span><span class="n">bydate_df</span><span class="p">[</span><span class="s1">&#39;category&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;Total&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Timestamp</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">weekday</span><span class="p">())</span>
+<span class="n">bydate_df</span><span class="p">[</span><span class="s1">&#39;binofday&#39;</span><span class="p">][</span><span class="n">bydate_df</span><span class="p">[</span><span class="s1">&#39;category&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;Total&#39;</span><span class="p">]</span> <span class="o">=</span>  <span class="n">bydate_df</span><span class="p">[</span><span class="s1">&#39;datetime&#39;</span><span class="p">][</span><span class="n">bydate_df</span><span class="p">[</span><span class="s1">&#39;category&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;Total&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">hlib</span><span class="o">.</span><span class="n">binofday</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">binsize_mins</span><span class="p">))</span>
+<span class="n">bydate_df</span><span class="p">[</span><span class="s1">&#39;binofweek&#39;</span><span class="p">][</span><span class="n">bydate_df</span><span class="p">[</span><span class="s1">&#39;category&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;Total&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">bydate_df</span><span class="p">[</span><span class="s1">&#39;datetime&#39;</span><span class="p">][</span><span class="n">bydate_df</span><span class="p">[</span><span class="s1">&#39;category&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;Total&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">hlib</span><span class="o">.</span><span class="n">binofweek</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">binsize_mins</span><span class="p">))</span>
+
+<span class="c1"># Drop the redundant category and datetime fields (since they comprise the multi-index)</span>
+<span class="k">del</span> <span class="n">bydate_df</span><span class="p">[</span><span class="s1">&#39;category&#39;</span><span class="p">]</span>
+<span class="k">del</span> <span class="n">bydate_df</span><span class="p">[</span><span class="s1">&#39;datetime&#39;</span><span class="p">]</span>
+
+<span class="c1"># Look at the tail to see example of totals</span>
+<span class="n">bydate_df</span><span class="o">.</span><span class="n">tail</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[52]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div style="max-height:1000px;max-width:1500px;overflow:auto;">
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th></th>
+      <th>arrivals</th>
+      <th>binofday</th>
+      <th>binofweek</th>
+      <th>dayofweek</th>
+      <th>departures</th>
+      <th>occupancy</th>
+    </tr>
+    <tr>
+      <th>category</th>
+      <th>datetime</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td rowspan="5" valign="top"><strong>Total</strong></td>
+      <td><strong>1996-03-31 21:30:00</strong></td>
+      <td> 0</td>
+      <td> 43</td>
+      <td> 331</td>
+      <td> 6</td>
+      <td> 0</td>
+      <td> 0.000000</td>
+    </tr>
+    <tr>
+      <td><strong>1996-03-31 22:00:00</strong></td>
+      <td> 0</td>
+      <td> 44</td>
+      <td> 332</td>
+      <td> 6</td>
+      <td> 0</td>
+      <td> 0.000000</td>
+    </tr>
+    <tr>
+      <td><strong>1996-03-31 22:30:00</strong></td>
+      <td> 4</td>
+      <td> 45</td>
+      <td> 333</td>
+      <td> 6</td>
+      <td> 0</td>
+      <td> 1.600000</td>
+    </tr>
+    <tr>
+      <td><strong>1996-03-31 23:00:00</strong></td>
+      <td> 0</td>
+      <td> 46</td>
+      <td> 334</td>
+      <td> 6</td>
+      <td> 0</td>
+      <td> 4.000000</td>
+    </tr>
+    <tr>
+      <td><strong>1996-03-31 23:30:00</strong></td>
+      <td> 0</td>
+      <td> 47</td>
+      <td> 335</td>
+      <td> 6</td>
+      <td> 4</td>
+      <td> 0.666667</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<p>Write out <code class="docutils literal notranslate"><span class="pre">bydate_df</span></code> to a csv file and take a look at it. With this data frame we can compute all kinds of interesting summary statistics by day of week and time of day. That will be the subject of part 2 of this tutorial.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[53]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">file_bydate_csv</span> <span class="o">=</span> <span class="s1">&#39;bydate_&#39;</span> <span class="o">+</span> <span class="n">scenario_name</span> <span class="o">+</span> <span class="s1">&#39;.csv&#39;</span>
+<span class="n">bydate_df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">file_bydate_csv</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<section id="About-this-IPython-notebook">
+<h3>About this IPython notebook<a class="headerlink" href="#About-this-IPython-notebook" title="Permalink to this headline">¶</a></h3>
+<p>You can find the data and the <code class="docutils literal notranslate"><span class="pre">.ipynb</span></code> file in my <a class="reference external" href="https://github.com/misken/hselab-tutorials">hselab-tutorials</a> github repo. Clone or download a zip.</p>
+<p>Check out the <a class="reference external" href="http://ipython.org/ipython-doc/stable/interactive/htmlnotebook.html#the-notebook-format">IPython doc on the notebook format</a> to learn all about working with IPython notebooks. A few highlights include:</p>
+<ul class="simple">
+<li><p>IPython notebooks are JSON text files with a <code class="docutils literal notranslate"><span class="pre">.ipynb</span></code> extension.</p></li>
+<li><p>You can download a notebook as regular <code class="docutils literal notranslate"><span class="pre">.py</span></code> file with a <strong>File|Download As…</strong> and setting the download filetype to py.</p></li>
+<li><p>If you add the proper comments to a regular <code class="docutils literal notranslate"><span class="pre">.py</span></code> file, you can open it as a notebook file by dragging and dropping the file into the notebook dashboard file list area. See the doc link above for the details on how to comment your Python file so that this works well.</p></li>
+<li><p>To create a static HTML or PDF of your notebook, do a <strong>File|Print</strong> and then just save or print or whatever from the resulting browser window.</p></li>
+</ul>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
+</section>
+</section>
+</section>
+
+<div class="section">
+    
+
+<div class="section">
+  <span style="float: left">
+     Previous:
+    
+    <a href="../create-sequence-ggplots-topdf/">
+       Create sequence of ggplots and send to pdf
+    </a>
+    
+  </span>
+  <span>&nbsp;</span>
+  <span style="float: right">
+     Next: 
+    <a href="../ggplot-coming-to-python/">
+      ggplot coming to Python? 
+    </a>
+    
+  </span>
+</div>
+  
+</div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../">misken</a></h1>
+
+
+
+
+
+
+
+
+  
+<h2>
+   
+  25 March 2013 
+</h2>
+
+<ul>
+   
+<li id="author">
+  <span
+    >Author:</span
+  >
+   
+  <a href="../author/misken/">misken</a>  
+</li>
+    
+<li id="tags">
+  <span
+    >Tags: </span
+  >
+   
+  <a href="../tag/python/">python</a>   
+  <a href="../tag/hillmaker/">hillmaker</a>   
+  <a href="../tag/occupancy-analysis/">occupancy analysis</a>  
+</li>
+ 
+</ul>
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../about/">About misken</a></li>
+</ul>
+
+
+<h3>
+  <a href="../">Recent Posts</a>
+</h3>
+<ul>
+   
+  <li>
+    <a href="../simpy_vaccine_clinic_improvements/"
+      >11 April - Using SimPy to simulate a vaccine clinic - Part 2: model improvements</a
+    >
+  </li>
+  
+  <li>
+    <a href="../simpy_getting_started_vaccine_clinic/"
+      >04 April - Using SimPy to simulate a vaccine clinic - Part 1: an introductory tutorial</a
+    >
+  </li>
+  
+  <li>
+    <a href="../use_jupyter_conda_envs/"
+      >03 April - Using different conda environments with Jupyter Lab</a
+    >
+  </li>
+  
+  <li>
+    <a href="../hello_world/"
+      >02 April - Hello world from ablog blogging with JupyterLab</a
+    >
+  </li>
+  
+  <li>
+    <a href="../first-post/"
+      >01 April - First Post at new blogging site</a
+    >
+  </li>
+  
+</ul>
+
+<h3><a href="../tag/">Tags</a></h3>
+<style type="text/css">
+  ul.ablog-cloud {
+    list-style: none;
+    overflow: auto;
+  }
+  ul.ablog-cloud li {
+    float: left;
+    height: 20pt;
+    line-height: 18pt;
+    margin-right: 5px;
+  }
+  ul.ablog-cloud a {
+    text-decoration: none;
+    vertical-align: middle;
+  }
+  li.ablog-cloud-1 {
+    font-size: 80%;
+  }
+  li.ablog-cloud-2 {
+    font-size: 95%;
+  }
+  li.ablog-cloud-3 {
+    font-size: 110%;
+  }
+  li.ablog-cloud-4 {
+    font-size: 125%;
+  }
+  li.ablog-cloud-5 {
+    font-size: 140%;
+  }
+</style>
+<ul class="ablog-cloud">
+   
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/github/">GitHub</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-3">
+    <a href="../tag/r/">R</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/ablog/">ablog</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/analytics/">analytics</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/bikeshare/">bikeshare</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/birding/">birding</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/blogging/">blogging</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/caret/">caret</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/conda/">conda</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/datetime/">datetime</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/dplyr/">dplyr</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/ebird/">ebird</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/ecology/">ecology</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/excel/">excel</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/ggmap/">ggmap</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/ggplot2/">ggplot2</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/gis/">gis</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/git/">git</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/gps/">gps</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/healthcare/">healthcare</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/hiking/">hiking</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/hillmaker/">hillmaker</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/jupyter/">jupyter</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/matplotlib/">matplotlib</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/metamodeling/">metamodeling</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/occupancy-analysis/">occupancy analysis</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/pandas/">pandas</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/patient-flow/">patient flow</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/plyr/">plyr</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-5">
+    <a href="../tag/python/">python</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/shiny/">shiny</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/simpy/">simpy</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/simulation/">simulation</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/sphinx/">sphinx</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/statistics/">statistics</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/teaching/">teaching</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/text/">text</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/xml/">xml</a>
+  </li>
+   
+</ul>
+
+<h3>
+  <a href="../archive/">Archives</a>
+</h3>
+<ul>
+   
+  <li>
+    <a href="../2022/">2022 (6)</a>
+  </li>
+    
+  <li>
+    <a href="../2021/">2021 (4)</a>
+  </li>
+    
+  <li>
+    <a href="../2020/">2020 (2)</a>
+  </li>
+    
+  <li>
+    <a href="../2019/">2019 (7)</a>
+  </li>
+    
+  <li>
+    <a href="../2018/">2018 (5)</a>
+  </li>
+    
+  <li>
+    <a href="../2017/">2017 (2)</a>
+  </li>
+    
+  <li>
+    <a href="../2016/">2016 (6)</a>
+  </li>
+    
+  <li>
+    <a href="../2014/">2014 (6)</a>
+  </li>
+    
+  <li>
+    <a href="../2013/">2013 (7)</a>
+  </li>
+   
+</ul>
+
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search/" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2022, misken.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.3.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../../_sources/blog/hillpy_bydate_demo.ipynb.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

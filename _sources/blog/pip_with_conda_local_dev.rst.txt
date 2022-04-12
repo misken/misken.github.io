@@ -1,6 +1,7 @@
 .. post:: Mar 15, 2022
    :tags: python, conda
    :author: misken
+   :exclude:
    
    Use the right pip when installing into conda envs
 

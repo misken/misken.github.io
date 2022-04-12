@@ -2,10 +2,131 @@
 <feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en">
   <id>https://misken.github.io/</id>
   <title>Bits of analytics</title>
-  <updated>2022-04-12T01:04:12.234657+00:00</updated>
+  <updated>2022-04-12T12:53:37.955335+00:00</updated>
   <link href="https://misken.github.io/"/>
   <link href="https://misken.github.io/blog/atom.xml" rel="self"/>
   <generator uri="https://ablog.readthedocs.org/" version="0.10.23">ABlog</generator>
+  <entry>
+    <id>https://misken.github.io/blog/getting-started-Python-group-by/</id>
+    <title>Getting started with Python (with pandas and matplotlib) for group by analysis</title>
+    <updated>2013-02-26T00:00:00-05:00</updated>
+    <author>
+      <name>misken</name>
+    </author>
+    <link href="https://misken.github.io/blog/getting-started-Python-group-by/" rel="alternate"/>
+    <summary>Group by analysis with Python</summary>
+    <category term="python" label="python"/>
+    <category term="pandas" label="pandas"/>
+    <category term="matplotlib" label="matplotlib"/>
+    <published>2013-02-26T00:00:00-05:00</published>
+  </entry>
+  <entry>
+    <id>https://misken.github.io/blog/getting-started-R-group-by/</id>
+    <title>Getting started with R (with plyr and ggplot2) for group by analysis</title>
+    <updated>2013-02-26T00:00:00-05:00</updated>
+    <author>
+      <name>misken</name>
+    </author>
+    <link href="https://misken.github.io/blog/getting-started-R-group-by/" rel="alternate"/>
+    <summary>Group by analysis with R</summary>
+    <category term="R" label="R"/>
+    <category term="plyr" label="plyr"/>
+    <category term="ggplot2" label="ggplot2"/>
+    <published>2013-02-26T00:00:00-05:00</published>
+  </entry>
+  <entry>
+    <id>https://misken.github.io/blog/future-of-hillmaker/</id>
+    <title>Future of Hillmaker</title>
+    <updated>2013-02-28T00:00:00-05:00</updated>
+    <author>
+      <name>misken</name>
+    </author>
+    <link href="https://misken.github.io/blog/future-of-hillmaker/" rel="alternate"/>
+    <summary>From Access to Python</summary>
+    <category term="python" label="python"/>
+    <category term="occupancyanalysis" label="occupancy analysis"/>
+    <published>2013-02-28T00:00:00-05:00</published>
+  </entry>
+  <entry>
+    <id>https://misken.github.io/blog/create-sequence-ggplots-topdf/</id>
+    <title>Create sequence of ggplots and send to pdf</title>
+    <updated>2013-03-22T00:00:00-04:00</updated>
+    <author>
+      <name>misken</name>
+    </author>
+    <link href="https://misken.github.io/blog/create-sequence-ggplots-topdf/" rel="alternate"/>
+    <summary>Create sequence of ggplots and send to pdf</summary>
+    <category term="R" label="R"/>
+    <category term="ggplot2" label="ggplot2"/>
+    <published>2013-03-22T00:00:00-04:00</published>
+  </entry>
+  <entry>
+    <id>https://misken.github.io/blog/hillpy_bydate_demo/</id>
+    <title>Computing occupancy statistics with Python - Part 1 of 3</title>
+    <updated>2013-03-25T00:00:00-04:00</updated>
+    <author>
+      <name>misken</name>
+    </author>
+    <link href="https://misken.github.io/blog/hillpy_bydate_demo/" rel="alternate"/>
+    <summary>Computing occupancy statistics by time of day and day of week</summary>
+    <category term="python" label="python"/>
+    <category term="hillmaker" label="hillmaker"/>
+    <category term="occupancyanalysis" label="occupancy analysis"/>
+    <published>2013-03-25T00:00:00-04:00</published>
+  </entry>
+  <entry>
+    <id>https://misken.github.io/blog/ggplot-coming-to-python/</id>
+    <title>ggplot coming to Python?</title>
+    <updated>2013-10-18T00:00:00-04:00</updated>
+    <author>
+      <name>misken</name>
+    </author>
+    <link href="https://misken.github.io/blog/ggplot-coming-to-python/" rel="alternate"/>
+    <summary>Can you use ggplot in Python?</summary>
+    <category term="R" label="R"/>
+    <category term="ggplot2" label="ggplot2"/>
+    <published>2013-10-18T00:00:00-04:00</published>
+  </entry>
+  <entry>
+    <id>https://misken.github.io/blog/learning-python-suggestions-and-resources-for-business-analytics-students-and-professionals/</id>
+    <title>Learning Python - suggestions and resources for business analytics students and professionals</title>
+    <updated>2013-12-18T00:00:00-05:00</updated>
+    <author>
+      <name>misken</name>
+    </author>
+    <link href="https://misken.github.io/blog/learning-python-suggestions-and-resources-for-business-analytics-students-and-professionals/" rel="alternate"/>
+    <summary>Learning Python for analytics</summary>
+    <category term="python" label="python"/>
+    <category term="pandas" label="pandas"/>
+    <category term="matplotlib" label="matplotlib"/>
+    <published>2013-12-18T00:00:00-05:00</published>
+  </entry>
+  <entry>
+    <id>https://misken.github.io/blog/detroit-asa-os-business-analytics/</id>
+    <title>Presentation to Detroit ASA on open source for teaching business analytics</title>
+    <updated>2014-01-01T00:00:00-05:00</updated>
+    <author>
+      <name>misken</name>
+    </author>
+    <link href="https://misken.github.io/blog/detroit-asa-os-business-analytics/" rel="alternate"/>
+    <summary>Presentation to Detroit ASA on open source for teaching business analytics</summary>
+    <category term="R" label="R"/>
+    <category term="python" label="python"/>
+    <category term="teaching" label="teaching"/>
+    <published>2014-01-01T00:00:00-05:00</published>
+  </entry>
+  <entry>
+    <id>https://misken.github.io/blog/great-time-to-be-a-datacomputerengineeringstatmathbusiness-geek/</id>
+    <title>Great time to be a data+computer+engineering+stat+math+business geek</title>
+    <updated>2014-04-12T00:00:00-04:00</updated>
+    <author>
+      <name>misken</name>
+    </author>
+    <link href="https://misken.github.io/blog/great-time-to-be-a-datacomputerengineeringstatmathbusiness-geek/" rel="alternate"/>
+    <summary>Analytics and higher ed</summary>
+    <category term="analytics" label="analytics"/>
+    <published>2014-04-12T00:00:00-04:00</published>
+  </entry>
   <entry>
     <id>https://misken.github.io/blog/datetime_exploring/</id>
     <title>Exploring dates and times in Python</title>
@@ -18,6 +139,77 @@
     <category term="python" label="python"/>
     <category term="datetime" label="datetime"/>
     <published>2014-06-25T00:00:00-04:00</published>
+  </entry>
+  <entry>
+    <id>https://misken.github.io/blog/displaying-state-park-locations-ggmap/</id>
+    <title>Displaying Michigan state park locations: A “getting started with ggmap (and XML)” project</title>
+    <updated>2014-07-01T00:00:00-04:00</updated>
+    <author>
+      <name>misken</name>
+    </author>
+    <link href="https://misken.github.io/blog/displaying-state-park-locations-ggmap/" rel="alternate"/>
+    <summary>Getting started with ggmap and XML</summary>
+    <category term="R" label="R"/>
+    <category term="ggmap" label="ggmap"/>
+    <category term="gis" label="gis"/>
+    <category term="xml" label="xml"/>
+    <published>2014-07-01T00:00:00-04:00</published>
+  </entry>
+  <entry>
+    <id>https://misken.github.io/blog/drupal-to-pelican/</id>
+    <title>Goodbye Drupal: static-blogging with Pelican</title>
+    <updated>2014-11-28T00:00:00-05:00</updated>
+    <author>
+      <name>misken</name>
+    </author>
+    <link href="https://misken.github.io/blog/drupal-to-pelican/" rel="alternate"/>
+    <summary>Static blogging with Pelican</summary>
+    <category term="python" label="python"/>
+    <category term="blogging" label="blogging"/>
+    <published>2014-11-28T00:00:00-05:00</published>
+  </entry>
+  <entry>
+    <id>https://misken.github.io/blog/first-shiny-app/</id>
+    <title>First R Shiny app: Rejection region plots for hypothesis tests</title>
+    <updated>2014-11-30T00:00:00-05:00</updated>
+    <author>
+      <name>misken</name>
+    </author>
+    <link href="https://misken.github.io/blog/first-shiny-app/" rel="alternate"/>
+    <summary>Plotting rejection regions for hypothesis tests using R Shiny</summary>
+    <category term="R" label="R"/>
+    <category term="shiny" label="shiny"/>
+    <category term="teaching" label="teaching"/>
+    <category term="statistics" label="statistics"/>
+    <published>2014-11-30T00:00:00-05:00</published>
+  </entry>
+  <entry>
+    <id>https://misken.github.io/blog/hillmaker-python-released/</id>
+    <title>New version of hillmaker (finally) released - and it’s Python</title>
+    <updated>2016-01-22T00:00:00-05:00</updated>
+    <author>
+      <name>misken</name>
+    </author>
+    <link href="https://misken.github.io/blog/hillmaker-python-released/" rel="alternate"/>
+    <summary>Analytics and higher ed</summary>
+    <category term="python" label="python"/>
+    <category term="hillmaker" label="hillmaker"/>
+    <category term="occupancyanalysis" label="occupancy analysis"/>
+    <published>2016-01-22T00:00:00-05:00</published>
+  </entry>
+  <entry>
+    <id>https://misken.github.io/blog/concat-csv-pandas/</id>
+    <title>Concatenating csv files using pandas</title>
+    <updated>2016-03-09T00:00:00-05:00</updated>
+    <author>
+      <name>misken</name>
+    </author>
+    <link href="https://misken.github.io/blog/concat-csv-pandas/" rel="alternate"/>
+    <summary>Concatenating csv files using pandas</summary>
+    <category term="python" label="python"/>
+    <category term="pandas" label="pandas"/>
+    <category term="text" label="text"/>
+    <published>2016-03-09T00:00:00-05:00</published>
   </entry>
   <entry>
     <id>https://misken.github.io/blog/otbirders_1_ebirdapi_python_1/</id>
@@ -161,6 +353,7 @@ wanted to be able to download data directly from the Garmin to my laptop
 using software available for Ubuntu. My initial goals were:</summary>
     <category term="gis" label="gis"/>
     <category term="hiking" label="hiking"/>
+    <category term="gps" label="gps"/>
     <published>2018-07-13T00:00:00-04:00</published>
   </entry>
   <entry>
@@ -214,8 +407,8 @@ using software available for Ubuntu. My initial goals were:</summary>
     </author>
     <link href="https://misken.github.io/blog/logmetrics/" rel="alternate"/>
     <summary>Firewood metrics and simulating firewood use</summary>
-    <category term="jupyter" label="jupyter"/>
-    <category term="ablog" label="ablog"/>
+    <category term="python" label="python"/>
+    <category term="simulation" label="simulation"/>
     <published>2019-01-02T00:00:00-05:00</published>
   </entry>
   <entry>

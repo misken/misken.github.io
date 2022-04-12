@@ -1,0 +1,992 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>Learning Python - suggestions and resources for business analytics students and professionals &#8212; misken 0,1,0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css" />
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <link rel="author" title="About these documents" href="../../about/" />
+    <link rel="index" title="Index" href="../../genindex/" />
+    <link rel="search" title="Search" href="../../search/" /> 
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+ 
+<link
+  rel="alternate"
+  type="application/atom+xml"
+  href="../../blog/atom.xml"
+  title="Bits of analytics"
+/>
+ 
+<style type="text/css">
+  ul.ablog-archive {
+    list-style: none;
+    overflow: auto;
+    margin-left: 0px;
+  }
+  ul.ablog-archive li {
+    float: left;
+    margin-right: 5px;
+    font-size: 80%;
+  }
+  ul.postlist a {
+    font-style: italic;
+  }
+  ul.postlist-style-disc {
+    list-style-type: disc;
+  }
+  ul.postlist-style-none {
+    list-style-type: none;
+  }
+  ul.postlist-style-circle {
+    list-style-type: circle;
+  }
+</style>
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+             <section id="learning-python-suggestions-and-resources-for-business-analytics-students-and-professionals">
+<h1>Learning Python - suggestions and resources for business analytics students and professionals<a class="headerlink" href="#learning-python-suggestions-and-resources-for-business-analytics-students-and-professionals" title="Permalink to this headline">¶</a></h1>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>(Apr 12, 2022) This post is hilariously old and outdated but it’s fun to look back.</p>
+</div>
+<div
+class="field field-name-body field-type-text-with-summary field-label-hidden"><div class="field-items"><div class="field-item even" property="content:encoded"><p>As I’ve been learning and using Python more and more for business
+analytics’ey things that I previously would have done in Excel or Access
+with some VBA sprinkled in, I thought it would be a good idea to put
+together a list of some of the resources I’ve found to be useful. As you
+start to read this, you’ll notice that there are quite a few references
+to “scientific computing” and “scientists”. There are many similarities
+between the scientific computing (as done by computing inclined
+scientists) and the business analytics computing done by business
+analysts. Both are communities of folks whose full time job is NOT to
+develop software but who do end up using sophisticated computing tools
+and doing a fair bit of computer programming. Both are dealing with
+increasingly large and varied data sets. Both need to worry about
+efficient and reproducible workflows. Many in both camps do end up
+developing software tools. Both are increasingly turning to tools like
+Python and R. Both need good resources for learning to effectively use
+such tools. Business analytics people are very comfortable creating
+crazy big Excel spreadsheets, dabbling in SQL, and maybe doing some VBA
+programming. The parallel world of tools like Python and R requires some
+getting used to but is well worth the investment in time (IMHO).</p>
+</p><div class="toc-filter toc-filter-number"><div class="toc-filter-content"><section id="contents">
+<h2>Contents<a class="headerlink" href="#contents" title="Permalink to this headline">¶</a></h2>
+<ol class="arabic simple">
+<li><p><a class="reference external" href="#what-is-python-and-why-is-it-called-python-">What is Python and why is it called
+Python?</a></p></li>
+<li><p><a class="reference external" href="#which-python-">Which Python?</a></p></li>
+<li><p><a class="reference external" href="#setting-up-your-sci-computing-python-environment">Setting up your sci-computing Python
+environment</a></p></li>
+<li><p><a class="reference external" href="#writing-python-programs">Writing Python programs</a></p></li>
+<li><p><a class="reference external" href="#collections-of-links-to-tutorials">Collections of links to
+tutorials</a></p></li>
+<li><p><a class="reference external" href="#general-and-data-science-focused-python-tutorials-and-e-books">General and data science focused Python tutorials and
+[e]Books</a></p></li>
+<li><p><a class="reference external" href="#open-access-courses">Open access courses</a></p></li>
+<li><p><a class="reference external" href="#toolbox">Toolbox</a></p></li>
+<li><p><a class="reference external" href="#musings-on-python-open-source-software-and-reproducible-analysis">Musings on Python, open source software and reproducible
+analysis</a></p></li>
+<li><p><a class="reference external" href="#general-python-resources">General Python resources</a></p></li>
+<li><p><a class="reference external" href="#the-python-packaging-ecosystem">The Python packaging ecosystem</a></p></li>
+</ol>
+</div></div></p><div class="toc-filter-back-to-top first"><p><a class="reference external" href="#top">Back to top</a></p>
+</div><section id="what-is-python-and-why-is-it-called-python">
+<h3>1. What is Python and why is it called Python?<a class="headerlink" href="#what-is-python-and-why-is-it-called-python" title="Permalink to this headline">¶</a></h3>
+</p><p><a class="reference external" href="http://en.wikipedia.org/wiki/Python_%28programming_language%29">Python (programming
+language)</a></p>
+</p><div class="toc-filter-back-to-top"><p><a class="reference external" href="#top">Back to top</a></p>
+</div></section>
+<section id="which-python">
+<h3>2. Which Python?<a class="headerlink" href="#which-python" title="Permalink to this headline">¶</a></h3>
+</p><p>As you get started learning Python, it’s unavoidable that you’ll run
+into the <a class="reference external" href="https://wiki.python.org/moin/Python2orPython3">Python 2 vs Python 3
+question</a> question.
+For now, I’m still using Python 2.7.3. Before downloading Python from
+<a class="reference external" href="http://python.org/">python.org</a>, read the next section of setting up
+your sci-computing Python environment.</p>
+</p><div class="toc-filter-back-to-top"><p><a class="reference external" href="#top">Back to top</a></p>
+</div></section>
+<section id="setting-up-your-sci-computing-python-environment">
+<h3>3. Setting up your sci-computing Python environment<a class="headerlink" href="#setting-up-your-sci-computing-python-environment" title="Permalink to this headline">¶</a></h3>
+</p><p>While you can certainly get Python and the various modules needed to get
+yourself setup to do some analytics or sci-computing, it’s easier to
+install one of the <a class="reference external" href="http://www.scipy.org/install.html">prepackaged Python
+distributions</a> containing the
+<a class="reference external" href="http://www.scipy.org/stackspec.html#stackspec">SciPy Stack</a>. The
+SciPy Stack specification contains the minimal set of Python packages
+one should have for sci-computing and includes things like Python
+itself, numpy, scipy, matplotlib, pandas, IPython, Sympy, and nose. Of
+course, there are a zillion more useful packages, some of which I’ll
+mention below. I have had good luck with the <a class="reference external" href="https://www.enthought.com/products/canopy/">Enthought
+Canopy</a> Python
+distribution for scientific computing. It includes not only the SciPy
+Stack but a ton of other useful packages. In addition, it’s got an
+integrated update manager that makes it easy to keep all your
+sci-computing packages up to date. Since Canopy uses virtualenv to
+create its own virtual Python environment, local users can handle all
+their own updates and you don’t mess around with your core Python
+system. Canopy also has a built in code editor and embedded IPython
+console.</p>
+</p><p>Recently (Feb 2014) I installed another leading sci-computing Python
+distro - <a class="reference external" href="https://store.continuum.io/cshop/anaconda/">Anaconda from Continuum
+Analytics</a>. It looks
+every bit as good as Canopy and I’m looking forward to working with it.</p>
+</p><div class="toc-filter-back-to-top"><p><a class="reference external" href="#top">Back to top</a></p>
+</div></section>
+<section id="writing-python-programs">
+<h3>4. Writing Python programs<a class="headerlink" href="#writing-python-programs" title="Permalink to this headline">¶</a></h3>
+</p><p>Now that you’ve got Python installed, what tools will you use to write
+Python programs? Also, since Python can be used in “interactive mode”,
+you’ll also want some tools for doing that. Let’s look at tools for
+interactive use first since that’s a natural way to start to learn to
+program in Python.</p>
+</p></section>
+</section>
+<section id="using-python-interactively">
+<h2>Using Python interactively<a class="headerlink" href="#using-python-interactively" title="Permalink to this headline">¶</a></h2>
+</p><p>Python ships with a bare bones interactive console called
+<a class="reference external" href="http://en.wikipedia.org/wiki/IDLE_%28Python%29">IDLE</a>. A much better
+interactive console is called <a class="reference external" href="http://ipython.org/">IPython</a>. It is
+an “architecture and toolset” for doing interactive computing with
+Python. I love IPython. It’s terrific for interactively hacking around
+and doing analysis with Python. The interface is reminiscent of tools
+like Matlab or Mathematica. There’s a browser based tool called an
+IPython Notebook that, well, let’s you use IPython right from a browser
+window. The ability to mix runnable Python code with
+<a class="reference external" href="http://daringfireball.net/projects/markdown/">markdown</a> text makes
+IPython great for developing tutorials and documenting analysis
+workflows. It’s a must-have. You can find links to several resources for
+learning IPython further down in this document. Both Canopy and Anaconda
+have various IPython shells built in.</p>
+</p></section>
+<section id="text-editors-and-ides-for-writing-python-programs">
+<h2>Text editors and IDEs for writing Python programs<a class="headerlink" href="#text-editors-and-ides-for-writing-python-programs" title="Permalink to this headline">¶</a></h2>
+</p><p>While certainly you can just write Python code in a text editor, I like
+a good IDE. For Python on Windows, a nice lightweight IDE is
+<a class="reference external" href="http://code.google.com/p/pyscripter/">PyScripter</a>. I’ve also been
+using <a class="reference external" href="https://code.google.com/p/spyderlib/">Spyder</a> on both Windows
+and Linux (though it doesn’t have a visual debugger, just a command line
+debugger). An IDE that looks promising is is the new community edition
+of
+<a class="reference external" href="http://blog.jetbrains.com/pycharm/2010/01/pycharm-py-is-for-python-charm-is-about-the-ide/">PyCharm</a>
+which I just installed a few days ago. I’ve also been using the editor
+built into Canopy. If you search StackOverflow (and Google in general)
+for a discussion on Python IDEs, you get a good sense of the landscape.
+Lots of folks are quite happy with editors like vim and emacs. Many
+editors have syntax highlighting including widely used tools like
+<a class="reference external" href="http://notepad-plus-plus.org/">Notepad++</a> on Windows and
+<a class="reference external" href="https://wiki.gnome.org/Apps/Gedit/">gedit</a> on Linux. For those used
+to <a class="reference external" href="http://www.eclipse.org/downloads/moreinfo/java.php#!">Eclipse as their Java
+IDE</a>, there is
+a plug-in called <a class="reference external" href="http://pydev.org/">PyDev</a>. However, Eclipse is a
+bit of overkill for cranking out beginner Python code. I’d start with
+something like PyScripter or PyCharm or Spyder. I’m not sure about the
+first two, but Spyder has both IDLE and IPython interactive consoles
+embedded in them. Also, get comfortable with IPython Notebooks as they
+are really useful for creating your own “tutorials” that contain a
+mixture of interactive code and text written in markdown. My Python
+tutorials on hselab.org were done this way and there are links to the
+actual notebooks hosted on GitHub.</p>
+</p><div class="toc-filter-back-to-top"><p><a class="reference external" href="#top">Back to top</a></p>
+</div><section id="collections-of-links-to-tutorials">
+<h3>5. Collections of links to tutorials<a class="headerlink" href="#collections-of-links-to-tutorials" title="Permalink to this headline">¶</a></h3>
+</p><p><a class="reference external" href="https://wiki.python.org/moin/BeginnersGuide/NonProgrammers">Collection of tutorials links for new Python
+programmers</a>
+From the official Python.org site.</p>
+</p><p><a class="reference external" href="http://net.tutsplus.com/tutorials/the-best-way-to-learn-python/">The Best Way to Learn
+Python</a>
+Kind of a meta-tutorial that guides you to a bunch of web based
+resources for learning Python.</p>
+</p><p><a class="reference external" href="http://datacommunitydc.org/blog/2013/07/python-for-data-analysis-the-landscape-of-tutorials/">Python for Data Analysis: The Landscape of
+Tutorials</a>
+Another nice collection of links to tutorials and resources for learning
+Python for doing data analysis.</p>
+</p><div class="toc-filter-back-to-top"><p><a class="reference external" href="#top">Back to top</a></p>
+</div></section>
+<section id="general-and-data-science-focused-python-tutorials-and-e-books">
+<h3>6. General and data science focused Python tutorials and [e]Books<a class="headerlink" href="#general-and-data-science-focused-python-tutorials-and-e-books" title="Permalink to this headline">¶</a></h3>
+</p><p><a class="reference external" href="http://docs.python.org/2/tutorial/">The Official Python Tutorial</a>
+Straight from the source.</p>
+</p><p><a class="reference external" href="http://software-carpentry.org/">Software Carpentry</a></p>
+</p><p>This is a fantastic resource aimed at teaching scientists how to be
+better software developers. In their words:</p>
+</p><p>
+
+ We run bootcamps all over the world, and provide open access
+ material for self-paced instruction.
+
+ .. raw:: html
+
+    </p>
+
+ .. raw:: html
+
+    <p></p><p>Their Lessons section has a large number of scientific computing
+tutorials which include screencasts and slides. The <a class="reference external" href="http://software-carpentry.org/v4/python/">Python
+section</a> is just one of
+many. Other topics include things like version control, the Shell,
+regular expressions, databases, and many, many more.</p>
+</p><p><a class="reference external" href="http://blog.yhathq.com/posts/data-science-in-python-tutorial.html">Data Science in
+Python</a></p>
+</p><p>Nice collection of IPython notebooks to provide intro to using Python
+for data science work. From <a class="reference external" href="http://www.yhathq.com/">y-hat</a>.</p>
+</p><p><a class="reference external" href="https://www.kaggle.com/wiki/GettingStartedWithPythonForDataScience">Getting Started with Python for Data
+Science</a></p>
+</p><p>This is from the folks at <a class="reference external" href="https://www.kaggle.com/">kaggle.com</a> who
+have turned data mining into a combination of a sport and community
+activity.</p>
+</p><p><a class="reference external" href="http://www.pythontutor.com/">Online Python Tutor</a></p>
+</p><p>Simply amazing web based tool that lets you visualize Python program
+execution. You can even use it from within an IPython notebook. And you
+can embed and/or share your program visualizations with others - the
+Online Python Tutor generates embed code or a URL. Wow.
+<a class="reference external" href="http://www.learnpython.org/">learnpython.org</a> An interactive Python
+tutorial.</p>
+</p><p><a class="reference external" href="http://en.wikibooks.org/wiki/Non-Programmer%27s_Tutorial_for_Python_2.6">Wikibooks Non-programmers tutorial for
+Python</a></p>
+</p><p>Aimed at folks with little to no programming experience.</p>
+</p><p><a class="reference external" href="http://learnpythonthehardway.org/book/">Learn Python the Hard Way</a></p>
+</p><p>Free HTML “book” with optional videos for purchase.</p>
+</p><p><a class="reference external" href="http://www.greenteapress.com/thinkpython/thinkpython.html">Think Python: How to think like a computer
+scientist</a></p>
+</p><p>Free eBook.</p>
+</p><p><a class="reference external" href="http://www.codecademy.com/tracks/python">Code Academy Python
+tutorial</a></p>
+</p><p>I haven’t checked out this tutorial much myself but have had some
+students mention that they were using it to learn Python. <a class="reference external" href="https://wiki.python.org/moin/PythonBooks">Python
+books</a> List of Python books
+compiled by the Python people.</p>
+</p><p><a class="reference external" href="http://www.amazon.com/Learning-Python-Edition-Mark-Lutz/dp/1449355730">Learning Python
+(Lutz)</a></p>
+</p><p>Nice first book for learning Python.</p>
+</p><p><a class="reference external" href="http://practicalcomputing.org/">Practical Computing for Biologists</a></p>
+</p><p>Terrific book that covers all kinds of practical ground for becoming a
+more effective scientific programmer. They use Python. Someone needs to
+write “Practical Computing for Business Analysts”.</p>
+</p><p><a class="reference external" href="http://www.barnesandnoble.com/listing/2686727554569?r=1&amp;cm_mmca2=pla&amp;cm_mmc=GooglePLA-_-TextBook_NotInStock_75Up-_-Q000000633-_-2686727554569">A Primer on Scientific Programming with
+Python</a></p>
+</p><p>Hardcover and pricey, but quite good.</p>
+</p><div class="toc-filter-back-to-top"><p><a class="reference external" href="#top">Back to top</a></p>
+</div></section>
+<section id="open-access-courses">
+<h3>7. Open access courses<a class="headerlink" href="#open-access-courses" title="Permalink to this headline">¶</a></h3>
+</p><p><a class="reference external" href="https://www.udacity.com/course/cs101">Udacity - Intro to Computer Science
+101</a></p>
+</p><p>Learn Python while building a search engine</p>
+</p><p><a class="reference external" href="https://www.udacity.com/course/ud359">Udacity - Intro to Data
+Science</a></p>
+</p><p>Assumes basic knowledge of Python and statistics.</p>
+</p><p><a class="reference external" href="https://www.coursera.org/course/datasci">Coursera - Introduction to Data
+Science</a></p>
+</p><p>Not so much a Python course as a data science course that uses Python
+among other tools. I really like the design of the course in terms of
+topical coverage and the balancing act required in terms of trying to
+serve both computing and analytics folks. Parallels between
+sci-computing and business analytics computing are nicely covered.</p>
+</p><p><a class="reference external" href="http://ocw.mit.edu/courses/electrical-engineering-and-computer-science/6-189-a-gentle-introduction-to-programming-using-python-january-iap-2008/">MIT - A Gentle Introduction to Programming with
+Python</a></p>
+</p><p>Part of the MIT Open Courseware initiative</p>
+</p><p><a class="reference external" href="http://cs109.org/">Harvard - Intro to Data Science 109</a></p>
+</p><p>Top notch data science course. Python used.</p>
+</p><p><a class="reference external" href="http://quant-econ.net/index.html">Quantitative Economics</a></p>
+</p><p>A set of lectures on quant econ modeling using Python. Includes info on
+getting your sci-computing environment set up.</p>
+</p><div class="toc-filter-back-to-top"><p><a class="reference external" href="#top">Back to top</a></p>
+</div></section>
+<section id="toolbox">
+<h3>8. Toolbox<a class="headerlink" href="#toolbox" title="Permalink to this headline">¶</a></h3>
+</p><p>There are a huge number of Python packages and tools for doing
+analytical work. I’m just going to mention a few of the biggies. I want
+to give a shout out to the very nice compilation of Python data analysis
+related tutorial links at <a class="reference external" href="http://datacommunitydc.org/blog/2013/07/python-for-data-analysis-the-landscape-of-tutorials/">Python for Data Analysis: The Landscape of
+Tutorials</a>
+as I’ve gotten a number of links from this post.</p>
+</p></section>
+</section>
+<section id="scipy-and-numpy-and-friends">
+<h2><a class="reference external" href="http://www.scipy.org/about.html">SciPy and numpy and friends</a><a class="headerlink" href="#scipy-and-numpy-and-friends" title="Permalink to this headline">¶</a></h2>
+</p><p>
+
+ SciPy (pronounced “Sigh Pie”) is a Python-based ecosystem of
+ open-source software for mathematics, science, and engineering.
+ numpy and SciPy are the bedrock of scientific computing in Python
+ providing a powerful n-dimensional array construct as well as core
+ scientific computing functionality.
+
+ .. raw:: html
+
+    </p>
+
+ .. raw:: html
+
+    <p></p><ul class="simple">
+<li><p><a class="reference external" href="http://conference.scipy.org/scipy2012/index.php">SciPy2012
+Conference</a> - the
+conference for the SciPy world.</p></li>
+</ul>
+</p></section>
+<section id="pandas-python-data-analysis-library">
+<h2><a class="reference external" href="http://pandas.pydata.org/">pandas - Python Data Analysis Library</a><a class="headerlink" href="#pandas-python-data-analysis-library" title="Permalink to this headline">¶</a></h2>
+</p><p>A must-have library for doing data crunching in Python. Developed by
+<a class="reference external" href="http://blog.wesmckinney.com/">Wes McKinney</a>. Pandas includes
+DataFrames and Series data structures and all kinds of methods for
+working with them. It includes tools for data IO, data prep, data
+transformation, data modeling, data analysis, data visualization, and
+data presentation. It uses numpy and matplotlib under the hood.</p>
+</p><ul class="simple">
+<li><p><a class="reference external" href="http://pandas.pydata.org/pandas-docs/stable/cookbook.html">pandas
+cookbook</a>
+- <em>“This is a respository for short and sweet examples and links for
+useful pandas recipes.”</em></p></li>
+<li><p><a class="reference external" href="http://vimeo.com/59324550">Wes McKinney’s 10 minute pandas overview
+vid</a> - get a quick demo from pandas
+founder. Longer tutorials from WM can be found
+<a class="reference external" href="http://youtu.be/MxRMXhjXZos">here</a> and
+<a class="reference external" href="http://youtu.be/w26x-z-BdWQ">here</a>.</p></li>
+<li><p><a class="reference external" href="http://www.gregreda.com/2013/10/26/intro-to-pandas-data-structures/">Intro to pandas data
+structures</a>
+- nice introductory tutorial aimed at those coming from the SQL
+world.</p></li>
+<li><p><a class="reference external" href="http://www.randalolson.com/2012/08/06/statistical-analysis-made-easy-in-python/">Statistical analysis with SciPy and
+pandas</a>
+- an IPython notebook based tutorial on doing stats using Python +
+SciPy + pandas</p></li>
+</ul>
+</p></section>
+<section id="ipython">
+<h2><a class="reference external" href="http://ipython.org/">IPython</a><a class="headerlink" href="#ipython" title="Permalink to this headline">¶</a></h2>
+</p><p>An architecture and toolset for doing interactive computing with Python.
+It was developed by <a class="reference external" href="http://blog.fperez.org/2012/01/ipython-notebook-historical.html">Fernando Perez and
+others.</a>
+I love IPython. It’s terrific for interactively hacking around and doing
+analysis with Python. The interface is reminiscent of tools like Matlab
+or Mathematica. There’s a browser based tool called an IPython Notebook
+that, well, let’s you use IPython right from a browser window. The
+ability to mix runnable Python code with
+<a class="reference external" href="http://daringfireball.net/projects/markdown/">markdown</a> text makes
+IPython great for developing tutorials and documenting analysis
+workflows. It’s a must-have.</p>
+</p><ul class="simple">
+<li><p><a class="reference external" href="http://ipython.org/ipython-doc/stable/interactive/tutorial.html">Official IPython
+Tutorial</a>
+- A very good place to start.</p></li>
+<li><p><a class="reference external" href="https://github.com/ipython/ipython/tree/master/examples/notebooks#a-collection-of-notebooks-for-using-ipython-effectively">A collection of notebooks for using IPython
+effectively</a>
+- Become an effective IPython user.</p></li>
+<li><p><a class="reference external" href="http://nbviewer.ipython.org/">IPython Notebook Viewer</a> -
+<em>“IPython Notebook Viewer (or nbviewer in short) is a free webservice
+that allows you to see static html versions of hosted notebook files.
+As long as a notebook is publicly available, by giving its url to
+nbviewer you should be able to view it.”</em></p></li>
+<li><p><a class="reference external" href="https://github.com/ipython/ipython/wiki/A-gallery-of-interesting-IPython-Notebooks">A gallery of interesting IPython
+notebooks</a>
+- Hosted at github, this is a HUGE, curated collection of notable
+IPython notebooks on many sci-computing related topics. Some are
+companions to books, some are tutorials, some are demonstrations,
+some are…</p></li>
+<li><p><a class="reference external" href="http://www.amazon.com/gp/product/1782169938/">Learning IPython for interactive computing and
+visualization</a> - A
+physical book. - You can find a bunch of great videos and slides on
+the development, evolution and how-to use of IPython at
+<a class="reference external" href="http://ipython.org/videos.html">http://ipython.org/videos.html</a></p></li>
+</ul>
+</p></section>
+<section id="matplotlib">
+<h2><a class="reference external" href="http://matplotlib.org/">matplotlib</a><a class="headerlink" href="#matplotlib" title="Permalink to this headline">¶</a></h2>
+</p><p>Matplotlib is a widely used plotting library. It’s very powerful and has
+great documentation with tons of examples. It was developed by <a class="reference external" href="http://numfocus.org/johnhunter.html">John
+Hunter</a> who sadly passed away in
+2012. Part of Python’s rise as a force in the sci-computing world is
+certainly due to matplotlib.</p>
+</p><p>
+
+ matplotlib is a python 2D plotting library which produces
+ publication quality figures in a variety of hardcopy formats and
+ interactive environments across platforms.
+
+ .. raw:: html
+
+    </p>
+
+ .. raw:: html
+
+    <p></p><p>matplotlib can be used in python scripts, the python and ipython shell
+(ala MATLAB®* or Mathematica®†), web application servers, and six
+graphical user interface toolkits. You can use matplotlib as an
+interactive plotting tool (ala Matlab) using its pyplot command or in
+more of an API based programmatic way. Here are some good links to
+matplotlib tutorials that I pulled directly from <a class="reference external" href="http://datacommunitydc.org/blog/2013/07/python-for-data-analysis-the-landscape-of-tutorials/">A. Dasgupta’s “Python
+for Data Analysis: The Landscape of
+Tutorials”</a>:</p>
+</p><ul class="simple">
+<li><p><a class="reference external" href="http://matplotlib.org/users/pyplot_tutorial.html">Official matplotlib.pyplot
+tutorial</a> -
+<a class="reference external" href="http://www.loria.fr/%7Erougier/teaching/matplotlib/">N.P. Rougier’s tutorial from EuroSciPy
+2012</a></p></li>
+<li><p><a class="reference external" href="http://jakevdp.github.io/mpl_tutorial/">Jake VanderPlas’ tutorial from PyData NYC
+2012</a></p></li>
+<li><p><a class="reference external" href="http://www.youtube.com/watch?v=DNRJwENqEUY">John Hunter’s Advanced Matplotlib Tutorial from PyData
+2012</a></p></li>
+<li><p><a class="reference external" href="https://sites.google.com/site/scigraphs/tutorial">A tutorial from
+Scigraph</a></p></li>
+</ul>
+</p></section>
+<section id="scikit-learn">
+<h2><a class="reference external" href="http://scikit-learn.org/stable/">scikit-learn</a><a class="headerlink" href="#scikit-learn" title="Permalink to this headline">¶</a></h2>
+</p><p>Tools for all kinds of “machine learning” algorithms and tools for
+classification, clustering, regression, dimensionality reduction, model
+selection and data preprocessing. It’s built on top of tools like numpy,
+SciPy, and matplotlib.</p>
+</p></section>
+<section id="statsmodels">
+<h2><a class="reference external" href="http://statsmodels.sourceforge.net/">statsmodels</a><a class="headerlink" href="#statsmodels" title="Permalink to this headline">¶</a></h2>
+</p><p>This is a Python package that contains all kinds of statistical analysis
+functionality. It’s not as comprehensive as R but but has the advantage
+of being part of a general programming language, Python, instead of a
+domain specific language like R. Regarding R on the data processing
+side, I find myself preferring Python and then using R for the stats.
+However, I do also end up doing a fair bit of data prep work in R during
+course of an analysis (e.g. output dataframe needing some transforming
+or reshaping for next stage of analysis). Having a full-fledged
+programming language with strong support for data prep (including regex)
+is really nice. I also find myself doing more and more statistical work
+in Python, especially when I’m embedding some kind of statistical model
+in some sort of analytical application or tool. Bottom line, it’s worth
+knowing both for both data handling and stats. The R and Python+(various
+goodies) worlds are colliding:</p>
+</p><ul class="simple">
+<li><p>Using R from Python is pretty easy via
+<a class="reference external" href="http://rpy.sourceforge.net/rpy2.html">Rpy2</a></p></li>
+<li><p>Go the other direction with
+<a class="reference external" href="http://rpython.r-forge.r-project.org/">rPython</a></p></li>
+<li><p>Closed but <a class="reference external" href="http://programmers.stackexchange.com/questions/181342/r-vs-python-for-data-analysis">good discussion on stackehange on R vs Python for data
+analysis</a></p></li>
+<li><p>ggplot2 (R) is usually considered somewhat better than matplotlib
+(mainly due to “grammar of graphics” foundation of ggplot2) but
+<a class="reference external" href="http://blog.yhathq.com/posts/ggplot-for-python.html">y-hat released ggplot -like plotting engine for
+Python</a>.</p></li>
+<li><p>pandas and statsmodels are Python packages that are terrific for
+stats and data analysis</p></li>
+</ul>
+</p></section>
+<section id="sphinx">
+<h2><a class="reference external" href="http://sphinx-doc.org/">Sphinx</a><a class="headerlink" href="#sphinx" title="Permalink to this headline">¶</a></h2>
+</p><p>Sphinx is a
+<a class="reference external" href="http://docutils.sourceforge.net/rst.html">reStructuredText</a> based
+documentation generation system for Python. It makes writing
+documentation fun.</p>
+</p><p>
+
+ Sphinx is a tool that makes it easy to create intelligent and
+ beautiful documentation, ...
+
+ .. raw:: html
+
+    </p>
+
+ .. raw:: html
+
+    <p></p><p>reStructuredText is an easy-to-read, <a class="reference external" href="http://xkcd.com/1341/">what-you-see-is-what-you-get
+plaintext markup syntax and parser system</a>.
+reST is part of
+<a class="reference external" href="http://docutils.sourceforge.net/index.html">docutils</a>, an open
+source text processing system that takes documentation written in plain
+text and converts it to useful formats like HTML, pdf, LaTex, and
+others. The official Python documentation is written in reST and reST is
+used for <a class="reference external" href="http://www.python.org/dev/peps/pep-0257/">docstrings</a> in
+Python code. Docstrings are just literal string comments included in
+source code that can be read, parsed, and used to automatically generate
+documentation. When you write docstrings, you write them in reST. Once
+you get used to it, you’ll wonder how you ever did without it. While
+Sphinx and reST are ubiquitous in the Python doc world, you can use them
+for general documentation and writing. I wrote documentation for a Java
+based computer simulation model using Sphinx and reST. I generated HTML
+but could have generated other output formats as well. Best of all, you
+just write the documentation in a text editor (many of which are reST
+aware). It’s genius.</p>
+</p></section>
+<section id="pytables">
+<h2><a class="reference external" href="http://pytables.github.io/">PyTables</a><a class="headerlink" href="#pytables" title="Permalink to this headline">¶</a></h2>
+</p><p>Built on top of <a class="reference external" href="http://www.h5py.org/">HDF5 - Hierarchical Data
+Format</a>, PyTables provides tools for working
+with large datasets in Python. &gt; PyTables is a package for managing
+hierarchical datasets and designed to efficiently and easily cope with
+extremely large amounts of data.</p>
+</p><div class="toc-filter-back-to-top"><p><a class="reference external" href="#top">Back to top</a></p>
+</div><section id="musings-on-python-open-source-software-and-reproducible-analysis">
+<h3>9. Musings on Python, open source software and reproducible analysis<a class="headerlink" href="#musings-on-python-open-source-software-and-reproducible-analysis" title="Permalink to this headline">¶</a></h3>
+</p><p><a class="reference external" href="http://numfocus.org/about.html">NumFocus: Open Code, Better Science</a></p>
+</p><p>A non-profit foundation dedicated to supporting better sci-computing.</p>
+</p><p>
+
+ Mission: to promote accessible and reproducible computing in science
+ and technology.
+
+ .. raw:: html
+
+    </p>
+
+ .. raw:: html
+
+    <p></p><p><a class="reference external" href="http://blog.fperez.org/2013/04/literate-computing-and-computational.html">Fernando Perez’s blog on open and literate scientific
+programming</a></p>
+</p><p>The developer of IPython writes eloquently about these topics.</p>
+</p><p><a class="reference external" href="http://ivory.idyll.org/blog/category/python.html">Living in an Ivory
+Basement</a></p>
+</p><p>C. Titus Brown is a computational biologist at Michigan State
+University. He’s got a great blog on scientific computing with lots of
+Python thrown in.</p>
+</p><p><a class="reference external" href="http://blog.wesmckinney.com/">Wes McKinney</a></p>
+</p><p>The pandas developer who has recently launched a <a class="reference external" href="http://www.datapad.io/">new data analytics
+venture</a>.</p>
+</p><p><a class="reference external" href="http://blog.yhathq.com/">yhat</a> (pronounced “why hat”)</p>
+</p><p>This is a company focused on providing a cloud platform for analytics.
+They create interesting tools with and write interesting things about
+Python and R.</p>
+</p><p><a class="reference external" href="http://software-carpentry.org/blog/index.html#recent-posts">Software Carpentry
+Blog</a></p>
+</p><p><a class="reference external" href="http://jakevdp.github.io/">Pythonic Perambulations</a></p>
+</p><p><a class="reference external" href="http://www.stat.washington.edu/~hoytak/blog/whypython.html">10 reasons Python rocks for
+research</a></p>
+</p><p><a class="reference external" href="http://blog.stodden.net/category/reproducible-research/">Victoria Stodden’s bloggings on reproducible
+research</a></p>
+</p><div class="toc-filter-back-to-top"><p><a class="reference external" href="#top">Back to top</a></p>
+</div></section>
+<section id="general-python-resources">
+<h3>10. General Python resources<a class="headerlink" href="#general-python-resources" title="Permalink to this headline">¶</a></h3>
+</p><p><a class="reference external" href="http://www.python.org/">Official Python site</a></p>
+</p><p><a class="reference external" href="https://pypi.python.org/pypi">PyPI - the Python Package Index</a></p>
+</p><p>The Python Package Index is a repository of software for the Python
+programming language. It’s the
+<a class="reference external" href="http://cran.us.r-project.org/index.html">CRAN</a> of Python world.</p>
+</p><p><a class="reference external" href="http://pyvideo.org/">pyvideo.org</a></p>
+</p><p>Index for Python related videos</p>
+</p><p><a class="reference external" href="http://stackoverflow.com/">StackOverflow</a></p>
+</p><p>StackOverflow is your friend. It’s a very good Q&amp;A site for all things
+programmatical. You can learn a lot just by browsing threads of
+interest. It’s the first place I go to when trying to figure out some
+Pythonic thing. It uses tags to help you find things.</p>
+</p><p>
+
+ Stack Overflow is a question and answer site for professional and
+ enthusiast programmers. It's 100% free, no registration required.
+
+ .. raw:: html
+
+    </p>
+
+ .. raw:: html
+
+    <p></p><div class="toc-filter-back-to-top"><p><a class="reference external" href="#top">Back to top</a></p>
+</div></section>
+<section id="the-python-packaging-ecosystem">
+<h3>11. The Python packaging ecosystem<a class="headerlink" href="#the-python-packaging-ecosystem" title="Permalink to this headline">¶</a></h3>
+</p><p>This is not a beginner topic but you’ll have to deal with it eventually.
+The following two articles will lead you into the morass.</p>
+</p><p><a class="reference external" href="http://dabapps.com/blog/introduction-to-pip-and-virtualenv-python/">A non-magical introduction to Pip and Virtualenv for Python
+beginners</a></p>
+</p><p><a class="reference external" href="http://lucumr.pocoo.org/2012/6/22/hate-hate-hate-everywhere/">Python Packaging: Hate, hate, hate
+everywhere</a></p>
+</p><div class="toc-filter-back-to-top last"><p><a class="reference external" href="#top">Back to top</a></p>
+</div></div></div></div><div
+class="field field-name-field-tags field-type-taxonomy-term-reference field-label-above"><div class="field-label"><p>Tags:</p>
+</div><div class="field-items"><div class="field-item even" rel="dc:subject"><p><a class="reference external" href="/taxonomy/term/1">python</a></p>
+</div><div class="field-item odd" rel="dc:subject"><p><a class="reference external" href="/taxonomy/term/8">business analytics</a></p>
+</div></div></div><div
+class="field field-name-field-article-type field-type-taxonomy-term-reference field-label-hidden"><div class="field-items"><div class="field-item even"><p><a class="reference external" href="/article-type/tutorial">tutorial</a></p>
+</div></div></div></p></section>
+</section>
+</section>
+
+<div class="section">
+    
+
+<div class="section">
+  <span style="float: left">
+     Previous:
+    
+    <a href="../ggplot-coming-to-python/">
+       ggplot coming to Python?
+    </a>
+    
+  </span>
+  <span>&nbsp;</span>
+  <span style="float: right">
+     Next: 
+    <a href="../detroit-asa-os-business-analytics/">
+      Presentation to Detroit ASA on open source for teaching business analytics 
+    </a>
+    
+  </span>
+</div>
+  
+</div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../">misken</a></h1>
+
+
+
+
+
+
+
+
+  
+<h2>
+   
+  18 December 2013 
+</h2>
+
+<ul>
+   
+<li id="author">
+  <span
+    >Author:</span
+  >
+   
+  <a href="../author/misken/">misken</a>  
+</li>
+    
+<li id="tags">
+  <span
+    >Tags: </span
+  >
+   
+  <a href="../tag/python/">python</a>   
+  <a href="../tag/pandas/">pandas</a>   
+  <a href="../tag/matplotlib/">matplotlib</a>  
+</li>
+ 
+</ul>
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../about/">About misken</a></li>
+</ul>
+
+
+<h3>
+  <a href="../">Recent Posts</a>
+</h3>
+<ul>
+   
+  <li>
+    <a href="../simpy_vaccine_clinic_improvements/"
+      >11 April - Using SimPy to simulate a vaccine clinic - Part 2: model improvements</a
+    >
+  </li>
+  
+  <li>
+    <a href="../simpy_getting_started_vaccine_clinic/"
+      >04 April - Using SimPy to simulate a vaccine clinic - Part 1: an introductory tutorial</a
+    >
+  </li>
+  
+  <li>
+    <a href="../use_jupyter_conda_envs/"
+      >03 April - Using different conda environments with Jupyter Lab</a
+    >
+  </li>
+  
+  <li>
+    <a href="../hello_world/"
+      >02 April - Hello world from ablog blogging with JupyterLab</a
+    >
+  </li>
+  
+  <li>
+    <a href="../first-post/"
+      >01 April - First Post at new blogging site</a
+    >
+  </li>
+  
+</ul>
+
+<h3><a href="../tag/">Tags</a></h3>
+<style type="text/css">
+  ul.ablog-cloud {
+    list-style: none;
+    overflow: auto;
+  }
+  ul.ablog-cloud li {
+    float: left;
+    height: 20pt;
+    line-height: 18pt;
+    margin-right: 5px;
+  }
+  ul.ablog-cloud a {
+    text-decoration: none;
+    vertical-align: middle;
+  }
+  li.ablog-cloud-1 {
+    font-size: 80%;
+  }
+  li.ablog-cloud-2 {
+    font-size: 95%;
+  }
+  li.ablog-cloud-3 {
+    font-size: 110%;
+  }
+  li.ablog-cloud-4 {
+    font-size: 125%;
+  }
+  li.ablog-cloud-5 {
+    font-size: 140%;
+  }
+</style>
+<ul class="ablog-cloud">
+   
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/github/">GitHub</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-3">
+    <a href="../tag/r/">R</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/ablog/">ablog</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/analytics/">analytics</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/bikeshare/">bikeshare</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/birding/">birding</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/blogging/">blogging</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/caret/">caret</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/conda/">conda</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/datetime/">datetime</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/dplyr/">dplyr</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/ebird/">ebird</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/ecology/">ecology</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/excel/">excel</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/ggmap/">ggmap</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/ggplot2/">ggplot2</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/gis/">gis</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/git/">git</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/gps/">gps</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/healthcare/">healthcare</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/hiking/">hiking</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/hillmaker/">hillmaker</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/jupyter/">jupyter</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/matplotlib/">matplotlib</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/metamodeling/">metamodeling</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/occupancy-analysis/">occupancy analysis</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/pandas/">pandas</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/patient-flow/">patient flow</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/plyr/">plyr</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-5">
+    <a href="../tag/python/">python</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/shiny/">shiny</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/simpy/">simpy</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/simulation/">simulation</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/sphinx/">sphinx</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/statistics/">statistics</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/teaching/">teaching</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/text/">text</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/xml/">xml</a>
+  </li>
+   
+</ul>
+
+<h3>
+  <a href="../archive/">Archives</a>
+</h3>
+<ul>
+   
+  <li>
+    <a href="../2022/">2022 (6)</a>
+  </li>
+    
+  <li>
+    <a href="../2021/">2021 (4)</a>
+  </li>
+    
+  <li>
+    <a href="../2020/">2020 (2)</a>
+  </li>
+    
+  <li>
+    <a href="../2019/">2019 (7)</a>
+  </li>
+    
+  <li>
+    <a href="../2018/">2018 (5)</a>
+  </li>
+    
+  <li>
+    <a href="../2017/">2017 (2)</a>
+  </li>
+    
+  <li>
+    <a href="../2016/">2016 (6)</a>
+  </li>
+    
+  <li>
+    <a href="../2014/">2014 (6)</a>
+  </li>
+    
+  <li>
+    <a href="../2013/">2013 (7)</a>
+  </li>
+   
+</ul>
+
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search/" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2022, misken.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.3.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../../_sources/blog/learning-python-suggestions-and-resources-for-business-analytics-students-and-professionals.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

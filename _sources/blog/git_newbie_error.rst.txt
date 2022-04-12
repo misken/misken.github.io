@@ -1,6 +1,7 @@
 .. post:: Feb 13, 2019
    :tags: git, GitHub
    :author: misken
+   :exclude:
    
    Recover from a common git error.
 
