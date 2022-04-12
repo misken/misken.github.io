@@ -316,7 +316,6 @@ div.rendered_html tbody tr:hover {
 </style>
 <section id="Analyzing-bike-usage-by-time-of-day-and-day-of-week">
 <h1>Analyzing bike usage by time of day and day of week<a class="headerlink" href="#Analyzing-bike-usage-by-time-of-day-and-day-of-week" title="Permalink to this headline">¶</a></h1>
-<p>Using hillmaker for datetime analysis of cycle share data</p>
 <p>For anyone managing a bike share system, understanding the patterns of bike use is pretty important. Capacity planning, in terms of the number of bikes needed, can be aided by analysis of the number of bikes in use by time of day and day of week. In this notebook, I show how the package <a class="reference external" href="https://github.com/misken/hillmaker">hillmaker</a> can be used to create statistical plots of bike use. Hillmaker was originally developed for use in healthcare capacity planning problems but can be used for any
 service system in which start times and stop times are available. This cycle share dataset is ideal.</p>
 <p>In this first example we’ll compare bike use patterns by members vs. short-term pass holders. Our goal is to compute the mean and percentiles of the number of bikes in use by hour of day and day of week.</p>
@@ -2460,8 +2459,9 @@ FrozenList([&#39;category&#39;, &#39;day_of_week&#39;, &#39;bin_of_day&#39;])
     >Tags: </span
   >
    
-  <a href="../../../../blog/tag/jupyter/">jupyter</a>   
-  <a href="../../../../blog/tag/ablog/">ablog</a>  
+  <a href="../../../../blog/tag/python/">python</a>   
+  <a href="../../../../blog/tag/hillmaker/">hillmaker</a>   
+  <a href="../../../../blog/tag/occupancy-analysis/">occupancy analysis</a>  
 </li>
  
 </ul>
@@ -2477,13 +2477,19 @@ FrozenList([&#39;category&#39;, &#39;day_of_week&#39;, &#39;bin_of_day&#39;])
 <ul>
    
   <li>
-    <a href="../simpy_getting_started_vaccine_clinic/"
-      >04 April - Using SimPy to simulate a vaccine clinic - Part 1: an introductory tutorial</a
+    <a href="../../../../blog/simpy_vaccine_clinic_improvements/"
+      >11 April - Using SimPy to simulate a vaccine clinic - Part 2: model improvements</a
     >
   </li>
   
   <li>
     <a href="../../../../blog/simpy_getting_started_vaccine_clinic/"
+      >04 April - Using SimPy to simulate a vaccine clinic - Part 1: an introductory tutorial</a
+    >
+  </li>
+  
+  <li>
+    <a href="../simpy_getting_started_vaccine_clinic/"
       >04 April - Using SimPy to simulate a vaccine clinic - Part 1: an introductory tutorial</a
     >
   </li>
@@ -2496,12 +2502,6 @@ FrozenList([&#39;category&#39;, &#39;day_of_week&#39;, &#39;bin_of_day&#39;])
   
   <li>
     <a href="../../../../blog/hello_world/"
-      >02 April - Hello world from ablog blogging with JupyterLab</a
-    >
-  </li>
-  
-  <li>
-    <a href="../hello_world/"
       >02 April - Hello world from ablog blogging with JupyterLab</a
     >
   </li>
@@ -2546,11 +2546,11 @@ FrozenList([&#39;category&#39;, &#39;day_of_week&#39;, &#39;bin_of_day&#39;])
     <a href="../../../../blog/tag/github/">GitHub</a>
   </li>
     
-  <li class="ablog-cloud ablog-cloud-1">
+  <li class="ablog-cloud ablog-cloud-2">
     <a href="../../../../blog/tag/r/">R</a>
   </li>
     
-  <li class="ablog-cloud ablog-cloud-2">
+  <li class="ablog-cloud ablog-cloud-1">
     <a href="../../../../blog/tag/ablog/">ablog</a>
   </li>
     
@@ -2564,6 +2564,10 @@ FrozenList([&#39;category&#39;, &#39;day_of_week&#39;, &#39;bin_of_day&#39;])
     
   <li class="ablog-cloud ablog-cloud-1">
     <a href="../../../../blog/tag/blogging/">blogging</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../../../../blog/tag/caret/">caret</a>
   </li>
     
   <li class="ablog-cloud ablog-cloud-1">
@@ -2586,7 +2590,7 @@ FrozenList([&#39;category&#39;, &#39;day_of_week&#39;, &#39;bin_of_day&#39;])
     <a href="../../../../blog/tag/ecology/">ecology</a>
   </li>
     
-  <li class="ablog-cloud ablog-cloud-2">
+  <li class="ablog-cloud ablog-cloud-1">
     <a href="../../../../blog/tag/excel/">excel</a>
   </li>
     
@@ -2603,6 +2607,10 @@ FrozenList([&#39;category&#39;, &#39;day_of_week&#39;, &#39;bin_of_day&#39;])
   </li>
     
   <li class="ablog-cloud ablog-cloud-1">
+    <a href="../../../../blog/tag/healthcare/">healthcare</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
     <a href="../../../../blog/tag/hiking/">hiking</a>
   </li>
     
@@ -2610,8 +2618,12 @@ FrozenList([&#39;category&#39;, &#39;day_of_week&#39;, &#39;bin_of_day&#39;])
     <a href="../../../../blog/tag/hillmaker/">hillmaker</a>
   </li>
     
-  <li class="ablog-cloud ablog-cloud-2">
+  <li class="ablog-cloud ablog-cloud-1">
     <a href="../../../../blog/tag/jupyter/">jupyter</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../../../../blog/tag/metamodeling/">metamodeling</a>
   </li>
     
   <li class="ablog-cloud ablog-cloud-1">
@@ -2622,12 +2634,12 @@ FrozenList([&#39;category&#39;, &#39;day_of_week&#39;, &#39;bin_of_day&#39;])
     <a href="../../../../blog/tag/pandas/">pandas</a>
   </li>
     
-  <li class="ablog-cloud ablog-cloud-5">
-    <a href="../../../../blog/tag/python/">python</a>
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../../../../blog/tag/patient-flow/">patient flow</a>
   </li>
     
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../../../../blog/tag/r/">r</a>
+  <li class="ablog-cloud ablog-cloud-5">
+    <a href="../../../../blog/tag/python/">python</a>
   </li>
     
   <li class="ablog-cloud ablog-cloud-1">
@@ -2650,7 +2662,7 @@ FrozenList([&#39;category&#39;, &#39;day_of_week&#39;, &#39;bin_of_day&#39;])
 <ul>
    
   <li>
-    <a href="../../../../blog/2022/">2022 (7)</a>
+    <a href="../../../../blog/2022/">2022 (8)</a>
   </li>
     
   <li>
@@ -2666,11 +2678,15 @@ FrozenList([&#39;category&#39;, &#39;day_of_week&#39;, &#39;bin_of_day&#39;])
   </li>
     
   <li>
-    <a href="../../../../blog/2018/">2018 (6)</a>
+    <a href="../../../../blog/2018/">2018 (7)</a>
   </li>
     
   <li>
-    <a href="../../../../blog/2016/">2016 (1)</a>
+    <a href="../../../../blog/2017/">2017 (4)</a>
+  </li>
+    
+  <li>
+    <a href="../../../../blog/2016/">2016 (4)</a>
   </li>
     
   <li>

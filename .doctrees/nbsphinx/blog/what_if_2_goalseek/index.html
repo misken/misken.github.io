@@ -316,7 +316,6 @@ div.rendered_html tbody tr:hover {
 </style>
 <section id="Excel-“what-if?”-analysis-with-Python---Part-2:-Goal-seek">
 <h1>Excel “what if?” analysis with Python - Part 2: Goal seek<a class="headerlink" href="#Excel-“what-if?”-analysis-with-Python---Part-2:-Goal-seek" title="Permalink to this headline">¶</a></h1>
-<p>Implement a spreadsheet type goal-seek function in Python.</p>
 <p>This is the second installment of a multi-part series on using Python for typical Excel modeling tasks. In the <a class="reference external" href="http://hselab.org/excel-to-python-1-models-datatables.html">first part</a> we developed an object oriented version of a simple Excel model along with a <code class="docutils literal notranslate"><span class="pre">data_table</span></code> function for doing sensitivity analysis that is a generalization of Excel’s Data Table tool. The Python version allows an arbitrary number of input and output variables.</p>
 <p>In this second part, we design and implement a <code class="docutils literal notranslate"><span class="pre">goal_seek</span></code> function for doing things like break even analysis. Along the way we once again explore some of Python’s more advanced features. This entire series is aimed at those who might have a strong Excel based background but only a basic familiarity with Python programming and are looking to add to their Python knowledge.</p>
 <p>You can also read and download the <a class="reference external" href="https://github.com/misken/whatif_modeling_oo">notebook based tutorial from GitHub</a>.</p>
@@ -1621,13 +1620,19 @@ implementation that someone has already done and tweak it.</p>
 <ul>
    
   <li>
-    <a href="../simpy_getting_started_vaccine_clinic/"
-      >04 April - Using SimPy to simulate a vaccine clinic - Part 1: an introductory tutorial</a
+    <a href="../../../../blog/simpy_vaccine_clinic_improvements/"
+      >11 April - Using SimPy to simulate a vaccine clinic - Part 2: model improvements</a
     >
   </li>
   
   <li>
     <a href="../../../../blog/simpy_getting_started_vaccine_clinic/"
+      >04 April - Using SimPy to simulate a vaccine clinic - Part 1: an introductory tutorial</a
+    >
+  </li>
+  
+  <li>
+    <a href="../simpy_getting_started_vaccine_clinic/"
       >04 April - Using SimPy to simulate a vaccine clinic - Part 1: an introductory tutorial</a
     >
   </li>
@@ -1640,12 +1645,6 @@ implementation that someone has already done and tweak it.</p>
   
   <li>
     <a href="../../../../blog/hello_world/"
-      >02 April - Hello world from ablog blogging with JupyterLab</a
-    >
-  </li>
-  
-  <li>
-    <a href="../hello_world/"
       >02 April - Hello world from ablog blogging with JupyterLab</a
     >
   </li>
@@ -1690,11 +1689,11 @@ implementation that someone has already done and tweak it.</p>
     <a href="../../../../blog/tag/github/">GitHub</a>
   </li>
     
-  <li class="ablog-cloud ablog-cloud-1">
+  <li class="ablog-cloud ablog-cloud-2">
     <a href="../../../../blog/tag/r/">R</a>
   </li>
     
-  <li class="ablog-cloud ablog-cloud-2">
+  <li class="ablog-cloud ablog-cloud-1">
     <a href="../../../../blog/tag/ablog/">ablog</a>
   </li>
     
@@ -1708,6 +1707,10 @@ implementation that someone has already done and tweak it.</p>
     
   <li class="ablog-cloud ablog-cloud-1">
     <a href="../../../../blog/tag/blogging/">blogging</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../../../../blog/tag/caret/">caret</a>
   </li>
     
   <li class="ablog-cloud ablog-cloud-1">
@@ -1730,7 +1733,7 @@ implementation that someone has already done and tweak it.</p>
     <a href="../../../../blog/tag/ecology/">ecology</a>
   </li>
     
-  <li class="ablog-cloud ablog-cloud-2">
+  <li class="ablog-cloud ablog-cloud-1">
     <a href="../../../../blog/tag/excel/">excel</a>
   </li>
     
@@ -1747,6 +1750,10 @@ implementation that someone has already done and tweak it.</p>
   </li>
     
   <li class="ablog-cloud ablog-cloud-1">
+    <a href="../../../../blog/tag/healthcare/">healthcare</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
     <a href="../../../../blog/tag/hiking/">hiking</a>
   </li>
     
@@ -1754,8 +1761,12 @@ implementation that someone has already done and tweak it.</p>
     <a href="../../../../blog/tag/hillmaker/">hillmaker</a>
   </li>
     
-  <li class="ablog-cloud ablog-cloud-2">
+  <li class="ablog-cloud ablog-cloud-1">
     <a href="../../../../blog/tag/jupyter/">jupyter</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../../../../blog/tag/metamodeling/">metamodeling</a>
   </li>
     
   <li class="ablog-cloud ablog-cloud-1">
@@ -1766,12 +1777,12 @@ implementation that someone has already done and tweak it.</p>
     <a href="../../../../blog/tag/pandas/">pandas</a>
   </li>
     
-  <li class="ablog-cloud ablog-cloud-5">
-    <a href="../../../../blog/tag/python/">python</a>
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../../../../blog/tag/patient-flow/">patient flow</a>
   </li>
     
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../../../../blog/tag/r/">r</a>
+  <li class="ablog-cloud ablog-cloud-5">
+    <a href="../../../../blog/tag/python/">python</a>
   </li>
     
   <li class="ablog-cloud ablog-cloud-1">
@@ -1794,7 +1805,7 @@ implementation that someone has already done and tweak it.</p>
 <ul>
    
   <li>
-    <a href="../../../../blog/2022/">2022 (7)</a>
+    <a href="../../../../blog/2022/">2022 (8)</a>
   </li>
     
   <li>
@@ -1810,11 +1821,15 @@ implementation that someone has already done and tweak it.</p>
   </li>
     
   <li>
-    <a href="../../../../blog/2018/">2018 (6)</a>
+    <a href="../../../../blog/2018/">2018 (7)</a>
   </li>
     
   <li>
-    <a href="../../../../blog/2016/">2016 (1)</a>
+    <a href="../../../../blog/2017/">2017 (4)</a>
+  </li>
+    
+  <li>
+    <a href="../../../../blog/2016/">2016 (4)</a>
   </li>
     
   <li>

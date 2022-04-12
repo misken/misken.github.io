@@ -17,8 +17,9 @@
     ".. post:: Feb 12, 2021\n",
     "   :author: misken\n",
     "   :tags: python, excel\n",
+    "   :exclude:\n",
     "   \n",
-    "   Build spreadsheet type models using Python."
+    "   Build spreadsheet type models using Python"
    ]
   },
   {

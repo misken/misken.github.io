@@ -17,8 +17,18 @@
     ".. post:: Jan 02, 2019\n",
     "   :author: misken\n",
     "   :tags: jupyter, ablog\n",
+    "   :exclude:\n",
     "   \n",
     "   Firewood metrics and simulating firewood use"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "\n",
+    "\n",
+    "We inherited a large pile of firewood for a wood burning stove. We've never had a wood burning stove. People who actually know something about, or sell, firewood for such devices talk about *cords* and *face cords* of firewood. Time to learn something about firewood metrics."
    ]
   },
   {
@@ -40,15 +50,6 @@
    "outputs": [],
    "source": [
     "%matplotlib inline"
-   ]
-  },
-  {
-   "cell_type": "markdown",
-   "metadata": {},
-   "source": [
-    "\n",
-    "\n",
-    "We inherited a large pile of firewood for a wood burning stove. We've never had a wood burning stove. People who actually know something about, or sell, firewood for such devices talk about *cords* and *face cords* of firewood. Time to learn something about firewood metrics."
    ]
   },
   {

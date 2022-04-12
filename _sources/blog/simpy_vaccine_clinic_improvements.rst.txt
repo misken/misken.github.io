@@ -5,8 +5,8 @@
    
    Improving our SimPy vaccine clinic model
    
-Improving our SimPy vaccine clinic model
-=========================================
+Using SimPy to simulate a vaccine clinic - Part 2: model improvements
+======================================================================
 
 In `Part 1 <https://misken.github.io/blog/simpy_getting_started_vaccine_clinic/>`_, we created a simple simulation model of a vaccine clinic
 using `SimPy <https://simpy.readthedocs.io/en/latest/>`_. Now we'll make

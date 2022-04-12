@@ -17,6 +17,7 @@
     ".. post:: Jul 17, 2018\n",
     "   :author: misken\n",
     "   :tags: python, occupancy analysis, pandas\n",
+    "   :exclude:\n",
     "   \n",
     "   Our goal is to compute statistics such as the average number of bikes rented per day in the Pronto CycleShare dataset, both overall and for individual stations. Seems easy. We'll see.\n"
    ]

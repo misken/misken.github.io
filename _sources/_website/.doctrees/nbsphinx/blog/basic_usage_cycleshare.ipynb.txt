@@ -16,9 +16,10 @@
    "source": [
     ".. post:: Jan 01, 2019\n",
     "   :author: misken\n",
-    "   :tags: jupyter, ablog\n",
+    "   :tags: python, hillmaker, occupancy analysis\n",
+    "   :exclude:\n",
     "   \n",
-    "   Using hillmaker for datetime analysis of cycle share data"
+    "   Using hillmaker for occupancy analysis of cycle share data"
    ]
   },
   {

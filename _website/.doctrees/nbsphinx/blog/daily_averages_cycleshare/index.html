@@ -316,7 +316,6 @@ div.rendered_html tbody tr:hover {
 </style>
 <section id="Computing-daily-averages-from-transaction-data-using-pandas-can-be-tricky---Part-1">
 <h1>Computing daily averages from transaction data using pandas can be tricky - Part 1<a class="headerlink" href="#Computing-daily-averages-from-transaction-data-using-pandas-can-be-tricky---Part-1" title="Permalink to this headline">¶</a></h1>
-<p>Our goal is to compute statistics such as the average number of bikes rented per day in the Pronto CycleShare dataset, both overall and for individual stations. Seems easy. We’ll see.</p>
 <p>Recently I watched an <a class="reference external" href="https://www.youtube.com/watch?v=DlgG0QdrqAU">interesting talk at PyCon 2018 on subtleties involved in computing time related averages</a> using pandas and SQL. While the talk raised some interesting points, it reminded me of another important “gotcha” related to computing such statistics.</p>
 <p>We’ll use the <code class="docutils literal notranslate"><span class="pre">trip.csv</span></code> datafile from the <a class="reference external" href="https://www.kaggle.com/pronto/cycle-share-dataset">Pronto Cycleshare Dataset</a>. You can get this notebook from <a class="reference external" href="https://github.com/misken/daily-averages">https://github.com/misken/daily-averages</a>.</p>
 <p>Our goal is to compute statistics such as the average number of bikes rented per day, both overall and for individual stations. Seems easy. We’ll see.</p>
@@ -1825,14 +1824,8 @@ Name: num_trips, dtype: float64
 <ul>
    
   <li>
-    <a href="../../../../../.doctrees/nbsphinx/blog/simpy_getting_started_vaccine_clinic/"
-      >04 April - Using SimPy to simulate a vaccine clinic - Part 1: an introductory tutorial</a
-    >
-  </li>
-  
-  <li>
-    <a href="../../../../blog/simpy_getting_started_vaccine_clinic/"
-      >04 April - Using SimPy to simulate a vaccine clinic - Part 1: an introductory tutorial</a
+    <a href="../../../../../blog/simpy_vaccine_clinic_improvements/"
+      >11 April - Using SimPy to simulate a vaccine clinic - Part 2: model improvements</a
     >
   </li>
   
@@ -1843,14 +1836,20 @@ Name: num_trips, dtype: float64
   </li>
   
   <li>
-    <a href="../../../../../blog/use_jupyter_conda_envs/"
-      >03 April - Using different conda environments with Jupyter Lab</a
+    <a href="../../../../../.doctrees/nbsphinx/blog/simpy_getting_started_vaccine_clinic/"
+      >04 April - Using SimPy to simulate a vaccine clinic - Part 1: an introductory tutorial</a
     >
   </li>
   
   <li>
-    <a href="../../../../../blog/hello_world/"
-      >02 April - Hello world from ablog blogging with JupyterLab</a
+    <a href="../../../../../.doctrees/nbsphinx/.doctrees/nbsphinx/blog/simpy_getting_started_vaccine_clinic/"
+      >04 April - Using SimPy to simulate a vaccine clinic - Part 1: an introductory tutorial</a
+    >
+  </li>
+  
+  <li>
+    <a href="../simpy_getting_started_vaccine_clinic/"
+      >04 April - Using SimPy to simulate a vaccine clinic - Part 1: an introductory tutorial</a
     >
   </li>
   
@@ -1898,7 +1897,7 @@ Name: num_trips, dtype: float64
     <a href="../../../../../blog/tag/r/">R</a>
   </li>
     
-  <li class="ablog-cloud ablog-cloud-2">
+  <li class="ablog-cloud ablog-cloud-1">
     <a href="../../../../../blog/tag/ablog/">ablog</a>
   </li>
     
@@ -1908,6 +1907,14 @@ Name: num_trips, dtype: float64
     
   <li class="ablog-cloud ablog-cloud-1">
     <a href="../../../../../blog/tag/birding/">birding</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../../../../../blog/tag/blogging/">blogging</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../../../../../blog/tag/caret/">caret</a>
   </li>
     
   <li class="ablog-cloud ablog-cloud-1">
@@ -1939,15 +1946,31 @@ Name: num_trips, dtype: float64
   </li>
     
   <li class="ablog-cloud ablog-cloud-1">
+    <a href="../../../../../blog/tag/gis/">gis</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
     <a href="../../../../../blog/tag/git/">git</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../../../../../blog/tag/healthcare/">healthcare</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../../../../../blog/tag/hiking/">hiking</a>
   </li>
     
   <li class="ablog-cloud ablog-cloud-1">
     <a href="../../../../../blog/tag/hillmaker/">hillmaker</a>
   </li>
     
-  <li class="ablog-cloud ablog-cloud-2">
+  <li class="ablog-cloud ablog-cloud-1">
     <a href="../../../../../blog/tag/jupyter/">jupyter</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../../../../../blog/tag/metamodeling/">metamodeling</a>
   </li>
     
   <li class="ablog-cloud ablog-cloud-1">
@@ -1958,8 +1981,20 @@ Name: num_trips, dtype: float64
     <a href="../../../../../blog/tag/pandas/">pandas</a>
   </li>
     
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../../../../../blog/tag/patient-flow/">patient flow</a>
+  </li>
+    
   <li class="ablog-cloud ablog-cloud-5">
     <a href="../../../../../blog/tag/python/">python</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../../../../../blog/tag/simpy/">simpy</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../../../../../blog/tag/simulation/">simulation</a>
   </li>
     
   <li class="ablog-cloud ablog-cloud-1">
@@ -1974,7 +2009,7 @@ Name: num_trips, dtype: float64
 <ul>
    
   <li>
-    <a href="../../../../../blog/2022/">2022 (10)</a>
+    <a href="../../../../../blog/2022/">2022 (12)</a>
   </li>
     
   <li>
@@ -1990,11 +2025,15 @@ Name: num_trips, dtype: float64
   </li>
     
   <li>
-    <a href="../../../../../blog/2018/">2018 (8)</a>
+    <a href="../../../../../blog/2018/">2018 (11)</a>
   </li>
     
   <li>
-    <a href="../../../../../blog/2016/">2016 (1)</a>
+    <a href="../../../../../blog/2017/">2017 (8)</a>
+  </li>
+    
+  <li>
+    <a href="../../../../../blog/2016/">2016 (4)</a>
   </li>
     
   <li>

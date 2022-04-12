@@ -1,0 +1,1209 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>An object oriented SimPy patient flow simulation model &#8212; misken 0,1,0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/alabaster.css" />
+    <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
+    <script src="../../../../_static/jquery.js"></script>
+    <script src="../../../../_static/underscore.js"></script>
+    <script src="../../../../_static/doctools.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <link rel="author" title="About these documents" href="../../../../about/" />
+    <link rel="index" title="Index" href="../../../../genindex/" />
+    <link rel="search" title="Search" href="../../../../search/" /> 
+   
+  <link rel="stylesheet" href="../../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+ 
+<link
+  rel="alternate"
+  type="application/atom+xml"
+  href="../../../../blog/atom.xml"
+  title="Bits of analytics"
+/>
+ 
+<style type="text/css">
+  ul.ablog-archive {
+    list-style: none;
+    overflow: auto;
+    margin-left: 0px;
+  }
+  ul.ablog-archive li {
+    float: left;
+    margin-right: 5px;
+    font-size: 80%;
+  }
+  ul.postlist a {
+    font-style: italic;
+  }
+  ul.postlist-style-disc {
+    list-style-type: disc;
+  }
+  ul.postlist-style-none {
+    list-style-type: none;
+  }
+  ul.postlist-style-circle {
+    list-style-type: circle;
+  }
+</style>
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+             
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt *,
+div.nbinput.container div.input_area pre,
+div.nboutput.container div.output_area pre,
+div.nbinput.container div.input_area .highlight,
+div.nboutput.container div.output_area .highlight {
+    border: none;
+    padding: 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+div.nbinput.container > div[class*=highlight],
+div.nboutput.container > div[class*=highlight] {
+    margin: 0;
+}
+
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt * {
+    background: none;
+}
+
+div.nboutput.container div.output_area .highlight,
+div.nboutput.container div.output_area pre {
+    background: unset;
+}
+
+div.nboutput.container div.output_area div.highlight {
+    color: unset;  /* override Pygments text color */
+}
+
+/* avoid gaps between output lines */
+div.nboutput.container div[class*=highlight] pre {
+    line-height: normal;
+}
+
+/* input/output containers */
+div.nbinput.container,
+div.nboutput.container {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+    width: 100%;
+}
+@media (max-width: 540px) {
+    div.nbinput.container,
+    div.nboutput.container {
+        flex-direction: column;
+    }
+}
+
+/* input container */
+div.nbinput.container {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast.container {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput.container div.prompt pre {
+    color: #307FC1;
+}
+
+/* output prompt */
+div.nboutput.container div.prompt pre {
+    color: #BF5B3D;
+}
+
+/* all prompts */
+div.nbinput.container div.prompt,
+div.nboutput.container div.prompt {
+    width: 4.5ex;
+    padding-top: 5px;
+    position: relative;
+    user-select: none;
+}
+
+div.nbinput.container div.prompt > div,
+div.nboutput.container div.prompt > div {
+    position: absolute;
+    right: 0;
+    margin-right: 0.3ex;
+}
+
+@media (max-width: 540px) {
+    div.nbinput.container div.prompt,
+    div.nboutput.container div.prompt {
+        width: unset;
+        text-align: left;
+        padding: 0.4em;
+    }
+    div.nboutput.container div.prompt.empty {
+        padding: 0;
+    }
+
+    div.nbinput.container div.prompt > div,
+    div.nboutput.container div.prompt > div {
+        position: unset;
+    }
+}
+
+/* disable scrollbars on prompts */
+div.nbinput.container div.prompt pre,
+div.nboutput.container div.prompt pre {
+    overflow: hidden;
+}
+
+/* input/output area */
+div.nbinput.container div.input_area,
+div.nboutput.container div.output_area {
+    -webkit-flex: 1;
+    flex: 1;
+    overflow: auto;
+}
+@media (max-width: 540px) {
+    div.nbinput.container div.input_area,
+    div.nboutput.container div.output_area {
+        width: 100%;
+    }
+}
+
+/* input area */
+div.nbinput.container div.input_area {
+    border: 1px solid #e0e0e0;
+    border-radius: 2px;
+    /*background: #f5f5f5;*/
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput.container div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.imgmath center alignment in output cells */
+div.nboutput.container div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput.container div.output_area.stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-default-inverse-fg { color: #FFFFFF; }
+.ansi-default-inverse-bg { background-color: #000000; }
+
+.ansi-bold { font-weight: bold; }
+.ansi-underline { text-decoration: underline; }
+
+
+div.nbinput.container div.input_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight].math,
+div.nboutput.container div.output_area.rendered_html,
+div.nboutput.container div.output_area > div.output_javascript,
+div.nboutput.container div.output_area:not(.rendered_html) > img{
+    padding: 5px;
+    margin: 0;
+}
+
+/* fix copybtn overflow problem in chromium (needed for 'sphinx_copybutton') */
+div.nbinput.container div.input_area > div[class^='highlight'],
+div.nboutput.container div.output_area > div[class^='highlight']{
+    overflow-y: hidden;
+}
+
+/* hide copybtn icon on prompts (needed for 'sphinx_copybutton') */
+.prompt .copybtn {
+    display: none;
+}
+
+/* Some additional styling taken form the Jupyter notebook CSS */
+div.rendered_html table {
+  border: none;
+  border-collapse: collapse;
+  border-spacing: 0;
+  color: black;
+  font-size: 12px;
+  table-layout: fixed;
+}
+div.rendered_html thead {
+  border-bottom: 1px solid black;
+  vertical-align: bottom;
+}
+div.rendered_html tr,
+div.rendered_html th,
+div.rendered_html td {
+  text-align: right;
+  vertical-align: middle;
+  padding: 0.5em 0.5em;
+  line-height: normal;
+  white-space: normal;
+  max-width: none;
+  border: none;
+}
+div.rendered_html th {
+  font-weight: bold;
+}
+div.rendered_html tbody tr:nth-child(odd) {
+  background: #f5f5f5;
+}
+div.rendered_html tbody tr:hover {
+  background: rgba(66, 165, 245, 0.2);
+}
+</style>
+<section id="An-object-oriented-SimPy-patient-flow-simulation-model">
+<h1>An object oriented SimPy patient flow simulation model<a class="headerlink" href="#An-object-oriented-SimPy-patient-flow-simulation-model" title="Permalink to this headline">¶</a></h1>
+<p>In <a class="reference external" href="http://misken.github.io/blog/simpy-getting-started-patient-flow-modeling.html">Part 1 of this series</a>, we built a few simple patient flow simulation models using SimPy. They all were <em>process oriented</em>. In this post, I’ll share my first attempt at an object oriented (OO) SimPy model for the same system. As mentioned in my previous post, I’ve had good luck building large complex discete event simulation models (including patient flow) with the object oriented Java library Simkit. In the
+process of building these initial OO models, I learned a bunch from the <a class="reference external" href="https://www.grotto-networking.com/DiscreteEventPython.html#Intro">posts done by the folks at Grotto Networking</a>.</p>
+<section id="OB-patient-flow-system-to-model">
+<h2>OB patient flow system to model<a class="headerlink" href="#OB-patient-flow-system-to-model" title="Permalink to this headline">¶</a></h2>
+<p>As a reminder, here’s a picture of the simple system I’ll be modeling.</p>
+<img alt=".doctrees/nbsphinx/blog/images/obflow.png" src=".doctrees/nbsphinx/blog/images/obflow.png" />
+<p>For this first set of simple models, features/assumptions of the system include:</p>
+<ul class="simple">
+<li><p>Patients in labor arrive according to a poisson process</p></li>
+<li><p>Assume c-section rate is zero and that all patients flow from OBS –&gt; LDR –&gt; PP units.</p></li>
+<li><p>Length of stay at each unit is exponentially distributed with a given unit specific mean</p></li>
+<li><p>Each unit has capacity level (i.e. the number of beds)</p></li>
+<li><p>Arrival rates and mean lengths of stay hard coded as constants. Later versions will read these from input files.</p></li>
+</ul>
+<p>I’m going to start by building the simplest model possible and then start layering on complexity and features.</p>
+</section>
+<section id="obflow_5_oo_2:-A-simple-object-oriented-SimPy-patient-flow-model">
+<h2>obflow_5_oo_2: A simple object oriented SimPy patient flow model<a class="headerlink" href="#obflow_5_oo_2:-A-simple-object-oriented-SimPy-patient-flow-model" title="Permalink to this headline">¶</a></h2>
+<p>Since I’m new to SimPy, this first object oriented model will be relatively simple. There are only four classes:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">OBPatientGenerator</span></code> - generates patients</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">OBPatient</span></code> - a patient; generated by <code class="docutils literal notranslate"><span class="pre">OBPatientGenerator</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">OBUnit</span></code> - for modeling the OBS, LDR, and PP units</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ExitFlow</span></code> - sink to which patients are routed when ready to leave the system</p></li>
+</ul>
+<p>My goal was to just figure out how to model a simple static route, OBS -&gt; LDR -&gt; PP -&gt; Exit, using SimPy in an OO way. Let’s look at each class and then at the main driver script. You can get the code for this and the other models at <a class="reference external" href="https://github.com/misken/obsimpy">https://github.com/misken/obsimpy</a>.</p>
+<section id="Imports-and-constants">
+<h3>Imports and constants<a class="headerlink" href="#Imports-and-constants" title="Permalink to this headline">¶</a></h3>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">simpy</span>
+<span class="kn">from</span> <span class="nn">numpy.random</span> <span class="kn">import</span> <span class="n">RandomState</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Simple OB patient flow model 5 - Very simple OO</span>
+
+<span class="sd">Details:</span>
+
+<span class="sd">- Generate arrivals via Poisson process</span>
+<span class="sd">- Define an OBUnit class that contains a simpy.Resource object as a member.</span>
+<span class="sd">  Not subclassing Resource, just trying to use it as a member.</span>
+<span class="sd">- Routing is done via setting ``out`` member of an OBUnit instance to</span>
+<span class="sd"> another OBUnit instance to which the OB patient flow instance should be</span>
+<span class="sd"> routed. The routing logic, for now, is in OBUnit object. Later,</span>
+<span class="sd"> we need some sort of router object and data driven routing.</span>
+<span class="sd">- Trying to get patient flow working without a process function that</span>
+<span class="sd">explicitly articulates the sequence of units and stays.</span>
+
+<span class="sd">Key Lessons Learned:</span>
+
+<span class="sd">- Any function that is a generator and might potentially yield for an event</span>
+<span class="sd">  must get registered as a process.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="c1"># Arrival rate and length of stay inputs.</span>
+<span class="n">ARR_RATE</span> <span class="o">=</span> <span class="mf">0.4</span>
+<span class="n">MEAN_LOS_OBS</span> <span class="o">=</span> <span class="mi">3</span>
+<span class="n">MEAN_LOS_LDR</span> <span class="o">=</span> <span class="mi">12</span>
+<span class="n">MEAN_LOS_PP</span> <span class="o">=</span> <span class="mi">48</span>
+
+<span class="c1"># Unit capacities</span>
+<span class="n">CAPACITY_OBS</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="n">CAPACITY_LDR</span> <span class="o">=</span> <span class="mi">6</span>
+<span class="n">CAPACITY_PP</span> <span class="o">=</span> <span class="mi">24</span>
+
+<span class="c1"># Random number seed</span>
+<span class="n">RNG_SEED</span> <span class="o">=</span> <span class="mi">6353</span>
+<br/></pre></div>
+</div>
+</div>
+</section>
+<section id="The-OBPatientGenerator-class">
+<h3>The <code class="docutils literal notranslate"><span class="pre">OBPatientGenerator</span></code> class<a class="headerlink" href="#The-OBPatientGenerator-class" title="Permalink to this headline">¶</a></h3>
+<p>This class generates OB patients according to a simple poisson process (exponential interarrival times). Its <code class="docutils literal notranslate"><span class="pre">run()</span></code> method gets registered as a SimPy process. The main loop in <code class="docutils literal notranslate"><span class="pre">run()</span></code> yields until the time for the next arrival. Upon arrival, a new <code class="docutils literal notranslate"><span class="pre">OBPatient</span></code> instance is generated and a request is initiated for a bed in the first unit of the patient’s route - OBS in this case. We’ll see shortly how the routing information is included in the <code class="docutils literal notranslate"><span class="pre">OBPatient</span></code> class (a “hack” that we’ll remedy
+later with proper routing related classes).</p>
+<p>A few niceties were added to the class based on things I know will be useful to have later. These include:</p>
+<ul class="simple">
+<li><p>arrival stream and patient type attributes; future versions of this model will support multiple patient types (e.g. spontaneous labor and induced labor) and arrival streams (e.g. random and scheduled),</p></li>
+<li><p>ability to shut off arrivals based on simulation time or number of patients generated.</p></li>
+</ul>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">OBPatientGenerator</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Generates patients.</span>
+
+<span class="sd">        Set the &quot;out&quot; member variable to resource at which patient generated.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        env : simpy.Environment</span>
+<span class="sd">            the simulation environment</span>
+<span class="sd">        arr_rate : float</span>
+<span class="sd">            Poisson arrival rate (expected number of arrivals per unit time)</span>
+<span class="sd">        arr_stream : int</span>
+<span class="sd">            Arrival stream id (default 1). Currently there is just one arrival</span>
+<span class="sd">            stream corresponding to the one patient generator class. In future,</span>
+<span class="sd">            likely to be be multiple generators for generating random and</span>
+<span class="sd">            scheduled arrivals</span>
+<span class="sd">        initial_delay : float</span>
+<span class="sd">            Starts generation after an initial delay. (default 0.0)</span>
+<span class="sd">        stoptime : float</span>
+<span class="sd">            Stops generation at the stoptime. (default Infinity)</span>
+<span class="sd">        max_arrivals : int</span>
+<span class="sd">            Stops generation after max_arrivals. (default Infinity)</span>
+<span class="sd">        debug: bool</span>
+<span class="sd">            If True, status message printed after</span>
+<span class="sd">            each patient created. (default False)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">env</span><span class="p">,</span> <span class="n">arr_rate</span><span class="p">,</span> <span class="n">patient_type</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">arr_stream</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                 <span class="n">initial_delay</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                 <span class="n">stoptime</span><span class="o">=</span><span class="n">simpy</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">Infinity</span><span class="p">,</span>
+                 <span class="n">max_arrivals</span><span class="o">=</span><span class="n">simpy</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">Infinity</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">env</span> <span class="o">=</span> <span class="n">env</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">arr_rate</span> <span class="o">=</span> <span class="n">arr_rate</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">patient_type</span> <span class="o">=</span> <span class="n">patient_type</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">arr_stream</span> <span class="o">=</span> <span class="n">arr_stream</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">initial_delay</span> <span class="o">=</span> <span class="n">initial_delay</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stoptime</span> <span class="o">=</span> <span class="n">stoptime</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_arrivals</span> <span class="o">=</span> <span class="n">max_arrivals</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span> <span class="o">=</span> <span class="n">debug</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">out</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_patients_created</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">prng</span> <span class="o">=</span> <span class="n">RandomState</span><span class="p">(</span><span class="n">RNG_SEED</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">action</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">process</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">run</span><span class="p">())</span>  <span class="c1"># starts the run() method as a SimPy process</span>
+
+    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;The patient generator.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Delay for initial_delay</span>
+        <span class="k">yield</span> <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">timeout</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">initial_delay</span><span class="p">)</span>
+        <span class="c1"># Main generator loop that terminates when stoptime reached</span>
+        <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">now</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">stoptime</span> <span class="ow">and</span> \
+                        <span class="bp">self</span><span class="o">.</span><span class="n">num_patients_created</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_arrivals</span><span class="p">:</span>
+            <span class="c1"># Delay until time for next arrival</span>
+            <span class="c1"># Compute next interarrival time</span>
+            <span class="n">iat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">prng</span><span class="o">.</span><span class="n">exponential</span><span class="p">(</span><span class="mf">1.0</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">arr_rate</span><span class="p">)</span>
+            <span class="k">yield</span> <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">timeout</span><span class="p">(</span><span class="n">iat</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">num_patients_created</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="c1"># Create new patient</span>
+            <span class="n">obp</span> <span class="o">=</span> <span class="n">OBPatient</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">now</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_patients_created</span><span class="p">,</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">patient_type</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">arr_stream</span><span class="p">,</span>
+                            <span class="n">prng</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">prng</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Patient </span><span class="si">{}</span><span class="s2"> created at </span><span class="si">{:.2f}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">num_patients_created</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">now</span><span class="p">))</span>
+
+            <span class="c1"># Set out member to OBunit object representing next destination</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">out</span> <span class="o">=</span> <span class="n">obunits</span><span class="p">[</span><span class="n">obp</span><span class="o">.</span><span class="n">planned_route_stop</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span>
+            <span class="c1"># Initiate process of requesting first bed in route</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">process</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">out</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">obp</span><span class="p">))</span>
+<br/></pre></div>
+</div>
+</div>
+</section>
+<section id="The-OBPatient-class">
+<h3>The <code class="docutils literal notranslate"><span class="pre">OBPatient</span></code> class<a class="headerlink" href="#The-OBPatient-class" title="Permalink to this headline">¶</a></h3>
+<p>These are the patients. As mentioned above, routing info (for now) is hard coded into this class. Each patient has same static route of OBS -&gt; LDR -&gt; PP. Lists are used to store routing information. Python uses 0 based indexing but we’ve chosen to use the [1] spot for OBS, [2] for LDR, and [3] for PP quantities. The [0] slot isn’t used. Just wanted to avoid a bunch of <code class="docutils literal notranslate"><span class="pre">current_stop_num</span> <span class="pre">-</span> <span class="pre">1</span></code> type of code fragments. Makes the code more readable, especially since we often have to refer to the
+previous stop and wish to avoid things like <code class="docutils literal notranslate"><span class="pre">current_stop_num</span> <span class="pre">-</span> <span class="pre">2</span></code> to mean the previous stop. Obviously this is simple to change if you’d rather use 0 for stop number 1.</p>
+<p>Several lists are used to store bed request instances as well as useful timestamps (any variable name ending in <code class="docutils literal notranslate"><span class="pre">_ts</span></code> such as entry and exit times to each unit.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">OBPatient</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Models an OB patient</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        arr_time : float</span>
+<span class="sd">            Patient arrival time</span>
+<span class="sd">        patient_id : int</span>
+<span class="sd">            Unique patient id</span>
+<span class="sd">        patient_type : int</span>
+<span class="sd">            Patient type id (default 1). Currently just one patient type.</span>
+<span class="sd">            In our prior research work we used a scheme with 11 patient types.</span>
+<span class="sd">        arr_stream : int</span>
+<span class="sd">            Arrival stream id (default 1). Currently there is just one arrival</span>
+<span class="sd">            stream corresponding to the one patient generator class. In future,</span>
+<span class="sd">            likely to be be multiple generators for generating random and</span>
+<span class="sd">            scheduled arrivals.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arr_time</span><span class="p">,</span> <span class="n">patient_id</span><span class="p">,</span> <span class="n">patient_type</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">arr_stream</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                 <span class="n">prng</span><span class="o">=</span><span class="n">RandomState</span><span class="p">(</span><span class="mi">0</span><span class="p">)):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">arr_time</span> <span class="o">=</span> <span class="n">arr_time</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">patient_id</span> <span class="o">=</span> <span class="n">patient_id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">patient_type</span> <span class="o">=</span> <span class="n">patient_type</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">arr_stream</span> <span class="o">=</span> <span class="n">arr_stream</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;Patient_</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">patient_id</span><span class="p">)</span>
+
+        <span class="c1"># Hard coding route, los and bed requests for now</span>
+        <span class="c1"># Not sure how best to do routing related data structures.</span>
+        <span class="c1"># Hack for now using combination of lists here, the out member</span>
+        <span class="c1"># and the obunits dictionary.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_stay_num</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">route_length</span> <span class="o">=</span> <span class="mi">3</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">planned_route_stop</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">planned_route_stop</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">planned_route_stop</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;OBS&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">planned_route_stop</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;LDR&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">planned_route_stop</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;PP&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">planned_route_stop</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;EXIT&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">planned_los</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">planned_los</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">planned_los</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">prng</span><span class="o">.</span><span class="n">exponential</span><span class="p">(</span><span class="n">MEAN_LOS_OBS</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">planned_los</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">prng</span><span class="o">.</span><span class="n">exponential</span><span class="p">(</span><span class="n">MEAN_LOS_LDR</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">planned_los</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">prng</span><span class="o">.</span><span class="n">exponential</span><span class="p">(</span><span class="n">MEAN_LOS_PP</span><span class="p">))</span>
+
+        <span class="c1"># Since we have fixed route for now, just initialize full list to</span>
+        <span class="c1"># hold bed requests</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bed_requests</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">route_length</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">request_entry_ts</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">route_length</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">entry_ts</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">route_length</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">exit_ts</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">route_length</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)]</span>
+
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;patientid: </span><span class="si">{}</span><span class="s2">, arr_stream: </span><span class="si">{}</span><span class="s2">, time: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span> \
+            <span class="nb">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">patient_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">arr_stream</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">arr_time</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="The-OBUnit-class">
+<h3>The <code class="docutils literal notranslate"><span class="pre">OBUnit</span></code> class<a class="headerlink" href="#The-OBUnit-class" title="Permalink to this headline">¶</a></h3>
+<p>This class is used to model the OBS, LDR and PP units. It does most of the heavy lifting related to patients flowing into and out of the various units. It can be used to model both finite and infinite capacity resources. A few basic statistal accumulators are included. The <code class="docutils literal notranslate"><span class="pre">out</span></code> member gets set to the next unit to be visited by the patient.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">OBunit</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Models an OB unit with fixed capacity.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        env : simpy.Environment</span>
+<span class="sd">            the simulation environment</span>
+<span class="sd">        name : str</span>
+<span class="sd">            unit name</span>
+<span class="sd">        capacity : integer (or None)</span>
+<span class="sd">            Number of beds. Use None for infinite capacity.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">env</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">capacity</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">capacity</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">capacity</span> <span class="o">=</span> <span class="n">simpy</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">Infinity</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">capacity</span> <span class="o">=</span> <span class="n">capacity</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">env</span> <span class="o">=</span> <span class="n">env</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span> <span class="o">=</span> <span class="n">debug</span>
+
+        <span class="c1"># Use a simpy Resource as one of the class members</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">unit</span> <span class="o">=</span> <span class="n">simpy</span><span class="o">.</span><span class="n">Resource</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="n">capacity</span><span class="p">)</span>
+
+        <span class="c1"># Statistical accumulators</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_entries</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_exits</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tot_occ_time</span> <span class="o">=</span> <span class="mf">0.0</span>
+
+        <span class="c1"># The out member will get set to destination unit</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">out</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">def</span> <span class="nf">put</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obp</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; A process method called when a bed is requested in the unit.</span>
+
+<span class="sd">            The logic of this method is reminiscent of the routing logic</span>
+<span class="sd">            in the process oriented obflow models 1-3. However, this method</span>
+<span class="sd">            is used for all of the units - no repeated logic.</span>
+
+<span class="sd">            Parameters</span>
+<span class="sd">            ----------</span>
+<span class="sd">            env : simpy.Environment</span>
+<span class="sd">                the simulation environment</span>
+
+<span class="sd">            obp : OBPatient object</span>
+<span class="sd">                the patient requestion the bed</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> trying to get </span><span class="si">{}</span><span class="s2"> at </span><span class="si">{:.4f}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">obp</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                                                    <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">now</span><span class="p">))</span>
+
+        <span class="c1"># Increments patient&#39;s attribute number of units visited</span>
+        <span class="n">obp</span><span class="o">.</span><span class="n">current_stay_num</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="c1"># Timestamp of request time</span>
+        <span class="n">bed_request_ts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">now</span>
+        <span class="c1"># Request a bed</span>
+        <span class="n">bed_request</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="o">.</span><span class="n">request</span><span class="p">()</span>
+        <span class="c1"># Store bed request and timestamp in patient&#39;s request lists</span>
+        <span class="n">obp</span><span class="o">.</span><span class="n">bed_requests</span><span class="p">[</span><span class="n">obp</span><span class="o">.</span><span class="n">current_stay_num</span><span class="p">]</span> <span class="o">=</span> <span class="n">bed_request</span>
+        <span class="n">obp</span><span class="o">.</span><span class="n">request_entry_ts</span><span class="p">[</span><span class="n">obp</span><span class="o">.</span><span class="n">current_stay_num</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">now</span>
+        <span class="c1"># Yield until we get a bed</span>
+        <span class="k">yield</span> <span class="n">bed_request</span>
+
+        <span class="c1"># Seized a bed.</span>
+        <span class="n">obp</span><span class="o">.</span><span class="n">entry_ts</span><span class="p">[</span><span class="n">obp</span><span class="o">.</span><span class="n">current_stay_num</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">now</span>
+
+        <span class="c1"># Check if we have a bed from a previous stay and release it.</span>
+        <span class="c1"># Update stats for previous unit.</span>
+
+        <span class="k">if</span> <span class="n">obp</span><span class="o">.</span><span class="n">bed_requests</span><span class="p">[</span><span class="n">obp</span><span class="o">.</span><span class="n">current_stay_num</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">previous_request</span> <span class="o">=</span> <span class="n">obp</span><span class="o">.</span><span class="n">bed_requests</span><span class="p">[</span><span class="n">obp</span><span class="o">.</span><span class="n">current_stay_num</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
+            <span class="n">previous_unit_name</span> <span class="o">=</span> \
+                <span class="n">obp</span><span class="o">.</span><span class="n">planned_route_stop</span><span class="p">[</span><span class="n">obp</span><span class="o">.</span><span class="n">current_stay_num</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
+            <span class="n">previous_unit</span> <span class="o">=</span> <span class="n">obunits</span><span class="p">[</span><span class="n">previous_unit_name</span><span class="p">]</span>
+            <span class="n">previous_unit</span><span class="o">.</span><span class="n">unit</span><span class="o">.</span><span class="n">release</span><span class="p">(</span><span class="n">previous_request</span><span class="p">)</span>
+            <span class="n">previous_unit</span><span class="o">.</span><span class="n">num_exits</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">previous_unit</span><span class="o">.</span><span class="n">tot_occ_time</span> <span class="o">+=</span> \
+                <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">now</span> <span class="o">-</span> <span class="n">obp</span><span class="o">.</span><span class="n">entry_ts</span><span class="p">[</span><span class="n">obp</span><span class="o">.</span><span class="n">current_stay_num</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
+            <span class="n">obp</span><span class="o">.</span><span class="n">exit_ts</span><span class="p">[</span><span class="n">obp</span><span class="o">.</span><span class="n">current_stay_num</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">now</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> entering </span><span class="si">{}</span><span class="s2"> at </span><span class="si">{:.4f}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">obp</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                                                <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">now</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_entries</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">now</span> <span class="o">&gt;</span> <span class="n">bed_request_ts</span><span class="p">:</span>
+                <span class="n">waittime</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">now</span> <span class="o">-</span> <span class="n">bed_request_ts</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> waited </span><span class="si">{:.4f}</span><span class="s2"> time units for </span><span class="si">{}</span><span class="s2"> bed&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">obp</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                                                                  <span class="n">waittime</span><span class="p">,</span>
+                                                                  <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
+
+        <span class="c1"># Determine los and then yield for the stay</span>
+        <span class="n">los</span> <span class="o">=</span> <span class="n">obp</span><span class="o">.</span><span class="n">planned_los</span><span class="p">[</span><span class="n">obp</span><span class="o">.</span><span class="n">current_stay_num</span><span class="p">]</span>
+        <span class="k">yield</span> <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">timeout</span><span class="p">(</span><span class="n">los</span><span class="p">)</span>
+
+        <span class="c1"># Go to next destination (which could be an exitflow)</span>
+        <span class="n">next_unit_name</span> <span class="o">=</span> <span class="n">obp</span><span class="o">.</span><span class="n">planned_route_stop</span><span class="p">[</span><span class="n">obp</span><span class="o">.</span><span class="n">current_stay_num</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">out</span> <span class="o">=</span> <span class="n">obunits</span><span class="p">[</span><span class="n">next_unit_name</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">obp</span><span class="o">.</span><span class="n">current_stay_num</span> <span class="o">==</span> <span class="n">obp</span><span class="o">.</span><span class="n">route_length</span><span class="p">:</span>
+            <span class="c1"># For ExitFlow object, no process needed</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">out</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">obp</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Process for putting patient into next bed</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">process</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">out</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">obp</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">basic_stats_msg</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Compute entries, exits, avg los and create summary message.</span>
+
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        str</span>
+<span class="sd">            Message with basic stats</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_exits</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">alos</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tot_occ_time</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_exits</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">alos</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{:6}</span><span class="s2">:</span><span class="se">\t</span><span class="s2"> Entries=</span><span class="si">{}</span><span class="s2">, Exits=</span><span class="si">{}</span><span class="s2">, Occ=</span><span class="si">{}</span><span class="s2">, ALOS=</span><span class="si">{:4.2f}</span><span class="s2">&quot;</span><span class="o">.</span>\
+            <span class="nb">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_entries</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_exits</span><span class="p">,</span>
+                   <span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="o">.</span><span class="n">count</span><span class="p">,</span> <span class="n">alos</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">msg</span>
+<br/></pre></div>
+</div>
+</div>
+</section>
+<section id="The-ExitFlow-class">
+<h3>The <code class="docutils literal notranslate"><span class="pre">ExitFlow</span></code> class<a class="headerlink" href="#The-ExitFlow-class" title="Permalink to this headline">¶</a></h3>
+<p>This is a “sink” and is used as a place to trigger any post-processing needs after the patient has completed their entire route through the OB system. For now we are just doing some basic statistical and conservation of flow summaries. More importantly, this class handles releasing the last bed in the patient’s route.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">ExitFlow</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Patients routed here when ready to exit.</span>
+
+<span class="sd">        Patient objects put into a Store. Can be accessed later for stats</span>
+<span class="sd">        and logs. A little worried about how big the Store will get.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        env : simpy.Environment</span>
+<span class="sd">            the simulation environment</span>
+<span class="sd">        debug : boolean</span>
+<span class="sd">            if true then patient details printed on arrival</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">env</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">store_obp</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">store</span> <span class="o">=</span> <span class="n">simpy</span><span class="o">.</span><span class="n">Store</span><span class="p">(</span><span class="n">env</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">env</span> <span class="o">=</span> <span class="n">env</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">store_obp</span> <span class="o">=</span> <span class="n">store_obp</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span> <span class="o">=</span> <span class="n">debug</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_exits</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">last_exit</span> <span class="o">=</span> <span class="mf">0.0</span>
+
+    <span class="k">def</span> <span class="nf">put</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obp</span><span class="p">):</span>
+
+        <span class="k">if</span> <span class="n">obp</span><span class="o">.</span><span class="n">bed_requests</span><span class="p">[</span><span class="n">obp</span><span class="o">.</span><span class="n">current_stay_num</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">previous_request</span> <span class="o">=</span> <span class="n">obp</span><span class="o">.</span><span class="n">bed_requests</span><span class="p">[</span><span class="n">obp</span><span class="o">.</span><span class="n">current_stay_num</span><span class="p">]</span>
+            <span class="n">previous_unit_name</span> <span class="o">=</span> <span class="n">obp</span><span class="o">.</span><span class="n">planned_route_stop</span><span class="p">[</span><span class="n">obp</span><span class="o">.</span><span class="n">current_stay_num</span><span class="p">]</span>
+            <span class="n">previous_unit</span> <span class="o">=</span> <span class="n">obunits</span><span class="p">[</span><span class="n">previous_unit_name</span><span class="p">]</span>
+            <span class="n">previous_unit</span><span class="o">.</span><span class="n">unit</span><span class="o">.</span><span class="n">release</span><span class="p">(</span><span class="n">previous_request</span><span class="p">)</span>
+            <span class="n">previous_unit</span><span class="o">.</span><span class="n">num_exits</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">previous_unit</span><span class="o">.</span><span class="n">tot_occ_time</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">now</span> <span class="o">-</span> <span class="n">obp</span><span class="o">.</span><span class="n">entry_ts</span><span class="p">[</span>
+                <span class="n">obp</span><span class="o">.</span><span class="n">current_stay_num</span><span class="p">]</span>
+            <span class="n">obp</span><span class="o">.</span><span class="n">exit_ts</span><span class="p">[</span><span class="n">obp</span><span class="o">.</span><span class="n">current_stay_num</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">now</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">last_exit</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">now</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_exits</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">obp</span><span class="p">)</span>
+
+        <span class="c1"># Store patient</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">store_obp</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">store</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">obp</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">basic_stats_msg</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Create summary message with basic stats on exits.</span>
+
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        str</span>
+<span class="sd">            Message with basic stats</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{:6}</span><span class="s2">:</span><span class="se">\t</span><span class="s2"> Exits=</span><span class="si">{}</span><span class="s2">, Last Exit=</span><span class="si">{:10.2f}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                                                            <span class="bp">self</span><span class="o">.</span><span class="n">num_exits</span><span class="p">,</span>
+                                                            <span class="bp">self</span><span class="o">.</span><span class="n">last_exit</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">msg</span>
+<br/></pre></div>
+</div>
+</div>
+</section>
+</section>
+<section id="Main-driver-script">
+<h2>Main driver script<a class="headerlink" href="#Main-driver-script" title="Permalink to this headline">¶</a></h2>
+<p>This looks much like the code in the previous models detailed in Part 1 of this series. One important change in this model is that the simulation environment variable is never used as a “global” variable. Any class needing access to the simulation environment explicitly requires it in its <code class="docutils literal notranslate"><span class="pre">__init__</span></code> method.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Initialize a simulation environment</span>
+<span class="n">simenv</span> <span class="o">=</span> <span class="n">simpy</span><span class="o">.</span><span class="n">Environment</span><span class="p">()</span>
+
+<span class="c1"># Compute and display traffic intensities</span>
+<span class="n">rho_obs</span> <span class="o">=</span> <span class="n">ARR_RATE</span> <span class="o">*</span> <span class="n">MEAN_LOS_OBS</span> <span class="o">/</span> <span class="n">CAPACITY_OBS</span>
+<span class="n">rho_ldr</span> <span class="o">=</span> <span class="n">ARR_RATE</span> <span class="o">*</span> <span class="n">MEAN_LOS_LDR</span> <span class="o">/</span> <span class="n">CAPACITY_LDR</span>
+<span class="n">rho_pp</span> <span class="o">=</span> <span class="n">ARR_RATE</span> <span class="o">*</span> <span class="n">MEAN_LOS_PP</span> <span class="o">/</span> <span class="n">CAPACITY_PP</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;rho_obs: </span><span class="si">{:6.3f}</span><span class="se">\n</span><span class="s2">rho_ldr: </span><span class="si">{:6.3f}</span><span class="se">\n</span><span class="s2">rho_pp: </span><span class="si">{:6.3f}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">rho_obs</span><span class="p">,</span>
+                                                                   <span class="n">rho_ldr</span><span class="p">,</span>
+                                                                   <span class="n">rho_pp</span><span class="p">))</span>
+
+<span class="c1"># Create nursing units</span>
+<span class="n">obs_unit</span> <span class="o">=</span> <span class="n">OBunit</span><span class="p">(</span><span class="n">simenv</span><span class="p">,</span> <span class="s1">&#39;OBS&#39;</span><span class="p">,</span> <span class="n">CAPACITY_OBS</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">ldr_unit</span> <span class="o">=</span> <span class="n">OBunit</span><span class="p">(</span><span class="n">simenv</span><span class="p">,</span> <span class="s1">&#39;LDR&#39;</span><span class="p">,</span> <span class="n">CAPACITY_LDR</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">pp_unit</span> <span class="o">=</span> <span class="n">OBunit</span><span class="p">(</span><span class="n">simenv</span><span class="p">,</span> <span class="s1">&#39;PP&#39;</span><span class="p">,</span> <span class="n">CAPACITY_PP</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+<span class="c1"># Define system exit</span>
+<span class="n">exitflow</span> <span class="o">=</span> <span class="n">ExitFlow</span><span class="p">(</span><span class="n">simenv</span><span class="p">,</span> <span class="s1">&#39;EXIT&#39;</span><span class="p">,</span> <span class="n">store_obp</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+<span class="c1"># Create dictionary of units keyed by name. This object can be passed along</span>
+<span class="c1"># to other objects so that the units are accessible as patients &quot;flow&quot;.</span>
+<span class="n">obunits</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;OBS&#39;</span><span class="p">:</span> <span class="n">obs_unit</span><span class="p">,</span> <span class="s1">&#39;LDR&#39;</span><span class="p">:</span> <span class="n">ldr_unit</span><span class="p">,</span> <span class="s1">&#39;PP&#39;</span><span class="p">:</span> <span class="n">pp_unit</span><span class="p">,</span> <span class="s1">&#39;EXIT&#39;</span><span class="p">:</span> <span class="n">exitflow</span><span class="p">}</span>
+
+<span class="c1"># Create a patient generator</span>
+<span class="n">obpat_gen</span> <span class="o">=</span> <span class="n">OBPatientGenerator</span><span class="p">(</span><span class="n">simenv</span><span class="p">,</span> <span class="n">ARR_RATE</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+<span class="c1"># Routing logic</span>
+<span class="c1"># Currently routing logic is hacked into the OBPatientGenerator</span>
+<span class="c1"># and OBPatient objects</span>
+
+<span class="c1"># Run the simulation for a while</span>
+<span class="n">runtime</span> <span class="o">=</span> <span class="mi">1000</span>
+<span class="n">simenv</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">until</span><span class="o">=</span><span class="n">runtime</span><span class="p">)</span>
+
+<span class="c1"># Patient generator stats</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Num patients generated: </span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">obpat_gen</span><span class="o">.</span><span class="n">num_patients_created</span><span class="p">))</span>
+
+<span class="c1"># Unit stats</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">obs_unit</span><span class="o">.</span><span class="n">basic_stats_msg</span><span class="p">())</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">ldr_unit</span><span class="o">.</span><span class="n">basic_stats_msg</span><span class="p">())</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">pp_unit</span><span class="o">.</span><span class="n">basic_stats_msg</span><span class="p">())</span>
+
+<span class="c1"># System exit stats</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Num patients exiting system: </span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">exitflow</span><span class="o">.</span><span class="n">num_exits</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Last exit at: </span><span class="si">{:.2f}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">exitflow</span><span class="o">.</span><span class="n">last_exit</span><span class="p">))</span>
+<br/></pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+rho_obs:  0.600
+rho_ldr:  0.800
+rho_pp:  0.800
+
+Num patients generated: 453
+
+OBS   :  Entries=431, Exits=429, Occ=2, ALOS=4.27
+LDR   :  Entries=429, Exits=425, Occ=4, ALOS=11.68
+PP    :  Entries=425, Exits=402, Occ=23, ALOS=48.40
+
+Num patients exiting system: 402
+
+Last exit at: 998.69
+
+</pre></div></div>
+</div>
+</section>
+<section id="Next-Steps">
+<h2>Next Steps<a class="headerlink" href="#Next-Steps" title="Permalink to this headline">¶</a></h2>
+<p>Now that I have a feel for how SimPy works, I’ve got two parallel directions to pursue.</p>
+<section id="Task-1:-Research-quality-SimPy-model">
+<h3>Task 1: Research quality SimPy model<a class="headerlink" href="#Task-1:-Research-quality-SimPy-model" title="Permalink to this headline">¶</a></h3>
+<p>I’ll start creating a more full featured version that replicates the functionality of the Simio based model I used in a recent research project. Some of the goals for this new version will be:</p>
+<ul class="simple">
+<li><p>volume, length of stay, routing information and other key inputs should be read in from structured data input files (probably YAML or JSON format),</p></li>
+<li><p>create routing classes to handle both random and scheduled arrivals,</p></li>
+<li><p>capability to generate time dependent Poisson arrivals,</p></li>
+<li><p>detailed patient flow logging to files,</p></li>
+<li><p>more statistical output analysis,</p></li>
+<li><p>comprehensive documentation,</p></li>
+<li><p>a test suite including validation via queueing models (for tractable cases).</p></li>
+</ul>
+</section>
+<section id="Task-2:-Rebuild-this-model-using-the-R-package,-simmer">
+<h3>Task 2: Rebuild this model using the R package, simmer<a class="headerlink" href="#Task-2:-Rebuild-this-model-using-the-R-package,-simmer" title="Permalink to this headline">¶</a></h3>
+<p>I’m a regular user of R for both research and teaching. So, I was pleasantly surprised to learn about a DES framework for R (!). The <a class="reference external" href="http://r-simmer.org/">simmer</a> package looks relatively new and seems to be positioning itself similarly to SimPy. Here’s the description from their main web page:</p>
+<blockquote>
+<div><p>simmer is a process-oriented and trajectory-based Discrete-Event Simulation (DES) package for R. Designed to be a generic framework like <a class="reference external" href="https://simpy.readthedocs.org/">SimPy</a> or <a class="reference external" href="http://simjuliajl.readthedocs.org/">SimJulia</a>, it leverages the power of <a class="reference external" href="http://www.rcpp.org/">Rcpp</a> to boost the performance and turning DES in R feasible. As a noteworthy characteristic, simmer exploits the concept of trajectory: a common path in the simulation model for entities of the same type. It is
+pretty flexible and simple to use, and leverages the chaining/piping workflow introduced by the <a class="reference external" href="https://github.com/smbache/magrittr">magrittr</a> package.</p>
+</div></blockquote>
+<p>Interesting. While I love chaining/piping via <a class="reference external" href="https://github.com/smbache/magrittr">magrittr</a>, especially when using the mighty <a class="reference external" href="https://github.com/tidyverse/dplyr">dplyr</a> package, I’m wondering if this will tie simmer to a process oriented simulation world view. I can see how the notion of a <em>trajectory</em> might lend itself to chaining and piping. Let’s find out. I’ll post the simmer version as soon as I get one working.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
+</section>
+</section>
+</section>
+
+<div class="section">
+    
+
+<div class="section">
+  <span style="float: left">
+     Previous:
+    
+    <a href="../../.doctrees/nbsphinx/blog/simpy-first-oo-patflow-model/">
+       An object oriented SimPy patient flow simulation model
+    </a>
+    
+  </span>
+  <span>&nbsp;</span>
+  <span style="float: right">
+     Next: 
+    <a href="../../../../_website/.doctrees/nbsphinx/blog/simpy-first-oo-patflow-model/">
+      An object oriented SimPy patient flow simulation model 
+    </a>
+    
+  </span>
+</div>
+  
+</div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../../../">misken</a></h1>
+
+
+
+
+
+
+
+
+  
+<h2>
+   
+  11 July 2017 
+</h2>
+
+<ul>
+   
+<li id="author">
+  <span
+    >Author:</span
+  >
+   
+  <a href="../../../../blog/author/misken/">misken</a>  
+</li>
+    
+<li id="tags">
+  <span
+    >Tags: </span
+  >
+   
+  <a href="../../../../blog/tag/python/">python</a>   
+  <a href="../../../../blog/tag/simpy/">simpy</a>   
+  <a href="../../../../blog/tag/simulation/">simulation</a>   
+  <a href="../../../../blog/tag/healthcare/">healthcare</a>   
+  <a href="../../../../blog/tag/patient-flow/">patient flow</a>  
+</li>
+ 
+</ul>
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../about/">About misken</a></li>
+</ul>
+
+
+<h3>
+  <a href="../../../../blog/">Recent Posts</a>
+</h3>
+<ul>
+   
+  <li>
+    <a href="../../../../blog/simpy_vaccine_clinic_improvements/"
+      >11 April - Using SimPy to simulate a vaccine clinic - Part 2: model improvements</a
+    >
+  </li>
+  
+  <li>
+    <a href="../../../../blog/simpy_getting_started_vaccine_clinic/"
+      >04 April - Using SimPy to simulate a vaccine clinic - Part 1: an introductory tutorial</a
+    >
+  </li>
+  
+  <li>
+    <a href="../simpy_getting_started_vaccine_clinic/"
+      >04 April - Using SimPy to simulate a vaccine clinic - Part 1: an introductory tutorial</a
+    >
+  </li>
+  
+  <li>
+    <a href="../../.doctrees/nbsphinx/blog/simpy_getting_started_vaccine_clinic/"
+      >04 April - Using SimPy to simulate a vaccine clinic - Part 1: an introductory tutorial</a
+    >
+  </li>
+  
+  <li>
+    <a href="../../../../_website/.doctrees/nbsphinx/blog/simpy_getting_started_vaccine_clinic/"
+      >04 April - Using SimPy to simulate a vaccine clinic - Part 1: an introductory tutorial</a
+    >
+  </li>
+  
+</ul>
+
+<h3><a href="../../../../blog/tag/">Tags</a></h3>
+<style type="text/css">
+  ul.ablog-cloud {
+    list-style: none;
+    overflow: auto;
+  }
+  ul.ablog-cloud li {
+    float: left;
+    height: 20pt;
+    line-height: 18pt;
+    margin-right: 5px;
+  }
+  ul.ablog-cloud a {
+    text-decoration: none;
+    vertical-align: middle;
+  }
+  li.ablog-cloud-1 {
+    font-size: 80%;
+  }
+  li.ablog-cloud-2 {
+    font-size: 95%;
+  }
+  li.ablog-cloud-3 {
+    font-size: 110%;
+  }
+  li.ablog-cloud-4 {
+    font-size: 125%;
+  }
+  li.ablog-cloud-5 {
+    font-size: 140%;
+  }
+</style>
+<ul class="ablog-cloud">
+   
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../../../../blog/tag/github/">GitHub</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../../../../blog/tag/r/">R</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../../../../blog/tag/ablog/">ablog</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../../../../blog/tag/bikeshare/">bikeshare</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../../../../blog/tag/birding/">birding</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../../../../blog/tag/blogging/">blogging</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../../../../blog/tag/caret/">caret</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../../../../blog/tag/conda/">conda</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../../../../blog/tag/datetime/">datetime</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../../../../blog/tag/dplyr/">dplyr</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../../../../blog/tag/ebird/">ebird</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../../../../blog/tag/ecology/">ecology</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-2">
+    <a href="../../../../blog/tag/excel/">excel</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../../../../blog/tag/ggplot2/">ggplot2</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../../../../blog/tag/gis/">gis</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../../../../blog/tag/git/">git</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../../../../blog/tag/healthcare/">healthcare</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../../../../blog/tag/hiking/">hiking</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../../../../blog/tag/hillmaker/">hillmaker</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../../../../blog/tag/jupyter/">jupyter</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../../../../blog/tag/metamodeling/">metamodeling</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../../../../blog/tag/occupancy-analysis/">occupancy analysis</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../../../../blog/tag/pandas/">pandas</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../../../../blog/tag/patient-flow/">patient flow</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-5">
+    <a href="../../../../blog/tag/python/">python</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../../../../blog/tag/simpy/">simpy</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../../../../blog/tag/simulation/">simulation</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../../../../blog/tag/sphinx/">sphinx</a>
+  </li>
+   
+</ul>
+
+<h3>
+  <a href="../../../../blog/archive/">Archives</a>
+</h3>
+<ul>
+   
+  <li>
+    <a href="../../../../blog/2022/">2022 (12)</a>
+  </li>
+    
+  <li>
+    <a href="../../../../blog/2021/">2021 (16)</a>
+  </li>
+    
+  <li>
+    <a href="../../../../blog/2020/">2020 (2)</a>
+  </li>
+    
+  <li>
+    <a href="../../../../blog/2019/">2019 (13)</a>
+  </li>
+    
+  <li>
+    <a href="../../../../blog/2018/">2018 (11)</a>
+  </li>
+    
+  <li>
+    <a href="../../../../blog/2017/">2017 (8)</a>
+  </li>
+    
+  <li>
+    <a href="../../../../blog/2016/">2016 (4)</a>
+  </li>
+    
+  <li>
+    <a href="../../../../blog/2014/">2014 (4)</a>
+  </li>
+   
+</ul>
+
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../search/" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2022, misken.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.3.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../../../../_sources/.doctrees/nbsphinx/blog/simpy-first-oo-patflow-model.ipynb.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

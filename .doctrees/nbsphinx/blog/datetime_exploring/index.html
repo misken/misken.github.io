@@ -316,7 +316,6 @@ div.rendered_html tbody tr:hover {
 </style>
 <section id="Exploring-dates-and-times-in-Python">
 <h1>Exploring dates and times in Python<a class="headerlink" href="#Exploring-dates-and-times-in-Python" title="Permalink to this headline">¶</a></h1>
-<p>Fun with dates and times in Python</p>
 <p>For many of us in the business analytics world, working with dates and times is bread and butter stuff. We can work all kinds of magic with Excel’s “serial” datetimes and worksheet functions like DATEVALUE(), WEEKDAY(), MONTH(), DATE() and many more. We can wield VBA functions like <a class="reference external" href="http://msdn.microsoft.com/en-us/library/b5xbyt6f%28v=vs.90%29.aspx">DateDiff</a> with the best of them. We all know that, according to MS, time started on 1/1/1900 (or 1904 if you’re on a Mac) and we just live with
 the fact that we can’t do reliable datetime work before those magic epochs. I even wrote and released a free and open source MS Access add-in called <a class="reference external" href="http://hillmaker.sourceforge.net/">Hillmaker</a> many years ago that did statistical analysis of time interval data by day of week and time of day. That tool still finds lots of use in the healthcare world for analyzing occupancy of things like nursing units, emergency departments, recovery room, and many other places with entry and exit timestamp
 data.</p>
@@ -2067,13 +2066,19 @@ array([12, 29, 84,  4,  6])
 <ul>
    
   <li>
-    <a href="../simpy_getting_started_vaccine_clinic/"
-      >04 April - Using SimPy to simulate a vaccine clinic - Part 1: an introductory tutorial</a
+    <a href="../../../../blog/simpy_vaccine_clinic_improvements/"
+      >11 April - Using SimPy to simulate a vaccine clinic - Part 2: model improvements</a
     >
   </li>
   
   <li>
     <a href="../../../../blog/simpy_getting_started_vaccine_clinic/"
+      >04 April - Using SimPy to simulate a vaccine clinic - Part 1: an introductory tutorial</a
+    >
+  </li>
+  
+  <li>
+    <a href="../simpy_getting_started_vaccine_clinic/"
       >04 April - Using SimPy to simulate a vaccine clinic - Part 1: an introductory tutorial</a
     >
   </li>
@@ -2086,12 +2091,6 @@ array([12, 29, 84,  4,  6])
   
   <li>
     <a href="../../../../blog/hello_world/"
-      >02 April - Hello world from ablog blogging with JupyterLab</a
-    >
-  </li>
-  
-  <li>
-    <a href="../hello_world/"
       >02 April - Hello world from ablog blogging with JupyterLab</a
     >
   </li>
@@ -2136,11 +2135,11 @@ array([12, 29, 84,  4,  6])
     <a href="../../../../blog/tag/github/">GitHub</a>
   </li>
     
-  <li class="ablog-cloud ablog-cloud-1">
+  <li class="ablog-cloud ablog-cloud-2">
     <a href="../../../../blog/tag/r/">R</a>
   </li>
     
-  <li class="ablog-cloud ablog-cloud-2">
+  <li class="ablog-cloud ablog-cloud-1">
     <a href="../../../../blog/tag/ablog/">ablog</a>
   </li>
     
@@ -2154,6 +2153,10 @@ array([12, 29, 84,  4,  6])
     
   <li class="ablog-cloud ablog-cloud-1">
     <a href="../../../../blog/tag/blogging/">blogging</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../../../../blog/tag/caret/">caret</a>
   </li>
     
   <li class="ablog-cloud ablog-cloud-1">
@@ -2176,7 +2179,7 @@ array([12, 29, 84,  4,  6])
     <a href="../../../../blog/tag/ecology/">ecology</a>
   </li>
     
-  <li class="ablog-cloud ablog-cloud-2">
+  <li class="ablog-cloud ablog-cloud-1">
     <a href="../../../../blog/tag/excel/">excel</a>
   </li>
     
@@ -2193,6 +2196,10 @@ array([12, 29, 84,  4,  6])
   </li>
     
   <li class="ablog-cloud ablog-cloud-1">
+    <a href="../../../../blog/tag/healthcare/">healthcare</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
     <a href="../../../../blog/tag/hiking/">hiking</a>
   </li>
     
@@ -2200,8 +2207,12 @@ array([12, 29, 84,  4,  6])
     <a href="../../../../blog/tag/hillmaker/">hillmaker</a>
   </li>
     
-  <li class="ablog-cloud ablog-cloud-2">
+  <li class="ablog-cloud ablog-cloud-1">
     <a href="../../../../blog/tag/jupyter/">jupyter</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../../../../blog/tag/metamodeling/">metamodeling</a>
   </li>
     
   <li class="ablog-cloud ablog-cloud-1">
@@ -2212,12 +2223,12 @@ array([12, 29, 84,  4,  6])
     <a href="../../../../blog/tag/pandas/">pandas</a>
   </li>
     
-  <li class="ablog-cloud ablog-cloud-5">
-    <a href="../../../../blog/tag/python/">python</a>
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../../../../blog/tag/patient-flow/">patient flow</a>
   </li>
     
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../../../../blog/tag/r/">r</a>
+  <li class="ablog-cloud ablog-cloud-5">
+    <a href="../../../../blog/tag/python/">python</a>
   </li>
     
   <li class="ablog-cloud ablog-cloud-1">
@@ -2240,7 +2251,7 @@ array([12, 29, 84,  4,  6])
 <ul>
    
   <li>
-    <a href="../../../../blog/2022/">2022 (7)</a>
+    <a href="../../../../blog/2022/">2022 (8)</a>
   </li>
     
   <li>
@@ -2256,11 +2267,15 @@ array([12, 29, 84,  4,  6])
   </li>
     
   <li>
-    <a href="../../../../blog/2018/">2018 (6)</a>
+    <a href="../../../../blog/2018/">2018 (7)</a>
   </li>
     
   <li>
-    <a href="../../../../blog/2016/">2016 (1)</a>
+    <a href="../../../../blog/2017/">2017 (4)</a>
+  </li>
+    
+  <li>
+    <a href="../../../../blog/2016/">2016 (4)</a>
   </li>
     
   <li>

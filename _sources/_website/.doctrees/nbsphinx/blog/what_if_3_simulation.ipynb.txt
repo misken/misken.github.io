@@ -17,8 +17,9 @@
     ".. post:: Feb 21, 2021\n",
     "   :author: misken\n",
     "   :tags: python, excel\n",
+    "   :exclude:\n",
     "   \n",
-    "   Do Monte-Carlo simulation in Python."
+    "   Do Monte-Carlo simulation in Python"
    ]
   },
   {
