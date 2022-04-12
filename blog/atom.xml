@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en">
   <id>https://misken.github.io/</id>
   <title>Bits of analytics</title>
-  <updated>2022-04-05T17:01:42.717161+00:00</updated>
+  <updated>2022-04-12T00:54:38.899738+00:00</updated>
   <link href="https://misken.github.io/"/>
   <link href="https://misken.github.io/blog/atom.xml" rel="self"/>
   <generator uri="https://ablog.readthedocs.org/" version="0.10.23">ABlog</generator>
@@ -427,9 +427,23 @@ using software available for Ubuntu. My initial goals were:</summary>
     </author>
     <link href="https://misken.github.io/blog/simpy_getting_started_vaccine_clinic/" rel="alternate"/>
     <summary>Build a simple vaccine clinic model with SimPy</summary>
-    <category term="jupyter" label="jupyter"/>
+    <category term="python" label="python"/>
     <category term="simpy" label="simpy"/>
     <category term="simulation" label="simulation"/>
     <published>2022-04-04T00:00:00-04:00</published>
+  </entry>
+  <entry>
+    <id>https://misken.github.io/blog/simpy_vaccine_clinic_improvements/</id>
+    <title>Improving our SimPy vaccine clinic model</title>
+    <updated>2022-04-11T00:00:00-04:00</updated>
+    <author>
+      <name>misken</name>
+    </author>
+    <link href="https://misken.github.io/blog/simpy_vaccine_clinic_improvements/" rel="alternate"/>
+    <summary>Improving our SimPy vaccine clinic model</summary>
+    <category term="python" label="python"/>
+    <category term="simpy" label="simpy"/>
+    <category term="simulation" label="simulation"/>
+    <published>2022-04-11T00:00:00-04:00</published>
   </entry>
 </feed>

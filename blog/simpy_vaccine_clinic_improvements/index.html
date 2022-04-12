@@ -4,8 +4,9 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Posted in 2017 &#8212; misken 0,1,0 documentation</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>Improving our SimPy vaccine clinic model &#8212; misken 0,1,0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css" />
     <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
@@ -26,7 +27,7 @@
   rel="alternate"
   type="application/atom+xml"
   href="../../blog/atom.xml"
-  title="Posted in 2017"
+  title="Bits of analytics"
 />
  
 <style type="text/css">
@@ -63,96 +64,49 @@
           
 
           <div class="body" role="main">
-            
+             <section id="improving-our-simpy-vaccine-clinic-model">
+<h1>Improving our SimPy vaccine clinic model<a class="headerlink" href="#improving-our-simpy-vaccine-clinic-model" title="Permalink to this headline">¶</a></h1>
+<p>In <a class="reference external" href="https://misken.github.io/blog/simpy_getting_started_vaccine_clinic/">Part 1</a>, we created a simple simulation model of a vaccine clinic
+using <a class="reference external" href="https://simpy.readthedocs.io/en/latest/">SimPy</a>. Now we’ll make
+a number of improvements to our model and use it to explore a few scenarios. Some of
+the things we’ll do include:</p>
+<ul class="simple">
+<li><p>adding a command line interface,</p></li>
+<li><p>specifying simulation inputs via a configuration file,</p></li>
+<li><p>automating the post-processing of simulation outputs to create summary statistics,</p></li>
+<li><p>move our code out of a Jupyter notebook and into a Python script,</p></li>
+<li><p>explore several clinic capacity plans using the simulation model,</p></li>
+<li><p>make some model extensions including handling two arrival streams - random arrivals and scheduled arrivals.</p></li>
+</ul>
+<p>This series of notebooks and Python scripts are part of a module I teach
+in one of my analytics courses. In addition to all of the files needed
+for the module, I have also created a number of screencasts that walk
+you through all of the pieces. So, instead of trying to repeat all that
+in a blog post, I’ll just point you to the course web page for this module.
+The entire courseweb is a Sphinx based site.</p>
+<ul class="simple">
+<li><p><a class="reference external" href="http://www.sba.oakland.edu/faculty/isken/courses/mis6900_s22/mod4_des_simpy.html">Discrete event simulation with SimPy</a></p></li>
+</ul>
+</section>
+
 <div class="section">
-  <h1>
-     Posted in  2017 
-  </h1>
-   
-
-  <div class="section ablog-post">
-    <h2 class="ablog-post-title">
-      <a href="../simpy-first-oo-patflow-model/"
-        >An object oriented SimPy patient flow simulation model</a
-      >
-    </h2>
-
-    <ul class="ablog-archive">
-      <li>
-          11 July 2017 
-      </li>
-       
-<li id="author">
-  <span
-    >Author:</span
-  >
-   
-  <a href="../author/misken/">misken</a>  
-</li>
     
-<li id="tags">
-  <span
-    >Tags: </span
-  >
-   
-  <a href="../tag/python/">python</a>   
-  <a href="../tag/simpy/">simpy</a>   
-  <a href="../tag/simulation/">simulation</a>   
-  <a href="../tag/healthcare/">healthcare</a>   
-  <a href="../tag/patient-flow/">patient flow</a>  
-</li>
- 
-    </ul>
-    <div class="ablog-post-excerpt docutils container">
-<p>In Part 2 of this series we build a simple object oriented SimPy model for simulating inpatient obsetrics patient flow.</p>
-</div>
 
-    <p class="ablog-post-expand"><a href="../simpy-first-oo-patflow-model/"><em>Read more ...</em></a></p>
-    <hr />
-  </div>
+<div class="section">
+  <span style="float: left">
+     Previous:
+    
+    <a href="../simpy_getting_started_vaccine_clinic/">
+       Using SimPy to simulate a vaccine clinic - Part 1: an introductory tutorial
+    </a>
+    
+  </span>
+  <span>&nbsp;</span>
+  <span style="float: right">
+    
+  </span>
+</div>
   
-
-  <div class="section ablog-post">
-    <h2 class="ablog-post-title">
-      <a href="../simpy-getting-started/"
-        >Getting started with SimPy for patient flow modeling</a
-      >
-    </h2>
-
-    <ul class="ablog-archive">
-      <li>
-          10 July 2017 
-      </li>
-       
-<li id="author">
-  <span
-    >Author:</span
-  >
-   
-  <a href="../author/misken/">misken</a>  
-</li>
-    
-<li id="tags">
-  <span
-    >Tags: </span
-  >
-   
-  <a href="../tag/python/">python</a>   
-  <a href="../tag/simpy/">simpy</a>   
-  <a href="../tag/simulation/">simulation</a>   
-  <a href="../tag/healthcare/">healthcare</a>   
-  <a href="../tag/patient-flow/">patient flow</a>  
-</li>
- 
-    </ul>
-    <div class="ablog-post-excerpt docutils container">
-<p>Building simple patient flow simulation models with SimPy. Part 1 of a multipart series.</p>
-</div>
-
-    <p class="ablog-post-expand"><a href="../simpy-getting-started/"><em>Read more ...</em></a></p>
-    <hr />
-  </div>
-   
 </div>
 
           </div>
@@ -170,6 +124,33 @@
 
 
 
+  
+<h2>
+   
+  11 April 2022 
+</h2>
+
+<ul>
+   
+<li id="author">
+  <span
+    >Author:</span
+  >
+   
+  <a href="../author/misken/">misken</a>  
+</li>
+    
+<li id="tags">
+  <span
+    >Tags: </span
+  >
+   
+  <a href="../tag/python/">python</a>   
+  <a href="../tag/simpy/">simpy</a>   
+  <a href="../tag/simulation/">simulation</a>  
+</li>
+ 
+</ul>
 <h3>Navigation</h3>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../about/">About misken</a></li>
@@ -181,12 +162,6 @@
 </h3>
 <ul>
    
-  <li>
-    <a href="../simpy_vaccine_clinic_improvements/"
-      >11 April - Improving our SimPy vaccine clinic model</a
-    >
-  </li>
-  
   <li>
     <a href="../simpy_getting_started_vaccine_clinic/"
       >04 April - Using SimPy to simulate a vaccine clinic - Part 1: an introductory tutorial</a
@@ -208,6 +183,12 @@
   <li>
     <a href="../first-post/"
       >01 April - First Post at new blogging site</a
+    >
+  </li>
+  
+  <li>
+    <a href="../pip_with_conda_local_dev/"
+      >15 March - Using pip with conda for local development projects</a
     >
   </li>
   
@@ -387,7 +368,7 @@
   </li>
     
   <li>
-    <a href="#">2017 (2)</a>
+    <a href="../2017/">2017 (2)</a>
   </li>
     
   <li>
@@ -421,6 +402,9 @@
       Powered by <a href="http://sphinx-doc.org/">Sphinx 4.3.2</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
+      |
+      <a href="../../_sources/blog/simpy_vaccine_clinic_improvements.rst.txt"
+          rel="nofollow">Page source</a>
     </div>
 
     

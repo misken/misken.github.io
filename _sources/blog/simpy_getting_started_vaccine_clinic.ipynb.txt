@@ -18,7 +18,7 @@
    "source": [
     ".. post:: Apr 04, 2022\n",
     "   :author: misken\n",
-    "   :tags: jupyter, simpy, simulation\n",
+    "   :tags: python, simpy, simulation\n",
     "   :exclude:\n",
     "   \n",
     "   Build a simple vaccine clinic model with SimPy"
