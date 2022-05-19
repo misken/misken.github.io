@@ -1,6 +1,7 @@
 .. post:: May 19, 2022
    :tags: python, hillmaker, occupancy analysis
    :author: misken
+   :exclude:
    
    Performance improvements to hillmaker
 
@@ -15,14 +16,14 @@ dataframe. All of this dataframe updating made things slow.
 Recently I overhauled the way that the occupancy by datetime values were
 being computed:
 
-- converted pandas `Series` to numpy ndarrays, 
+- converted pandas ``Series`` to numpy ndarrays, 
 - tried to do almost all computations via vectorized operations on numpy arrays.
 
 I also fixed a dumb thing I was doing in computing the percentiles by making
-sure I passed the entire list of desired percentiles to the pandas `percentile`
+sure I passed the entire list of desired percentiles to the pandas ``percentile``
 function (I was iterating through a list of percentiles - oops).
 
-It worked. My standard benchmark dataset (ShortStay.csv) is just under 60k records
+It worked. My standard benchmark dataset (``ShortStay.csv``) is just under 60k records
 with five unique category (patient type) values. Running hillmaker with
 a bin size of 60 minutes took about one minute on a standard laptop. After
 the numpy related changes, the same run is ~8 seconds. Of that, between 6-7

@@ -16,7 +16,7 @@
    "source": [
     ".. post:: Jan 02, 2019\n",
     "   :author: misken\n",
-    "   :tags: jupyter, ablog\n",
+    "   :tags: python, simulation\n",
     "   :exclude:\n",
     "   \n",
     "   Firewood metrics and simulating firewood use"
