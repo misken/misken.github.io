@@ -7,7 +7,7 @@ tags: python, birding, dplyr, ggplot2, ebird, R
 
 # Wednesday OT Birders - Using the ebird API, Python, and R to analyze data for our birding group
 
-Using the eBird API from Python, we downloaded birding lists submitted by our Wednesday morning birding group. R was then used to create some basic plots showing the top species sighted each year. 
+Using the eBird API from Python, we downloaded birding lists submitted by our Wednesday morning birding group. R was used to create some basic plots showing the top species sighted each year. 
 
 ## The Wednesday OT Birders
 

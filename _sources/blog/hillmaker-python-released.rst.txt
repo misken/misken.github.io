@@ -3,7 +3,7 @@
    :author: misken
    :exclude:
    
-   Analytics and higher ed
+   Occupancy analysis tool for Python
 
 New version of hillmaker (finally) released - and it's Python
 ==============================================================
