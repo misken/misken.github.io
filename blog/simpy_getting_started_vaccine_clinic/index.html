@@ -7,24 +7,42 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
     <title>Using SimPy to simulate a vaccine clinic - Part 1: an introductory tutorial &#8212; misken 0,1,0 documentation</title>
+    
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+
+    
+  <link rel="stylesheet"
+    href="../../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/design-style.b7bb847fb20b106c3d81b95245e65545.min.css" />
+    
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
+
     <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
     <script src="../../_static/jquery.js"></script>
     <script src="../../_static/underscore.js"></script>
     <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/design-tabs.js"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <link rel="author" title="About these documents" href="../../about/" />
     <link rel="index" title="Index" href="../../genindex/" />
     <link rel="search" title="Search" href="../../search/" /> 
-   
-  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
-  
-  
-  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
- 
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="en">
+    
+
+    <!-- Google Analytics -->
+     
 <link
   rel="alternate"
   type="application/atom+xml"
@@ -57,16 +75,593 @@
   }
 </style>
 
-  </head><body>
-  
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
+    
+    <div class="container-fluid" id="banner"></div>
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
+    
+    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main"><div class="container-xl">
+
+  <div id="navbar-start">
+    
+    
+<a class="navbar-brand" href="../../">
+<p class="title">misken</p>
+</a>
+
+    
+  </div>
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapsible" aria-controls="navbar-collapsible" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  
+  <div id="navbar-collapsible" class="col-lg-9 collapse navbar-collapse">
+    <div id="navbar-center" class="mr-auto">
+      
+      <div class="navbar-center-item">
+        <ul id="navbar-main-elements" class="navbar-nav">
+    <li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../about/">
+  About misken
+ </a>
+</li>
+
+    
+</ul>
+      </div>
+      
+    </div>
+
+    <div id="navbar-end">
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+      </ul>
+      </div>
+      
+    </div>
+  </div>
+</div>
+    </nav>
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+            
+            <!-- Only show if we have sidebars configured, else just a small margin  -->
+            <div class="col-12 col-md-3 bd-sidebar">
+              <div class="sidebar-start-items">  
+<h2>
+   
+  04 April 2022 
+</h2>
+
+<ul>
+   
+<li id="author">
+  <span
+    >Author:</span
+  >
+   
+  <a href="../author/misken/">misken</a>  
+</li>
+    
+<li id="tags">
+  <span
+    >Tags: </span
+  >
+   
+  <a href="../tag/python/">python</a>   
+  <a href="../tag/simpy/">simpy</a>   
+  <a href="../tag/simulation/">simulation</a>  
+</li>
+ 
+</ul>
+
+<h3>
+  <a href="../">Recent Posts</a>
+</h3>
+<ul>
+   
+  <li>
+    <a href="../hillmaker_030_released/"
+      >19 May - numpy speeds up hillmaker dramatically</a
+    >
+  </li>
+  
+  <li>
+    <a href="../simpy_vaccine_clinic_improvements/"
+      >11 April - Using SimPy to simulate a vaccine clinic - Part 2: model improvements</a
+    >
+  </li>
+  
+  <li>
+    <a href="../use_jupyter_conda_envs/"
+      >03 April - Using different conda environments with Jupyter Lab</a
+    >
+  </li>
+  
+  <li>
+    <a href="../hello_world/"
+      >02 April - Hello world from ablog blogging with JupyterLab</a
+    >
+  </li>
+  
+  <li>
+    <a href="../first-post/"
+      >01 April - First Post at new blogging site</a
+    >
+  </li>
+  
+</ul>
+
+<h3><a href="../tag/">Tags</a></h3>
+<style type="text/css">
+  ul.ablog-cloud {
+    list-style: none;
+    overflow: auto;
+  }
+  ul.ablog-cloud li {
+    float: left;
+    height: 20pt;
+    line-height: 18pt;
+    margin-right: 5px;
+  }
+  ul.ablog-cloud a {
+    text-decoration: none;
+    vertical-align: middle;
+  }
+  li.ablog-cloud-1 {
+    font-size: 80%;
+  }
+  li.ablog-cloud-2 {
+    font-size: 95%;
+  }
+  li.ablog-cloud-3 {
+    font-size: 110%;
+  }
+  li.ablog-cloud-4 {
+    font-size: 125%;
+  }
+  li.ablog-cloud-5 {
+    font-size: 140%;
+  }
+</style>
+<ul class="ablog-cloud">
+   
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/github/">GitHub</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-3">
+    <a href="../tag/r/">R</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/ablog/">ablog</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/analytics/">analytics</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/bikeshare/">bikeshare</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/birding/">birding</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/blogging/">blogging</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/caret/">caret</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/conda/">conda</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/datetime/">datetime</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/dplyr/">dplyr</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/ebird/">ebird</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/ecology/">ecology</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/excel/">excel</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/ggmap/">ggmap</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/ggplot2/">ggplot2</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/gis/">gis</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/git/">git</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/gps/">gps</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/healthcare/">healthcare</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/hiking/">hiking</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/hillmaker/">hillmaker</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/jupyter/">jupyter</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/matplotlib/">matplotlib</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/metamodeling/">metamodeling</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-2">
+    <a href="../tag/occupancy-analysis/">occupancy analysis</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/pandas/">pandas</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/patient-flow/">patient flow</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/plyr/">plyr</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-5">
+    <a href="../tag/python/">python</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/shiny/">shiny</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/simpy/">simpy</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/simulation/">simulation</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/sphinx/">sphinx</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/statistics/">statistics</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/teaching/">teaching</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/text/">text</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/xml/">xml</a>
+  </li>
+   
+</ul>
+
+<h3>
+  <a href="../archive/">Archives</a>
+</h3>
+<ul>
+   
+  <li>
+    <a href="../2022/">2022 (7)</a>
+  </li>
+    
+  <li>
+    <a href="../2021/">2021 (4)</a>
+  </li>
+    
+  <li>
+    <a href="../2020/">2020 (2)</a>
+  </li>
+    
+  <li>
+    <a href="../2019/">2019 (7)</a>
+  </li>
+    
+  <li>
+    <a href="../2018/">2018 (5)</a>
+  </li>
+    
+  <li>
+    <a href="../2017/">2017 (2)</a>
+  </li>
+    
+  <li>
+    <a href="../2016/">2016 (6)</a>
+  </li>
+    
+  <li>
+    <a href="../2014/">2014 (6)</a>
+  </li>
+    
+  <li>
+    <a href="../2013/">2013 (7)</a>
+  </li>
+   
+</ul>
+
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search/" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+              </div>
+              <div class="sidebar-end-items">
+              </div>
+            </div>
+            
           
 
-          <div class="body" role="main">
-             
+          
+          <div class="d-none d-xl-block col-xl-2 bd-toc">
+            
+              
+              <div class="toc-item">
+                
+<div class="tocsection onthispage mt-5 pt-1 pb-3">
+    <i class="fas fa-list"></i> On this page
+</div>
+
+<nav id="bd-toc-nav">
+    <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#Under-the-hood-with-DES-software">
+   Under the hood with DES software
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#DES-software">
+     DES software
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#Getting-started-with-SimPy">
+   Getting started with SimPy
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#Another-really-good-getting-started-tutorial">
+     Another really good getting started tutorial
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#Digging-a-little-deeper-into-the-inner-workings-of-SimPy">
+     Digging a little deeper into the inner workings of SimPy
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#Prelude:-Generators">
+   Prelude: Generators
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#The-structure-of-a-SimPy-program">
+   The structure of a SimPy program
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#Model-1:-Creating-a-patient-arrival-process">
+   Model 1: Creating a patient arrival process
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#Model-2:-Simplified-vaccine-clinic-with-delay-processes-and-one-resource">
+   Model 2: Simplified vaccine clinic with delay processes and one resource
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#Acquiring-and-releasing-resources">
+     Acquiring and releasing resources
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#Model-3:-The-vaccine-clinic-model---version-0.01">
+   Model 3: The vaccine clinic model - version 0.01
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#Creating-a-VaccineClinic-class">
+     Creating a
+     <code class="docutils literal notranslate">
+      <span class="pre">
+       VaccineClinic
+      </span>
+     </code>
+     class
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#The-get_vaccinated-function">
+     The
+     <code class="docutils literal notranslate">
+      <span class="pre">
+       get_vaccinated
+      </span>
+     </code>
+     function
+    </a>
+    <ul class="nav section-nav flex-column">
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#id1">
+       Acquiring and releasing resources
+      </a>
+     </li>
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#Patient-flow-timestamps">
+       Patient flow timestamps
+      </a>
+     </li>
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#Logging-occupancy-changes">
+       Logging occupancy changes
+      </a>
+     </li>
+    </ul>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#The-run_clinic-function">
+     The
+     <code class="docutils literal notranslate">
+      <span class="pre">
+       run_clinic
+      </span>
+     </code>
+     function
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#Post-processing-the-timestamps-file">
+     Post-processing the timestamps file
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#Histgram-of-total-time-in-system">
+     Histgram of total time in system
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#Key-summary-stats">
+     Key summary stats
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#The-time-dependent-nature-of-our-metrics">
+     The time dependent nature of our metrics
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#Occupancy-statistics">
+     Occupancy statistics
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#Multiple-replications">
+   Multiple replications
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#Possible-improvements">
+     Possible improvements
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#More-SimPy-resources">
+   More SimPy resources
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#From-the-SimPy-docs:">
+     From the SimPy docs:
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#From-Real-Python:">
+     From Real Python:
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#From-a-healthcare-modeling-workshop">
+     From a healthcare modeling workshop
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#From-a-few-of-my-blog-posts:">
+     From a few of my blog posts:
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#Some-computer-network-based-examples:">
+     Some computer network based examples:
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+
+</nav>
+              </div>
+              
+              <div class="toc-item">
+                
+              </div>
+              
+            
+          </div>
+          
+
+          
+          
+            
+          
+          <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+              
+              <div>
+                 
 <style>
 /* CSS for nbsphinx extension */
 
@@ -315,7 +910,7 @@ div.rendered_html tbody tr:hover {
 }
 </style>
 <section id="Using-SimPy-to-simulate-a-vaccine-clinic---Part-1:-an-introductory-tutorial">
-<h1>Using SimPy to simulate a vaccine clinic - Part 1: an introductory tutorial<a class="headerlink" href="#Using-SimPy-to-simulate-a-vaccine-clinic---Part-1:-an-introductory-tutorial" title="Permalink to this headline">¶</a></h1>
+<h1>Using SimPy to simulate a vaccine clinic - Part 1: an introductory tutorial<a class="headerlink" href="#Using-SimPy-to-simulate-a-vaccine-clinic---Part-1:-an-introductory-tutorial" title="Permalink to this headline">#</a></h1>
 <p>Discrete event simulation (DES) is a well established technique for building simulation models of systems characterized by:</p>
 <ul class="simple">
 <li><p>events that happen at discrete points in time (e.g. the arrival of a patient to the vaccine clinic, the completion of the vaccine injection),</p></li>
@@ -371,7 +966,7 @@ some important entity or resource related inputs: patient arrival rate, machine 
 </div>
 </div>
 <section id="Under-the-hood-with-DES-software">
-<h2>Under the hood with DES software<a class="headerlink" href="#Under-the-hood-with-DES-software" title="Permalink to this headline">¶</a></h2>
+<h2>Under the hood with DES software<a class="headerlink" href="#Under-the-hood-with-DES-software" title="Permalink to this headline">#</a></h2>
 <p>Internally, DES software relies on the notion of a simulation clock and a next event list (the <em>discrete events</em>) to decide which event to process next and when to process it. <strong>Between these discrete events, nothing happens to the state of the system - the clock “ticks” from event to event.</strong> For example, here’s what the next event list might look like (conceptually) at some time <span class="math notranslate nohighlight">\(t=70.1\)</span> during the simulation.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
@@ -411,7 +1006,7 @@ some important entity or resource related inputs: patient arrival rate, machine 
 </ul>
 <p>The advantage of using DES software such as SimPy is that it does the tedious work of managing the next event list and all the resource queues. Yes, you could write all this code yourself in any general purpose language, but it’s much easier to use a good simulation library like SimPy.</p>
 <section id="DES-software">
-<h3>DES software<a class="headerlink" href="#DES-software" title="Permalink to this headline">¶</a></h3>
+<h3>DES software<a class="headerlink" href="#DES-software" title="Permalink to this headline">#</a></h3>
 <p>DES has a long history and there are numerous commercial packages for doing this type of simulation. Many of these are quite sophisticated and allow you to build very complex, animated models and include comprehensive statistical monitors and analysis tools. Here’s are two short video clips of such a models built with Simio, a modern DES package. As you can see, you can build simple, abstract models as well as very complex and realistic models.</p>
 <ul class="simple">
 <li><p><a class="reference external" href="https://www.youtube.com/watch?v=2_FgFgLXNm8">A simple abstract model</a></p></li>
@@ -429,7 +1024,7 @@ some important entity or resource related inputs: patient arrival rate, machine 
 </section>
 </section>
 <section id="Getting-started-with-SimPy">
-<h2>Getting started with SimPy<a class="headerlink" href="#Getting-started-with-SimPy" title="Permalink to this headline">¶</a></h2>
+<h2>Getting started with SimPy<a class="headerlink" href="#Getting-started-with-SimPy" title="Permalink to this headline">#</a></h2>
 <p>From the <a class="reference external" href="https://simpy.readthedocs.io/en/latest/simpy_intro/">SimPy in 10 Minutes</a> tutorial:</p>
 <blockquote>
 <div><p>SimPy is a discrete-event simulation library. The behavior of active components (like vehicles, customers or messages) is modeled with processes. All processes live in an environment. They interact with the environment and with each other via events.</p>
@@ -451,19 +1046,19 @@ some important entity or resource related inputs: patient arrival rate, machine 
 </ul>
 <p>I encourage you to have a Jupyter notebook open as you are going through the SimPy in 10 Minutes tutorial and build the simple Car Simulation model it uses.</p>
 <section id="Another-really-good-getting-started-tutorial">
-<h3>Another really good getting started tutorial<a class="headerlink" href="#Another-really-good-getting-started-tutorial" title="Permalink to this headline">¶</a></h3>
+<h3>Another really good getting started tutorial<a class="headerlink" href="#Another-really-good-getting-started-tutorial" title="Permalink to this headline">#</a></h3>
 <p>I also highly recommend the following tutorial from Real Python. It walks you through building a simulation model a movie theater. It’s very well done and will help you better understand both the big picture of DES modeling and SimPy.</p>
 <ul class="simple">
 <li><p><a class="reference external" href="https://realpython.com/simpy-simulating-with-python/">https://realpython.com/simpy-simulating-with-python/</a></p></li>
 </ul>
 </section>
 <section id="Digging-a-little-deeper-into-the-inner-workings-of-SimPy">
-<h3>Digging a little deeper into the inner workings of SimPy<a class="headerlink" href="#Digging-a-little-deeper-into-the-inner-workings-of-SimPy" title="Permalink to this headline">¶</a></h3>
+<h3>Digging a little deeper into the inner workings of SimPy<a class="headerlink" href="#Digging-a-little-deeper-into-the-inner-workings-of-SimPy" title="Permalink to this headline">#</a></h3>
 <p>If interested, see <a class="reference external" href="https://simpy.readthedocs.io/en/latest/topical_guides/simpy_basics.html#how-simpy-works">https://simpy.readthedocs.io/en/latest/topical_guides/simpy_basics.html#how-simpy-works</a> for more technical details on how SimPy works.</p>
 </section>
 </section>
 <section id="Prelude:-Generators">
-<h2>Prelude: Generators<a class="headerlink" href="#Prelude:-Generators" title="Permalink to this headline">¶</a></h2>
+<h2>Prelude: Generators<a class="headerlink" href="#Prelude:-Generators" title="Permalink to this headline">#</a></h2>
 <p>The way that SimPy enables event based modeling is through Python <em>generators</em>. Generators are a special type of function (or method) that acts as an <strong>iterator</strong> and that <strong>remembers its state between calls to it</strong>. We also say that generator functions are <em>lazy iterators</em>. They are lazy in the sense that they don’t generate their values until asked to do so. For example, consider using a list comprehension to generate the first 10 perfect squares.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
@@ -609,14 +1204,14 @@ it takes for a patient to get registered at our clinic. We will also use <code c
 </ul>
 </section>
 <section id="The-structure-of-a-SimPy-program">
-<h2>The structure of a SimPy program<a class="headerlink" href="#The-structure-of-a-SimPy-program" title="Permalink to this headline">¶</a></h2>
+<h2>The structure of a SimPy program<a class="headerlink" href="#The-structure-of-a-SimPy-program" title="Permalink to this headline">#</a></h2>
 <p>There are actually several different ways to structure a SimPy simulation model program. You can do things in an object-oriented fashion, or a more procedural way, or a combination of both. Within these choices there are many different ways to go about developing the details of the model. Even though SimPy has been around for several years, best practices for modeling are still evolving. In addition, things that come as standard features in many commercial simulation packages such as statistical
 monitoring and animation, are the responsibility of the modeler when using SimPy. This can affect how the model is architected.</p>
 <p>In this tutorial, I’m going to try to use a pattern that is easily accessible by new Python simulation modelers. It will use a combination of custom classes as well as process functions.</p>
 <p>Before launching into building the entire vaccine clinic model, let’s do a few simple warmup models to become more familiar with SimPy.</p>
 </section>
 <section id="Model-1:-Creating-a-patient-arrival-process">
-<h2>Model 1: Creating a patient arrival process<a class="headerlink" href="#Model-1:-Creating-a-patient-arrival-process" title="Permalink to this headline">¶</a></h2>
+<h2>Model 1: Creating a patient arrival process<a class="headerlink" href="#Model-1:-Creating-a-patient-arrival-process" title="Permalink to this headline">#</a></h2>
 <p>For our vaccine clinic model, we’ll need a way to generate patient arrivals. To start, let’s just generate a new patient every <span class="math notranslate nohighlight">\(n\)</span> minutes. There are no specific time units specified in SimPy. It’s our job to keep our time units straight and is helpful to think of each unit of time as a minute. It would be nice to know when each patient was created to make sure things are working correctly. SimPy has functions for accessing the state of the simulation clock - the current simulation time is
 accessible from the <code class="docutils literal notranslate"><span class="pre">now</span></code> attribute of the simulation environment object (which by convention we usually name <code class="docutils literal notranslate"><span class="pre">env</span></code>). We’ll include <code class="docutils literal notranslate"><span class="pre">print</span></code> statements to help illustrate what is going in inside the function.</p>
 <div class="nbinput docutils container">
@@ -642,7 +1237,8 @@ accessible from the <code class="docutils literal notranslate"><span class="pre"
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">patient_arrivals</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="n">interarrival_time</span><span class="o">=</span><span class="mf">5.0</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Generate patients according to a fixed time arrival process&quot;&quot;&quot;</span>
 
-    <span class="c1"># Create a counter to keep track of number of patients generated and to serve as unique patient id</span>
+    <span class="c1"># Create a counter to keep track of number of patients generated and</span>
+    <span class="c1"># to serve as unique patient id</span>
     <span class="n">patient</span> <span class="o">=</span> <span class="mi">0</span>
 
     <span class="c1"># Infinite loop for generating patients</span>
@@ -651,7 +1247,8 @@ accessible from the <code class="docutils literal notranslate"><span class="pre"
         <span class="c1"># Generate next interarrival time (this will be more complicated later)</span>
         <span class="n">iat</span> <span class="o">=</span> <span class="n">interarrival_time</span>
 
-        <span class="c1"># This process will now yield to a &#39;timeout&#39; event. This process will resume after iat time units.</span>
+        <span class="c1"># This process will now yield to a &#39;timeout&#39; event. This process will</span>
+        <span class="c1"># resume after iat time units.</span>
         <span class="k">yield</span> <span class="n">env</span><span class="o">.</span><span class="n">timeout</span><span class="p">(</span><span class="n">iat</span><span class="p">)</span>
 
         <span class="c1"># Okay, we&#39;re back. :) New patient generated = update counter of patients</span>
@@ -752,9 +1349,11 @@ of generated exponential random variates.</p>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Import exponential distribution function from scipy.stats</span>
 <span class="kn">from</span> <span class="nn">scipy.stats</span> <span class="kn">import</span> <span class="n">expon</span>
-<span class="c1"># Set mean of this distribution to whatever we were using above for interarrival time</span>
+<span class="c1"># Set mean of this distribution to whatever we were using</span>
+<span class="c1"># above for interarrival time</span>
 <span class="n">mean_interarrival_time</span> <span class="o">=</span> <span class="n">interarrival_time</span>
-<span class="c1"># Create a random variable object based on the exponential distribution with the given mean</span>
+<span class="c1"># Create a random variable object based on the exponential</span>
+<span class="c1"># distribution with the given mean</span>
 <span class="n">rv_expon</span> <span class="o">=</span> <span class="n">expon</span><span class="p">(</span><span class="n">scale</span><span class="o">=</span><span class="n">mean_interarrival_time</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -763,7 +1362,8 @@ of generated exponential random variates.</p>
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Generate 1000 exponential random variates (notice this is the exponential function from numpy)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Generate 1000 exponential random variates</span>
+<span class="c1"># (notice this is the exponential function from numpy)</span>
 <span class="n">iat_sample</span> <span class="o">=</span> <span class="n">rg</span><span class="o">.</span><span class="n">exponential</span><span class="p">(</span><span class="n">mean_interarrival_time</span><span class="p">,</span> <span class="mi">10000</span><span class="p">)</span>
 
 <span class="c1"># Create a histogram of the random samples with exponential pdf overlaid</span>
@@ -796,10 +1396,12 @@ of generated exponential random variates.</p>
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">patient_arrivals_random_1</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="n">mean_interarrival_time</span><span class="o">=</span><span class="mf">5.0</span><span class="p">,</span> <span class="n">rg</span><span class="o">=</span><span class="n">default_rng</span><span class="p">(</span><span class="mi">0</span><span class="p">)):</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">patient_arrivals_random_1</span><span class="p">(</span><span class="n">env</span><span class="p">,</span>
+                              <span class="n">mean_interarrival_time</span><span class="o">=</span><span class="mf">5.0</span><span class="p">,</span> <span class="n">rg</span><span class="o">=</span><span class="n">default_rng</span><span class="p">(</span><span class="mi">0</span><span class="p">)):</span>
     <span class="sd">&quot;&quot;&quot;Generate patients according to a Poisson arrival process&quot;&quot;&quot;</span>
 
-    <span class="c1"># Create a counter to keep track of number of patients generated and to serve as unique patient id</span>
+    <span class="c1"># Create a counter to keep track of number of patients generated</span>
+    <span class="c1"># and to serve as unique patient id</span>
     <span class="n">patient</span> <span class="o">=</span> <span class="mi">0</span>
 
     <span class="c1"># Infinite loop for generating patients</span>
@@ -808,7 +1410,8 @@ of generated exponential random variates.</p>
         <span class="c1"># Generate next interarrival time from exponential distribution</span>
         <span class="n">iat</span> <span class="o">=</span> <span class="n">rg</span><span class="o">.</span><span class="n">exponential</span><span class="p">(</span><span class="n">mean_interarrival_time</span><span class="p">)</span>
 
-        <span class="c1"># This process will now yield to a &#39;timeout&#39; event. This process will resume after iat time units.</span>
+        <span class="c1"># This process will now yield to a &#39;timeout&#39; event. This process</span>
+        <span class="c1"># will resume after iat time units.</span>
         <span class="k">yield</span> <span class="n">env</span><span class="o">.</span><span class="n">timeout</span><span class="p">(</span><span class="n">iat</span><span class="p">)</span>
 
         <span class="c1"># Update counter of patients</span>
@@ -855,7 +1458,7 @@ Patient 9 created at time 24.44267577471252
 </div>
 </section>
 <section id="Model-2:-Simplified-vaccine-clinic-with-delay-processes-and-one-resource">
-<h2>Model 2: Simplified vaccine clinic with delay processes and one resource<a class="headerlink" href="#Model-2:-Simplified-vaccine-clinic-with-delay-processes-and-one-resource" title="Permalink to this headline">¶</a></h2>
+<h2>Model 2: Simplified vaccine clinic with delay processes and one resource<a class="headerlink" href="#Model-2:-Simplified-vaccine-clinic-with-delay-processes-and-one-resource" title="Permalink to this headline">#</a></h2>
 <p>Let’s extend the model a bit and create our first simplified vaccine clinic model by adding:</p>
 <ul class="simple">
 <li><p>a simple delay process to represent the steps before vaccination - we’ll model this total time in the pre-vaccination stages with another exponential distribution having a mean of 4.25 minutes,</p></li>
@@ -885,7 +1488,7 @@ Patient 9 created at time 24.44267577471252
 <li><p>Modify the arrival process to create a vaccination event for each patient arrival,</p></li>
 </ul>
 <section id="Acquiring-and-releasing-resources">
-<h3>Acquiring and releasing resources<a class="headerlink" href="#Acquiring-and-releasing-resources" title="Permalink to this headline">¶</a></h3>
+<h3>Acquiring and releasing resources<a class="headerlink" href="#Acquiring-and-releasing-resources" title="Permalink to this headline">#</a></h3>
 <p>For the actual vaccination stage, we’ll use a common code block pattern:</p>
 <ul class="simple">
 <li><p>attempt to acquire a certain type of staff resource using a <a class="reference external" href="https://dbader.org/blog/python-context-managers-and-with-statement">Python context manager</a>,</p></li>
@@ -910,7 +1513,8 @@ Patient 9 created at time 24.44267577471252
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">simplified_vac_process</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">mean_prevac_time</span><span class="p">,</span> <span class="n">mean_vac_time</span><span class="p">,</span> <span class="n">mean_postvac_time</span><span class="p">,</span> <span class="n">vaccinator</span><span class="p">):</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">simplified_vac_process</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">mean_prevac_time</span><span class="p">,</span>
+                           <span class="n">mean_vac_time</span><span class="p">,</span> <span class="n">mean_postvac_time</span><span class="p">,</span> <span class="n">vaccinator</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Process function modeling how a patient flows through system.&quot;&quot;&quot;</span>
 
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> entering vaccination clinic at </span><span class="si">{</span><span class="n">env</span><span class="o">.</span><span class="n">now</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -939,11 +1543,13 @@ Patient 9 created at time 24.44267577471252
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">patient_arrivals_random_2</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="n">mean_interarrival_time</span><span class="p">,</span> <span class="n">mean_prevac_time</span><span class="p">,</span> <span class="n">mean_vac_time</span><span class="p">,</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">patient_arrivals_random_2</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="n">mean_interarrival_time</span><span class="p">,</span>
+                              <span class="n">mean_prevac_time</span><span class="p">,</span> <span class="n">mean_vac_time</span><span class="p">,</span>
                               <span class="n">mean_postvac_time</span><span class="p">,</span> <span class="n">vaccinator</span><span class="p">,</span> <span class="n">rg</span><span class="o">=</span><span class="n">default_rng</span><span class="p">(</span><span class="mi">0</span><span class="p">)):</span>
     <span class="sd">&quot;&quot;&quot;Generate patients according to a Poisson arrival process&quot;&quot;&quot;</span>
 
-    <span class="c1"># Create a counter to keep track of number of patients generated and to serve as unique patient id</span>
+    <span class="c1"># Create a counter to keep track of number of patients generated</span>
+    <span class="c1"># and to serve as unique patient id</span>
     <span class="n">patient</span> <span class="o">=</span> <span class="mi">0</span>
 
     <span class="c1"># Infinite loop for generating patients</span>
@@ -965,8 +1571,9 @@ Patient 9 created at time 24.44267577471252
         <span class="c1"># I&#39;m doing in two steps here, but could combine into one</span>
 
         <span class="c1"># Create a new patient delay process generator object.</span>
-        <span class="n">patient_visit</span> <span class="o">=</span> <span class="n">simplified_vac_process</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="s1">&#39;Patient</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">patient</span><span class="p">),</span>
-                                               <span class="n">mean_prevac_time</span><span class="p">,</span> <span class="n">mean_vac_time</span><span class="p">,</span> <span class="n">mean_postvac_time</span><span class="p">,</span> <span class="n">vaccinator</span><span class="p">)</span>
+        <span class="n">patient_visit</span> <span class="o">=</span> <span class="n">simplified_vac_process</span><span class="p">(</span>
+            <span class="n">env</span><span class="p">,</span> <span class="s1">&#39;Patient</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">patient</span><span class="p">),</span> <span class="n">mean_prevac_time</span><span class="p">,</span>
+            <span class="n">mean_vac_time</span><span class="p">,</span> <span class="n">mean_postvac_time</span><span class="p">,</span> <span class="n">vaccinator</span><span class="p">)</span>
 
         <span class="c1"># Register the process with the simulation environment</span>
         <span class="n">env</span><span class="o">.</span><span class="n">process</span><span class="p">(</span><span class="n">patient_visit</span><span class="p">)</span>
@@ -997,8 +1604,9 @@ Patient 9 created at time 24.44267577471252
 <span class="n">vaccinator</span> <span class="o">=</span> <span class="n">simpy</span><span class="o">.</span><span class="n">Resource</span><span class="p">(</span><span class="n">env3</span><span class="p">,</span> <span class="n">num_vaccinators</span><span class="p">)</span>
 
 <span class="c1"># Register our new arrivals process</span>
-<span class="n">env3</span><span class="o">.</span><span class="n">process</span><span class="p">(</span><span class="n">patient_arrivals_random_2</span><span class="p">(</span><span class="n">env3</span><span class="p">,</span> <span class="n">mean_interarrival_time</span><span class="p">,</span> <span class="n">mean_prevac_time</span><span class="p">,</span> <span class="n">mean_vac_time</span><span class="p">,</span>
-                                      <span class="n">mean_postvac_time</span><span class="p">,</span> <span class="n">vaccinator</span><span class="p">))</span>
+<span class="n">env3</span><span class="o">.</span><span class="n">process</span><span class="p">(</span><span class="n">patient_arrivals_random_2</span><span class="p">(</span>
+    <span class="n">env3</span><span class="p">,</span> <span class="n">mean_interarrival_time</span><span class="p">,</span> <span class="n">mean_prevac_time</span><span class="p">,</span>
+    <span class="n">mean_vac_time</span><span class="p">,</span> <span class="n">mean_postvac_time</span><span class="p">,</span> <span class="n">vaccinator</span><span class="p">))</span>
 
 <span class="c1"># Run the simulation</span>
 <span class="n">runtime</span> <span class="o">=</span> <span class="mi">50</span>
@@ -1066,7 +1674,7 @@ Patient10 got vaccinator at 45.3688
 </section>
 </section>
 <section id="Model-3:-The-vaccine-clinic-model---version-0.01">
-<h2>Model 3: The vaccine clinic model - version 0.01<a class="headerlink" href="#Model-3:-The-vaccine-clinic-model---version-0.01" title="Permalink to this headline">¶</a></h2>
+<h2>Model 3: The vaccine clinic model - version 0.01<a class="headerlink" href="#Model-3:-The-vaccine-clinic-model---version-0.01" title="Permalink to this headline">#</a></h2>
 <p>Here’s the basic vaccination process we’ll model.</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span>Arrival --&gt; Temperature check --&gt; Registration --&gt; Vaccination --&gt; Schedule dose 2 (if needed) --&gt; Wait 15 min --&gt; Exit
 </pre></div>
@@ -1088,7 +1696,7 @@ Patient10 got vaccinator at 45.3688
 </div>
 </div>
 <section id="Creating-a-VaccineClinic-class">
-<h3>Creating a <code class="docutils literal notranslate"><span class="pre">VaccineClinic</span></code> class<a class="headerlink" href="#Creating-a-VaccineClinic-class" title="Permalink to this headline">¶</a></h3>
+<h3>Creating a <code class="docutils literal notranslate"><span class="pre">VaccineClinic</span></code> class<a class="headerlink" href="#Creating-a-VaccineClinic-class" title="Permalink to this headline">#</a></h3>
 <p>We will model the clinic itself with a Python class. This class will contain attributes such as:</p>
 <ul class="simple">
 <li><p>the SimPy environment,</p></li>
@@ -1104,7 +1712,8 @@ Patient10 got vaccinator at 45.3688
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">VaccineClinic</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">env</span><span class="p">,</span> <span class="n">num_greeters</span><span class="p">,</span> <span class="n">num_reg_staff</span><span class="p">,</span> <span class="n">num_vaccinators</span><span class="p">,</span> <span class="n">num_schedulers</span><span class="p">,</span> <span class="n">rg</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">env</span><span class="p">,</span> <span class="n">num_greeters</span><span class="p">,</span> <span class="n">num_reg_staff</span><span class="p">,</span>
+                 <span class="n">num_vaccinators</span><span class="p">,</span> <span class="n">num_schedulers</span><span class="p">,</span> <span class="n">rg</span><span class="p">):</span>
         <span class="c1"># Simulation environment</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">env</span> <span class="o">=</span> <span class="n">env</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">rg</span> <span class="o">=</span> <span class="n">rg</span>
@@ -1146,7 +1755,7 @@ Patient10 got vaccinator at 45.3688
 </div>
 </section>
 <section id="The-get_vaccinated-function">
-<h3>The <code class="docutils literal notranslate"><span class="pre">get_vaccinated</span></code> function<a class="headerlink" href="#The-get_vaccinated-function" title="Permalink to this headline">¶</a></h3>
+<h3>The <code class="docutils literal notranslate"><span class="pre">get_vaccinated</span></code> function<a class="headerlink" href="#The-get_vaccinated-function" title="Permalink to this headline">#</a></h3>
 <p>Now we’ll create a general <code class="docutils literal notranslate"><span class="pre">get_vaccinated</span></code> function to define the sequence of steps traversed by patients. We’ll also capture a bunch of timestamps to make it easy to compute various system performance measures such as patient waiting times, queue sizes and resource utilization. The inputs to this function include:</p>
 <ul class="simple">
 <li><p>the simulation environment,</p></li>
@@ -1156,7 +1765,7 @@ Patient10 got vaccinator at 45.3688
 <li><p>the random number generator.</p></li>
 </ul>
 <section id="id1">
-<h4>Acquiring and releasing resources<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h4>
+<h4>Acquiring and releasing resources<a class="headerlink" href="#id1" title="Permalink to this headline">#</a></h4>
 <p>For each step in the vaccination process, you’ll find a sequence of code blocks in which we:</p>
 <ul class="simple">
 <li><p>attempt to acquire a certain type of staff resource,</p></li>
@@ -1175,14 +1784,14 @@ Patient10 got vaccinator at 45.3688
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">request</span></code> is a type of SimPy event corresponding to our request to get one unit of the <code class="docutils literal notranslate"><span class="pre">reg_staff</span></code> resource,</p></li>
 <li><p>We <code class="docutils literal notranslate"><span class="pre">yield</span></code> the <code class="docutils literal notranslate"><span class="pre">request</span></code> - in essence, suspending the function until the request can be satistfied,</p></li>
-<li><p>once the request is satisfied, the next line, <code class="docutils literal notranslate"><span class="pre">got_reg_ts</span> <span class="pre">=</span> <span class="pre">env.now</span></code> gets executed and we get the current simulation time and store it in a local variable, <code class="docutils literal notranslate"><span class="pre">got_reg_ts</span></code> (later in the code we’ll put this variable value into a dictionary that we persists throughout the entire simulation)</p></li>
+<li><p>once the request is satisfied, the next line, <code class="docutils literal notranslate"><span class="pre">got_reg_ts</span> <span class="pre">=</span> <span class="pre">env.now</span></code> gets executed and we get the current simulation time and store it in a local variable, <code class="docutils literal notranslate"><span class="pre">got_reg_ts</span></code> (later in the code we’ll put this variable value into a dictionary that will persist throughout the entire simulation)</p></li>
 <li><p>Now we do another <code class="docutils literal notranslate"><span class="pre">yield</span></code> but this time we are yielding a new <code class="docutils literal notranslate"><span class="pre">process</span></code> event, the actual <code class="docutils literal notranslate"><span class="pre">registration</span></code> (generator) function, which is part of the <code class="docutils literal notranslate"><span class="pre">clinic</span></code> object.</p></li>
 <li><p>When the patient is done with the registration process, the next line, <code class="docutils literal notranslate"><span class="pre">release_reg_ts</span> <span class="pre">=</span> <span class="pre">env.now</span></code>, captures the registration finish time.</p></li>
 </ul>
 <p>We’ll use this same code <em>pattern</em> throughout the <code class="docutils literal notranslate"><span class="pre">get_vaccinated</span></code> function as we move through the different stages of the vaccination process.</p>
 </section>
 <section id="Patient-flow-timestamps">
-<h4>Patient flow timestamps<a class="headerlink" href="#Patient-flow-timestamps" title="Permalink to this headline">¶</a></h4>
+<h4>Patient flow timestamps<a class="headerlink" href="#Patient-flow-timestamps" title="Permalink to this headline">#</a></h4>
 <p>You just saw that we create numerous timestamp variables corresponding to things like when a patient starts and ends various stages of the vaccination process. For example:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">got_greeter_ts</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">now</span>
 </pre></div>
@@ -1191,7 +1800,7 @@ Patient10 got vaccinator at 45.3688
 <p>When the simulation is done, we can convert this list of dictionaries into a pandas dataframe, compute the important time durations for each patient and then do summary stats and plots on these new fields.</p>
 </section>
 <section id="Logging-occupancy-changes">
-<h4>Logging occupancy changes<a class="headerlink" href="#Logging-occupancy-changes" title="Permalink to this headline">¶</a></h4>
+<h4>Logging occupancy changes<a class="headerlink" href="#Logging-occupancy-changes" title="Permalink to this headline">#</a></h4>
 <p>We are also interested in the number of patients present in the vaccination stage and the number in the post-vaccination observation stage. Unfortunately, SimPy no longer has built in <em>monitor</em> classes to track these things. So, we’ll do it ourselves. In order to correctly compute time averaged occupancy statistics, we just need to log the time and occupancy level each time it changes. For example, when a patient acquires a staff member to administer the vaccination, the occupancy in the
 vaccination stage increases by 1. When the vaccination is complete and the patient releases the resource, the occupancy decreases by 1.</p>
 <p>If you look back at the <code class="docutils literal notranslate"><span class="pre">VaccineClinic</span></code> class definition, you’ll see the initialization for the occupancy lists that we’ll updating.</p>
@@ -1220,7 +1829,8 @@ vaccination stage increases by 1. When the vaccination is complete and the patie
     <span class="n">arrival_ts</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">now</span>
 
     <span class="c1"># Request a greeter for temperature check</span>
-    <span class="c1"># By using request() in a context manager, we&#39;ll automatically release the resource when done</span>
+    <span class="c1"># By using request() in a context manager, we&#39;ll automatically</span>
+    <span class="c1"># release the resource when done</span>
     <span class="k">with</span> <span class="n">clinic</span><span class="o">.</span><span class="n">greeter</span><span class="o">.</span><span class="n">request</span><span class="p">()</span> <span class="k">as</span> <span class="n">request</span><span class="p">:</span>
         <span class="k">yield</span> <span class="n">request</span>
         <span class="c1"># Now that we have a greeter, check temperature. Note time.</span>
@@ -1245,18 +1855,20 @@ vaccination stage increases by 1. When the vaccination is complete and the patie
         <span class="n">clinic</span><span class="o">.</span><span class="n">vac_occupancy_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_occ</span><span class="p">)</span>
         <span class="k">yield</span> <span class="n">env</span><span class="o">.</span><span class="n">process</span><span class="p">(</span><span class="n">clinic</span><span class="o">.</span><span class="n">vaccinate</span><span class="p">(</span><span class="n">patient</span><span class="p">))</span>
         <span class="n">release_vaccinator_ts</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">now</span>
-        <span class="c1"># Update vac occupancy - decrement by 1 - more compact code</span>
-        <span class="c1"># Note that clinic.vac_occupancy_list[-1] is the last tuple in the list</span>
-        <span class="c1">#  and that clinic.vac_occupancy_list[-1][1] is referencing the occupancy</span>
-        <span class="c1">#  value in the tuple (remember tuple elements are indexed starting with 0, so</span>
-        <span class="c1">#  the timestamp is at [0] and the occupancy is at [1]).</span>
-        <span class="c1">#  BTW, this suggests that perhaps using something known as &quot;namedtuples&quot; might</span>
-        <span class="c1">#  make our code more readable. See https://realpython.com/python-namedtuple/</span>
-        <span class="c1">#  for a good introduction to namedtuples.</span>
-        <span class="n">clinic</span><span class="o">.</span><span class="n">vac_occupancy_list</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">env</span><span class="o">.</span><span class="n">now</span><span class="p">,</span> <span class="n">clinic</span><span class="o">.</span><span class="n">vac_occupancy_list</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span>
+<span class="c1"># Update vac occupancy - decrement by 1 - more compact code</span>
+<span class="c1"># Note that clinic.vac_occupancy_list[-1] is the last tuple in the list</span>
+<span class="c1">#  and that clinic.vac_occupancy_list[-1][1] is referencing the occupancy</span>
+<span class="c1">#  value in the tuple (remember tuple elements are indexed starting with 0, so</span>
+<span class="c1">#  the timestamp is at [0] and the occupancy is at [1]).</span>
+<span class="c1">#  BTW, this suggests that perhaps using something known as &quot;namedtuples&quot; might</span>
+<span class="c1">#  make our code more readable. See https://realpython.com/python-namedtuple/</span>
+<span class="c1">#  for a good introduction to namedtuples.</span>
+        <span class="n">clinic</span><span class="o">.</span><span class="n">vac_occupancy_list</span><span class="o">.</span><span class="n">append</span><span class="p">((</span>
+            <span class="n">env</span><span class="o">.</span><span class="n">now</span><span class="p">,</span> <span class="n">clinic</span><span class="o">.</span><span class="n">vac_occupancy_list</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span>
 
         <span class="c1"># Update postvac occupancy - increment by 1</span>
-        <span class="n">clinic</span><span class="o">.</span><span class="n">postvac_occupancy_list</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">env</span><span class="o">.</span><span class="n">now</span><span class="p">,</span> <span class="n">clinic</span><span class="o">.</span><span class="n">postvac_occupancy_list</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="n">clinic</span><span class="o">.</span><span class="n">postvac_occupancy_list</span><span class="o">.</span><span class="n">append</span><span class="p">((</span>
+            <span class="n">env</span><span class="o">.</span><span class="n">now</span><span class="p">,</span> <span class="n">clinic</span><span class="o">.</span><span class="n">postvac_occupancy_list</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
 
     <span class="c1"># Request scheduler to schedule second dose if needed</span>
     <span class="k">if</span> <span class="n">rg</span><span class="o">.</span><span class="n">random</span><span class="p">()</span> <span class="o">&lt;</span> <span class="n">pct_first_dose</span><span class="p">:</span>
@@ -1279,7 +1891,8 @@ vaccination stage increases by 1. When the vaccination is complete and the patie
         <span class="n">exit_system_ts</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">now</span>
 
         <span class="c1"># Update postvac occupancy - decrement by 1</span>
-        <span class="n">clinic</span><span class="o">.</span><span class="n">postvac_occupancy_list</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">env</span><span class="o">.</span><span class="n">now</span><span class="p">,</span> <span class="n">clinic</span><span class="o">.</span><span class="n">postvac_occupancy_list</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="n">clinic</span><span class="o">.</span><span class="n">postvac_occupancy_list</span><span class="o">.</span><span class="n">append</span><span class="p">((</span>
+            <span class="n">env</span><span class="o">.</span><span class="n">now</span><span class="p">,</span> <span class="n">clinic</span><span class="o">.</span><span class="n">postvac_occupancy_list</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span>
 
     <span class="n">exit_system_ts</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">now</span>
     <span class="c1">#print(f&quot;Patient {patient} exited at time {env.now}&quot;)</span>
@@ -1304,7 +1917,7 @@ vaccination stage increases by 1. When the vaccination is complete and the patie
 </section>
 </section>
 <section id="The-run_clinic-function">
-<h3>The <code class="docutils literal notranslate"><span class="pre">run_clinic</span></code> function<a class="headerlink" href="#The-run_clinic-function" title="Permalink to this headline">¶</a></h3>
+<h3>The <code class="docutils literal notranslate"><span class="pre">run_clinic</span></code> function<a class="headerlink" href="#The-run_clinic-function" title="Permalink to this headline">#</a></h3>
 <p>Now we’ll create a function that runs the clinic for a specified number of hours. The inputs to this function include:</p>
 <ul class="simple">
 <li><p>the simulation environment,</p></li>
@@ -1322,13 +1935,14 @@ vaccination stage increases by 1. When the vaccination is complete and the patie
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">run_clinic</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="n">clinic</span><span class="p">,</span> <span class="n">mean_interarrival_time</span><span class="p">,</span> <span class="n">pct_first_dose</span><span class="p">,</span> <span class="n">rg</span><span class="p">,</span>
                <span class="n">stoptime</span><span class="o">=</span><span class="n">simpy</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">Infinity</span><span class="p">,</span> <span class="n">max_arrivals</span><span class="o">=</span><span class="n">simpy</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">Infinity</span><span class="p">):</span>
 
-    <span class="c1"># Create a counter to keep track of number of patients generated and to serve as unique patient id</span>
+    <span class="c1"># Create a counter to keep track of number of patients</span>
+    <span class="c1"># generated and to serve as unique patient id</span>
     <span class="n">patient</span> <span class="o">=</span> <span class="mi">0</span>
 
     <span class="c1"># Loop for generating patients</span>
     <span class="k">while</span> <span class="n">env</span><span class="o">.</span><span class="n">now</span> <span class="o">&lt;</span> <span class="n">stoptime</span> <span class="ow">and</span> <span class="n">patient</span> <span class="o">&lt;</span> <span class="n">max_arrivals</span><span class="p">:</span>
 
-        <span class="c1"># Generate next interarrival time (this will be more complicated later)</span>
+        <span class="c1"># Generate next interarrival time</span>
         <span class="n">iat</span> <span class="o">=</span> <span class="n">rg</span><span class="o">.</span><span class="n">exponential</span><span class="p">(</span><span class="n">mean_interarrival_time</span><span class="p">)</span>
 
         <span class="c1"># This process will now yield to a &#39;timeout&#39; event.</span>
@@ -1371,10 +1985,12 @@ vaccination stage increases by 1. When the vaccination is complete and the patie
     <span class="c1"># Create a simulation environment</span>
     <span class="n">env</span> <span class="o">=</span> <span class="n">simpy</span><span class="o">.</span><span class="n">Environment</span><span class="p">()</span>
     <span class="c1"># Create a clinic to simulate</span>
-    <span class="n">clinic</span> <span class="o">=</span> <span class="n">VaccineClinic</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="n">num_greeters</span><span class="p">,</span> <span class="n">num_reg_staff</span><span class="p">,</span> <span class="n">num_vaccinators</span><span class="p">,</span> <span class="n">num_schedulers</span><span class="p">,</span> <span class="n">rg</span><span class="p">)</span>
+    <span class="n">clinic</span> <span class="o">=</span> <span class="n">VaccineClinic</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="n">num_greeters</span><span class="p">,</span> <span class="n">num_reg_staff</span><span class="p">,</span>
+                           <span class="n">num_vaccinators</span><span class="p">,</span> <span class="n">num_schedulers</span><span class="p">,</span> <span class="n">rg</span><span class="p">)</span>
 
     <span class="c1"># Register the run_clinic (generator) function</span>
-    <span class="n">env</span><span class="o">.</span><span class="n">process</span><span class="p">(</span><span class="n">run_clinic</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="n">clinic</span><span class="p">,</span> <span class="n">mean_interarrival_time</span><span class="p">,</span> <span class="n">pct_first_dose</span><span class="p">,</span> <span class="n">rg</span><span class="p">,</span> <span class="n">stoptime</span><span class="o">=</span><span class="n">stoptime</span><span class="p">))</span>
+    <span class="n">env</span><span class="o">.</span><span class="n">process</span><span class="p">(</span><span class="n">run_clinic</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="n">clinic</span><span class="p">,</span> <span class="n">mean_interarrival_time</span><span class="p">,</span>
+                           <span class="n">pct_first_dose</span><span class="p">,</span> <span class="n">rg</span><span class="p">,</span> <span class="n">stoptime</span><span class="o">=</span><span class="n">stoptime</span><span class="p">))</span>
     <span class="c1"># Actually run the simulation</span>
     <span class="n">env</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
 
@@ -1383,13 +1999,17 @@ vaccination stage increases by 1. When the vaccination is complete and the patie
 
     <span class="c1"># Output log files</span>
     <span class="n">clinic_patient_log_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">clinic</span><span class="o">.</span><span class="n">timestamps_list</span><span class="p">)</span>
-    <span class="n">clinic_patient_log_df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="s1">&#39;./output/clinic_patient_log_df.csv&#39;</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">clinic_patient_log_df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span>
+        <span class="s1">&#39;./output/clinic_patient_log_df.csv&#39;</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
     <span class="n">vac_occupancy_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">clinic</span><span class="o">.</span><span class="n">vac_occupancy_list</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;ts&#39;</span><span class="p">,</span> <span class="s1">&#39;occ&#39;</span><span class="p">])</span>
-    <span class="n">vac_occupancy_df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="s1">&#39;./output/vac_occupancy_df.csv&#39;</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">vac_occupancy_df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span>
+        <span class="s1">&#39;./output/vac_occupancy_df.csv&#39;</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
-    <span class="n">postvac_occupancy_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">clinic</span><span class="o">.</span><span class="n">postvac_occupancy_list</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;ts&#39;</span><span class="p">,</span> <span class="s1">&#39;occ&#39;</span><span class="p">])</span>
-    <span class="n">postvac_occupancy_df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="s1">&#39;./output/postvac_occupancy_df.csv&#39;</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">postvac_occupancy_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+        <span class="n">clinic</span><span class="o">.</span><span class="n">postvac_occupancy_list</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;ts&#39;</span><span class="p">,</span> <span class="s1">&#39;occ&#39;</span><span class="p">])</span>
+    <span class="n">postvac_occupancy_df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span>
+        <span class="s1">&#39;./output/postvac_occupancy_df.csv&#39;</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
     <span class="c1"># Note simulation end time</span>
     <span class="n">end_time</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">now</span>
@@ -1418,7 +2038,7 @@ Simulation ended at time 875.4387606496971
 <p>Oh, oh. The clinic ran several hours past it’s intended ending time of 10 hours (600 minutes). Let’s dig into the output files and figure out how to make this clinic run better.</p>
 </section>
 <section id="Post-processing-the-timestamps-file">
-<h3>Post-processing the timestamps file<a class="headerlink" href="#Post-processing-the-timestamps-file" title="Permalink to this headline">¶</a></h3>
+<h3>Post-processing the timestamps file<a class="headerlink" href="#Post-processing-the-timestamps-file" title="Permalink to this headline">#</a></h3>
 <p>Our simulation model captured numerous timestamps for each patient as they went through the vaccination process. The timestamps were written to a log file with one row per patient. Now we can compute various wait times and service times for each patient and then summarize them for the clinic.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[30]:
@@ -1580,13 +2200,20 @@ memory usage: 154.4 KB
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">compute_durations</span><span class="p">(</span><span class="n">timestamp_df</span><span class="p">):</span>
 
-    <span class="n">timestamp_df</span><span class="p">[</span><span class="s1">&#39;wait_for_greeter&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">timestamp_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="s1">&#39;got_greeter_ts&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="n">timestamp_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="s1">&#39;arrival_ts&#39;</span><span class="p">]</span>
-    <span class="n">timestamp_df</span><span class="p">[</span><span class="s1">&#39;wait_for_reg&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">timestamp_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="s1">&#39;got_reg_ts&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="n">timestamp_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="s1">&#39;release_greeter_ts&#39;</span><span class="p">]</span>
-    <span class="n">timestamp_df</span><span class="p">[</span><span class="s1">&#39;wait_for_vaccinator&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">timestamp_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="s1">&#39;got_vaccinator_ts&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="n">timestamp_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="s1">&#39;release_reg_ts&#39;</span><span class="p">]</span>
-    <span class="n">timestamp_df</span><span class="p">[</span><span class="s1">&#39;vaccination_time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">timestamp_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="s1">&#39;release_vaccinator_ts&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="n">timestamp_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="s1">&#39;got_vaccinator_ts&#39;</span><span class="p">]</span>
-    <span class="n">timestamp_df</span><span class="p">[</span><span class="s1">&#39;wait_for_scheduler&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">timestamp_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="s1">&#39;got_scheduler_ts&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="n">timestamp_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="s1">&#39;release_vaccinator_ts&#39;</span><span class="p">]</span>
-    <span class="n">timestamp_df</span><span class="p">[</span><span class="s1">&#39;post_vacc_time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">timestamp_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="s1">&#39;exit_system_ts&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="n">timestamp_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="s1">&#39;release_vaccinator_ts&#39;</span><span class="p">]</span>
-    <span class="n">timestamp_df</span><span class="p">[</span><span class="s1">&#39;time_in_system&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">timestamp_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="s1">&#39;exit_system_ts&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="n">timestamp_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="s1">&#39;arrival_ts&#39;</span><span class="p">]</span>
+    <span class="n">timestamp_df</span><span class="p">[</span><span class="s1">&#39;wait_for_greeter&#39;</span><span class="p">]</span> <span class="o">=</span> \
+        <span class="n">timestamp_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="s1">&#39;got_greeter_ts&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="n">timestamp_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="s1">&#39;arrival_ts&#39;</span><span class="p">]</span>
+    <span class="n">timestamp_df</span><span class="p">[</span><span class="s1">&#39;wait_for_reg&#39;</span><span class="p">]</span> <span class="o">=</span> \
+        <span class="n">timestamp_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="s1">&#39;got_reg_ts&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="n">timestamp_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="s1">&#39;release_greeter_ts&#39;</span><span class="p">]</span>
+    <span class="n">timestamp_df</span><span class="p">[</span><span class="s1">&#39;wait_for_vaccinator&#39;</span><span class="p">]</span> <span class="o">=</span> \
+        <span class="n">timestamp_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="s1">&#39;got_vaccinator_ts&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="n">timestamp_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="s1">&#39;release_reg_ts&#39;</span><span class="p">]</span>
+    <span class="n">timestamp_df</span><span class="p">[</span><span class="s1">&#39;vaccination_time&#39;</span><span class="p">]</span> <span class="o">=</span> \
+        <span class="n">timestamp_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="s1">&#39;release_vaccinator_ts&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="n">timestamp_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="s1">&#39;got_vaccinator_ts&#39;</span><span class="p">]</span>
+    <span class="n">timestamp_df</span><span class="p">[</span><span class="s1">&#39;wait_for_scheduler&#39;</span><span class="p">]</span> <span class="o">=</span> \
+        <span class="n">timestamp_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="s1">&#39;got_scheduler_ts&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="n">timestamp_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="s1">&#39;release_vaccinator_ts&#39;</span><span class="p">]</span>
+    <span class="n">timestamp_df</span><span class="p">[</span><span class="s1">&#39;post_vacc_time&#39;</span><span class="p">]</span> <span class="o">=</span> \
+        <span class="n">timestamp_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="s1">&#39;exit_system_ts&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="n">timestamp_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="s1">&#39;release_vaccinator_ts&#39;</span><span class="p">]</span>
+    <span class="n">timestamp_df</span><span class="p">[</span><span class="s1">&#39;time_in_system&#39;</span><span class="p">]</span> <span class="o">=</span> \
+        <span class="n">timestamp_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="s1">&#39;exit_system_ts&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="n">timestamp_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="s1">&#39;arrival_ts&#39;</span><span class="p">]</span>
 
     <span class="k">return</span> <span class="n">timestamp_df</span>
 </pre></div>
@@ -1883,7 +2510,7 @@ memory usage: 154.4 KB
 </div>
 </section>
 <section id="Histgram-of-total-time-in-system">
-<h3>Histgram of total time in system<a class="headerlink" href="#Histgram-of-total-time-in-system" title="Permalink to this headline">¶</a></h3>
+<h3>Histgram of total time in system<a class="headerlink" href="#Histgram-of-total-time-in-system" title="Permalink to this headline">#</a></h3>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[34]:
 </pre></div>
@@ -1902,14 +2529,15 @@ memory usage: 154.4 KB
 <p>Wow, some patients are spending close to five hours in the clinic!</p>
 </section>
 <section id="Key-summary-stats">
-<h3>Key summary stats<a class="headerlink" href="#Key-summary-stats" title="Permalink to this headline">¶</a></h3>
+<h3>Key summary stats<a class="headerlink" href="#Key-summary-stats" title="Permalink to this headline">#</a></h3>
 <p>Let’s look at the wait times for each stage of the process.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[35]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">clinic_patient_log_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="p">[</span><span class="s1">&#39;wait_for_greeter&#39;</span><span class="p">,</span> <span class="s1">&#39;wait_for_reg&#39;</span><span class="p">,</span>
-                              <span class="s1">&#39;wait_for_scheduler&#39;</span><span class="p">,</span> <span class="s1">&#39;wait_for_vaccinator&#39;</span><span class="p">,</span> <span class="s1">&#39;time_in_system&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">describe</span><span class="p">()</span>
+                              <span class="s1">&#39;wait_for_scheduler&#39;</span><span class="p">,</span> <span class="s1">&#39;wait_for_vaccinator&#39;</span><span class="p">,</span>
+                              <span class="s1">&#39;time_in_system&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">describe</span><span class="p">()</span>
 <br/></pre></div>
 </div>
 </div>
@@ -2041,10 +2669,12 @@ memory usage: 154.4 KB
     <span class="c1"># Create a simulation environment</span>
     <span class="n">env</span> <span class="o">=</span> <span class="n">simpy</span><span class="o">.</span><span class="n">Environment</span><span class="p">()</span>
     <span class="c1"># Create a clinic to simulate</span>
-    <span class="n">clinic</span> <span class="o">=</span> <span class="n">VaccineClinic</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="n">num_greeters</span><span class="p">,</span> <span class="n">num_reg_staff</span><span class="p">,</span> <span class="n">num_vaccinators</span><span class="p">,</span> <span class="n">num_schedulers</span><span class="p">,</span> <span class="n">rg</span><span class="p">)</span>
+    <span class="n">clinic</span> <span class="o">=</span> <span class="n">VaccineClinic</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="n">num_greeters</span><span class="p">,</span>
+                           <span class="n">num_reg_staff</span><span class="p">,</span> <span class="n">num_vaccinators</span><span class="p">,</span> <span class="n">num_schedulers</span><span class="p">,</span> <span class="n">rg</span><span class="p">)</span>
 
     <span class="c1"># Register the run_clinic (generator) function</span>
-    <span class="n">env</span><span class="o">.</span><span class="n">process</span><span class="p">(</span><span class="n">run_clinic</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="n">clinic</span><span class="p">,</span> <span class="n">mean_interarrival_time</span><span class="p">,</span> <span class="n">pct_first_dose</span><span class="p">,</span> <span class="n">rg</span><span class="p">,</span> <span class="n">stoptime</span><span class="o">=</span><span class="n">stoptime</span><span class="p">))</span>
+    <span class="n">env</span><span class="o">.</span><span class="n">process</span><span class="p">(</span><span class="n">run_clinic</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="n">clinic</span><span class="p">,</span> <span class="n">mean_interarrival_time</span><span class="p">,</span>
+                           <span class="n">pct_first_dose</span><span class="p">,</span> <span class="n">rg</span><span class="p">,</span> <span class="n">stoptime</span><span class="o">=</span><span class="n">stoptime</span><span class="p">))</span>
     <span class="c1"># Actually run the simulation</span>
     <span class="n">env</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
 
@@ -2053,13 +2683,16 @@ memory usage: 154.4 KB
 
     <span class="c1"># Output log files</span>
     <span class="n">clinic_patient_log_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">clinic</span><span class="o">.</span><span class="n">timestamps_list</span><span class="p">)</span>
-    <span class="n">clinic_patient_log_df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="s1">&#39;./output/clinic_patient_log_df.csv&#39;</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">clinic_patient_log_df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span>
+        <span class="s1">&#39;./output/clinic_patient_log_df.csv&#39;</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
     <span class="n">vac_occupancy_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">clinic</span><span class="o">.</span><span class="n">vac_occupancy_list</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;ts&#39;</span><span class="p">,</span> <span class="s1">&#39;occ&#39;</span><span class="p">])</span>
-    <span class="n">vac_occupancy_df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="s1">&#39;./output/vac_occupancy_df.csv&#39;</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">vac_occupancy_df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span>
+        <span class="s1">&#39;./output/vac_occupancy_df.csv&#39;</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
     <span class="n">postvac_occupancy_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">clinic</span><span class="o">.</span><span class="n">postvac_occupancy_list</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;ts&#39;</span><span class="p">,</span> <span class="s1">&#39;occ&#39;</span><span class="p">])</span>
-    <span class="n">postvac_occupancy_df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="s1">&#39;./output/postvac_occupancy_df.csv&#39;</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">postvac_occupancy_df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span>
+        <span class="s1">&#39;./output/postvac_occupancy_df.csv&#39;</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
     <span class="c1"># Note simulation end time</span>
     <span class="n">end_time</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">now</span>
@@ -2091,7 +2724,8 @@ Simulation ended at time 623.0704926354564
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">clinic_patient_log_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;./output/clinic_patient_log_df.csv&#39;</span><span class="p">)</span>
 <span class="n">clinic_patient_log_df</span> <span class="o">=</span> <span class="n">compute_durations</span><span class="p">(</span><span class="n">clinic_patient_log_df</span><span class="p">)</span>
 <span class="n">clinic_patient_log_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="p">[</span><span class="s1">&#39;wait_for_greeter&#39;</span><span class="p">,</span> <span class="s1">&#39;wait_for_reg&#39;</span><span class="p">,</span>
-                              <span class="s1">&#39;wait_for_scheduler&#39;</span><span class="p">,</span> <span class="s1">&#39;wait_for_vaccinator&#39;</span><span class="p">,</span> <span class="s1">&#39;time_in_system&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">describe</span><span class="p">()</span>
+                              <span class="s1">&#39;wait_for_scheduler&#39;</span><span class="p">,</span> <span class="s1">&#39;wait_for_vaccinator&#39;</span><span class="p">,</span>
+                              <span class="s1">&#39;time_in_system&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">describe</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
@@ -2196,7 +2830,7 @@ Simulation ended at time 623.0704926354564
 </div>
 </section>
 <section id="The-time-dependent-nature-of-our-metrics">
-<h3>The time dependent nature of our metrics<a class="headerlink" href="#The-time-dependent-nature-of-our-metrics" title="Permalink to this headline">¶</a></h3>
+<h3>The time dependent nature of our metrics<a class="headerlink" href="#The-time-dependent-nature-of-our-metrics" title="Permalink to this headline">#</a></h3>
 <p>Since each day the clinic starts out empty and then ends ten hours later, the wait times may depend on time of day. Of course there is also likely to be much variability just do to the inherent randomness of the system. Let’s plot a rolling mean for time in system.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[39]:
@@ -2225,7 +2859,7 @@ Simulation ended at time 623.0704926354564
 </div>
 </section>
 <section id="Occupancy-statistics">
-<h3>Occupancy statistics<a class="headerlink" href="#Occupancy-statistics" title="Permalink to this headline">¶</a></h3>
+<h3>Occupancy statistics<a class="headerlink" href="#Occupancy-statistics" title="Permalink to this headline">#</a></h3>
 <p>In addition to patient level metrics, we are interested in clinic level metrics such as the number of patients in each stage as this will impact space requirements. During the simulation, we collected occupancy data every time a patient entered or exited a stage. So, we need to do time weighted statistics.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[40]:
@@ -2853,7 +3487,7 @@ Name: p, dtype: float64
 </section>
 </section>
 <section id="Multiple-replications">
-<h2>Multiple replications<a class="headerlink" href="#Multiple-replications" title="Permalink to this headline">¶</a></h2>
+<h2>Multiple replications<a class="headerlink" href="#Multiple-replications" title="Permalink to this headline">#</a></h2>
 <p>Since our clinic opens and closes every day, it is technically known as a <em>terminating simulation</em>. For such simulations, we would usually run them multiple times to generate independent samples of our performance metrics (patient wait times, resource utilizations, …). We’ll see how to do this in the next version of our model, but for now, let’s focus on analyzing output from multiple replications.</p>
 <p>I ran the model 15 times with 3 greeters, 3 registration staff, 15 vaccinators, and 3 scheduling staff. The (future version) simulation model creates a csv file with the detailed patient log values for each replications. Let’s read it in and see what it looks like.</p>
 <div class="nbinput docutils container">
@@ -3486,7 +4120,7 @@ simply running more replications (and getting a more precise estimate of our mea
 </div>
 </div>
 <section id="Possible-improvements">
-<h3>Possible improvements<a class="headerlink" href="#Possible-improvements" title="Permalink to this headline">¶</a></h3>
+<h3>Possible improvements<a class="headerlink" href="#Possible-improvements" title="Permalink to this headline">#</a></h3>
 <p>Now that we have a rough first model working, let’s think about some possible improvements. There are many as we’ve taken numerous shortcuts to get this model working. We definitely want to make it easier to experiment with different scenarios involving capacity levels and patient volume. A few potential improvements include:</p>
 <ul class="simple">
 <li><p>Specifying the global sim inputs through a command line interface (CLI)</p></li>
@@ -3498,34 +4132,34 @@ simply running more replications (and getting a more precise estimate of our mea
 </section>
 </section>
 <section id="More-SimPy-resources">
-<h2>More SimPy resources<a class="headerlink" href="#More-SimPy-resources" title="Permalink to this headline">¶</a></h2>
+<h2>More SimPy resources<a class="headerlink" href="#More-SimPy-resources" title="Permalink to this headline">#</a></h2>
 <p>I suggest taking a look at some the following resources to get a sense of different ways of building SimPy models.</p>
 <section id="From-the-SimPy-docs:">
-<h3>From the SimPy docs:<a class="headerlink" href="#From-the-SimPy-docs:" title="Permalink to this headline">¶</a></h3>
+<h3>From the SimPy docs:<a class="headerlink" href="#From-the-SimPy-docs:" title="Permalink to this headline">#</a></h3>
 <ul class="simple">
 <li><p><a class="reference external" href="https://simpy.readthedocs.io/en/latest/simpy_intro/index.html">SimPy in 10 Minutes</a> - the “Hello, world” of SimPy</p></li>
 <li><p><a class="reference external" href="https://simpy.readthedocs.io/en/latest/examples/index.html#all-examples">Example models from the SimPy documentation</a> - demonstrates various features of SimPy through relatively simple models</p></li>
 </ul>
 </section>
 <section id="From-Real-Python:">
-<h3>From Real Python:<a class="headerlink" href="#From-Real-Python:" title="Permalink to this headline">¶</a></h3>
+<h3>From Real Python:<a class="headerlink" href="#From-Real-Python:" title="Permalink to this headline">#</a></h3>
 <ul class="simple">
 <li><p><a class="reference external" href="https://realpython.com/simpy-simulating-with-python/">SimPy: Simulating Real-World Processes With Python</a> - a very good introductory tutorial</p></li>
 </ul>
 </section>
 <section id="From-a-healthcare-modeling-workshop">
-<h3>From a healthcare modeling workshop<a class="headerlink" href="#From-a-healthcare-modeling-workshop" title="Permalink to this headline">¶</a></h3>
+<h3>From a healthcare modeling workshop<a class="headerlink" href="#From-a-healthcare-modeling-workshop" title="Permalink to this headline">#</a></h3>
 <p>These are long but quite good. The modeling approach they use is similar to what I cover in our session. * <a class="reference external" href="https://www.youtube.com/watch?v=jXDjrWKcu6w">Session 5B: Building a DES model with SimPy</a> - this is a YouTube vid from a healthcare modeling workshop and they go through models very similar to this clinic model. They use a non-OO approach but many things are the same. * <a class="reference external" href="https://www.youtube.com/watch?v=QV-pJnKrGuc">Session 5C: Object-oriented SimPy</a> - follow up to the video above.</p>
 </section>
 <section id="From-a-few-of-my-blog-posts:">
-<h3>From a few of my blog posts:<a class="headerlink" href="#From-a-few-of-my-blog-posts:" title="Permalink to this headline">¶</a></h3>
+<h3>From a few of my blog posts:<a class="headerlink" href="#From-a-few-of-my-blog-posts:" title="Permalink to this headline">#</a></h3>
 <ul class="simple">
-<li><p><a class="reference external" href="http://hselab.org/simpy-getting-started-patient-flow-modeling.html">Getting started with SimPy for patient flow modeling</a> - one of my blog posts on SimPy modeling using a process focused approach</p></li>
-<li><p><a class="reference external" href="http://hselab.org/simpy-first-oo-patflow-model.html">An object oriented SimPy patient flow simulation model</a> - one of my blog posts on SimPy modeling using an object oriented approach</p></li>
+<li><p><a class="reference external" href="https://misken.github.io/blog/simpy-getting-started/">Getting started with SimPy for patient flow modeling</a> - one of my blog posts on SimPy modeling using a process focused approach</p></li>
+<li><p><a class="reference external" href="https://misken.github.io/blog/simpy-first-oo-patflow-model/">An object oriented SimPy patient flow simulation model</a> - one of my blog posts on SimPy modeling using an object oriented approach</p></li>
 </ul>
 </section>
 <section id="Some-computer-network-based-examples:">
-<h3>Some computer network based examples:<a class="headerlink" href="#Some-computer-network-based-examples:" title="Permalink to this headline">¶</a></h3>
+<h3>Some computer network based examples:<a class="headerlink" href="#Some-computer-network-based-examples:" title="Permalink to this headline">#</a></h3>
 <ul class="simple">
 <li><p><a class="reference external" href="https://www.grotto-networking.com/DiscreteEventPython.html#Intro">Basic Network Simulations and Beyond in Python</a> - good examples of network simulation models, building components to extend SimPy components. I found this site very helpful when I was building the patient flow models in the above two blog posts.</p></li>
 </ul>
@@ -3557,350 +4191,37 @@ simply running more replications (and getting a more precise estimate of our mea
   
 </div>
 
-          </div>
-          
-        </div>
-      </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-<h1 class="logo"><a href="../../">misken</a></h1>
-
-
-
-
-
-
-
-
-  
-<h2>
-   
-  04 April 2022 
-</h2>
-
-<ul>
-   
-<li id="author">
-  <span
-    >Author:</span
-  >
-   
-  <a href="../author/misken/">misken</a>  
-</li>
-    
-<li id="tags">
-  <span
-    >Tags: </span
-  >
-   
-  <a href="../tag/python/">python</a>   
-  <a href="../tag/simpy/">simpy</a>   
-  <a href="../tag/simulation/">simulation</a>  
-</li>
- 
-</ul>
-<h3>Navigation</h3>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../../about/">About misken</a></li>
-</ul>
-
-
-<h3>
-  <a href="../">Recent Posts</a>
-</h3>
-<ul>
-   
-  <li>
-    <a href="../hillmaker_030_released/"
-      >19 May - numpy speeds up hillmaker dramatically</a
-    >
-  </li>
-  
-  <li>
-    <a href="../simpy_vaccine_clinic_improvements/"
-      >11 April - Using SimPy to simulate a vaccine clinic - Part 2: model improvements</a
-    >
-  </li>
-  
-  <li>
-    <a href="../use_jupyter_conda_envs/"
-      >03 April - Using different conda environments with Jupyter Lab</a
-    >
-  </li>
-  
-  <li>
-    <a href="../hello_world/"
-      >02 April - Hello world from ablog blogging with JupyterLab</a
-    >
-  </li>
-  
-  <li>
-    <a href="../first-post/"
-      >01 April - First Post at new blogging site</a
-    >
-  </li>
-  
-</ul>
-
-<h3><a href="../tag/">Tags</a></h3>
-<style type="text/css">
-  ul.ablog-cloud {
-    list-style: none;
-    overflow: auto;
-  }
-  ul.ablog-cloud li {
-    float: left;
-    height: 20pt;
-    line-height: 18pt;
-    margin-right: 5px;
-  }
-  ul.ablog-cloud a {
-    text-decoration: none;
-    vertical-align: middle;
-  }
-  li.ablog-cloud-1 {
-    font-size: 80%;
-  }
-  li.ablog-cloud-2 {
-    font-size: 95%;
-  }
-  li.ablog-cloud-3 {
-    font-size: 110%;
-  }
-  li.ablog-cloud-4 {
-    font-size: 125%;
-  }
-  li.ablog-cloud-5 {
-    font-size: 140%;
-  }
-</style>
-<ul class="ablog-cloud">
-   
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/github/">GitHub</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-3">
-    <a href="../tag/r/">R</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/ablog/">ablog</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/analytics/">analytics</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/bikeshare/">bikeshare</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/birding/">birding</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/blogging/">blogging</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/caret/">caret</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/conda/">conda</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/datetime/">datetime</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/dplyr/">dplyr</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/ebird/">ebird</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/ecology/">ecology</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/excel/">excel</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/ggmap/">ggmap</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/ggplot2/">ggplot2</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/gis/">gis</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/git/">git</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/gps/">gps</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/healthcare/">healthcare</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/hiking/">hiking</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/hillmaker/">hillmaker</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/jupyter/">jupyter</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/matplotlib/">matplotlib</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/metamodeling/">metamodeling</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-2">
-    <a href="../tag/occupancy-analysis/">occupancy analysis</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/pandas/">pandas</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/patient-flow/">patient flow</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/plyr/">plyr</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-5">
-    <a href="../tag/python/">python</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/shiny/">shiny</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/simpy/">simpy</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/simulation/">simulation</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/sphinx/">sphinx</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/statistics/">statistics</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/teaching/">teaching</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/text/">text</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/xml/">xml</a>
-  </li>
-   
-</ul>
-
-<h3>
-  <a href="../archive/">Archives</a>
-</h3>
-<ul>
-   
-  <li>
-    <a href="../2022/">2022 (7)</a>
-  </li>
-    
-  <li>
-    <a href="../2021/">2021 (4)</a>
-  </li>
-    
-  <li>
-    <a href="../2020/">2020 (2)</a>
-  </li>
-    
-  <li>
-    <a href="../2019/">2019 (7)</a>
-  </li>
-    
-  <li>
-    <a href="../2018/">2018 (5)</a>
-  </li>
-    
-  <li>
-    <a href="../2017/">2017 (2)</a>
-  </li>
-    
-  <li>
-    <a href="../2016/">2016 (6)</a>
-  </li>
-    
-  <li>
-    <a href="../2014/">2014 (6)</a>
-  </li>
-    
-  <li>
-    <a href="../2013/">2013 (7)</a>
-  </li>
-   
-</ul>
-
-<div id="searchbox" style="display: none" role="search">
-  <h3 id="searchlabel">Quick search</h3>
-    <div class="searchformwrapper">
-    <form class="search" action="../../search/" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
-      <input type="submit" value="Go" />
-    </form>
-    </div>
+              </div>
+              
+              
+              <!-- Previous / next buttons -->
+<div class='prev-next-area'>
 </div>
-<script>$('#searchbox').show(0);</script>
-        </div>
+              
+          </main>
+          
+
       </div>
-      <div class="clearer"></div>
     </div>
-    <div class="footer">
-      &copy;2022, misken.
-      
-      |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.3.2</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
-      
-      |
-      <a href="../../_sources/blog/simpy_getting_started_vaccine_clinic.ipynb.txt"
-          rel="nofollow">Page source</a>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
+<footer class="footer mt-5 mt-md-0">
+  <div class="container">
+    
+    <div class="footer-item">
+      <p class="copyright">
+    &copy; Copyright 2022, misken.<br>
+</p>
     </div>
-
     
-
+    <div class="footer-item">
+      <p class="sphinx-version">
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.3.2.<br>
+</p>
+    </div>
     
+  </div>
+</footer>
   </body>
 </html>

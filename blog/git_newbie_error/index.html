@@ -7,22 +7,40 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
     <title>A common git / GitHub error by those new to git &#8212; misken 0,1,0 documentation</title>
+    
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+
+    
+  <link rel="stylesheet"
+    href="../../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/design-style.b7bb847fb20b106c3d81b95245e65545.min.css" />
+    
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
+
     <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
     <script src="../../_static/jquery.js"></script>
     <script src="../../_static/underscore.js"></script>
     <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/design-tabs.js"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <link rel="author" title="About these documents" href="../../about/" />
     <link rel="index" title="Index" href="../../genindex/" />
     <link rel="search" title="Search" href="../../search/" /> 
-   
-  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
-  
-  
-  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
- 
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="en">
+    
+
+    <!-- Google Analytics -->
+     
 <link
   rel="alternate"
   type="application/atom+xml"
@@ -55,172 +73,66 @@
   }
 </style>
 
-  </head><body>
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
+    
+    <div class="container-fluid" id="banner"></div>
+
+    
+    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main"><div class="container-xl">
+
+  <div id="navbar-start">
+    
+    
+<a class="navbar-brand" href="../../">
+<p class="title">misken</p>
+</a>
+
+    
+  </div>
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapsible" aria-controls="navbar-collapsible" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
   
+  <div id="navbar-collapsible" class="col-lg-9 collapse navbar-collapse">
+    <div id="navbar-center" class="mr-auto">
+      
+      <div class="navbar-center-item">
+        <ul id="navbar-main-elements" class="navbar-nav">
+    <li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../about/">
+  About misken
+ </a>
+</li>
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          
-
-          <div class="body" role="main">
-             <section id="a-common-git-github-error-by-those-new-to-git">
-<h1>A common git / GitHub error by those new to git<a class="headerlink" href="#a-common-git-github-error-by-those-new-to-git" title="Permalink to this headline">¶</a></h1>
-<p>In one of the <a class="reference external" href="http://www.sba.oakland.edu/faculty/isken/courses/mis5470_w19/">data analytics courses I teach</a> I have a little
-<a class="reference external" href="http://www.sba.oakland.edu/faculty/isken/courses/mis5470_w19/git_intro.html">intro to git and GitHub</a>. We learn to do basic git operations in
-bash shell and from within R Studio. I use the <a class="reference external" href="https://swcarpentry.github.io/git-novice/">really good git tutorial
-from Software Carpentry</a> in addition to some examples specific to my
-class.</p>
-<p>Git has a pretty steep learning curve for folks with little to no experience with version control and there’s one mistake that’s pretty easy to make, but not super easy to fix without digging into more advanced git topics. I’m
-using this blog post to document this common error and its fix so that I (and my students) can avoid it
-in the future.</p>
-<section id="the-error-scenario">
-<h2>The error scenario<a class="headerlink" href="#the-error-scenario" title="Permalink to this headline">¶</a></h2>
-<p>Let’s assume we have a directory called <code class="docutils literal notranslate"><span class="pre">r4ds_ggplot</span></code> which contains a single Rmd file.</p>
-<p>We open a bash shell and navigate to the <code class="docutils literal notranslate"><span class="pre">r4ds_ggplot</span></code> directory.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ git init
-$ git add *.Rmd
-$ git commit -m <span class="s1">&#39;Initial commit&#39;</span>
-</pre></div>
-</div>
-<p>Great. We’ve initialized a new git repo on our local machine, staged
-our Rmd file and then done our first commit. We’ll then make a few
-edits and go through the stage and commit cycle a few times doing
-<code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">status</span></code> and <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">log</span></code> to see what’s happening. Now we are
-ready to create a remote repo in GitHub and learn how to push our
-local repo to this new remote.</p>
-<p>Student then login in their newly created GitHub account and we
-go through the process of creating a new repo called <cite>r4ds_ggplot</cite>.</p>
-<p>Click the Add New Repository link
-Fill in the repo name
-Add a description like “learning ggplot”</p>
-<p>… and here’s where trouble might ensue. Sometimes, new users will
-inadvertantly check the little box telling GitHub to “initialize this repository with a README”.</p>
-<img alt="../../_images/github_readme_checked.png" src="../../_images/github_readme_checked.png" />
-<p>Oops. The message says not to do this if we are planning on importing an existing repository (which we are).
-Again, easy mistake to make anyway. So, now, you’ve got a remote repo in GitHub which contains a
-README.md file. It looks like this.</p>
-<img alt="../../_images/github_readme_inrepo.png" src="../../_images/github_readme_inrepo.png" />
-<p>Now, back in the bash shell, we add this new remote to our local repo.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ git remote add origin https://github.com/&lt;username&gt;/r4ds_ggplot.git
-</pre></div>
-</div>
-<p>With the remote added, we are ready to push our local repo up to GitHub,
-not realizing that there’s work up there in the GitHub repo that
-we don’t have in our local repo.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ git push -u origin master
-
-To https://github.com/misken/r4ds_ggplot.git
-! <span class="o">[</span>rejected<span class="o">]</span>        master -&gt; master <span class="o">(</span>fetch first<span class="o">)</span>
-error: failed to push some refs to <span class="s1">&#39;https://github.com/misken/r4ds_ggplot.git&#39;</span>
-hint: Updates were rejected because the remote contains work that you <span class="k">do</span>
-hint: not have locally. This is usually caused by another repository pushing
-hint: to the same ref. You may want to first integrate the remote changes
-hint: <span class="o">(</span>e.g., <span class="s1">&#39;git pull ...&#39;</span><span class="o">)</span> before pushing again.
-hint: See the <span class="s1">&#39;Note about fast-forwards&#39;</span> <span class="k">in</span> <span class="s1">&#39;git push --help&#39;</span> <span class="k">for</span> details.
-</pre></div>
-</div>
-<p>Often a little searching and reading will result in trying to do what the
-error messages suggests we do, a <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">pull</span></code>. A little <a class="reference external" href="https://help.github.com/articles/fetching-a-remote/">more research</a> will
-reveal that a <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">pull</span></code> will do a <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">fetch</span></code> and then attempt a <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">merge</span></code>.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ git pull origin master
-
-warning: no common commits
-remote: Enumerating objects: <span class="m">3</span>, <span class="k">done</span>.
-remote: Counting objects: <span class="m">100</span>% <span class="o">(</span><span class="m">3</span>/3<span class="o">)</span>, <span class="k">done</span>.
-remote: Total <span class="m">3</span> <span class="o">(</span>delta <span class="m">0</span><span class="o">)</span>, reused <span class="m">0</span> <span class="o">(</span>delta <span class="m">0</span><span class="o">)</span>, pack-reused <span class="m">0</span>
-Unpacking objects: <span class="m">100</span>% <span class="o">(</span><span class="m">3</span>/3<span class="o">)</span>, <span class="k">done</span>.
-From https://github.com/misken/r4ds_ggplot
- * branch            master     -&gt; FETCH_HEAD
- * <span class="o">[</span>new branch<span class="o">]</span>      master     -&gt; origin/master
-fatal: refusing to merge unrelated histories
-</pre></div>
-</div>
-<p>What?! Looks like the merge part of the pull process is the sticking point.</p>
-</section>
-<section id="the-fix">
-<h2>The fix<a class="headerlink" href="#the-fix" title="Permalink to this headline">¶</a></h2>
-<p>Let’s put that final message about unrelated histories into a little Google search and we land on this StackOverflow post - <a class="reference external" href="https://stackoverflow.com/questions/37937984/git-refusing-to-merge-unrelated-histories-on-rebase">https://stackoverflow.com/questions/37937984/git-refusing-to-merge-unrelated-histories-on-rebase</a>. Reading the whole post reveals the issue:</p>
-<blockquote>
-<div><p>“git merge” used to allow merging two branches that have no common base by default, which led to a brand new history of an existing project created and then get pulled by an unsuspecting maintainer, which allowed an unnecessary parallel history merged into the existing project. The command has been taught not to allow this by default, with an escape hatch –allow-unrelated-histories option to be used in a rare event that merges histories of two projects that started their lives independently.</p>
-</div></blockquote>
-<p>That’s the case here. Our local repo and our GitHub repo “started their lives independently” (inadvertantly). Now we want to allow them to be merged but we need to tell git to allow this by including the <code class="docutils literal notranslate"><span class="pre">--allow-unrelated-histories</span></code> option.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ git pull origin master --allow-unrelated-histories
-</pre></div>
-</div>
-<p>Now, git drops us into our default commit editor (e.g. nano) and we can enter a commit message. And then, ta da…</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>From https://github.com/misken/r4ds_ggplot
- * branch            master     -&gt; FETCH_HEAD
-Merge made by the <span class="s1">&#39;recursive&#39;</span> strategy.
-README.md <span class="p">|</span> <span class="m">2</span> ++
-<span class="m">1</span> file changed, <span class="m">2</span> insertions<span class="o">(</span>+<span class="o">)</span>
-create mode <span class="m">100644</span> README.md
-</pre></div>
-</div>
-<p>Now we can push our local repo to GitHub.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ git push -u origin master
-
-Username <span class="k">for</span> <span class="s1">&#39;https://github.com&#39;</span>: misken
-Password <span class="k">for</span> <span class="s1">&#39;https://misken@github.com&#39;</span>:
-Counting objects: <span class="m">8</span>, <span class="k">done</span>.
-Delta compression using up to <span class="m">8</span> threads.
-Compressing objects: <span class="m">100</span>% <span class="o">(</span><span class="m">8</span>/8<span class="o">)</span>, <span class="k">done</span>.
-Writing objects: <span class="m">100</span>% <span class="o">(</span><span class="m">8</span>/8<span class="o">)</span>, <span class="m">6</span>.45 KiB <span class="p">|</span> <span class="m">1</span>.61 MiB/s, <span class="k">done</span>.
-Total <span class="m">8</span> <span class="o">(</span>delta <span class="m">1</span><span class="o">)</span>, reused <span class="m">0</span> <span class="o">(</span>delta <span class="m">0</span><span class="o">)</span>
-remote: Resolving deltas: <span class="m">100</span>% <span class="o">(</span><span class="m">1</span>/1<span class="o">)</span>, <span class="k">done</span>.
-To https://github.com/misken/r4ds_ggplot.git
-   d565a8a..d77afd3  master -&gt; master
-Branch <span class="s1">&#39;master&#39;</span> <span class="nb">set</span> up to track remote branch <span class="s1">&#39;master&#39;</span> from <span class="s1">&#39;origin&#39;</span>.
-</pre></div>
-</div>
-<p>Head over to GitHub repo and refresh the page. Done.</p>
-<img alt="../../_images/github_repo_fixed.png" src="../../_images/github_repo_fixed.png" />
-<p>Now the local and remote repos are in sync and we can carry on. Of course,
-git is still hard for those new to version control (like me) and I’m sure
-we’ll make more mistakes. That’s how you learn.</p>
-</section>
-</section>
-
-<div class="section">
     
-
-<div class="section">
-  <span style="float: left">
-     Previous:
-    
-    <a href="../otbirders_2_stats_2018/">
-       Wednesday Birders - 2018 stats and historical analysis using R
-    </a>
-    
-  </span>
-  <span>&nbsp;</span>
-  <span style="float: right">
-     Next: 
-    <a href="../hillmaker_r_sfcs/">
-      Using hillmaker from R with reticulate to analyze time of day patterns in bike share data 
-    </a>
-    
-  </span>
-</div>
-  
-</div>
-
-          </div>
-          
-        </div>
+</ul>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-<h1 class="logo"><a href="../../">misken</a></h1>
+      
+    </div>
 
+    <div id="navbar-end">
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+      </ul>
+      </div>
+      
+    </div>
+  </div>
+</div>
+    </nav>
+    
 
-
-
-
-
-
-
-  
+    <div class="container-xl">
+      <div class="row">
+          
+            
+            <!-- Only show if we have sidebars configured, else just a small margin  -->
+            <div class="col-12 col-md-3 bd-sidebar">
+              <div class="sidebar-start-items">  
 <h2>
    
   13 February 2019 
@@ -246,11 +158,6 @@ we’ll make more mistakes. That’s how you learn.</p>
 </li>
  
 </ul>
-<h3>Navigation</h3>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../../about/">About misken</a></li>
-</ul>
-
 
 <h3>
   <a href="../">Recent Posts</a>
@@ -530,24 +437,227 @@ we’ll make more mistakes. That’s how you learn.</p>
     </div>
 </div>
 <script>$('#searchbox').show(0);</script>
-        </div>
+              </div>
+              <div class="sidebar-end-items">
+              </div>
+            </div>
+            
+          
+
+          
+          <div class="d-none d-xl-block col-xl-2 bd-toc">
+            
+              
+              <div class="toc-item">
+                
+<div class="tocsection onthispage mt-5 pt-1 pb-3">
+    <i class="fas fa-list"></i> On this page
+</div>
+
+<nav id="bd-toc-nav">
+    <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#the-error-scenario">
+   The error scenario
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#the-fix">
+   The fix
+  </a>
+ </li>
+</ul>
+
+</nav>
+              </div>
+              
+              <div class="toc-item">
+                
+              </div>
+              
+            
+          </div>
+          
+
+          
+          
+            
+          
+          <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+              
+              <div>
+                 <section id="a-common-git-github-error-by-those-new-to-git">
+<h1>A common git / GitHub error by those new to git<a class="headerlink" href="#a-common-git-github-error-by-those-new-to-git" title="Permalink to this headline">#</a></h1>
+<p>In one of the <a class="reference external" href="http://www.sba.oakland.edu/faculty/isken/courses/mis5470_w19/">data analytics courses I teach</a> I have a little
+<a class="reference external" href="http://www.sba.oakland.edu/faculty/isken/courses/mis5470_w19/git_intro.html">intro to git and GitHub</a>. We learn to do basic git operations in
+bash shell and from within R Studio. I use the <a class="reference external" href="https://swcarpentry.github.io/git-novice/">really good git tutorial
+from Software Carpentry</a> in addition to some examples specific to my
+class.</p>
+<p>Git has a pretty steep learning curve for folks with little to no experience with version control and there’s one mistake that’s pretty easy to make, but not super easy to fix without digging into more advanced git topics. I’m
+using this blog post to document this common error and its fix so that I (and my students) can avoid it
+in the future.</p>
+<section id="the-error-scenario">
+<h2>The error scenario<a class="headerlink" href="#the-error-scenario" title="Permalink to this headline">#</a></h2>
+<p>Let’s assume we have a directory called <code class="docutils literal notranslate"><span class="pre">r4ds_ggplot</span></code> which contains a single Rmd file.</p>
+<p>We open a bash shell and navigate to the <code class="docutils literal notranslate"><span class="pre">r4ds_ggplot</span></code> directory.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ git init
+$ git add *.Rmd
+$ git commit -m <span class="s1">&#39;Initial commit&#39;</span>
+</pre></div>
+</div>
+<p>Great. We’ve initialized a new git repo on our local machine, staged
+our Rmd file and then done our first commit. We’ll then make a few
+edits and go through the stage and commit cycle a few times doing
+<code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">status</span></code> and <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">log</span></code> to see what’s happening. Now we are
+ready to create a remote repo in GitHub and learn how to push our
+local repo to this new remote.</p>
+<p>Student then login in their newly created GitHub account and we
+go through the process of creating a new repo called <cite>r4ds_ggplot</cite>.</p>
+<p>Click the Add New Repository link
+Fill in the repo name
+Add a description like “learning ggplot”</p>
+<p>… and here’s where trouble might ensue. Sometimes, new users will
+inadvertantly check the little box telling GitHub to “initialize this repository with a README”.</p>
+<img alt="../../_images/github_readme_checked.png" src="../../_images/github_readme_checked.png" />
+<p>Oops. The message says not to do this if we are planning on importing an existing repository (which we are).
+Again, easy mistake to make anyway. So, now, you’ve got a remote repo in GitHub which contains a
+README.md file. It looks like this.</p>
+<img alt="../../_images/github_readme_inrepo.png" src="../../_images/github_readme_inrepo.png" />
+<p>Now, back in the bash shell, we add this new remote to our local repo.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ git remote add origin https://github.com/&lt;username&gt;/r4ds_ggplot.git
+</pre></div>
+</div>
+<p>With the remote added, we are ready to push our local repo up to GitHub,
+not realizing that there’s work up there in the GitHub repo that
+we don’t have in our local repo.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ git push -u origin master
+
+To https://github.com/misken/r4ds_ggplot.git
+! <span class="o">[</span>rejected<span class="o">]</span>        master -&gt; master <span class="o">(</span>fetch first<span class="o">)</span>
+error: failed to push some refs to <span class="s1">&#39;https://github.com/misken/r4ds_ggplot.git&#39;</span>
+hint: Updates were rejected because the remote contains work that you <span class="k">do</span>
+hint: not have locally. This is usually caused by another repository pushing
+hint: to the same ref. You may want to first integrate the remote changes
+hint: <span class="o">(</span>e.g., <span class="s1">&#39;git pull ...&#39;</span><span class="o">)</span> before pushing again.
+hint: See the <span class="s1">&#39;Note about fast-forwards&#39;</span> <span class="k">in</span> <span class="s1">&#39;git push --help&#39;</span> <span class="k">for</span> details.
+</pre></div>
+</div>
+<p>Often a little searching and reading will result in trying to do what the
+error messages suggests we do, a <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">pull</span></code>. A little <a class="reference external" href="https://help.github.com/articles/fetching-a-remote/">more research</a> will
+reveal that a <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">pull</span></code> will do a <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">fetch</span></code> and then attempt a <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">merge</span></code>.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ git pull origin master
+
+warning: no common commits
+remote: Enumerating objects: <span class="m">3</span>, <span class="k">done</span>.
+remote: Counting objects: <span class="m">100</span>% <span class="o">(</span><span class="m">3</span>/3<span class="o">)</span>, <span class="k">done</span>.
+remote: Total <span class="m">3</span> <span class="o">(</span>delta <span class="m">0</span><span class="o">)</span>, reused <span class="m">0</span> <span class="o">(</span>delta <span class="m">0</span><span class="o">)</span>, pack-reused <span class="m">0</span>
+Unpacking objects: <span class="m">100</span>% <span class="o">(</span><span class="m">3</span>/3<span class="o">)</span>, <span class="k">done</span>.
+From https://github.com/misken/r4ds_ggplot
+ * branch            master     -&gt; FETCH_HEAD
+ * <span class="o">[</span>new branch<span class="o">]</span>      master     -&gt; origin/master
+fatal: refusing to merge unrelated histories
+</pre></div>
+</div>
+<p>What?! Looks like the merge part of the pull process is the sticking point.</p>
+</section>
+<section id="the-fix">
+<h2>The fix<a class="headerlink" href="#the-fix" title="Permalink to this headline">#</a></h2>
+<p>Let’s put that final message about unrelated histories into a little Google search and we land on this StackOverflow post - <a class="reference external" href="https://stackoverflow.com/questions/37937984/git-refusing-to-merge-unrelated-histories-on-rebase">https://stackoverflow.com/questions/37937984/git-refusing-to-merge-unrelated-histories-on-rebase</a>. Reading the whole post reveals the issue:</p>
+<blockquote>
+<div><p>“git merge” used to allow merging two branches that have no common base by default, which led to a brand new history of an existing project created and then get pulled by an unsuspecting maintainer, which allowed an unnecessary parallel history merged into the existing project. The command has been taught not to allow this by default, with an escape hatch –allow-unrelated-histories option to be used in a rare event that merges histories of two projects that started their lives independently.</p>
+</div></blockquote>
+<p>That’s the case here. Our local repo and our GitHub repo “started their lives independently” (inadvertantly). Now we want to allow them to be merged but we need to tell git to allow this by including the <code class="docutils literal notranslate"><span class="pre">--allow-unrelated-histories</span></code> option.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ git pull origin master --allow-unrelated-histories
+</pre></div>
+</div>
+<p>Now, git drops us into our default commit editor (e.g. nano) and we can enter a commit message. And then, ta da…</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>From https://github.com/misken/r4ds_ggplot
+ * branch            master     -&gt; FETCH_HEAD
+Merge made by the <span class="s1">&#39;recursive&#39;</span> strategy.
+README.md <span class="p">|</span> <span class="m">2</span> ++
+<span class="m">1</span> file changed, <span class="m">2</span> insertions<span class="o">(</span>+<span class="o">)</span>
+create mode <span class="m">100644</span> README.md
+</pre></div>
+</div>
+<p>Now we can push our local repo to GitHub.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ git push -u origin master
+
+Username <span class="k">for</span> <span class="s1">&#39;https://github.com&#39;</span>: misken
+Password <span class="k">for</span> <span class="s1">&#39;https://misken@github.com&#39;</span>:
+Counting objects: <span class="m">8</span>, <span class="k">done</span>.
+Delta compression using up to <span class="m">8</span> threads.
+Compressing objects: <span class="m">100</span>% <span class="o">(</span><span class="m">8</span>/8<span class="o">)</span>, <span class="k">done</span>.
+Writing objects: <span class="m">100</span>% <span class="o">(</span><span class="m">8</span>/8<span class="o">)</span>, <span class="m">6</span>.45 KiB <span class="p">|</span> <span class="m">1</span>.61 MiB/s, <span class="k">done</span>.
+Total <span class="m">8</span> <span class="o">(</span>delta <span class="m">1</span><span class="o">)</span>, reused <span class="m">0</span> <span class="o">(</span>delta <span class="m">0</span><span class="o">)</span>
+remote: Resolving deltas: <span class="m">100</span>% <span class="o">(</span><span class="m">1</span>/1<span class="o">)</span>, <span class="k">done</span>.
+To https://github.com/misken/r4ds_ggplot.git
+   d565a8a..d77afd3  master -&gt; master
+Branch <span class="s1">&#39;master&#39;</span> <span class="nb">set</span> up to track remote branch <span class="s1">&#39;master&#39;</span> from <span class="s1">&#39;origin&#39;</span>.
+</pre></div>
+</div>
+<p>Head over to GitHub repo and refresh the page. Done.</p>
+<img alt="../../_images/github_repo_fixed.png" src="../../_images/github_repo_fixed.png" />
+<p>Now the local and remote repos are in sync and we can carry on. Of course,
+git is still hard for those new to version control (like me) and I’m sure
+we’ll make more mistakes. That’s how you learn.</p>
+</section>
+</section>
+
+<div class="section">
+    
+
+<div class="section">
+  <span style="float: left">
+     Previous:
+    
+    <a href="../otbirders_2_stats_2018/">
+       Wednesday Birders - 2018 stats and historical analysis using R
+    </a>
+    
+  </span>
+  <span>&nbsp;</span>
+  <span style="float: right">
+     Next: 
+    <a href="../hillmaker_r_sfcs/">
+      Using hillmaker from R with reticulate to analyze time of day patterns in bike share data 
+    </a>
+    
+  </span>
+</div>
+  
+</div>
+
+              </div>
+              
+              
+              <!-- Previous / next buttons -->
+<div class='prev-next-area'>
+</div>
+              
+          </main>
+          
+
       </div>
-      <div class="clearer"></div>
     </div>
-    <div class="footer">
-      &copy;2022, misken.
-      
-      |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.3.2</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
-      
-      |
-      <a href="../../_sources/blog/git_newbie_error.rst.txt"
-          rel="nofollow">Page source</a>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
+<footer class="footer mt-5 mt-md-0">
+  <div class="container">
+    
+    <div class="footer-item">
+      <p class="copyright">
+    &copy; Copyright 2022, misken.<br>
+</p>
     </div>
-
     
-
+    <div class="footer-item">
+      <p class="sphinx-version">
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.3.2.<br>
+</p>
+    </div>
     
+  </div>
+</footer>
   </body>
 </html>

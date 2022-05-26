@@ -7,24 +7,42 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
     <title>Exploring dates and times in Python &#8212; misken 0,1,0 documentation</title>
+    
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+
+    
+  <link rel="stylesheet"
+    href="../../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/design-style.b7bb847fb20b106c3d81b95245e65545.min.css" />
+    
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
+
     <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
     <script src="../../_static/jquery.js"></script>
     <script src="../../_static/underscore.js"></script>
     <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/design-tabs.js"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <link rel="author" title="About these documents" href="../../about/" />
     <link rel="index" title="Index" href="../../genindex/" />
     <link rel="search" title="Search" href="../../search/" /> 
-   
-  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
-  
-  
-  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
- 
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="en">
+    
+
+    <!-- Google Analytics -->
+     
 <link
   rel="alternate"
   type="application/atom+xml"
@@ -57,16 +75,516 @@
   }
 </style>
 
-  </head><body>
-  
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
+    
+    <div class="container-fluid" id="banner"></div>
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
+    
+    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main"><div class="container-xl">
+
+  <div id="navbar-start">
+    
+    
+<a class="navbar-brand" href="../../">
+<p class="title">misken</p>
+</a>
+
+    
+  </div>
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapsible" aria-controls="navbar-collapsible" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  
+  <div id="navbar-collapsible" class="col-lg-9 collapse navbar-collapse">
+    <div id="navbar-center" class="mr-auto">
+      
+      <div class="navbar-center-item">
+        <ul id="navbar-main-elements" class="navbar-nav">
+    <li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../about/">
+  About misken
+ </a>
+</li>
+
+    
+</ul>
+      </div>
+      
+    </div>
+
+    <div id="navbar-end">
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+      </ul>
+      </div>
+      
+    </div>
+  </div>
+</div>
+    </nav>
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+            
+            <!-- Only show if we have sidebars configured, else just a small margin  -->
+            <div class="col-12 col-md-3 bd-sidebar">
+              <div class="sidebar-start-items">  
+<h2>
+   
+  25 June 2014 
+</h2>
+
+<ul>
+   
+<li id="author">
+  <span
+    >Author:</span
+  >
+   
+  <a href="../author/misken/">misken</a>  
+</li>
+    
+<li id="tags">
+  <span
+    >Tags: </span
+  >
+   
+  <a href="../tag/python/">python</a>   
+  <a href="../tag/datetime/">datetime</a>  
+</li>
+ 
+</ul>
+
+<h3>
+  <a href="../">Recent Posts</a>
+</h3>
+<ul>
+   
+  <li>
+    <a href="../hillmaker_030_released/"
+      >19 May - numpy speeds up hillmaker dramatically</a
+    >
+  </li>
+  
+  <li>
+    <a href="../simpy_vaccine_clinic_improvements/"
+      >11 April - Using SimPy to simulate a vaccine clinic - Part 2: model improvements</a
+    >
+  </li>
+  
+  <li>
+    <a href="../simpy_getting_started_vaccine_clinic/"
+      >04 April - Using SimPy to simulate a vaccine clinic - Part 1: an introductory tutorial</a
+    >
+  </li>
+  
+  <li>
+    <a href="../use_jupyter_conda_envs/"
+      >03 April - Using different conda environments with Jupyter Lab</a
+    >
+  </li>
+  
+  <li>
+    <a href="../hello_world/"
+      >02 April - Hello world from ablog blogging with JupyterLab</a
+    >
+  </li>
+  
+</ul>
+
+<h3><a href="../tag/">Tags</a></h3>
+<style type="text/css">
+  ul.ablog-cloud {
+    list-style: none;
+    overflow: auto;
+  }
+  ul.ablog-cloud li {
+    float: left;
+    height: 20pt;
+    line-height: 18pt;
+    margin-right: 5px;
+  }
+  ul.ablog-cloud a {
+    text-decoration: none;
+    vertical-align: middle;
+  }
+  li.ablog-cloud-1 {
+    font-size: 80%;
+  }
+  li.ablog-cloud-2 {
+    font-size: 95%;
+  }
+  li.ablog-cloud-3 {
+    font-size: 110%;
+  }
+  li.ablog-cloud-4 {
+    font-size: 125%;
+  }
+  li.ablog-cloud-5 {
+    font-size: 140%;
+  }
+</style>
+<ul class="ablog-cloud">
+   
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/github/">GitHub</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-3">
+    <a href="../tag/r/">R</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/ablog/">ablog</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/analytics/">analytics</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/bikeshare/">bikeshare</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/birding/">birding</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/blogging/">blogging</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/caret/">caret</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/conda/">conda</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/datetime/">datetime</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/dplyr/">dplyr</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/ebird/">ebird</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/ecology/">ecology</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/excel/">excel</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/ggmap/">ggmap</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/ggplot2/">ggplot2</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/gis/">gis</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/git/">git</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/gps/">gps</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/healthcare/">healthcare</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/hiking/">hiking</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/hillmaker/">hillmaker</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/jupyter/">jupyter</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/matplotlib/">matplotlib</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/metamodeling/">metamodeling</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-2">
+    <a href="../tag/occupancy-analysis/">occupancy analysis</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/pandas/">pandas</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/patient-flow/">patient flow</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/plyr/">plyr</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-5">
+    <a href="../tag/python/">python</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/shiny/">shiny</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/simpy/">simpy</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/simulation/">simulation</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/sphinx/">sphinx</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/statistics/">statistics</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/teaching/">teaching</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/text/">text</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/xml/">xml</a>
+  </li>
+   
+</ul>
+
+<h3>
+  <a href="../archive/">Archives</a>
+</h3>
+<ul>
+   
+  <li>
+    <a href="../2022/">2022 (7)</a>
+  </li>
+    
+  <li>
+    <a href="../2021/">2021 (4)</a>
+  </li>
+    
+  <li>
+    <a href="../2020/">2020 (2)</a>
+  </li>
+    
+  <li>
+    <a href="../2019/">2019 (7)</a>
+  </li>
+    
+  <li>
+    <a href="../2018/">2018 (5)</a>
+  </li>
+    
+  <li>
+    <a href="../2017/">2017 (2)</a>
+  </li>
+    
+  <li>
+    <a href="../2016/">2016 (6)</a>
+  </li>
+    
+  <li>
+    <a href="../2014/">2014 (6)</a>
+  </li>
+    
+  <li>
+    <a href="../2013/">2013 (7)</a>
+  </li>
+   
+</ul>
+
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search/" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+              </div>
+              <div class="sidebar-end-items">
+              </div>
+            </div>
+            
           
 
-          <div class="body" role="main">
-             
+          
+          <div class="d-none d-xl-block col-xl-2 bd-toc">
+            
+              
+              <div class="toc-item">
+                
+<div class="tocsection onthispage mt-5 pt-1 pb-3">
+    <i class="fas fa-list"></i> On this page
+</div>
+
+<nav id="bd-toc-nav">
+    <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#Python’s-datetime-and-timedelta-classes">
+   Python’s
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     datetime
+    </span>
+   </code>
+   and
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     timedelta
+    </span>
+   </code>
+   classes
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#Numpy’s-newish-datetime64-and-timedelta64-classes">
+   Numpy’s newish
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     datetime64
+    </span>
+   </code>
+   and
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     timedelta64
+    </span>
+   </code>
+   classes
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#Pandas-and-datetimes">
+   Pandas and datetimes
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#Pandas-and-time-series">
+   Pandas and time series
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#Pandas-DateOffset-objects">
+     Pandas
+     <code class="docutils literal notranslate">
+      <span class="pre">
+       DateOffset
+      </span>
+     </code>
+     objects
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#Week-of-month-dates">
+     Week of month dates
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#Shifting-(Leading-and-Lagging)-Data">
+   Shifting (Leading and Lagging) Data
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#Periods-and-period-arithmetic">
+   Periods and period arithmetic
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#Resampling-and-frequency-conversion">
+   Resampling and frequency conversion
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#Downsampling">
+     Downsampling
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#Upsampling">
+     Upsampling
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#Time-Series-Plotting">
+   Time Series Plotting
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#Moving-window-functions">
+     Moving window functions
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#Learn-more-about-pandas-timeseries">
+   Learn more about pandas timeseries
+  </a>
+ </li>
+</ul>
+
+</nav>
+              </div>
+              
+              <div class="toc-item">
+                
+              </div>
+              
+            
+          </div>
+          
+
+          
+          
+            
+          
+          <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+              
+              <div>
+                 
 <style>
 /* CSS for nbsphinx extension */
 
@@ -315,7 +833,7 @@ div.rendered_html tbody tr:hover {
 }
 </style>
 <section id="Exploring-dates-and-times-in-Python">
-<h1>Exploring dates and times in Python<a class="headerlink" href="#Exploring-dates-and-times-in-Python" title="Permalink to this headline">¶</a></h1>
+<h1>Exploring dates and times in Python<a class="headerlink" href="#Exploring-dates-and-times-in-Python" title="Permalink to this headline">#</a></h1>
 <p>For many of us in the business analytics world, working with dates and times is bread and butter stuff. We can work all kinds of magic with Excel’s “serial” datetimes and worksheet functions like DATEVALUE(), WEEKDAY(), MONTH(), DATE() and many more. We can wield VBA functions like <a class="reference external" href="http://msdn.microsoft.com/en-us/library/b5xbyt6f%28v=vs.90%29.aspx">DateDiff</a> with the best of them. We all know that, according to MS, time started on 1/1/1900 (or 1904 if you’re on a Mac) and we just live with
 the fact that we can’t do reliable datetime work before those magic epochs. I even wrote and released a free and open source MS Access add-in called <a class="reference external" href="http://hillmaker.sourceforge.net/">Hillmaker</a> many years ago that did statistical analysis of time interval data by day of week and time of day. That tool still finds lots of use in the healthcare world for analyzing occupancy of things like nursing units, emergency departments, recovery room, and many other places with entry and exit timestamp
 data.</p>
@@ -323,7 +841,7 @@ data.</p>
 I’m far from an expert, I did put together this little intro to Python dates and times aimed at business analtytics types who are new to Python. It is by no means comprehensive, but does cover the basics of the base Python <code class="docutils literal notranslate"><span class="pre">datetime</span></code> and <code class="docutils literal notranslate"><span class="pre">timedelta</span></code> classes along with Numpy <code class="docutils literal notranslate"><span class="pre">datetime64</span></code> and <code class="docutils literal notranslate"><span class="pre">timedelta64</span></code> classes. Oh yeah, it also covers the pandas <code class="docutils literal notranslate"><span class="pre">Timestamp</span></code> and <code class="docutils literal notranslate"><span class="pre">timedelta</span></code> classes (confused yet?). I also show one particular dragon that bit me - conversion between Numpy datetimes
 and Pandas datetimes - even though Pandas uses Numpy under the hood.</p>
 <section id="Python’s-datetime-and-timedelta-classes">
-<h2>Python’s <code class="docutils literal notranslate"><span class="pre">datetime</span></code> and <code class="docutils literal notranslate"><span class="pre">timedelta</span></code> classes<a class="headerlink" href="#Python’s-datetime-and-timedelta-classes" title="Permalink to this headline">¶</a></h2>
+<h2>Python’s <code class="docutils literal notranslate"><span class="pre">datetime</span></code> and <code class="docutils literal notranslate"><span class="pre">timedelta</span></code> classes<a class="headerlink" href="#Python’s-datetime-and-timedelta-classes" title="Permalink to this headline">#</a></h2>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
@@ -609,7 +1127,7 @@ datetime.timedelta(microseconds=10)
 </div>
 </section>
 <section id="Numpy’s-newish-datetime64-and-timedelta64-classes">
-<h2>Numpy’s newish <code class="docutils literal notranslate"><span class="pre">datetime64</span></code> and <code class="docutils literal notranslate"><span class="pre">timedelta64</span></code> classes<a class="headerlink" href="#Numpy’s-newish-datetime64-and-timedelta64-classes" title="Permalink to this headline">¶</a></h2>
+<h2>Numpy’s newish <code class="docutils literal notranslate"><span class="pre">datetime64</span></code> and <code class="docutils literal notranslate"><span class="pre">timedelta64</span></code> classes<a class="headerlink" href="#Numpy’s-newish-datetime64-and-timedelta64-classes" title="Permalink to this headline">#</a></h2>
 <p>The Numpy library (v 1.7.0) introduced a new datatype called datetime64. Numpy uses this name because there is already a datetime data type in Python datetime library. Like R, dates and times in Python are stored based on the notion of POSIX time - the number of seconds elapsed since Jan 1, 1970 00:00:00 GMT - called the UTC epoch. This doesn’t mean that dates and times before that cannot be represented - we just use negative numbers. Representing and working with dates and times for computing
 is a pretty interesting topic, fraught with complexities like time zones, daylight savings time, and leap seconds. A few good places to start are:</p>
 <p>Numpy docs - <a class="reference external" href="http://docs.scipy.org/doc/numpy-dev/reference/arrays.datetime.html">http://docs.scipy.org/doc/numpy-dev/reference/arrays.datetime.html</a></p>
@@ -831,7 +1349,7 @@ numpy.timedelta64(55,&#39;m&#39;)
 <p>Unfortunately, <code class="docutils literal notranslate"><span class="pre">timedelta64</span></code> objects have almost no useful attributes in terms of date time math. OTH, see the <code class="docutils literal notranslate"><span class="pre">datetime.timedelta</span></code> object (and Pandas) for a number of useful attributes.</p>
 </section>
 <section id="Pandas-and-datetimes">
-<h2>Pandas and datetimes<a class="headerlink" href="#Pandas-and-datetimes" title="Permalink to this headline">¶</a></h2>
+<h2>Pandas and datetimes<a class="headerlink" href="#Pandas-and-datetimes" title="Permalink to this headline">#</a></h2>
 <p>Pandas prides itself on its handling of time series data (speed, flexibility, power) and is built on time of numpy <code class="docutils literal notranslate"><span class="pre">datetime64</span></code> and <code class="docutils literal notranslate"><span class="pre">timedelta64</span></code> data types (instead of Python’s base <code class="docutils literal notranslate"><span class="pre">datetime</span></code> and <code class="docutils literal notranslate"><span class="pre">timedelta</span></code> types. Pandas also wanted to be very <a class="reference external" href="http://wesmckinney.com/blog/?cat=5">time-zone aware and time-zone capable</a>. So, Pandas has its own data type for timestamps called, well, <code class="docutils literal notranslate"><span class="pre">Timetamp</span></code>. It’s based on numpy’s <code class="docutils literal notranslate"><span class="pre">datetime64</span></code> type but works like Python’s <code class="docutils literal notranslate"><span class="pre">datetime</span></code> (I think).
 The following StackOverlfow post (the “welcome to hell” post) is quite popular and relevant.</p>
 <p><a class="reference external" href="http://stackoverflow.com/questions/13703720/converting-between-datetime-timestamp-and-datetime64">http://stackoverflow.com/questions/13703720/converting-between-datetime-timestamp-and-datetime64</a></p>
@@ -1102,7 +1620,7 @@ Max: 106751 days 23:47:16.854775
 </div>
 </section>
 <section id="Pandas-and-time-series">
-<h2>Pandas and time series<a class="headerlink" href="#Pandas-and-time-series" title="Permalink to this headline">¶</a></h2>
+<h2>Pandas and time series<a class="headerlink" href="#Pandas-and-time-series" title="Permalink to this headline">#</a></h2>
 <p>Generally, a time series in pandas is a <code class="docutils literal notranslate"><span class="pre">Series</span></code> object with a <code class="docutils literal notranslate"><span class="pre">DateTimeIndex</span></code>. Pandas has convenience functions for creating time series indexes. The default frequency for date_range is a calendar day while the default for bdate_range is a business day</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[44]:
@@ -1429,7 +1947,7 @@ DatetimeIndex([&#39;2014-01-05&#39;, &#39;2014-01-12&#39;, &#39;2014-01-19&#39;,
 </div></div>
 </div>
 <section id="Pandas-DateOffset-objects">
-<h3>Pandas <code class="docutils literal notranslate"><span class="pre">DateOffset</span></code> objects<a class="headerlink" href="#Pandas-DateOffset-objects" title="Permalink to this headline">¶</a></h3>
+<h3>Pandas <code class="docutils literal notranslate"><span class="pre">DateOffset</span></code> objects<a class="headerlink" href="#Pandas-DateOffset-objects" title="Permalink to this headline">#</a></h3>
 <p>Usually <em>base frequencies</em> are specified with a string alias such as ‘W’ or ‘M’. However,</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[53]:
@@ -1525,7 +2043,7 @@ array([12, 29, 84,  4,  6])
 </div>
 </section>
 <section id="Week-of-month-dates">
-<h3>Week of month dates<a class="headerlink" href="#Week-of-month-dates" title="Permalink to this headline">¶</a></h3>
+<h3>Week of month dates<a class="headerlink" href="#Week-of-month-dates" title="Permalink to this headline">#</a></h3>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
@@ -1569,7 +2087,7 @@ array([12, 29, 84,  4,  6])
 </section>
 </section>
 <section id="Shifting-(Leading-and-Lagging)-Data">
-<h2>Shifting (Leading and Lagging) Data<a class="headerlink" href="#Shifting-(Leading-and-Lagging)-Data" title="Permalink to this headline">¶</a></h2>
+<h2>Shifting (Leading and Lagging) Data<a class="headerlink" href="#Shifting-(Leading-and-Lagging)-Data" title="Permalink to this headline">#</a></h2>
 <p>Move data back and forth through time. <code class="docutils literal notranslate"><span class="pre">Series</span></code> and <code class="docutils literal notranslate"><span class="pre">DateFrame</span></code> objects have a <code class="docutils literal notranslate"><span class="pre">shift</span></code> method for doing naive shifts forward and backward and leaving the index unchanged.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
@@ -1616,7 +2134,7 @@ array([12, 29, 84,  4,  6])
 </div>
 </section>
 <section id="Periods-and-period-arithmetic">
-<h2>Periods and period arithmetic<a class="headerlink" href="#Periods-and-period-arithmetic" title="Permalink to this headline">¶</a></h2>
+<h2>Periods and period arithmetic<a class="headerlink" href="#Periods-and-period-arithmetic" title="Permalink to this headline">#</a></h2>
 <p>Periods represent time spans like months or quarters or years.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
@@ -1678,14 +2196,14 @@ array([12, 29, 84,  4,  6])
 </div>
 </section>
 <section id="Resampling-and-frequency-conversion">
-<h2>Resampling and frequency conversion<a class="headerlink" href="#Resampling-and-frequency-conversion" title="Permalink to this headline">¶</a></h2>
+<h2>Resampling and frequency conversion<a class="headerlink" href="#Resampling-and-frequency-conversion" title="Permalink to this headline">#</a></h2>
 <p><em>Resampling</em> - convert time series from one frequency to another.</p>
 <ul class="simple">
 <li><p><em>Downsampling</em> - higher frequency to lower frequency (e.g. daily to monthly)</p></li>
 <li><p><em>Upsampling</em> - lower frequency to higher frequency (e.g. annual to monthly)</p></li>
 </ul>
 <section id="Downsampling">
-<h3>Downsampling<a class="headerlink" href="#Downsampling" title="Permalink to this headline">¶</a></h3>
+<h3>Downsampling<a class="headerlink" href="#Downsampling" title="Permalink to this headline">#</a></h3>
 <p>Take a daily time series and convert to monthly.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
@@ -1796,7 +2314,7 @@ array([12, 29, 84,  4,  6])
 </div>
 </section>
 <section id="Upsampling">
-<h3>Upsampling<a class="headerlink" href="#Upsampling" title="Permalink to this headline">¶</a></h3>
+<h3>Upsampling<a class="headerlink" href="#Upsampling" title="Permalink to this headline">#</a></h3>
 <p>Upsampling brings an entirely different set of challenges. If we increase the frequency of the samples, how do we fill in these new time series values? For example, consider the reverse of the last example. Then check out the <code class="docutils literal notranslate"><span class="pre">fill_method</span></code> options.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
@@ -1817,7 +2335,7 @@ array([12, 29, 84,  4,  6])
 </section>
 </section>
 <section id="Time-Series-Plotting">
-<h2>Time Series Plotting<a class="headerlink" href="#Time-Series-Plotting" title="Permalink to this headline">¶</a></h2>
+<h2>Time Series Plotting<a class="headerlink" href="#Time-Series-Plotting" title="Permalink to this headline">#</a></h2>
 <p>Pandas tries to make it a little easier to create nice looking time series plots using <code class="docutils literal notranslate"><span class="pre">matplotlib</span></code> than if you just used <code class="docutils literal notranslate"><span class="pre">matplotlib</span></code> yourself. Let’s read in some stock price data from Yahoo! Finance that has already been saved to a csv file.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
@@ -1926,7 +2444,7 @@ array([12, 29, 84,  4,  6])
 </div>
 </div>
 <section id="Moving-window-functions">
-<h3>Moving window functions<a class="headerlink" href="#Moving-window-functions" title="Permalink to this headline">¶</a></h3>
+<h3>Moving window functions<a class="headerlink" href="#Moving-window-functions" title="Permalink to this headline">#</a></h3>
 <p>Pandas makes it easy to do all kinds of <em>moving window</em> operations like moving average, cumulative sums, and even things like exponential moving averages (“exponential smoothing”).</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
@@ -1983,7 +2501,7 @@ array([12, 29, 84,  4,  6])
 </section>
 </section>
 <section id="Learn-more-about-pandas-timeseries">
-<h2>Learn more about pandas timeseries<a class="headerlink" href="#Learn-more-about-pandas-timeseries" title="Permalink to this headline">¶</a></h2>
+<h2>Learn more about pandas timeseries<a class="headerlink" href="#Learn-more-about-pandas-timeseries" title="Permalink to this headline">#</a></h2>
 <p>Another intro tutorial is <a class="reference external" href="http://earthpy.org/pandas-basics.html">http://earthpy.org/pandas-basics.html</a></p>
 <p>Wes Mckinney’s 2012 PyCon talk on pandas and timeseries - <a class="reference external" href="http://pyvideo.org/video/1198/time-series-data-analysis-with-pandas">http://pyvideo.org/video/1198/time-series-data-analysis-with-pandas</a></p>
 </section>
@@ -2013,349 +2531,37 @@ array([12, 29, 84,  4,  6])
   
 </div>
 
-          </div>
-          
-        </div>
-      </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-<h1 class="logo"><a href="../../">misken</a></h1>
-
-
-
-
-
-
-
-
-  
-<h2>
-   
-  25 June 2014 
-</h2>
-
-<ul>
-   
-<li id="author">
-  <span
-    >Author:</span
-  >
-   
-  <a href="../author/misken/">misken</a>  
-</li>
-    
-<li id="tags">
-  <span
-    >Tags: </span
-  >
-   
-  <a href="../tag/python/">python</a>   
-  <a href="../tag/datetime/">datetime</a>  
-</li>
- 
-</ul>
-<h3>Navigation</h3>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../../about/">About misken</a></li>
-</ul>
-
-
-<h3>
-  <a href="../">Recent Posts</a>
-</h3>
-<ul>
-   
-  <li>
-    <a href="../hillmaker_030_released/"
-      >19 May - numpy speeds up hillmaker dramatically</a
-    >
-  </li>
-  
-  <li>
-    <a href="../simpy_vaccine_clinic_improvements/"
-      >11 April - Using SimPy to simulate a vaccine clinic - Part 2: model improvements</a
-    >
-  </li>
-  
-  <li>
-    <a href="../simpy_getting_started_vaccine_clinic/"
-      >04 April - Using SimPy to simulate a vaccine clinic - Part 1: an introductory tutorial</a
-    >
-  </li>
-  
-  <li>
-    <a href="../use_jupyter_conda_envs/"
-      >03 April - Using different conda environments with Jupyter Lab</a
-    >
-  </li>
-  
-  <li>
-    <a href="../hello_world/"
-      >02 April - Hello world from ablog blogging with JupyterLab</a
-    >
-  </li>
-  
-</ul>
-
-<h3><a href="../tag/">Tags</a></h3>
-<style type="text/css">
-  ul.ablog-cloud {
-    list-style: none;
-    overflow: auto;
-  }
-  ul.ablog-cloud li {
-    float: left;
-    height: 20pt;
-    line-height: 18pt;
-    margin-right: 5px;
-  }
-  ul.ablog-cloud a {
-    text-decoration: none;
-    vertical-align: middle;
-  }
-  li.ablog-cloud-1 {
-    font-size: 80%;
-  }
-  li.ablog-cloud-2 {
-    font-size: 95%;
-  }
-  li.ablog-cloud-3 {
-    font-size: 110%;
-  }
-  li.ablog-cloud-4 {
-    font-size: 125%;
-  }
-  li.ablog-cloud-5 {
-    font-size: 140%;
-  }
-</style>
-<ul class="ablog-cloud">
-   
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/github/">GitHub</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-3">
-    <a href="../tag/r/">R</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/ablog/">ablog</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/analytics/">analytics</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/bikeshare/">bikeshare</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/birding/">birding</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/blogging/">blogging</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/caret/">caret</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/conda/">conda</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/datetime/">datetime</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/dplyr/">dplyr</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/ebird/">ebird</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/ecology/">ecology</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/excel/">excel</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/ggmap/">ggmap</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/ggplot2/">ggplot2</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/gis/">gis</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/git/">git</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/gps/">gps</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/healthcare/">healthcare</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/hiking/">hiking</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/hillmaker/">hillmaker</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/jupyter/">jupyter</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/matplotlib/">matplotlib</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/metamodeling/">metamodeling</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-2">
-    <a href="../tag/occupancy-analysis/">occupancy analysis</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/pandas/">pandas</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/patient-flow/">patient flow</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/plyr/">plyr</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-5">
-    <a href="../tag/python/">python</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/shiny/">shiny</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/simpy/">simpy</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/simulation/">simulation</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/sphinx/">sphinx</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/statistics/">statistics</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/teaching/">teaching</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/text/">text</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/xml/">xml</a>
-  </li>
-   
-</ul>
-
-<h3>
-  <a href="../archive/">Archives</a>
-</h3>
-<ul>
-   
-  <li>
-    <a href="../2022/">2022 (7)</a>
-  </li>
-    
-  <li>
-    <a href="../2021/">2021 (4)</a>
-  </li>
-    
-  <li>
-    <a href="../2020/">2020 (2)</a>
-  </li>
-    
-  <li>
-    <a href="../2019/">2019 (7)</a>
-  </li>
-    
-  <li>
-    <a href="../2018/">2018 (5)</a>
-  </li>
-    
-  <li>
-    <a href="../2017/">2017 (2)</a>
-  </li>
-    
-  <li>
-    <a href="../2016/">2016 (6)</a>
-  </li>
-    
-  <li>
-    <a href="../2014/">2014 (6)</a>
-  </li>
-    
-  <li>
-    <a href="../2013/">2013 (7)</a>
-  </li>
-   
-</ul>
-
-<div id="searchbox" style="display: none" role="search">
-  <h3 id="searchlabel">Quick search</h3>
-    <div class="searchformwrapper">
-    <form class="search" action="../../search/" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
-      <input type="submit" value="Go" />
-    </form>
-    </div>
+              </div>
+              
+              
+              <!-- Previous / next buttons -->
+<div class='prev-next-area'>
 </div>
-<script>$('#searchbox').show(0);</script>
-        </div>
+              
+          </main>
+          
+
       </div>
-      <div class="clearer"></div>
     </div>
-    <div class="footer">
-      &copy;2022, misken.
-      
-      |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.3.2</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
-      
-      |
-      <a href="../../_sources/blog/datetime_exploring.ipynb.txt"
-          rel="nofollow">Page source</a>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
+<footer class="footer mt-5 mt-md-0">
+  <div class="container">
+    
+    <div class="footer-item">
+      <p class="copyright">
+    &copy; Copyright 2022, misken.<br>
+</p>
     </div>
-
     
-
+    <div class="footer-item">
+      <p class="sphinx-version">
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.3.2.<br>
+</p>
+    </div>
     
+  </div>
+</footer>
   </body>
 </html>

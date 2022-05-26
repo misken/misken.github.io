@@ -7,22 +7,40 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
     <title>Using hillmaker from R with reticulate to analyze time of day patterns in bike share data &#8212; misken 0,1,0 documentation</title>
+    
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+
+    
+  <link rel="stylesheet"
+    href="../../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/design-style.b7bb847fb20b106c3d81b95245e65545.min.css" />
+    
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
+
     <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
     <script src="../../_static/jquery.js"></script>
     <script src="../../_static/underscore.js"></script>
     <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/design-tabs.js"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <link rel="author" title="About these documents" href="../../about/" />
     <link rel="index" title="Index" href="../../genindex/" />
     <link rel="search" title="Search" href="../../search/" /> 
-   
-  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
-  
-  
-  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
- 
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="en">
+    
+
+    <!-- Google Analytics -->
+     
 <link
   rel="alternate"
   type="application/atom+xml"
@@ -55,17 +73,437 @@
   }
 </style>
 
-  </head><body>
-  
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
+    
+    <div class="container-fluid" id="banner"></div>
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
+    
+    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main"><div class="container-xl">
+
+  <div id="navbar-start">
+    
+    
+<a class="navbar-brand" href="../../">
+<p class="title">misken</p>
+</a>
+
+    
+  </div>
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapsible" aria-controls="navbar-collapsible" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  
+  <div id="navbar-collapsible" class="col-lg-9 collapse navbar-collapse">
+    <div id="navbar-center" class="mr-auto">
+      
+      <div class="navbar-center-item">
+        <ul id="navbar-main-elements" class="navbar-nav">
+    <li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../about/">
+  About misken
+ </a>
+</li>
+
+    
+</ul>
+      </div>
+      
+    </div>
+
+    <div id="navbar-end">
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+      </ul>
+      </div>
+      
+    </div>
+  </div>
+</div>
+    </nav>
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+            
+            <!-- Only show if we have sidebars configured, else just a small margin  -->
+            <div class="col-12 col-md-3 bd-sidebar">
+              <div class="sidebar-start-items">  
+<h2>
+   
+  23 February 2019 
+</h2>
+
+<ul>
+   
+<li id="author">
+  <span
+    >Author:</span
+  >
+   
+  <a href="../author/misken/">misken</a>  
+</li>
+    
+<li id="tags">
+  <span
+    >Tags: </span
+  >
+   
+  <a href="../tag/r/">R</a>   
+  <a href="../tag/python/">python</a>   
+  <a href="../tag/hillmaker/">hillmaker</a>  
+</li>
+ 
+</ul>
+
+<h3>
+  <a href="../">Recent Posts</a>
+</h3>
+<ul>
+   
+  <li>
+    <a href="../hillmaker_030_released/"
+      >19 May - numpy speeds up hillmaker dramatically</a
+    >
+  </li>
+  
+  <li>
+    <a href="../simpy_vaccine_clinic_improvements/"
+      >11 April - Using SimPy to simulate a vaccine clinic - Part 2: model improvements</a
+    >
+  </li>
+  
+  <li>
+    <a href="../simpy_getting_started_vaccine_clinic/"
+      >04 April - Using SimPy to simulate a vaccine clinic - Part 1: an introductory tutorial</a
+    >
+  </li>
+  
+  <li>
+    <a href="../use_jupyter_conda_envs/"
+      >03 April - Using different conda environments with Jupyter Lab</a
+    >
+  </li>
+  
+  <li>
+    <a href="../hello_world/"
+      >02 April - Hello world from ablog blogging with JupyterLab</a
+    >
+  </li>
+  
+</ul>
+
+<h3><a href="../tag/">Tags</a></h3>
+<style type="text/css">
+  ul.ablog-cloud {
+    list-style: none;
+    overflow: auto;
+  }
+  ul.ablog-cloud li {
+    float: left;
+    height: 20pt;
+    line-height: 18pt;
+    margin-right: 5px;
+  }
+  ul.ablog-cloud a {
+    text-decoration: none;
+    vertical-align: middle;
+  }
+  li.ablog-cloud-1 {
+    font-size: 80%;
+  }
+  li.ablog-cloud-2 {
+    font-size: 95%;
+  }
+  li.ablog-cloud-3 {
+    font-size: 110%;
+  }
+  li.ablog-cloud-4 {
+    font-size: 125%;
+  }
+  li.ablog-cloud-5 {
+    font-size: 140%;
+  }
+</style>
+<ul class="ablog-cloud">
+   
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/github/">GitHub</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-3">
+    <a href="../tag/r/">R</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/ablog/">ablog</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/analytics/">analytics</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/bikeshare/">bikeshare</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/birding/">birding</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/blogging/">blogging</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/caret/">caret</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/conda/">conda</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/datetime/">datetime</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/dplyr/">dplyr</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/ebird/">ebird</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/ecology/">ecology</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/excel/">excel</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/ggmap/">ggmap</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/ggplot2/">ggplot2</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/gis/">gis</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/git/">git</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/gps/">gps</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/healthcare/">healthcare</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/hiking/">hiking</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/hillmaker/">hillmaker</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/jupyter/">jupyter</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/matplotlib/">matplotlib</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/metamodeling/">metamodeling</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-2">
+    <a href="../tag/occupancy-analysis/">occupancy analysis</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/pandas/">pandas</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/patient-flow/">patient flow</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/plyr/">plyr</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-5">
+    <a href="../tag/python/">python</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/shiny/">shiny</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/simpy/">simpy</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/simulation/">simulation</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/sphinx/">sphinx</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/statistics/">statistics</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/teaching/">teaching</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/text/">text</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/xml/">xml</a>
+  </li>
+   
+</ul>
+
+<h3>
+  <a href="../archive/">Archives</a>
+</h3>
+<ul>
+   
+  <li>
+    <a href="../2022/">2022 (7)</a>
+  </li>
+    
+  <li>
+    <a href="../2021/">2021 (4)</a>
+  </li>
+    
+  <li>
+    <a href="../2020/">2020 (2)</a>
+  </li>
+    
+  <li>
+    <a href="../2019/">2019 (7)</a>
+  </li>
+    
+  <li>
+    <a href="../2018/">2018 (5)</a>
+  </li>
+    
+  <li>
+    <a href="../2017/">2017 (2)</a>
+  </li>
+    
+  <li>
+    <a href="../2016/">2016 (6)</a>
+  </li>
+    
+  <li>
+    <a href="../2014/">2014 (6)</a>
+  </li>
+    
+  <li>
+    <a href="../2013/">2013 (7)</a>
+  </li>
+   
+</ul>
+
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search/" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+              </div>
+              <div class="sidebar-end-items">
+              </div>
+            </div>
+            
           
 
-          <div class="body" role="main">
-             <section id="using-hillmaker-from-r-with-reticulate-to-analyze-time-of-day-patterns-in-bike-share-data">
-<h1>Using hillmaker from R with reticulate to analyze time of day patterns in bike share data<a class="headerlink" href="#using-hillmaker-from-r-with-reticulate-to-analyze-time-of-day-patterns-in-bike-share-data" title="Permalink to this headline">¶</a></h1>
+          
+          <div class="d-none d-xl-block col-xl-2 bd-toc">
+            
+              
+              <div class="toc-item">
+                
+<div class="tocsection onthispage mt-5 pt-1 pb-3">
+    <i class="fas fa-list"></i> On this page
+</div>
+
+<nav id="bd-toc-nav">
+    <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#a-bit-about-reticulate">
+   A bit about reticulate
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#the-data-analysis-problem">
+   The data analysis problem
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#trends-in-cycle-share-use">
+   Trends in cycle share use
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#time-of-day-and-day-of-week-analysis-with-hillmaker">
+   Time of day and day of week analysis with hillmaker
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#what-does-the-returned-data-structure-look-like">
+   What does the returned data structure look like?
+  </a>
+ </li>
+</ul>
+
+</nav>
+              </div>
+              
+              <div class="toc-item">
+                
+              </div>
+              
+            
+          </div>
+          
+
+          
+          
+            
+          
+          <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+              
+              <div>
+                 <section id="using-hillmaker-from-r-with-reticulate-to-analyze-time-of-day-patterns-in-bike-share-data">
+<h1>Using hillmaker from R with reticulate to analyze time of day patterns in bike share data<a class="headerlink" href="#using-hillmaker-from-r-with-reticulate-to-analyze-time-of-day-patterns-in-bike-share-data" title="Permalink to this headline">#</a></h1>
 <p>Python based hillmaker is called from R using reticulate.</p>
 <p>In a previous post, <a class="reference external" href="https://misken.github.io/blog/basic_usage_cycleshare/">Analyzing Pronto Cycle Share data with hillmaker</a>, we showed how the Python <a class="reference external" href="https://github.com/misken/hillmaker">hillmaker</a> module can be used to create statistical summaries by time of day and day of week for bike share system usage. As an everyday user of both Python and R, I’ve been wanting to test out the <a class="reference external" href="https://github.com/rstudio/reticulate">reticulate</a> R package that makes it possible to use Python from within R. Let’s see if we can use hillmaker from R.</p>
 <div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="nf">library</span><span class="p">(</span><span class="n">dplyr</span><span class="p">)</span>
@@ -76,7 +514,7 @@
 </pre></div>
 </div>
 <section id="a-bit-about-reticulate">
-<h2>A bit about reticulate<a class="headerlink" href="#a-bit-about-reticulate" title="Permalink to this headline">¶</a></h2>
+<h2>A bit about reticulate<a class="headerlink" href="#a-bit-about-reticulate" title="Permalink to this headline">#</a></h2>
 <p>It looks like reticulate makes it possible to interact with Python in a number of ways, including:</p>
 <ul class="simple">
 <li><p>loading Python modules or sourcing Python programs from within R Markdown documents,</p></li>
@@ -113,7 +551,7 @@
 </div>
 </section>
 <section id="the-data-analysis-problem">
-<h2>The data analysis problem<a class="headerlink" href="#the-data-analysis-problem" title="Permalink to this headline">¶</a></h2>
+<h2>The data analysis problem<a class="headerlink" href="#the-data-analysis-problem" title="Permalink to this headline">#</a></h2>
 <p>To test out reticulate with hillmaker, let’s assume we are interested in obtaining statistics on the total number of bikes in use by time of day and day of week for 2014 in the San Francisco bike share system. We’ll use the anonymized <a class="reference external" href="https://www.kaggle.com/benhamner/sf-bay-area-bike-share">trip data available from Kaggle</a>. In a <a class="reference external" href="https://misken.github.io/blog/eda_post_balance_func_sfcs/">previous post exploring station balance in this system</a> I described some data prep done to facilitate analysis. I’m going to reuse that prepped data for this analysis.</p>
 <div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="nf">load</span><span class="p">(</span><span class="s">&quot;data/processed/sfcs_prepped.Rdata&quot;</span><span class="p">)</span>
 </pre></div>
@@ -152,7 +590,7 @@
 </div>
 </section>
 <section id="trends-in-cycle-share-use">
-<h2>Trends in cycle share use<a class="headerlink" href="#trends-in-cycle-share-use" title="Permalink to this headline">¶</a></h2>
+<h2>Trends in cycle share use<a class="headerlink" href="#trends-in-cycle-share-use" title="Permalink to this headline">#</a></h2>
 <p>Before diving into detailed time of day and day of week analysis, let’s look at overall number of riders by year, month and subscription type.</p>
 <div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="n">trip</span> <span class="o">%&gt;%</span> 
   <span class="nf">group_by</span><span class="p">(</span><span class="n">trip_ym</span><span class="p">,</span> <span class="n">subscription_type</span><span class="p">)</span> <span class="o">%&gt;%</span> 
@@ -219,7 +657,7 @@
 <p>On to time of day analysis.</p>
 </section>
 <section id="time-of-day-and-day-of-week-analysis-with-hillmaker">
-<h2>Time of day and day of week analysis with hillmaker<a class="headerlink" href="#time-of-day-and-day-of-week-analysis-with-hillmaker" title="Permalink to this headline">¶</a></h2>
+<h2>Time of day and day of week analysis with hillmaker<a class="headerlink" href="#time-of-day-and-day-of-week-analysis-with-hillmaker" title="Permalink to this headline">#</a></h2>
 <p>The hillmaker module describes itself this way on its <a class="reference external" href="https://github.com/misken/hillmaker">GitHub page</a>.</p>
 <blockquote>
 <div><p>hillmaker is a Python package that computes time of day and day of week specific occupancy statistics from transaction data containing arrival and departure timestamps. Typical use is for capacity planning problems in places like hospital emergency departments, surgical recovery rooms or any system in which entities arrive, occupy capacity for some amount of time, and then depart. It gets its name from the hill-like nature of plots based on temporal occupancy statistics.</p>
@@ -557,7 +995,7 @@
 <p>Bottom line, need to be really careful when calling datetime related functions in Python from R using reticulate. Now that we got that sorted out, let’s return to exploring the hillmaker data structures returned from Python.</p>
 </section>
 <section id="what-does-the-returned-data-structure-look-like">
-<h2>What does the returned data structure look like?<a class="headerlink" href="#what-does-the-returned-data-structure-look-like" title="Permalink to this headline">¶</a></h2>
+<h2>What does the returned data structure look like?<a class="headerlink" href="#what-does-the-returned-data-structure-look-like" title="Permalink to this headline">#</a></h2>
 <p>The hillmaker function returns a Python dictionary of pandas DataFrame objects. Reticulate converts these to a list of, hmm, let’s see.</p>
 <div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="nf">class</span><span class="p">(</span><span class="n">utc_results</span><span class="p">)</span>
 </pre></div>
@@ -816,350 +1254,37 @@
   
 </div>
 
-          </div>
-          
-        </div>
-      </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-<h1 class="logo"><a href="../../">misken</a></h1>
-
-
-
-
-
-
-
-
-  
-<h2>
-   
-  23 February 2019 
-</h2>
-
-<ul>
-   
-<li id="author">
-  <span
-    >Author:</span
-  >
-   
-  <a href="../author/misken/">misken</a>  
-</li>
-    
-<li id="tags">
-  <span
-    >Tags: </span
-  >
-   
-  <a href="../tag/r/">R</a>   
-  <a href="../tag/python/">python</a>   
-  <a href="../tag/hillmaker/">hillmaker</a>  
-</li>
- 
-</ul>
-<h3>Navigation</h3>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../../about/">About misken</a></li>
-</ul>
-
-
-<h3>
-  <a href="../">Recent Posts</a>
-</h3>
-<ul>
-   
-  <li>
-    <a href="../hillmaker_030_released/"
-      >19 May - numpy speeds up hillmaker dramatically</a
-    >
-  </li>
-  
-  <li>
-    <a href="../simpy_vaccine_clinic_improvements/"
-      >11 April - Using SimPy to simulate a vaccine clinic - Part 2: model improvements</a
-    >
-  </li>
-  
-  <li>
-    <a href="../simpy_getting_started_vaccine_clinic/"
-      >04 April - Using SimPy to simulate a vaccine clinic - Part 1: an introductory tutorial</a
-    >
-  </li>
-  
-  <li>
-    <a href="../use_jupyter_conda_envs/"
-      >03 April - Using different conda environments with Jupyter Lab</a
-    >
-  </li>
-  
-  <li>
-    <a href="../hello_world/"
-      >02 April - Hello world from ablog blogging with JupyterLab</a
-    >
-  </li>
-  
-</ul>
-
-<h3><a href="../tag/">Tags</a></h3>
-<style type="text/css">
-  ul.ablog-cloud {
-    list-style: none;
-    overflow: auto;
-  }
-  ul.ablog-cloud li {
-    float: left;
-    height: 20pt;
-    line-height: 18pt;
-    margin-right: 5px;
-  }
-  ul.ablog-cloud a {
-    text-decoration: none;
-    vertical-align: middle;
-  }
-  li.ablog-cloud-1 {
-    font-size: 80%;
-  }
-  li.ablog-cloud-2 {
-    font-size: 95%;
-  }
-  li.ablog-cloud-3 {
-    font-size: 110%;
-  }
-  li.ablog-cloud-4 {
-    font-size: 125%;
-  }
-  li.ablog-cloud-5 {
-    font-size: 140%;
-  }
-</style>
-<ul class="ablog-cloud">
-   
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/github/">GitHub</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-3">
-    <a href="../tag/r/">R</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/ablog/">ablog</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/analytics/">analytics</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/bikeshare/">bikeshare</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/birding/">birding</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/blogging/">blogging</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/caret/">caret</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/conda/">conda</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/datetime/">datetime</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/dplyr/">dplyr</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/ebird/">ebird</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/ecology/">ecology</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/excel/">excel</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/ggmap/">ggmap</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/ggplot2/">ggplot2</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/gis/">gis</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/git/">git</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/gps/">gps</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/healthcare/">healthcare</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/hiking/">hiking</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/hillmaker/">hillmaker</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/jupyter/">jupyter</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/matplotlib/">matplotlib</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/metamodeling/">metamodeling</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-2">
-    <a href="../tag/occupancy-analysis/">occupancy analysis</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/pandas/">pandas</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/patient-flow/">patient flow</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/plyr/">plyr</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-5">
-    <a href="../tag/python/">python</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/shiny/">shiny</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/simpy/">simpy</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/simulation/">simulation</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/sphinx/">sphinx</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/statistics/">statistics</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/teaching/">teaching</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/text/">text</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/xml/">xml</a>
-  </li>
-   
-</ul>
-
-<h3>
-  <a href="../archive/">Archives</a>
-</h3>
-<ul>
-   
-  <li>
-    <a href="../2022/">2022 (7)</a>
-  </li>
-    
-  <li>
-    <a href="../2021/">2021 (4)</a>
-  </li>
-    
-  <li>
-    <a href="../2020/">2020 (2)</a>
-  </li>
-    
-  <li>
-    <a href="../2019/">2019 (7)</a>
-  </li>
-    
-  <li>
-    <a href="../2018/">2018 (5)</a>
-  </li>
-    
-  <li>
-    <a href="../2017/">2017 (2)</a>
-  </li>
-    
-  <li>
-    <a href="../2016/">2016 (6)</a>
-  </li>
-    
-  <li>
-    <a href="../2014/">2014 (6)</a>
-  </li>
-    
-  <li>
-    <a href="../2013/">2013 (7)</a>
-  </li>
-   
-</ul>
-
-<div id="searchbox" style="display: none" role="search">
-  <h3 id="searchlabel">Quick search</h3>
-    <div class="searchformwrapper">
-    <form class="search" action="../../search/" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
-      <input type="submit" value="Go" />
-    </form>
-    </div>
+              </div>
+              
+              
+              <!-- Previous / next buttons -->
+<div class='prev-next-area'>
 </div>
-<script>$('#searchbox').show(0);</script>
-        </div>
+              
+          </main>
+          
+
       </div>
-      <div class="clearer"></div>
     </div>
-    <div class="footer">
-      &copy;2022, misken.
-      
-      |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.3.2</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
-      
-      |
-      <a href="../../_sources/blog/hillmaker_r_sfcs.md.txt"
-          rel="nofollow">Page source</a>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
+<footer class="footer mt-5 mt-md-0">
+  <div class="container">
+    
+    <div class="footer-item">
+      <p class="copyright">
+    &copy; Copyright 2022, misken.<br>
+</p>
     </div>
-
     
-
+    <div class="footer-item">
+      <p class="sphinx-version">
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.3.2.<br>
+</p>
+    </div>
     
+  </div>
+</footer>
   </body>
 </html>

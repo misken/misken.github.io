@@ -7,24 +7,42 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
     <title>Excel “what if?” analysis with Python - Part 1: Models and Data Tables &#8212; misken 0,1,0 documentation</title>
+    
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+
+    
+  <link rel="stylesheet"
+    href="../../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/design-style.b7bb847fb20b106c3d81b95245e65545.min.css" />
+    
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
+
     <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
     <script src="../../_static/jquery.js"></script>
     <script src="../../_static/underscore.js"></script>
     <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/design-tabs.js"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <link rel="author" title="About these documents" href="../../about/" />
     <link rel="index" title="Index" href="../../genindex/" />
     <link rel="search" title="Search" href="../../search/" /> 
-   
-  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
-  
-  
-  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
- 
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="en">
+    
+
+    <!-- Google Analytics -->
+     
 <link
   rel="alternate"
   type="application/atom+xml"
@@ -57,16 +75,509 @@
   }
 </style>
 
-  </head><body>
-  
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
+    
+    <div class="container-fluid" id="banner"></div>
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
+    
+    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main"><div class="container-xl">
+
+  <div id="navbar-start">
+    
+    
+<a class="navbar-brand" href="../../">
+<p class="title">misken</p>
+</a>
+
+    
+  </div>
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapsible" aria-controls="navbar-collapsible" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  
+  <div id="navbar-collapsible" class="col-lg-9 collapse navbar-collapse">
+    <div id="navbar-center" class="mr-auto">
+      
+      <div class="navbar-center-item">
+        <ul id="navbar-main-elements" class="navbar-nav">
+    <li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../about/">
+  About misken
+ </a>
+</li>
+
+    
+</ul>
+      </div>
+      
+    </div>
+
+    <div id="navbar-end">
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+      </ul>
+      </div>
+      
+    </div>
+  </div>
+</div>
+    </nav>
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+            
+            <!-- Only show if we have sidebars configured, else just a small margin  -->
+            <div class="col-12 col-md-3 bd-sidebar">
+              <div class="sidebar-start-items">  
+<h2>
+   
+  12 February 2021 
+</h2>
+
+<ul>
+   
+<li id="author">
+  <span
+    >Author:</span
+  >
+   
+  <a href="../author/misken/">misken</a>  
+</li>
+    
+<li id="tags">
+  <span
+    >Tags: </span
+  >
+   
+  <a href="../tag/python/">python</a>   
+  <a href="../tag/excel/">excel</a>  
+</li>
+ 
+</ul>
+
+<h3>
+  <a href="../">Recent Posts</a>
+</h3>
+<ul>
+   
+  <li>
+    <a href="../hillmaker_030_released/"
+      >19 May - numpy speeds up hillmaker dramatically</a
+    >
+  </li>
+  
+  <li>
+    <a href="../simpy_vaccine_clinic_improvements/"
+      >11 April - Using SimPy to simulate a vaccine clinic - Part 2: model improvements</a
+    >
+  </li>
+  
+  <li>
+    <a href="../simpy_getting_started_vaccine_clinic/"
+      >04 April - Using SimPy to simulate a vaccine clinic - Part 1: an introductory tutorial</a
+    >
+  </li>
+  
+  <li>
+    <a href="../use_jupyter_conda_envs/"
+      >03 April - Using different conda environments with Jupyter Lab</a
+    >
+  </li>
+  
+  <li>
+    <a href="../hello_world/"
+      >02 April - Hello world from ablog blogging with JupyterLab</a
+    >
+  </li>
+  
+</ul>
+
+<h3><a href="../tag/">Tags</a></h3>
+<style type="text/css">
+  ul.ablog-cloud {
+    list-style: none;
+    overflow: auto;
+  }
+  ul.ablog-cloud li {
+    float: left;
+    height: 20pt;
+    line-height: 18pt;
+    margin-right: 5px;
+  }
+  ul.ablog-cloud a {
+    text-decoration: none;
+    vertical-align: middle;
+  }
+  li.ablog-cloud-1 {
+    font-size: 80%;
+  }
+  li.ablog-cloud-2 {
+    font-size: 95%;
+  }
+  li.ablog-cloud-3 {
+    font-size: 110%;
+  }
+  li.ablog-cloud-4 {
+    font-size: 125%;
+  }
+  li.ablog-cloud-5 {
+    font-size: 140%;
+  }
+</style>
+<ul class="ablog-cloud">
+   
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/github/">GitHub</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-3">
+    <a href="../tag/r/">R</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/ablog/">ablog</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/analytics/">analytics</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/bikeshare/">bikeshare</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/birding/">birding</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/blogging/">blogging</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/caret/">caret</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/conda/">conda</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/datetime/">datetime</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/dplyr/">dplyr</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/ebird/">ebird</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/ecology/">ecology</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/excel/">excel</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/ggmap/">ggmap</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/ggplot2/">ggplot2</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/gis/">gis</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/git/">git</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/gps/">gps</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/healthcare/">healthcare</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/hiking/">hiking</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/hillmaker/">hillmaker</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/jupyter/">jupyter</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/matplotlib/">matplotlib</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/metamodeling/">metamodeling</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-2">
+    <a href="../tag/occupancy-analysis/">occupancy analysis</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/pandas/">pandas</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/patient-flow/">patient flow</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/plyr/">plyr</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-5">
+    <a href="../tag/python/">python</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/shiny/">shiny</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/simpy/">simpy</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/simulation/">simulation</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/sphinx/">sphinx</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/statistics/">statistics</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/teaching/">teaching</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/text/">text</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/xml/">xml</a>
+  </li>
+   
+</ul>
+
+<h3>
+  <a href="../archive/">Archives</a>
+</h3>
+<ul>
+   
+  <li>
+    <a href="../2022/">2022 (7)</a>
+  </li>
+    
+  <li>
+    <a href="../2021/">2021 (4)</a>
+  </li>
+    
+  <li>
+    <a href="../2020/">2020 (2)</a>
+  </li>
+    
+  <li>
+    <a href="../2019/">2019 (7)</a>
+  </li>
+    
+  <li>
+    <a href="../2018/">2018 (5)</a>
+  </li>
+    
+  <li>
+    <a href="../2017/">2017 (2)</a>
+  </li>
+    
+  <li>
+    <a href="../2016/">2016 (6)</a>
+  </li>
+    
+  <li>
+    <a href="../2014/">2014 (6)</a>
+  </li>
+    
+  <li>
+    <a href="../2013/">2013 (7)</a>
+  </li>
+   
+</ul>
+
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search/" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+              </div>
+              <div class="sidebar-end-items">
+              </div>
+            </div>
+            
           
 
-          <div class="body" role="main">
-             
+          
+          <div class="d-none d-xl-block col-xl-2 bd-toc">
+            
+              
+              <div class="toc-item">
+                
+<div class="tocsection onthispage mt-5 pt-1 pb-3">
+    <i class="fas fa-list"></i> On this page
+</div>
+
+<nav id="bd-toc-nav">
+    <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#Import-some-libraries">
+   Import some libraries
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#Bookstore-model">
+   Bookstore model
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#Base-model---non-OO-approach">
+     Base model - non-OO approach
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#Sensitivity-analysis-analogous-to-a-1-way-Data-Table">
+     Sensitivity analysis analogous to a 1-way Data Table
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#Everything-is-an-object-in-Python">
+   Everything is an object in Python
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#List-objects">
+     List objects
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#What-about-numbers?">
+     What about numbers?
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#Writing-our-own-classes">
+     Writing our own classes
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#An-OO-version-of-the-Bookstore-Model">
+   An OO version of the Bookstore Model
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#Initial-design-of-the-BookstoreModel-class">
+     Initial design of the BookstoreModel class
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#1-way-Data-Table-with-OO-model">
+     1-way Data Table with OO model
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#A-decision-point-in-our-software-design-process">
+     A decision point in our software design process
+    </a>
+    <ul class="nav section-nav flex-column">
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#Adding-an-update-method">
+       Adding an
+       <code class="docutils literal notranslate">
+        <span class="pre">
+         update
+        </span>
+       </code>
+       method
+      </a>
+     </li>
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#How-to-generate-and-iterate-over-scenarios-to-create-a-2-way-Data-Table?">
+       How to generate and iterate over scenarios to create a 2-way Data Table?
+      </a>
+     </li>
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#Learning-from-the-ideas-and-code-from-scikit-learn">
+       Learning from the ideas and code from scikit-learn
+      </a>
+     </li>
+    </ul>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#Creating-the-data_table-function">
+     Creating the data_table function
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#Concluding-thoughts-and-next-steps">
+   Concluding thoughts and next steps
+  </a>
+ </li>
+</ul>
+
+</nav>
+              </div>
+              
+              <div class="toc-item">
+                
+              </div>
+              
+            
+          </div>
+          
+
+          
+          
+            
+          
+          <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+              
+              <div>
+                 
 <style>
 /* CSS for nbsphinx extension */
 
@@ -315,7 +826,7 @@ div.rendered_html tbody tr:hover {
 }
 </style>
 <section id="Excel-“what-if?”-analysis-with-Python---Part-1:-Models-and-Data-Tables">
-<h1>Excel “what if?” analysis with Python - Part 1: Models and Data Tables<a class="headerlink" href="#Excel-“what-if?”-analysis-with-Python---Part-1:-Models-and-Data-Tables" title="Permalink to this headline">¶</a></h1>
+<h1>Excel “what if?” analysis with Python - Part 1: Models and Data Tables<a class="headerlink" href="#Excel-“what-if?”-analysis-with-Python---Part-1:-Models-and-Data-Tables" title="Permalink to this headline">#</a></h1>
 <p>Excel is widely used for building and using models of business problems to explore the impact of various model inputs on key outputs. Built in “what if?” tools such as Excel Data Tables and Goal Seek are well known to power spreadsheet modelers. How might we do similar modeling and analysis using Python?</p>
 <p>While Python has been gaining momentum in the business analytics world, it is often used for data wrangling, analysis and visualization of tablular data using tools like pandas and matplotlib or Seaborn. You can find some great examples at <a class="reference external" href="https://pbpython.com/">Chris Moffit’s Practical Business Python blog</a>. I use Python all the time for such tasks and teach a course called <a class="reference external" href="http://www.sba.oakland.edu/faculty/isken/courses/mis5470_w21/">Practical Computing for Data Analytics</a> that is
 Python (and R) based. But, it got me to thinking. What about those things for which Excel is well suited such as building formula based models and doing sensitivity analysis on these models? What would those look like in Python?</p>
@@ -353,7 +864,7 @@ motivated reader”). I’ve structured things as follows:</p>
 <p><strong>Part 4 - Create package: fourth notebook</strong> * share the results</p>
 <p><strong>Part 5 - Simple GUI w/widgets: fifth notebook</strong></p>
 <section id="Import-some-libraries">
-<h2>Import some libraries<a class="headerlink" href="#Import-some-libraries" title="Permalink to this headline">¶</a></h2>
+<h2>Import some libraries<a class="headerlink" href="#Import-some-libraries" title="Permalink to this headline">#</a></h2>
 <p>We’ll need several Python libraries for this post.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
@@ -378,7 +889,7 @@ motivated reader”). I’ve structured things as follows:</p>
 </div>
 </section>
 <section id="Bookstore-model">
-<h2>Bookstore model<a class="headerlink" href="#Bookstore-model" title="Permalink to this headline">¶</a></h2>
+<h2>Bookstore model<a class="headerlink" href="#Bookstore-model" title="Permalink to this headline">#</a></h2>
 <p>This example is based on one in the <a class="reference external" href="https://host.kelley.iu.edu/albrightbooks/">spreadsheet modeling textbook(s) I’ve used in my classes since 2001</a>. I started out using Practical Management Science by Winston and Albright and switched to their Business Analytics: Data Analysis and Decision Making (Albright and Winston) around 2013ish. In both books, they introduce the “Walton Bookstore” problem in the chapter on Monte-Carlo simulation. Here’s the basic problem (with a few modifications):</p>
 <ul class="simple">
 <li><p>we have to place an order for a perishable product (e.g. a calendar),</p></li>
@@ -389,7 +900,7 @@ motivated reader”). I’ve structured things as follows:</p>
 <li><p>we need to select the order quantity for our one order for the year; orders can only be in multiples of 25.</p></li>
 </ul>
 <section id="Base-model---non-OO-approach">
-<h3>Base model - non-OO approach<a class="headerlink" href="#Base-model---non-OO-approach" title="Permalink to this headline">¶</a></h3>
+<h3>Base model - non-OO approach<a class="headerlink" href="#Base-model---non-OO-approach" title="Permalink to this headline">#</a></h3>
 <p>Starting simple, let’s create some initialized variables for the base inputs.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
@@ -525,7 +1036,7 @@ Profit             447.50
 <p>Notice we’ve used Python newish approach to formatting strings called <a class="reference external" href="https://realpython.com/python-f-strings/">f-strings</a>. See <a class="reference external" href="https://pyformat.info/">https://pyformat.info/</a> for the basics on the format specification (using examples comparing the old % style formatting versus the newer <code class="docutils literal notranslate"><span class="pre">str.format()</span></code> approach) or the <a class="reference external" href="https://docs.python.org/3/library/string.html#format-specification-mini-language">official docs for all the gory details</a>.</p>
 </section>
 <section id="Sensitivity-analysis-analogous-to-a-1-way-Data-Table">
-<h3>Sensitivity analysis analogous to a 1-way Data Table<a class="headerlink" href="#Sensitivity-analysis-analogous-to-a-1-way-Data-Table" title="Permalink to this headline">¶</a></h3>
+<h3>Sensitivity analysis analogous to a 1-way Data Table<a class="headerlink" href="#Sensitivity-analysis-analogous-to-a-1-way-Data-Table" title="Permalink to this headline">#</a></h3>
 <p>To compute <code class="docutils literal notranslate"><span class="pre">profit</span></code> for several different values of <code class="docutils literal notranslate"><span class="pre">order_quantity</span></code> in Excel, we could do a 1-way Data Table.</p>
 <p>In Python, we could set <code class="docutils literal notranslate"><span class="pre">order_quantity</span></code> equal to a vector and then recompute profit. Our model should spit out a vector of profit values corresponding to the order quantities in our <code class="docutils literal notranslate"><span class="pre">order_quantity</span></code> vector. The numpy function <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.arange.html">arange</a> can be used to create the vector.</p>
 <div class="nbinput docutils container">
@@ -961,12 +1472,12 @@ the following ranges:</p>
 </section>
 </section>
 <section id="Everything-is-an-object-in-Python">
-<h2>Everything is an object in Python<a class="headerlink" href="#Everything-is-an-object-in-Python" title="Permalink to this headline">¶</a></h2>
+<h2>Everything is an object in Python<a class="headerlink" href="#Everything-is-an-object-in-Python" title="Permalink to this headline">#</a></h2>
 <p>So far we have used standard procedural Python for creating and using our model. However, we want to explore using an object-oriented approach to doing the same things we just did. Before doing that, we need to review some basics regarding object-oriented programming.</p>
 <p>Objects are the “things” we create, use, change and share in our Python programs. Objects contain both data about the object and functions for using and changing the object. If you’ve programmed in Excel VBA, you’ve already worked with objects and their various properties (data) and methods (functions). For example, consider a <code class="docutils literal notranslate"><span class="pre">Worksheet</span></code> object. One of its properties is <code class="docutils literal notranslate"><span class="pre">Name</span></code> and we can reference it with <code class="docutils literal notranslate"><span class="pre">Worksheet.Name</span></code>. To copy a worksheet, we use <code class="docutils literal notranslate"><span class="pre">Worksheet.Copy</span></code> - <code class="docutils literal notranslate"><span class="pre">Copy</span></code> is a
 method.</p>
 <section id="List-objects">
-<h3>List objects<a class="headerlink" href="#List-objects" title="Permalink to this headline">¶</a></h3>
+<h3>List objects<a class="headerlink" href="#List-objects" title="Permalink to this headline">#</a></h3>
 <p>In Python, everything is an object and we’ve already been using objects in this Notebook. It’s probably not surprising that something like an array or a list are objects. Let’s see what kind of objects they are.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[23]:
@@ -1321,7 +1832,7 @@ int64
 <p><strong>QUESTIONS</strong> Why don’t we use parens with <code class="docutils literal notranslate"><span class="pre">dtype</span></code>? Why don’t list objects have a <code class="docutils literal notranslate"><span class="pre">dtype</span></code> property?</p>
 </section>
 <section id="What-about-numbers?">
-<h3>What about numbers?<a class="headerlink" href="#What-about-numbers?" title="Permalink to this headline">¶</a></h3>
+<h3>What about numbers?<a class="headerlink" href="#What-about-numbers?" title="Permalink to this headline">#</a></h3>
 <p>Are things like integers and floating point numbers actually objects?</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[39]:
@@ -1410,14 +1921,14 @@ int64
 <p>Yep. Try out some of the attributes.</p>
 </section>
 <section id="Writing-our-own-classes">
-<h3>Writing our own classes<a class="headerlink" href="#Writing-our-own-classes" title="Permalink to this headline">¶</a></h3>
+<h3>Writing our own classes<a class="headerlink" href="#Writing-our-own-classes" title="Permalink to this headline">#</a></h3>
 <p>While Python has many useful built in classes, true <a class="reference external" href="https://en.wikipedia.org/wiki/Object-oriented_programming">object-oriented programming</a> (OOP) involves creating our own classes from which we can create object instances that are useful for the problem at hand. Python is an OOP language but it does <strong>not</strong> force you to create classes if you don’t want to. You can write any blend you’d like of <a class="reference external" href="https://en.wikipedia.org/wiki/Procedural_programming">procedural</a>, object oriented and
 <a class="reference external" href="https://en.wikipedia.org/wiki/Functional_programming">functional programming</a>. We aren’t going to get into debates about which programming paradigm is the “best”. There are times when OOP makes a lot of sense, and for those times, we’ll use it. Other times, simply creating useful functions (such as the <code class="docutils literal notranslate"><span class="pre">bookstore_profit</span></code> function we used earlier) is the appropriate thing to do.</p>
 <p>Many business analysts who learn Excel VBA, don’t realize that you can actually create classes in VBA. Most stick with using the built in Excel objects.</p>
 </section>
 </section>
 <section id="An-OO-version-of-the-Bookstore-Model">
-<h2>An OO version of the Bookstore Model<a class="headerlink" href="#An-OO-version-of-the-Bookstore-Model" title="Permalink to this headline">¶</a></h2>
+<h2>An OO version of the Bookstore Model<a class="headerlink" href="#An-OO-version-of-the-Bookstore-Model" title="Permalink to this headline">#</a></h2>
 <p>Let’s create an OO version of the Bookstore Model and figure out how to do n-way data tables just as we did with the non-OO version of the model. Then we’ll go on and figure out how to duplicate the functionality of Excel’s Goal Seek tool in Python. It’s not clear whether the non-OO or the OO version of our model will ultimately prove best for this use case. Regardless, we’ll learn a few things along the way.</p>
 <p>As an aside, there’s a very useful site aimed at using Python for quantitative economics and finance - <a class="reference external" href="https://quantecon.org/">https://quantecon.org/</a>. Within there are some terrific notebooks on various Python topics. Here are two related to OOP:</p>
 <ul class="simple">
@@ -1425,7 +1936,7 @@ int64
 <li><p><a class="reference external" href="https://python-programming.quantecon.org/python_oop.html">https://python-programming.quantecon.org/python_oop.html</a></p></li>
 </ul>
 <section id="Initial-design-of-the-BookstoreModel-class">
-<h3>Initial design of the BookstoreModel class<a class="headerlink" href="#Initial-design-of-the-BookstoreModel-class" title="Permalink to this headline">¶</a></h3>
+<h3>Initial design of the BookstoreModel class<a class="headerlink" href="#Initial-design-of-the-BookstoreModel-class" title="Permalink to this headline">#</a></h3>
 <p>It seems like we would want all of the base inputs such as unit cost, selling price, unit refund, order quantity and demand to be attributes (properties) of the class. Here’s the start of our class definition code:</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[40]:
@@ -1707,7 +2218,7 @@ representation that includes the object type.</p>
 <p><strong>CHALLENGE</strong> Modify the <code class="docutils literal notranslate"><span class="pre">__str__</span></code> function so that it also shows the computed value of <code class="docutils literal notranslate"><span class="pre">order_cost</span></code>, <code class="docutils literal notranslate"><span class="pre">sales_revenue</span></code>, <code class="docutils literal notranslate"><span class="pre">refund_revenue</span></code> and <code class="docutils literal notranslate"><span class="pre">profit</span></code>.</p>
 </section>
 <section id="1-way-Data-Table-with-OO-model">
-<h3>1-way Data Table with OO model<a class="headerlink" href="#1-way-Data-Table-with-OO-model" title="Permalink to this headline">¶</a></h3>
+<h3>1-way Data Table with OO model<a class="headerlink" href="#1-way-Data-Table-with-OO-model" title="Permalink to this headline">#</a></h3>
 <p>It seems entirely plausible that we could simply set one of the inputs to an array of values and then call the <code class="docutils literal notranslate"><span class="pre">profit</span></code> method.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[52]:
@@ -1758,11 +2269,11 @@ representation that includes the object type.</p>
 over alll the input ranges and update the bookstore model object’s input attributes and then call the <code class="docutils literal notranslate"><span class="pre">profit</span></code> method.</p>
 </section>
 <section id="A-decision-point-in-our-software-design-process">
-<h3>A decision point in our software design process<a class="headerlink" href="#A-decision-point-in-our-software-design-process" title="Permalink to this headline">¶</a></h3>
+<h3>A decision point in our software design process<a class="headerlink" href="#A-decision-point-in-our-software-design-process" title="Permalink to this headline">#</a></h3>
 <p>An end user modeler analagous to your basic Excel power user isn’t going to write OO code to do a Data Table. The list comprehension approach based on a global function (i.e. the non-OO model) is much more likely. However, a relatively generic Data Table function could be implemented in an OO way and be quite reusable. Also, we still want to implement Goal Seek and it’s not clear whether the OO or non-OO approach makes the most sense.</p>
 <p>Well, let’s forge ahead and design and create a Python based Data Table function that accepts an OO BookstoreModel object as one of its inputs. Surely, we’ll learn some things along the way.</p>
 <section id="Adding-an-update-method">
-<h4>Adding an <code class="docutils literal notranslate"><span class="pre">update</span></code> method<a class="headerlink" href="#Adding-an-update-method" title="Permalink to this headline">¶</a></h4>
+<h4>Adding an <code class="docutils literal notranslate"><span class="pre">update</span></code> method<a class="headerlink" href="#Adding-an-update-method" title="Permalink to this headline">#</a></h4>
 <p>Since were are going to need to repeatedly update some subset of the input parameters, let’s add an <code class="docutils literal notranslate"><span class="pre">update</span></code> method to the BookstoreModel class that takes a dictionary of property, value pairs. The question is, how do we update object attributes from a dictionary specifying the attribute and the new value? This StackoverFlow post was quite helpful:</p>
 <p><a class="reference external" href="https://stackoverflow.com/questions/2466191/set-attributes-from-dictionary-in-python">https://stackoverflow.com/questions/2466191/set-attributes-from-dictionary-in-python</a></p>
 <p>The idea is that we use Python’s <code class="docutils literal notranslate"><span class="pre">setattr</span></code> function. Using <code class="docutils literal notranslate"><span class="pre">`setattr</span></code> &lt;<a class="reference external" href="https://www.w3schools.com/python/ref_func_setattr.asp">https://www.w3schools.com/python/ref_func_setattr.asp</a>&gt;`__ is really easy:</p>
@@ -1877,7 +2388,7 @@ over alll the input ranges and update the bookstore model object’s input attri
 </div>
 </section>
 <section id="How-to-generate-and-iterate-over-scenarios-to-create-a-2-way-Data-Table?">
-<h4>How to generate and iterate over scenarios to create a 2-way Data Table?<a class="headerlink" href="#How-to-generate-and-iterate-over-scenarios-to-create-a-2-way-Data-Table?" title="Permalink to this headline">¶</a></h4>
+<h4>How to generate and iterate over scenarios to create a 2-way Data Table?<a class="headerlink" href="#How-to-generate-and-iterate-over-scenarios-to-create-a-2-way-Data-Table?" title="Permalink to this headline">#</a></h4>
 <p>Let’s regroup and remind ourselves where we are in the development process for our 2-way data table function. We’ve got two input variables, <code class="docutils literal notranslate"><span class="pre">demand</span></code> and <code class="docutils literal notranslate"><span class="pre">order_quantity</span></code> and we’d like to specify a range over which each variable should vary. Then, we want to consider all combinations of these variable values and compute the associated, say, profit (really, any ouput of our model). It would be convenient to be be able to specify our input ranges with a dictionary whose keys are the input
 variable names and the values are any valid Python iterable (such as a list or the output of some function that returns a range of values). For example:</p>
 <div class="nbinput nblast docutils container">
@@ -1909,7 +2420,7 @@ variable names and the values are any valid Python iterable (such as a list or t
 <p>Each of these component dictionaries is something we can use with our new model object <code class="docutils literal notranslate"><span class="pre">update</span></code> method to set the corresponding values for each scenario. Hmmm, feels like some clever iterating and zipping and more iterating. Before doing that ourselves, can we do this using the functionality of some existing Python library? Spoiler alert, yes, we can.</p>
 </section>
 <section id="Learning-from-the-ideas-and-code-from-scikit-learn">
-<h4>Learning from the ideas and code from scikit-learn<a class="headerlink" href="#Learning-from-the-ideas-and-code-from-scikit-learn" title="Permalink to this headline">¶</a></h4>
+<h4>Learning from the ideas and code from scikit-learn<a class="headerlink" href="#Learning-from-the-ideas-and-code-from-scikit-learn" title="Permalink to this headline">#</a></h4>
 <p><a class="reference external" href="https://scikit-learn.org/stable/index.html">Scikit-learn</a> is an extremely popular Python package for building, testing and using machine learning models. In thinking about the input values for an n-way data table, it feels similar to a <a class="reference external" href="https://scikit-learn.org/stable/modules/grid_search.html">parameter grid for a hyperparameter grid search in scikit learn</a>. Can we borrow some of their patterns or code ideas?</p>
 <p><a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.GridSearchCV.html#sklearn.model_selection.GridSearchCV">https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.GridSearchCV.html#sklearn.model_selection.GridSearchCV</a></p>
 <p><a class="reference external" href="https://scikit-learn.org/stable/modules/grid_search.html#grid-search">https://scikit-learn.org/stable/modules/grid_search.html#grid-search</a></p>
@@ -2347,7 +2858,7 @@ The zipped tuples
 </section>
 </section>
 <section id="Creating-the-data_table-function">
-<h3>Creating the data_table function<a class="headerlink" href="#Creating-the-data_table-function" title="Permalink to this headline">¶</a></h3>
+<h3>Creating the data_table function<a class="headerlink" href="#Creating-the-data_table-function" title="Permalink to this headline">#</a></h3>
 <p>Our plan is to create a function that takes three inputs:</p>
 <ul class="simple">
 <li><p>a model object such as <code class="docutils literal notranslate"><span class="pre">model_5</span></code>,</p></li>
@@ -2720,7 +3231,7 @@ our function will convert this list to a pandas DataFrame and return it.</p>
 </section>
 </section>
 <section id="Concluding-thoughts-and-next-steps">
-<h2>Concluding thoughts and next steps<a class="headerlink" href="#Concluding-thoughts-and-next-steps" title="Permalink to this headline">¶</a></h2>
+<h2>Concluding thoughts and next steps<a class="headerlink" href="#Concluding-thoughts-and-next-steps" title="Permalink to this headline">#</a></h2>
 <p>We’ve created an OO version of a simple spreadsheet type model that lends itself pretty well to the type of sensitivity analysis we would do with something like Excel’s Data Table tool. Our Python <code class="docutils literal notranslate"><span class="pre">data_table</span></code> function actually allows <em>n</em> input variables and <em>m</em> output variables. In Excel, you can either do a <span class="math notranslate nohighlight">\(1xn\)</span> (a one-way Data Table) or <span class="math notranslate nohighlight">\(2x1\)</span> (a two-way Data Table).</p>
 <p>Along the way we wearned the basics of doing OOP in Python and a bunch of more advanced Python functions and techniques. While that might have seemed like a bunch of work, now we’ve got a reusable model object and reusable data table function that we can build on.</p>
 <p>In the next post, we’ll build on this work and take on implementing an Excel-style Goal Seek function in Python. We’ll explore this using both the OO and the non-OO models. Each leads to some interesting challenges. Which approach do you think will end up being easier to use within a Python <code class="docutils literal notranslate"><span class="pre">goal_seek</span></code> function?</p>
@@ -2762,349 +3273,37 @@ our function will convert this list to a pandas DataFrame and return it.</p>
   
 </div>
 
-          </div>
-          
-        </div>
-      </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-<h1 class="logo"><a href="../../">misken</a></h1>
-
-
-
-
-
-
-
-
-  
-<h2>
-   
-  12 February 2021 
-</h2>
-
-<ul>
-   
-<li id="author">
-  <span
-    >Author:</span
-  >
-   
-  <a href="../author/misken/">misken</a>  
-</li>
-    
-<li id="tags">
-  <span
-    >Tags: </span
-  >
-   
-  <a href="../tag/python/">python</a>   
-  <a href="../tag/excel/">excel</a>  
-</li>
- 
-</ul>
-<h3>Navigation</h3>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../../about/">About misken</a></li>
-</ul>
-
-
-<h3>
-  <a href="../">Recent Posts</a>
-</h3>
-<ul>
-   
-  <li>
-    <a href="../hillmaker_030_released/"
-      >19 May - numpy speeds up hillmaker dramatically</a
-    >
-  </li>
-  
-  <li>
-    <a href="../simpy_vaccine_clinic_improvements/"
-      >11 April - Using SimPy to simulate a vaccine clinic - Part 2: model improvements</a
-    >
-  </li>
-  
-  <li>
-    <a href="../simpy_getting_started_vaccine_clinic/"
-      >04 April - Using SimPy to simulate a vaccine clinic - Part 1: an introductory tutorial</a
-    >
-  </li>
-  
-  <li>
-    <a href="../use_jupyter_conda_envs/"
-      >03 April - Using different conda environments with Jupyter Lab</a
-    >
-  </li>
-  
-  <li>
-    <a href="../hello_world/"
-      >02 April - Hello world from ablog blogging with JupyterLab</a
-    >
-  </li>
-  
-</ul>
-
-<h3><a href="../tag/">Tags</a></h3>
-<style type="text/css">
-  ul.ablog-cloud {
-    list-style: none;
-    overflow: auto;
-  }
-  ul.ablog-cloud li {
-    float: left;
-    height: 20pt;
-    line-height: 18pt;
-    margin-right: 5px;
-  }
-  ul.ablog-cloud a {
-    text-decoration: none;
-    vertical-align: middle;
-  }
-  li.ablog-cloud-1 {
-    font-size: 80%;
-  }
-  li.ablog-cloud-2 {
-    font-size: 95%;
-  }
-  li.ablog-cloud-3 {
-    font-size: 110%;
-  }
-  li.ablog-cloud-4 {
-    font-size: 125%;
-  }
-  li.ablog-cloud-5 {
-    font-size: 140%;
-  }
-</style>
-<ul class="ablog-cloud">
-   
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/github/">GitHub</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-3">
-    <a href="../tag/r/">R</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/ablog/">ablog</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/analytics/">analytics</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/bikeshare/">bikeshare</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/birding/">birding</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/blogging/">blogging</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/caret/">caret</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/conda/">conda</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/datetime/">datetime</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/dplyr/">dplyr</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/ebird/">ebird</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/ecology/">ecology</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/excel/">excel</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/ggmap/">ggmap</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/ggplot2/">ggplot2</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/gis/">gis</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/git/">git</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/gps/">gps</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/healthcare/">healthcare</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/hiking/">hiking</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/hillmaker/">hillmaker</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/jupyter/">jupyter</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/matplotlib/">matplotlib</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/metamodeling/">metamodeling</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-2">
-    <a href="../tag/occupancy-analysis/">occupancy analysis</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/pandas/">pandas</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/patient-flow/">patient flow</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/plyr/">plyr</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-5">
-    <a href="../tag/python/">python</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/shiny/">shiny</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/simpy/">simpy</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/simulation/">simulation</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/sphinx/">sphinx</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/statistics/">statistics</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/teaching/">teaching</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/text/">text</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/xml/">xml</a>
-  </li>
-   
-</ul>
-
-<h3>
-  <a href="../archive/">Archives</a>
-</h3>
-<ul>
-   
-  <li>
-    <a href="../2022/">2022 (7)</a>
-  </li>
-    
-  <li>
-    <a href="../2021/">2021 (4)</a>
-  </li>
-    
-  <li>
-    <a href="../2020/">2020 (2)</a>
-  </li>
-    
-  <li>
-    <a href="../2019/">2019 (7)</a>
-  </li>
-    
-  <li>
-    <a href="../2018/">2018 (5)</a>
-  </li>
-    
-  <li>
-    <a href="../2017/">2017 (2)</a>
-  </li>
-    
-  <li>
-    <a href="../2016/">2016 (6)</a>
-  </li>
-    
-  <li>
-    <a href="../2014/">2014 (6)</a>
-  </li>
-    
-  <li>
-    <a href="../2013/">2013 (7)</a>
-  </li>
-   
-</ul>
-
-<div id="searchbox" style="display: none" role="search">
-  <h3 id="searchlabel">Quick search</h3>
-    <div class="searchformwrapper">
-    <form class="search" action="../../search/" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
-      <input type="submit" value="Go" />
-    </form>
-    </div>
+              </div>
+              
+              
+              <!-- Previous / next buttons -->
+<div class='prev-next-area'>
 </div>
-<script>$('#searchbox').show(0);</script>
-        </div>
+              
+          </main>
+          
+
       </div>
-      <div class="clearer"></div>
     </div>
-    <div class="footer">
-      &copy;2022, misken.
-      
-      |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.3.2</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
-      
-      |
-      <a href="../../_sources/blog/what_if_1_model_datatable.ipynb.txt"
-          rel="nofollow">Page source</a>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
+<footer class="footer mt-5 mt-md-0">
+  <div class="container">
+    
+    <div class="footer-item">
+      <p class="copyright">
+    &copy; Copyright 2022, misken.<br>
+</p>
     </div>
-
     
-
+    <div class="footer-item">
+      <p class="sphinx-version">
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.3.2.<br>
+</p>
+    </div>
     
+  </div>
+</footer>
   </body>
 </html>

@@ -7,24 +7,40 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
     <title>Exploration of metamodels for simulation models of patient flow systems (Part 1) &#8212; misken 0,1,0 documentation</title>
+    
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+
+    
+  <link rel="stylesheet"
+    href="../../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/design-style.b7bb847fb20b106c3d81b95245e65545.min.css" />
+    
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
+
     <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
     <script src="../../_static/jquery.js"></script>
     <script src="../../_static/underscore.js"></script>
     <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/design-tabs.js"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-    <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <link rel="author" title="About these documents" href="../../about/" />
     <link rel="index" title="Index" href="../../genindex/" />
     <link rel="search" title="Search" href="../../search/" /> 
-   
-  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
-  
-  
-  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
- 
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="en">
+    
+
+    <!-- Google Analytics -->
+     
 <link
   rel="alternate"
   type="application/atom+xml"
@@ -57,678 +73,66 @@
   }
 </style>
 
-  </head><body>
-  
-
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          
-
-          <div class="body" role="main">
-             <section id="exploration-of-metamodels-for-simulation-models-of-patient-flow-systems-part-1">
-<h1>Exploration of metamodels for simulation models of patient flow systems (Part 1)<a class="headerlink" href="#exploration-of-metamodels-for-simulation-models-of-patient-flow-systems-part-1" title="Permalink to this headline">¶</a></h1>
-<p>Simulation metamodeling involves building predictive models based on outputs of designed simulation experiments. In this series of posts we’ll share our experience with using the R package <code class="docutils literal notranslate"><span class="pre">caret</span></code> for building and comparing several predictive modeling based metamodels including linear models, neural networks, random forests, k-nearest neighbor, and cubic splines.</p>
-<section id="introduction">
-<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
-<p>A typical configuration of hospital units which provide care for women about to
-give birth might include an observation unit, a labor, delivery and recovery
-unit (LDR) and a postpartum (PP) unit. Matching the capacity of these units to
-demand placed on them is important for maintaining smooth patient flow. For
-example, there should be sufficient capacity in a PP unit so that there is a
-relatively small probability that a post-delivery patient is <em>blocked</em> in the
-LDR due to lack of a bed in PP. Of course, complicating the capacity planning
-process is the fact that there are numerous sources of uncertainty in
-obstetrical patient care processes. These include the number and timing of
-patient arrivals, whether or not the patient requires a C-section and the length
-of stay in each of the three units.</p>
-<p><img alt="OB flow diagram" src="../../_images/obflow.png" /></p>
-<p>I’m working on a research project involving capacity planning models for these
-systems. One phase involves building what are known as <em>simulation metamodels</em>.
-The main components are:</p>
-<ul class="simple">
-<li><p>built a discrete event simulation model of a simplified queueing network model
-of a typical obstetrical patient flow system.</p></li>
-<li><p>designed and ran a set of simulation experiments involving a range patient
-volumes, percentages of patients requiring c-section, and unit sizes (numbers of
-beds). There were 150 scenarios simulated.</p></li>
-<li><p>post-processed the output using both R and Python
-(https://github.com/misken/hillmaker) to compute several performance measures
-related to unit occupancy and patient delays.</p></li>
-<li><p>now working on building and comparing a number of different
-statistical/machine learning techniques for predicting occupancy and delay
-related peformance measures using the experimental inputs (volume, % c-section,
-unit sizes).</p></li>
-</ul>
-<p>In the simulation world, this last step is known as <em>simulation metamodeling</em>.
-It has a long history. See any good discrete event simulation text such as
-<em>Simulation modeling and analysis by Law and Kelton</em> [&#64;Law2000] for an overview.
-There’s also a nice overview done by R. Barton and available as a <a class="reference external" href="http://www.informs-sim.org/wsc15papers/185.pdf">free pdf</a> from
-the Proceedings of the 2015 Winter Simulation
-Conference [&#64;Barton2015]. Any
-predictive modeling technique capable of producing real valued output such as
-neural networks, regression trees, k-nearest neighbor or any number of advanced
-regression techniques are viable candidates for building simulation metamodels.</p>
-<p>As this was my first significant project using <a class="reference external" href="http://topepo.github.io/caret/index.html">caret</a>, I thought it would be
-helpful to write up some of the challenges faced and share some of the
-techniques I used to make it easier to compare different models. This resulted
-in three blog posts:</p>
-<ul class="simple">
-<li><p><a class="reference external" href="https://misken.github.io/blog/obsim_caret_part1/">Comparing predictive models for obstetrical unit occupancy using caret - Part 1</a></p></li>
-<li><p><a class="reference external" href="https://misken.github.io/blog/obsim_caret_part2/">Comparing predictive model performance using caret - Part 2: A simple caret automation function</a></p></li>
-<li><p><a class="reference external" href="https://misken.github.io/blog/obsim_caret_part3/">Comparing predictive model performance using caret - Part 3: Automate</a></p></li>
-</ul>
-</section>
-<section id="analysis-of-patient-flow-networks">
-<h2>Analysis of patient flow networks<a class="headerlink" href="#analysis-of-patient-flow-networks" title="Permalink to this headline">¶</a></h2>
-<p>In analyzing tandem flow systems with blocking, such as this one,
-a common and pragmatic approach is to:</p>
-<ul class="simple">
-<li><p>decompose the system into a set of models, one for each unit,</p></li>
-<li><p>intelligently modify key system parameters such as arrival rates and
-service rates for each unit to heuristically account for blocking and
-other interunit phenomena,</p></li>
-<li><p>start by analyzing the last unit in the system since no departures from that
-unit will be blocked,</p></li>
-<li><p>work your way backwards using the results from downstream units as needed,</p></li>
-<li><p>perhaps use iteration to converge upon a final solution.</p></li>
-</ul>
-<p>Decomposition based approaches for approximate analysis of queueing networks has
-a long history. For special kinds of networks known as <em>Jackson networks</em>,
-decomposition and analysis of each node (unit in our case) in isolation can be
-used to exactly analyze the network. Our OB system is definitely not a Jackson
-network:</p>
-<ul class="simple">
-<li><p>non-exponential service times for finite capacity units</p></li>
-<li><p>Patients enter the LDR for the labor and birth process after leaving the
-observation (OBS) unit. After delivery and recovery, patients are transferred to
-the postpartum (PP) unit. Occupancy levels in the LDR are impacted not only by
-volume and length of stay for the LDR phase but also by congestion levels in the
-PP unit. If a bed in PP is not available when requested, that patient will
-simply remain in the LDR until a bed becomes available.</p></li>
-</ul>
-<p>Since we need approximate approaches (and/or simulation), let’s get back to the
-simulation metamodeling problem at hand. We’ll start with the postpartum unit as
-it is the last unit visited before the patient leaves the hospital.</p>
-</section>
-<section id="objectives">
-<h2>Objectives<a class="headerlink" href="#objectives" title="Permalink to this headline">¶</a></h2>
-<p>Our primary obectives for this first experiment were to:</p>
-<ul class="simple">
-<li><p>Compare the ability of popular predictive modeling techniques to accurately
-predict performance measures of queueing type systems arising in healthcare
-capacity planning problems,</p></li>
-<li><p>Assess the value of queueing system domain knowledge embedded in predictive
-models on model accuracy,</p></li>
-<li><p>Explore the impact of hyperparameters such as relative size of training and
-test datasets on model accuracy and model stability.</p></li>
-</ul>
-<p>It is well known that good <em>feature engineering</em> is often important for creating
-good predictive models. Knowledge of queueing dynamics that we can capture in
-new predictor variables seems like it has the potential for creating better
-predictive models. In this first experiment, relatively basic queueing knowledge
-will be used. Variables based on the concepts of <em>offered load</em> and <em>traffic
-intensity</em> will be considered. In addition, when predicting percentiles of
-occupancy, the well known <em>square root law</em> for capacity planning of queueing
-systems will also be used to engineer new model terms.</p>
-</section>
-<section id="experimental-design">
-<h2>Experimental design<a class="headerlink" href="#experimental-design" title="Permalink to this headline">¶</a></h2>
-<section id="patient-flow-input-variables">
-<h3>Patient Flow Input Variables<a class="headerlink" href="#patient-flow-input-variables" title="Permalink to this headline">¶</a></h3>
-<p>Key inputs include the patient arrival rate, average length of stay, and capacity
-of the postpartum unit.</p>
-<table class="colwidths-auto docutils align-default">
-<thead>
-<tr class="row-odd"><th class="head"><p><strong>Name</strong></p></th>
-<th class="head"><p><strong>Math</strong></p></th>
-<th class="head"><p><strong>Description</strong></p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">lam_pp</span></code></p></td>
-<td><p><span class="math notranslate nohighlight">\(\lambda_P\)</span></p></td>
-<td><p>Arrival rate of patients to postpartum (PP) unit</p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">alos_pp</span></code></p></td>
-<td><p><span class="math notranslate nohighlight">\(B_P\)</span></p></td>
-<td><p>Average length of stay in PP</p></td>
-</tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">cap_pp</span></code></p></td>
-<td><p><span class="math notranslate nohighlight">\(c_P\)</span></p></td>
-<td><p>Number of beds in PP</p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">load_pp</span></code></p></td>
-<td><p><span class="math notranslate nohighlight">\(\lambda_P B_P\)</span></p></td>
-<td><p>Arrival rate times average length of stay; a measure of workload submitted to the PP</p></td>
-</tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">rho_pp</span></code></p></td>
-<td><p><span class="math notranslate nohighlight">\(\rho_P=\lambda_P B_P/c_P\)</span></p></td>
-<td><p>Traffic intensity; a measure of congestion of PP</p></td>
-</tr>
-</tbody>
-</table>
-<br/>
-<p>If you’ve studied queueing systems, you know that the
-interarrival and service time distributions also matter. In the simulation
-model, patient arrivals were modeled with a Poisson process which means
-that the interarrival times are exponentially distributed. The postpartum
-service times were modeled with two simple discrete distributions - one
-for patients requiring a c-section and one for those with a regular delivery.
-For this first set of models, only the mean arrival rate (<code class="docutils literal notranslate"><span class="pre">lam_pp</span></code>)
-and the mean service time (<code class="docutils literal notranslate"><span class="pre">alos_pp</span></code>) were used. Distributional information
-is used in later models.</p>
-</section>
-<section id="statistical-modeling-input-variables">
-<h3>Statistical Modeling Input Variables<a class="headerlink" href="#statistical-modeling-input-variables" title="Permalink to this headline">¶</a></h3>
-<p>The process of model fitting and validation is characterized by a number of <em>hyperparameters</em> or <em>tuning parameters</em>. It isn’t clear (at least to me) how
-to pick good values for some of these or how sensitive predictive accuracy
-and/or model stability is to them. We focused on a few of these in this experiment.</p>
-<table class="colwidths-auto docutils align-default">
-<thead>
-<tr class="row-odd"><th class="head"><p><strong>Name</strong></p></th>
-<th class="head"><p><strong>Description</strong></p></th>
-<th class="head"><p><strong>Levels</strong></p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">pct_train_val</span></code></p></td>
-<td><p>Percent of cases allocated to training set</p></td>
-<td><p>0.5, 0.6, 0.7, 0.8, 0.9</p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">partition.times</span></code></p></td>
-<td><p>Number of train/test partitions to do and use in entire partition, train, predict, summarize cycle</p></td>
-<td><p>10, 20</p></td>
-</tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">kfold_number</span></code></p></td>
-<td><p>Number of folds in crossfold validation</p></td>
-<td><p>5, 10</p></td>
-</tr>
-</tbody>
-</table>
-<br/>
-<p>For now we’ll focus on the results for <code class="docutils literal notranslate"><span class="pre">partition.times=20</span></code> and
-<code class="docutils literal notranslate"><span class="pre">kfold_number=5</span></code>. The <code class="docutils literal notranslate"><span class="pre">pct_train_val</span></code> parameter controlled the percentage of
-cases allocated between the training and test datasets. Models were built using
-only training data, with k-crossfold validation used to pick the best model.
-The number of repititions of the entire process for each model was
-controlled by the parameter <code class="docutils literal notranslate"><span class="pre">partition.times</span></code>. The final models were then
-used to make predictions on the test set and several error metrics computed.</p>
-</section>
-<section id="error-metrics">
-<h3>Error metrics<a class="headerlink" href="#error-metrics" title="Permalink to this headline">¶</a></h3>
-<p>For each model fit instance, we computed root mean square error (RMSE),
-mean absolute error (MAE), and mean absolute percent error (MAPE) using
-predictions on the . Since
-we are just focusing on <code class="docutils literal notranslate"><span class="pre">partition.times=20</span></code> for each
-value of <code class="docutils literal notranslate"><span class="pre">pct_train_val</span></code>, the percentage of cases allocated to the training set,
-we get 20 observations of each error metric and can look at the distribution
-of the error metrics in addition to overall means.</p>
-<p>Since many of the models end up fitting quite well and have errors less
-than one, we’ll focus on the MAE metric (so as not to square numbers &lt; 1).</p>
-</section>
-<section id="model-families">
-<h3>Model families<a class="headerlink" href="#model-families" title="Permalink to this headline">¶</a></h3>
-<p>We used a few different models that are widely used and seem applicable to the
-general regression type problem at hand. In parentheses are the abbreviations
-used for each of the modeling families.</p>
-<ul class="simple">
-<li><p>Linear models based on queueing approximations (<strong>load</strong>)</p></li>
-<li><p>Random forests (<strong>rf</strong>)</p></li>
-<li><p>Neural networks (<strong>nnet</strong>)</p></li>
-<li><p>Cubic splines (<strong>spline</strong>)</p></li>
-<li><p>k-nearest neighbor (<strong>knn</strong>)</p></li>
-<li><p>Polynomial regression (<strong>poly</strong>)</p></li>
-<li><p>Stepwise regression (<strong>lmstep</strong>)</p></li>
-</ul>
-<p>Each of these is discussed in more detail below, including information about
-specific R packages used and algorithm parameter settings.</p>
-</section>
-<section id="process-physics-knowledge">
-<h3>Process physics knowledge<a class="headerlink" href="#process-physics-knowledge" title="Permalink to this headline">¶</a></h3>
-<p>For all of the modeling families except the linear models with queueing terms,
-we considered two different sets of input variables. One set represented a
-somewhat “queueing unaware”” modeler who did <strong>not</strong> used the two engineered
-features, <code class="docutils literal notranslate"><span class="pre">load_pp</span></code> and <code class="docutils literal notranslate"><span class="pre">rho_pp</span></code>, in their models. Only <code class="docutils literal notranslate"><span class="pre">lam_pp</span></code>, <code class="docutils literal notranslate"><span class="pre">alos_pp</span></code>,
-and <code class="docutils literal notranslate"><span class="pre">cap_pp</span></code> were used. In the other set, representing a modeler
-with some queueing knowledge, both <code class="docutils literal notranslate"><span class="pre">load_pp</span></code> and <code class="docutils literal notranslate"><span class="pre">rho_pp</span></code> were included as
-predictor variables. For example, <strong>knn1</strong> is a k-nearest neighbor model which
-did not include <code class="docutils literal notranslate"><span class="pre">load_pp</span></code> and <code class="docutils literal notranslate"><span class="pre">rho_pp</span></code>, whereas <strong>knn2</strong> does include these
-additional input variables.</p>
-</section>
-<section id="response-variables">
-<h3>Response Variables<a class="headerlink" href="#response-variables" title="Permalink to this headline">¶</a></h3>
-<p>To begin we just focused on mean and percentiles of postpartum occupancy.</p>
-<table class="colwidths-auto docutils align-default">
-<thead>
-<tr class="row-odd"><th class="head"><p><strong>Name</strong></p></th>
-<th class="head"><p><strong>Description</strong></p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">occmean_pp</span></code></p></td>
-<td><p>Mean occupancy (number of patients) in PP unit</p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">occp75_pp</span></code></p></td>
-<td><p>75th percentile of occupancy in PP unit</p></td>
-</tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">occp95_pp</span></code></p></td>
-<td><p>95th percentile of occupancy in PP unit</p></td>
-</tr>
-</tbody>
-</table>
-<br/>
-<p>There are other important response variables such as the probability that a
-patient gets blocked in the LDR due to the PP unit being full and the amount of
-time (mean, percentiles) that such blocked patients wait for a PP bed to become
-available. We’ll explore those variables in subsequent articles.</p>
-</section>
-</section>
-<section id="model-details">
-<h2>Model details<a class="headerlink" href="#model-details" title="Permalink to this headline">¶</a></h2>
-<p>All models were fit using the caret package. Details of the mechanics can
-be found in the three blog posts mentioned above.</p>
-<section id="linear-models-based-on-queueing-approximations">
-<h3>Linear models based on queueing approximations<a class="headerlink" href="#linear-models-based-on-queueing-approximations" title="Permalink to this headline">¶</a></h3>
-<p>The <code class="docutils literal notranslate"><span class="pre">lm()</span></code> function was used to fit a multiple linear regression model for
-each of the response variables.</p>
-<p>For mean occupancy, the <code class="docutils literal notranslate"><span class="pre">load_pp</span></code> variable should be sufficient since
-this is an exact relationship for <span class="math notranslate nohighlight">\(G/G/m\)</span> queues.</p>
-<p><code class="docutils literal notranslate"><span class="pre">occmean_pp</span> <span class="pre">~</span> <span class="pre">load_pp</span></code></p>
-<p>For the percentiles, we’ll use an infinite capacity approximation based on
-the <span class="math notranslate nohighlight">\(M/G/\infty\)</span> queue. For such systems, occupancy is Poisson distributed
-with mean equal to the load placed on the system (arrival rate * average
-service time). For large values of load we can use a normal approximation
-to the Poisson to approximate occupancy percentiles. Even for loads as small
-as 10, the approximation is reasonably accurate assuming a continuity
-correction is done. For example, to approximate the <span class="math notranslate nohighlight">\(95\)</span>th percentile of
-occupancy in a system with load <span class="math notranslate nohighlight">\(L\)</span>, the normal approximation to the Poisson is:</p>
-<div class="math notranslate nohighlight">
-\[
-O_{0.95} \approx L + 0.5 + 1.645\sqrt{L}
-\]</div>
-<p>So, we will fit a simple linear model using <code class="docutils literal notranslate"><span class="pre">lm()</span></code>.</p>
-<p><code class="docutils literal notranslate"><span class="pre">occp95_pp</span> <span class="pre">~</span>&#160; <span class="pre">load_pp</span> <span class="pre">+</span> <span class="pre">I(load_pp</span> <span class="pre">^</span> <span class="pre">0.5)</span></code></p>
-<p>The arrivals to the post-partum aren’t technically Poisson but analysis of the
-simulation output revealed that they are quite close to Poisson. So, it wouldn’t
-be surprising if the estimates of the y-intercept is close to 0.5 and the
-slopes are near 1.0 and 1.645 for systems which are not too heavily congested.</p>
-</section>
-<section id="other-modeling-techniques">
-<h3>Other modeling techniques<a class="headerlink" href="#other-modeling-techniques" title="Permalink to this headline">¶</a></h3>
-<p>For random forests and all the other techniques,  we fit six models - one
-“queueing physics unaware” and one “queueing physics aware” for each of the
-three occupancy related response variables. For example,</p>
-<section id="occmean-pp-rf1-mean-occupancy-using-random-forest-no-queueing-terms">
-<h4>occmean_pp_rf1: Mean occupancy using random forest, no queueing terms<a class="headerlink" href="#occmean-pp-rf1-mean-occupancy-using-random-forest-no-queueing-terms" title="Permalink to this headline">¶</a></h4>
-<p><code class="docutils literal notranslate"><span class="pre">occmean_pp</span> <span class="pre">~</span>&#160; <span class="pre">lam_pp</span> <span class="pre">+</span> <span class="pre">lam_pp</span> <span class="pre">+</span> <span class="pre">cap_pp</span></code></p>
-</section>
-<section id="occmean-pp-rf2-mean-occupancy-using-random-forest-queueing-terms">
-<h4>occmean_pp_rf2: Mean occupancy using random forest, queueing terms<a class="headerlink" href="#occmean-pp-rf2-mean-occupancy-using-random-forest-queueing-terms" title="Permalink to this headline">¶</a></h4>
-<p><code class="docutils literal notranslate"><span class="pre">occmean_pp</span> <span class="pre">~</span>&#160; <span class="pre">lam_pp</span> <span class="pre">+</span> <span class="pre">lam_pp</span> <span class="pre">+</span> <span class="pre">cap_pp</span> <span class="pre">+</span> <span class="pre">load_pp</span> <span class="pre">+</span> <span class="pre">rho_pp</span></code></p>
-<p>The same predictors were used to fit models for <code class="docutils literal notranslate"><span class="pre">occp75_pp</span></code> and <code class="docutils literal notranslate"><span class="pre">occp95_pp</span></code>.</p>
-<p>The <a class="reference external" href="https://cran.r-project.org/web/packages/randomForest/randomForest.pdf">randomForest</a> package was used to fit the models. Default
-values for parameters were used in the <code class="docutils literal notranslate"><span class="pre">randomForest()</span></code> function calls.</p>
-<p>The <a class="reference external" href="https://cran.r-project.org/web/packages/nnet/index.html">nnet</a> package was used to fit the neural network models. Default
-values for all parameters except <code class="docutils literal notranslate"><span class="pre">linout</span></code> were used in the <code class="docutils literal notranslate"><span class="pre">nnet()</span></code> function calls.
-To get regression predictions (instead of classes) we set <code class="docutils literal notranslate"><span class="pre">linout=TRUE</span></code>.</p>
-<p>The <a class="reference external" href="https://cran.r-project.org/web/packages/gam/gam.pdf">gam</a> package was used to fit the cubic spline models. Default
-values for parameters were used in the function calls.</p>
-<p>The <a class="reference external" href="https://stat.ethz.ch/R-manual/R-devel/library/class/html/knn.html"><code class="docutils literal notranslate"><span class="pre">knn</span></code> function from the class package</a> was used to fit the cubic spline models. A preprocessing step was used to center and scale the data. Default
-values for parameters were used in the function calls.</p>
-<p>The <code class="docutils literal notranslate"><span class="pre">stepAIC</span></code> function from the <a class="reference external" href="https://cran.r-project.org/web/packages/MASS/MASS.pdf">MASS</a> package was used to fit stepwise regression models. Default
-values for parameters were used in the function calls.</p>
-<p>For the polynomial regression models, <code class="docutils literal notranslate"><span class="pre">lm</span></code> was used, and linear and quadratic
-terms were included.</p>
-</section>
-</section>
-</section>
-<section id="results">
-<h2>Results<a class="headerlink" href="#results" title="Permalink to this headline">¶</a></h2>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">## </span>
-<span class="c1">## Attaching package: &#39;dplyr&#39;</span>
-</pre></div>
-</div>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">## The following objects are masked from &#39;package:stats&#39;:</span>
-<span class="c1">## </span>
-<span class="c1">##     filter, lag</span>
-</pre></div>
-</div>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">## The following objects are masked from &#39;package:base&#39;:</span>
-<span class="c1">## </span>
-<span class="c1">##     intersect, setdiff, setequal, union</span>
-</pre></div>
-</div>
-<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="c1">## Read results data</span>
-
-<span class="n">ptps_results_pp_occ_mean_df</span> <span class="o">&lt;-</span> <span class="nf">read.csv</span><span class="p">(</span><span class="s">&quot;data/mmout/pp_occ_mean.csv&quot;</span><span class="p">)</span>
-<span class="n">ptps_results_pp_occ_p75_df</span> <span class="o">&lt;-</span> <span class="nf">read.csv</span><span class="p">(</span><span class="s">&quot;data/mmout/pp_occ_p75.csv&quot;</span><span class="p">)</span>
-<span class="n">ptps_results_pp_occ_p95_df</span> <span class="o">&lt;-</span> <span class="nf">read.csv</span><span class="p">(</span><span class="s">&quot;data/mmout/pp_occ_p95.csv&quot;</span><span class="p">)</span>
-
-<span class="n">ptps_results_pp_occ_df</span> <span class="o">&lt;-</span> <span class="nf">rbind</span><span class="p">(</span><span class="n">ptps_results_pp_occ_mean_df</span><span class="p">,</span>
-                                <span class="n">ptps_results_pp_occ_p75_df</span><span class="p">,</span>
-                                <span class="n">ptps_results_pp_occ_p95_df</span><span class="p">)</span>
-</pre></div>
-</div>
-<p>To make things concrete, here are the 20 rows associated with the following
-model fit and test instance:</p>
-<ul class="simple">
-<li><p>Model = <code class="docutils literal notranslate"><span class="pre">knn1</span></code></p></li>
-<li><p>Pct of cases allocated to training set = 0.7</p></li>
-<li><p>Performance measure = mean occupancy</p></li>
-</ul>
-<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="n">ptps_results_pp_occ_df</span> <span class="o">%&gt;%</span>
-  <span class="nf">filter</span><span class="p">(</span><span class="n">model</span><span class="o">==</span><span class="s">&#39;knn1&#39;</span> <span class="o">&amp;</span> <span class="n">ptrain</span><span class="o">==</span><span class="m">0.7</span> <span class="o">&amp;</span> <span class="n">perf_measure</span><span class="o">==</span><span class="s">&#39;occmean&#39;</span><span class="p">)</span> <span class="o">%&gt;%</span>
-  <span class="nf">select</span><span class="p">(</span><span class="m">1</span><span class="o">:</span><span class="m">3</span><span class="p">,</span> <span class="n">rmse_test</span><span class="p">,</span> <span class="n">mae_test</span><span class="p">,</span> <span class="n">mape_test</span><span class="p">)</span>
-</pre></div>
-</div>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">##    pm_unit_model_id ptrain sample rmse_test  mae_test   mape_test</span>
-<span class="c1">## 1   occmean_pp_knn1    0.7      1 1.0052279 0.2145379 0.007545913</span>
-<span class="c1">## 2   occmean_pp_knn1    0.7      2 2.0627406 0.5897758 0.016124523</span>
-<span class="c1">## 3   occmean_pp_knn1    0.7      3 3.4692304 1.0973854 0.024377439</span>
-<span class="c1">## 4   occmean_pp_knn1    0.7      4 2.7514137 0.8739269 0.022656215</span>
-<span class="c1">## 5   occmean_pp_knn1    0.7      5 0.3008833 0.0722353 0.002003952</span>
-<span class="c1">## 6   occmean_pp_knn1    0.7      6 1.8100720 0.4052148 0.009430376</span>
-<span class="c1">## 7   occmean_pp_knn1    0.7      7 3.5187415 1.6827260 0.051162870</span>
-<span class="c1">## 8   occmean_pp_knn1    0.7      8 3.0495487 0.9335612 0.020722189</span>
-<span class="c1">## 9   occmean_pp_knn1    0.7      9 0.8945858 0.3518124 0.011725163</span>
-<span class="c1">## 10  occmean_pp_knn1    0.7     10 2.4575233 0.6836743 0.017971330</span>
-<span class="c1">## 11  occmean_pp_knn1    0.7     11 3.4595388 1.0887717 0.025021145</span>
-<span class="c1">## 12  occmean_pp_knn1    0.7     12 2.0926021 0.5347662 0.016196254</span>
-<span class="c1">## 13  occmean_pp_knn1    0.7     13 2.9919025 0.9974762 0.025276314</span>
-<span class="c1">## 14  occmean_pp_knn1    0.7     14 2.3613384 0.8347072 0.020721143</span>
-<span class="c1">## 15  occmean_pp_knn1    0.7     15 3.1262837 1.2469138 0.027042326</span>
-<span class="c1">## 16  occmean_pp_knn1    0.7     16 2.8826036 1.0613012 0.025373251</span>
-<span class="c1">## 17  occmean_pp_knn1    0.7     17 3.0209032 1.1946814 0.035235445</span>
-<span class="c1">## 18  occmean_pp_knn1    0.7     18 2.4898844 0.6559066 0.014181538</span>
-<span class="c1">## 19  occmean_pp_knn1    0.7     19 4.1696193 2.1009985 0.062670714</span>
-<span class="c1">## 20  occmean_pp_knn1    0.7     20 2.9599517 1.4845715 0.074980965</span>
-</pre></div>
-</div>
-<section id="comparison-of-load1-to-queuing-unaware-models">
-<h3>Comparison of <strong>load1</strong> to queuing unaware models<a class="headerlink" href="#comparison-of-load1-to-queuing-unaware-models" title="Permalink to this headline">¶</a></h3>
-<p>For mean occupancy, we would expect <strong>load1</strong> to outperform the queueing
-unaware versions of the competing models since <strong>load1</strong> is based on a
-queueing relationship that holds for <span class="math notranslate nohighlight">\(G/G/m\)</span> models. It does. Let’s see
-how it does on the occupancy percentiles.</p>
-<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="n">df</span> <span class="o">&lt;-</span> <span class="n">ptps_results_pp_occ_df</span> <span class="o">%&gt;%</span> 
-   <span class="nf">filter</span><span class="p">(</span><span class="n">kfold_number</span><span class="o">==</span><span class="m">5</span> <span class="o">&amp;</span> <span class="n">partition.times</span><span class="o">==</span><span class="m">20</span><span class="p">)</span> <span class="o">%&gt;%</span>
-  <span class="nf">filter</span><span class="p">(</span><span class="nf">grepl</span><span class="p">(</span><span class="s">&#39;load1|spline1|lmstep1|nnet1|rf1|poly1|knn1&#39;</span><span class="p">,</span> <span class="n">model</span><span class="p">))</span>
-
-<span class="n">ggp</span> <span class="o">&lt;-</span> <span class="nf">ggplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">df</span><span class="p">)</span> <span class="o">+</span> 
-  <span class="nf">geom_boxplot</span><span class="p">(</span><span class="nf">aes</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="nf">as.factor</span><span class="p">(</span><span class="n">ptrain</span><span class="p">),</span> <span class="n">y</span><span class="o">=</span><span class="n">mae_test</span><span class="p">),</span> <span class="n">colour</span><span class="o">=</span><span class="s">&quot;tan2&quot;</span><span class="p">)</span> <span class="o">+</span>
-  <span class="nf">facet_grid</span><span class="p">(</span><span class="n">perf_measure</span><span class="o">~</span><span class="n">model</span><span class="p">)</span> <span class="o">+</span> 
-  <span class="nf">labs</span><span class="p">(</span><span class="n">title</span> <span class="o">=</span> <span class="s">&quot;PP occupancy - MAE for models and performance measures&quot;</span><span class="p">,</span>
-       <span class="n">subtitle</span> <span class="o">=</span> <span class="s">&quot;Queueing unaware&quot;</span><span class="p">,</span>
-       <span class="n">x</span> <span class="o">=</span> <span class="s">&quot;Pct of cases in training set&quot;</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="s">&quot;MAE&quot;</span><span class="p">)</span>
-</pre></div>
-</div>
-<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="n">ggp</span>
-</pre></div>
-</div>
-<p><img alt="center" src="../../_images/boxplots1-1.png" /></p>
-<p>Clearly, <strong>knn1</strong> is not competitive. Let’s drop it and replot so that we can
-compress the y-axis a bit.</p>
-<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="n">df</span> <span class="o">&lt;-</span> <span class="n">ptps_results_pp_occ_df</span> <span class="o">%&gt;%</span> 
-   <span class="nf">filter</span><span class="p">(</span><span class="n">kfold_number</span><span class="o">==</span><span class="m">5</span> <span class="o">&amp;</span> <span class="n">partition.times</span><span class="o">==</span><span class="m">20</span><span class="p">)</span> <span class="o">%&gt;%</span>
-  <span class="nf">filter</span><span class="p">(</span><span class="nf">grepl</span><span class="p">(</span><span class="s">&#39;load1|spline1|lmstep1|nnet1|rf1|poly1&#39;</span><span class="p">,</span> <span class="n">model</span><span class="p">))</span>
-
-<span class="n">ggp</span> <span class="o">&lt;-</span> <span class="nf">ggplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">df</span><span class="p">)</span> <span class="o">+</span> 
-  <span class="nf">geom_boxplot</span><span class="p">(</span><span class="nf">aes</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="nf">as.factor</span><span class="p">(</span><span class="n">ptrain</span><span class="p">),</span> <span class="n">y</span><span class="o">=</span><span class="n">mae_test</span><span class="p">),</span> <span class="n">colour</span><span class="o">=</span><span class="s">&quot;tan2&quot;</span><span class="p">)</span> <span class="o">+</span>
-  <span class="nf">facet_grid</span><span class="p">(</span><span class="n">perf_measure</span><span class="o">~</span><span class="n">model</span><span class="p">)</span> <span class="o">+</span> 
-  <span class="nf">labs</span><span class="p">(</span><span class="n">title</span> <span class="o">=</span> <span class="s">&quot;PP occupancy - MAE for models and performance measures&quot;</span><span class="p">,</span>
-       <span class="n">subtitle</span> <span class="o">=</span> <span class="s">&quot;Queueing unaware&quot;</span><span class="p">,</span>
-       <span class="n">x</span> <span class="o">=</span> <span class="s">&quot;Pct of cases in training set&quot;</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="s">&quot;MAE&quot;</span><span class="p">)</span> 
-  
-  
-<span class="n">ggp</span>
-</pre></div>
-</div>
-<p><img alt="center" src="../../_images/occpctiles2-1.png" /></p>
-<p>A few things pop out immediately:</p>
-<ul class="simple">
-<li><p>the queueing approximation based models, <strong>load1</strong>, have both low overall
-MAE as well as low variability in MAE</p></li>
-<li><p>the neural networks and random forests don’t fare well. They have both high
-overall value and high variability in MAE This is somewhat surprising since
-these techniques are often well suited to capturing nonlinear relationships.</p></li>
-<li><p>The random forest models seem most sensitive to the train-test partitioning.</p></li>
-</ul>
-<p>Let’s drop the <strong>nnet1</strong> and <strong>rf1</strong> models to make it easier to compare the
-various linear models.</p>
-<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="n">df</span> <span class="o">&lt;-</span> <span class="n">ptps_results_pp_occ_df</span> <span class="o">%&gt;%</span> 
-   <span class="nf">filter</span><span class="p">(</span><span class="n">kfold_number</span><span class="o">==</span><span class="m">5</span> <span class="o">&amp;</span> <span class="n">partition.times</span><span class="o">==</span><span class="m">20</span><span class="p">)</span> <span class="o">%&gt;%</span>
-  <span class="nf">filter</span><span class="p">(</span><span class="nf">grepl</span><span class="p">(</span><span class="s">&#39;load1|spline1|lmstep1|poly1&#39;</span><span class="p">,</span> <span class="n">model</span><span class="p">))</span>
-
-<span class="n">ggp</span> <span class="o">&lt;-</span> <span class="nf">ggplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">df</span><span class="p">)</span> <span class="o">+</span> 
-  <span class="nf">geom_boxplot</span><span class="p">(</span><span class="nf">aes</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="nf">as.factor</span><span class="p">(</span><span class="n">ptrain</span><span class="p">),</span> <span class="n">y</span><span class="o">=</span><span class="n">mae_test</span><span class="p">),</span> <span class="n">colour</span><span class="o">=</span><span class="s">&quot;tan2&quot;</span><span class="p">)</span> <span class="o">+</span>
-  <span class="nf">facet_grid</span><span class="p">(</span><span class="n">perf_measure</span><span class="o">~</span><span class="n">model</span><span class="p">)</span> <span class="o">+</span> 
-  <span class="nf">labs</span><span class="p">(</span><span class="n">title</span> <span class="o">=</span> <span class="s">&quot;PP occupancy - MAE for models and performance measures&quot;</span><span class="p">,</span>
-       <span class="n">subtitle</span> <span class="o">=</span> <span class="s">&quot;Queueing unaware&quot;</span><span class="p">,</span>
-       <span class="n">x</span> <span class="o">=</span> <span class="s">&quot;Pct of cases in training set&quot;</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="s">&quot;MAE&quot;</span><span class="p">)</span> 
-  
-<span class="n">ggp</span>
-</pre></div>
-</div>
-<p><img alt="center" src="../../_images/occpctiles3-1.png" /></p>
-<p>A few observations:</p>
-<ul class="simple">
-<li><p>the <strong>load1</strong> model again has lower and more stable MAE values across the
-samples.</p></li>
-<li><p>a higher percentage of cases in the training set tends to lead to higher
-variability in MAE across all the linear models.</p></li>
-<li><p>commonly used metamodeling techniques such as polynomial regression and
-cubic splines performed reasonably well.</p></li>
-</ul>
-</section>
-<section id="comparison-of-load1-to-queueing-aware-models">
-<h3>Comparison of <strong>load1</strong> to queueing aware models<a class="headerlink" href="#comparison-of-load1-to-queueing-aware-models" title="Permalink to this headline">¶</a></h3>
-<p>Now let’s repeat the above comparisons but use the queueing aware models - i.e.
-those that include <code class="docutils literal notranslate"><span class="pre">load_pp</span></code> and <code class="docutils literal notranslate"><span class="pre">rho_pp</span></code> as predictors.</p>
-<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="n">df</span> <span class="o">&lt;-</span> <span class="n">ptps_results_pp_occ_df</span> <span class="o">%&gt;%</span> 
-   <span class="nf">filter</span><span class="p">(</span><span class="n">kfold_number</span><span class="o">==</span><span class="m">5</span> <span class="o">&amp;</span> <span class="n">partition.times</span><span class="o">==</span><span class="m">20</span><span class="p">)</span> <span class="o">%&gt;%</span>
-  <span class="nf">filter</span><span class="p">(</span><span class="nf">grepl</span><span class="p">(</span><span class="s">&#39;load1|spline2|lmstep2|nnet2|rf2|poly2&#39;</span><span class="p">,</span> <span class="n">model</span><span class="p">))</span>
-
-<span class="n">ggp</span> <span class="o">&lt;-</span> <span class="nf">ggplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">df</span><span class="p">)</span> <span class="o">+</span> 
-  <span class="nf">geom_boxplot</span><span class="p">(</span><span class="nf">aes</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="nf">as.factor</span><span class="p">(</span><span class="n">ptrain</span><span class="p">),</span> <span class="n">y</span><span class="o">=</span><span class="n">mae_test</span><span class="p">),</span> <span class="n">colour</span><span class="o">=</span><span class="s">&quot;blue2&quot;</span><span class="p">)</span> <span class="o">+</span>
-  <span class="nf">facet_grid</span><span class="p">(</span><span class="n">perf_measure</span><span class="o">~</span><span class="n">model</span><span class="p">)</span> <span class="o">+</span> 
-  <span class="nf">labs</span><span class="p">(</span><span class="n">title</span> <span class="o">=</span> <span class="s">&quot;PP occupancy - MAE for models and performance measures&quot;</span><span class="p">,</span>
-       <span class="n">subtitle</span> <span class="o">=</span> <span class="s">&quot;Queueing aware&quot;</span><span class="p">,</span>
-       <span class="n">x</span> <span class="o">=</span> <span class="s">&quot;Pct of cases in training set&quot;</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="s">&quot;MAE&quot;</span><span class="p">)</span> 
-  
-<span class="n">ggp</span>
-</pre></div>
-</div>
-<p><img alt="center" src="../../_images/occpctiles4-1.png" /></p>
-<p>Clearly the queueing related inputs, <code class="docutils literal notranslate"><span class="pre">load_pp</span></code> and <code class="docutils literal notranslate"><span class="pre">rho_pp</span></code>, lead to improved
-performance for the competing models. Remember, <strong>load1</strong> is already a
-queueing approximation based model but one which uses <code class="docutils literal notranslate"><span class="pre">load_pp</span></code> in a queueing
-theory driven way. The other models are simply using queueing model
-related inputs in addition to the original volume and capacity related inputs.</p>
-<p>While the neural net and random forest models have improved, they still
-appear to be outperformed by the linear models. Let’s look closer at the
-polynomial, spline and queueing approximation models.</p>
-<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="n">df</span> <span class="o">&lt;-</span> <span class="n">ptps_results_pp_occ_df</span> <span class="o">%&gt;%</span> 
-   <span class="nf">filter</span><span class="p">(</span><span class="n">kfold_number</span><span class="o">==</span><span class="m">5</span> <span class="o">&amp;</span> <span class="n">partition.times</span><span class="o">==</span><span class="m">20</span><span class="p">)</span> <span class="o">%&gt;%</span>
-  <span class="nf">filter</span><span class="p">(</span><span class="nf">grepl</span><span class="p">(</span><span class="s">&#39;load1|spline2|poly2&#39;</span><span class="p">,</span> <span class="n">model</span><span class="p">))</span>
-
-<span class="n">ggp</span> <span class="o">&lt;-</span> <span class="nf">ggplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">df</span><span class="p">)</span> <span class="o">+</span> 
-  <span class="nf">geom_boxplot</span><span class="p">(</span><span class="nf">aes</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="nf">as.factor</span><span class="p">(</span><span class="n">ptrain</span><span class="p">),</span> <span class="n">y</span><span class="o">=</span><span class="n">mae_test</span><span class="p">),</span> <span class="n">colour</span><span class="o">=</span><span class="s">&quot;blue2&quot;</span><span class="p">)</span> <span class="o">+</span>
-  <span class="nf">facet_grid</span><span class="p">(</span><span class="n">perf_measure</span><span class="o">~</span><span class="n">model</span><span class="p">)</span> <span class="o">+</span> 
-  <span class="nf">labs</span><span class="p">(</span><span class="n">title</span> <span class="o">=</span> <span class="s">&quot;PP occupancy - MAE for models and performance measures&quot;</span><span class="p">,</span>
-       <span class="n">subtitle</span> <span class="o">=</span> <span class="s">&quot;Queueing aware&quot;</span><span class="p">,</span>
-       <span class="n">x</span> <span class="o">=</span> <span class="s">&quot;Pct of cases in training set&quot;</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="s">&quot;MAE&quot;</span><span class="p">)</span> 
-  
-<span class="n">ggp</span>
-</pre></div>
-</div>
-<p><img alt="center" src="../../_images/occpctiles5-1.png" /></p>
-<p>For the mean and 75th percentile of occupancy, the three models perform
-similarly. For the 95th percentile, <strong>load1</strong> and <strong>spline1</strong> slightly
-outperforms the polynomical regression model.</p>
-</section>
-<section id="model-interpretability-and-stability">
-<h3>Model interpretability and stability<a class="headerlink" href="#model-interpretability-and-stability" title="Permalink to this headline">¶</a></h3>
-<p>Let’s explore the coefficients of the fitted models for <strong>load1</strong> and <strong>poly1</strong>.
-The trained models created by caret were stored in a rather complex list. So, I
-wrote an R script to gather all the fitted model coefficients into a data frame.
-This data frame has 100 rows since there were 5 values of <code class="docutils literal notranslate"><span class="pre">ptrain</span></code> and
-<code class="docutils literal notranslate"><span class="pre">partition.times</span></code> was equal to 20.</p>
-<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="c1"># queuing based model - load1 coefficients</span>
-<span class="n">load1_mean_coeffs</span> <span class="o">&lt;-</span> <span class="nf">read.csv</span><span class="p">(</span><span class="s">&quot;data/mmcoeffs/pp_occ_mean_load1_coeffs.csv&quot;</span><span class="p">)</span>
-<span class="n">load1_p75_coeffs</span> <span class="o">&lt;-</span> <span class="nf">read.csv</span><span class="p">(</span><span class="s">&quot;data/mmcoeffs/pp_occ_p75_load1_coeffs.csv&quot;</span><span class="p">)</span>
-<span class="n">load1_p95_coeffs</span> <span class="o">&lt;-</span> <span class="nf">read.csv</span><span class="p">(</span><span class="s">&quot;data/mmcoeffs/pp_occ_p95_load1_coeffs.csv&quot;</span><span class="p">)</span>
-
-<span class="n">load1_mean_coeffs</span><span class="o">$</span><span class="n">ptrain</span> <span class="o">&lt;-</span> <span class="nf">as.factor</span><span class="p">(</span><span class="n">load1_mean_coeffs</span><span class="o">$</span><span class="n">ptrain</span><span class="p">)</span>
-<span class="n">load1_p75_coeffs</span><span class="o">$</span><span class="n">ptrain</span> <span class="o">&lt;-</span> <span class="nf">as.factor</span><span class="p">(</span><span class="n">load1_p75_coeffs</span><span class="o">$</span><span class="n">ptrain</span><span class="p">)</span>
-<span class="n">load1_p95_coeffs</span><span class="o">$</span><span class="n">ptrain</span> <span class="o">&lt;-</span> <span class="nf">as.factor</span><span class="p">(</span><span class="n">load1_p95_coeffs</span><span class="o">$</span><span class="n">ptrain</span><span class="p">)</span>
-
-<span class="c1"># polynomial regression model - poly1 coefficients</span>
-<span class="n">poly1_mean_coeffs</span> <span class="o">&lt;-</span> <span class="nf">read.csv</span><span class="p">(</span><span class="s">&quot;data/mmcoeffs/pp_occ_mean_poly1_coeffs.csv&quot;</span><span class="p">)</span>
-<span class="n">poly1_p75_coeffs</span> <span class="o">&lt;-</span> <span class="nf">read.csv</span><span class="p">(</span><span class="s">&quot;data/mmcoeffs/pp_occ_p75_poly1_coeffs.csv&quot;</span><span class="p">)</span>
-<span class="n">poly1_p95_coeffs</span> <span class="o">&lt;-</span> <span class="nf">read.csv</span><span class="p">(</span><span class="s">&quot;data/mmcoeffs/pp_occ_p95_poly1_coeffs.csv&quot;</span><span class="p">)</span>
-
-<span class="n">poly1_mean_coeffs</span><span class="o">$</span><span class="n">ptrain</span> <span class="o">&lt;-</span> <span class="nf">as.factor</span><span class="p">(</span><span class="n">poly1_mean_coeffs</span><span class="o">$</span><span class="n">ptrain</span><span class="p">)</span>
-<span class="n">poly1_p75_coeffs</span><span class="o">$</span><span class="n">ptrain</span> <span class="o">&lt;-</span> <span class="nf">as.factor</span><span class="p">(</span><span class="n">poly1_p75_coeffs</span><span class="o">$</span><span class="n">ptrain</span><span class="p">)</span>
-<span class="n">poly1_p95_coeffs</span><span class="o">$</span><span class="n">ptrain</span> <span class="o">&lt;-</span> <span class="nf">as.factor</span><span class="p">(</span><span class="n">poly1_p95_coeffs</span><span class="o">$</span><span class="n">ptrain</span><span class="p">)</span>
-</pre></div>
-</div>
-<p>Let’s look at the models for the 75th percentile of occupancy for <code class="docutils literal notranslate"><span class="pre">ptrain=0.7</span></code>.</p>
-<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="n">load1_p75_coeffs</span> <span class="o">%&gt;%</span>
-  <span class="nf">filter</span><span class="p">(</span><span class="n">ptrain</span> <span class="o">==</span> <span class="m">0.7</span><span class="p">)</span>
-</pre></div>
-</div>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">##    pm_unit_model_id ptrain sample intercept slope_load slope_sqrt_load</span>
-<span class="c1">## 1   occp75_pp_load1    0.7      1 0.2889593   1.008352       0.5903721</span>
-<span class="c1">## 2   occp75_pp_load1    0.7      2 0.3258063   1.008224       0.5840773</span>
-<span class="c1">## 3   occp75_pp_load1    0.7      3 0.3116994   1.008871       0.5836862</span>
-<span class="c1">## 4   occp75_pp_load1    0.7      4 0.3360193   1.010452       0.5690141</span>
-<span class="c1">## 5   occp75_pp_load1    0.7      5 0.3498063   1.011646       0.5590474</span>
-<span class="c1">## 6   occp75_pp_load1    0.7      6 0.3155310   1.009692       0.5765139</span>
-<span class="c1">## 7   occp75_pp_load1    0.7      7 0.2959349   1.009102       0.5832487</span>
-<span class="c1">## 8   occp75_pp_load1    0.7      8 0.2860954   1.009727       0.5818735</span>
-<span class="c1">## 9   occp75_pp_load1    0.7      9 0.2693956   1.008493       0.5914415</span>
-<span class="c1">## 10  occp75_pp_load1    0.7     10 0.2628473   1.007700       0.5968104</span>
-<span class="c1">## 11  occp75_pp_load1    0.7     11 0.3387758   1.010829       0.5662158</span>
-<span class="c1">## 12  occp75_pp_load1    0.7     12 0.2447432   1.007460       0.6011716</span>
-<span class="c1">## 13  occp75_pp_load1    0.7     13 0.3362630   1.009187       0.5783160</span>
-<span class="c1">## 14  occp75_pp_load1    0.7     14 0.3094409   1.009444       0.5788988</span>
-<span class="c1">## 15  occp75_pp_load1    0.7     15 0.2132483   1.004000       0.6312151</span>
-<span class="c1">## 16  occp75_pp_load1    0.7     16 0.3302913   1.009689       0.5753801</span>
-<span class="c1">## 17  occp75_pp_load1    0.7     17 0.2325615   1.007789       0.6029448</span>
-<span class="c1">## 18  occp75_pp_load1    0.7     18 0.2929132   1.010284       0.5773439</span>
-<span class="c1">## 19  occp75_pp_load1    0.7     19 0.3360432   1.010810       0.5667083</span>
-<span class="c1">## 20  occp75_pp_load1    0.7     20 0.2571813   1.006646       0.6051993</span>
-</pre></div>
-</div>
-<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="n">poly1_p75_coeffs</span> <span class="o">%&gt;%</span>
-  <span class="nf">filter</span><span class="p">(</span><span class="n">ptrain</span> <span class="o">==</span> <span class="m">0.7</span><span class="p">)</span>
-</pre></div>
-</div>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">##     pm_unit_model_id ptrain sample X.Intercept.   lam_pp     alos_pp</span>
-<span class="c1">## 1  occp75_pp_lmpoly1    0.7      1   -87.688291 2.579820   65.099967</span>
-<span class="c1">## 2  occp75_pp_lmpoly1    0.7      2   -12.162427 2.555547   -2.455481</span>
-<span class="c1">## 3  occp75_pp_lmpoly1    0.7      3   -73.491714 2.603787   52.874226</span>
-<span class="c1">## 4  occp75_pp_lmpoly1    0.7      4     3.628048 2.528600  -16.498736</span>
-<span class="c1">## 5  occp75_pp_lmpoly1    0.7      5    41.462226 2.583363  -49.236971</span>
-<span class="c1">## 6  occp75_pp_lmpoly1    0.7      6    81.222038 2.522743  -84.228856</span>
-<span class="c1">## 7  occp75_pp_lmpoly1    0.7      7  -137.371576 2.577796  109.616369</span>
-<span class="c1">## 8  occp75_pp_lmpoly1    0.7      8   -28.576602 2.568045   12.404693</span>
-<span class="c1">## 9  occp75_pp_lmpoly1    0.7      9   -21.623492 2.577156    6.089589</span>
-<span class="c1">## 10 occp75_pp_lmpoly1    0.7     10    67.083738 2.477220  -72.630074</span>
-<span class="c1">## 11 occp75_pp_lmpoly1    0.7     11    -9.864239 2.531038   -3.316826</span>
-<span class="c1">## 12 occp75_pp_lmpoly1    0.7     12  -163.789360 2.543246  132.946595</span>
-<span class="c1">## 13 occp75_pp_lmpoly1    0.7     13    42.064209 2.529504  -49.988497</span>
-<span class="c1">## 14 occp75_pp_lmpoly1    0.7     14    24.170231 2.590286  -33.514514</span>
-<span class="c1">## 15 occp75_pp_lmpoly1    0.7     15     6.779503 2.504883  -18.593471</span>
-<span class="c1">## 16 occp75_pp_lmpoly1    0.7     16   122.976439 2.565841 -121.259978</span>
-<span class="c1">## 17 occp75_pp_lmpoly1    0.7     17  -118.970123 2.633574   93.266116</span>
-<span class="c1">## 18 occp75_pp_lmpoly1    0.7     18   -73.219030 2.579481   52.423174</span>
-<span class="c1">## 19 occp75_pp_lmpoly1    0.7     19    26.355554 2.543214  -36.138816</span>
-<span class="c1">## 20 occp75_pp_lmpoly1    0.7     20    73.223459 2.528021  -77.390740</span>
-<span class="c1">##          cap_pp X.I.lam_pp.2.. X.I.alos_pp.2.. X.I.cap_pp.2..</span>
-<span class="c1">## 1  -0.030845067   -0.005741691     -11.3619065   2.601597e-04</span>
-<span class="c1">## 2  -0.025632428   -0.005083089       3.7516415   2.162221e-04</span>
-<span class="c1">## 3  -0.040246820   -0.006668308      -8.7096608   3.411388e-04</span>
-<span class="c1">## 4  -0.018205549   -0.004385510       6.8711698   1.697167e-04</span>
-<span class="c1">## 5  -0.035890961   -0.005740894      13.9490820   3.077558e-04</span>
-<span class="c1">## 6  -0.017799964   -0.004654535      21.6469987   2.124188e-04</span>
-<span class="c1">## 7  -0.026538028   -0.006007476     -21.3407036   2.315027e-04</span>
-<span class="c1">## 8  -0.024935909   -0.005265262       0.3673775   1.987442e-04</span>
-<span class="c1">## 9  -0.025219731   -0.005449551       1.7967066   1.800406e-04</span>
-<span class="c1">## 10  0.001003787   -0.003249230      19.2592239   3.971013e-05</span>
-<span class="c1">## 11 -0.018766936   -0.004841127       3.6881823   1.926407e-04</span>
-<span class="c1">## 12 -0.014468823   -0.005145656     -26.5043317   1.491973e-04</span>
-<span class="c1">## 13 -0.021212189   -0.004545079      14.1846651   1.954244e-04</span>
-<span class="c1">## 14 -0.043465930   -0.006606853      10.4005853   4.455661e-04</span>
-<span class="c1">## 15 -0.008669886   -0.003341825       7.1719121   5.156785e-05</span>
-<span class="c1">## 16 -0.033838814   -0.005887669      29.8724299   3.518421e-04</span>
-<span class="c1">## 17 -0.045338648   -0.007583201     -17.7135740   4.237847e-04</span>
-<span class="c1">## 18 -0.025372856   -0.005866851      -8.6069308   2.151193e-04</span>
-<span class="c1">## 19 -0.024621035   -0.004343342      11.1175351   1.843272e-04</span>
-<span class="c1">## 20 -0.015682715   -0.004378092      20.1781025   1.405878e-04</span>
-</pre></div>
-</div>
-<p>A quick perusal of the two data frames suggests that the coefficients in
-the polynomial regression model, especially those related to average length
-of stay, vary widely from sample to sample. The <strong>load1</strong> model coefficients
-are very stable across the samples. This stability is desirable from the
-perspective of interpreting and explaining the model to others as well giving
-the modeler some confidence that the model is in some sense capturing the
-essence of the underlyng process physics.</p>
-<p>Exploring this question of
-model stability and interpretability will be the subject of the next post. I’m
-not exactly sure how to quantify these measures for modeling techniques such
-as random forests or neural networks. One idea for random forest models would
-be to look at how consistent the <em>variable importance</em> values are across the
-20 different train-test partitions.</p>
-</section>
-</section>
-</section>
-<section id="references">
-<h1>References<a class="headerlink" href="#references" title="Permalink to this headline">¶</a></h1>
-</section>
-
-<div class="section">
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
     
+    <div class="container-fluid" id="banner"></div>
 
-<div class="section">
-  <span style="float: left">
-     Previous:
     
-    <a href="../simpy-first-oo-patflow-model/">
-       An object oriented SimPy patient flow simulation model
-    </a>
+    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main"><div class="container-xl">
+
+  <div id="navbar-start">
     
-  </span>
-  <span>&nbsp;</span>
-  <span style="float: right">
-     Next: 
-    <a href="../blogging_pelican_rmd/">
-      Blogging with Pelican and R Markdown 
-    </a>
     
-  </span>
-</div>
+<a class="navbar-brand" href="../../">
+<p class="title">misken</p>
+</a>
+
+    
+  </div>
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapsible" aria-controls="navbar-collapsible" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
   
-</div>
+  <div id="navbar-collapsible" class="col-lg-9 collapse navbar-collapse">
+    <div id="navbar-center" class="mr-auto">
+      
+      <div class="navbar-center-item">
+        <ul id="navbar-main-elements" class="navbar-nav">
+    <li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../about/">
+  About misken
+ </a>
+</li>
 
-          </div>
-          
-        </div>
+    
+</ul>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-<h1 class="logo"><a href="../../">misken</a></h1>
+      
+    </div>
 
+    <div id="navbar-end">
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+      </ul>
+      </div>
+      
+    </div>
+  </div>
+</div>
+    </nav>
+    
 
-
-
-
-
-
-
-  
+    <div class="container-xl">
+      <div class="row">
+          
+            
+            <!-- Only show if we have sidebars configured, else just a small margin  -->
+            <div class="col-12 col-md-3 bd-sidebar">
+              <div class="sidebar-start-items">  
 <h2>
    
   05 February 2018 
@@ -755,11 +159,6 @@ be to look at how consistent the <em>variable importance</em> values are across 
 </li>
  
 </ul>
-<h3>Navigation</h3>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../../about/">About misken</a></li>
-</ul>
-
 
 <h3>
   <a href="../">Recent Posts</a>
@@ -1039,24 +438,845 @@ be to look at how consistent the <em>variable importance</em> values are across 
     </div>
 </div>
 <script>$('#searchbox').show(0);</script>
-        </div>
+              </div>
+              <div class="sidebar-end-items">
+              </div>
+            </div>
+            
+          
+
+          
+          <div class="d-none d-xl-block col-xl-2 bd-toc">
+            
+              
+              <div class="toc-item">
+                
+<div class="tocsection onthispage mt-5 pt-1 pb-3">
+    <i class="fas fa-list"></i> On this page
+</div>
+
+<nav id="bd-toc-nav">
+    <ul class="visible nav section-nav flex-column">
+ <li class="toc-h1 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#">
+   Exploration of metamodels for simulation models of patient flow systems (Part 1)
+  </a>
+  <ul class="visible nav section-nav flex-column">
+   <li class="toc-h2 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#introduction">
+     Introduction
+    </a>
+   </li>
+   <li class="toc-h2 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#analysis-of-patient-flow-networks">
+     Analysis of patient flow networks
+    </a>
+   </li>
+   <li class="toc-h2 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#objectives">
+     Objectives
+    </a>
+   </li>
+   <li class="toc-h2 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#experimental-design">
+     Experimental design
+    </a>
+    <ul class="nav section-nav flex-column">
+     <li class="toc-h3 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#patient-flow-input-variables">
+       Patient Flow Input Variables
+      </a>
+     </li>
+     <li class="toc-h3 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#statistical-modeling-input-variables">
+       Statistical Modeling Input Variables
+      </a>
+     </li>
+     <li class="toc-h3 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#error-metrics">
+       Error metrics
+      </a>
+     </li>
+     <li class="toc-h3 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#model-families">
+       Model families
+      </a>
+     </li>
+     <li class="toc-h3 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#process-physics-knowledge">
+       Process physics knowledge
+      </a>
+     </li>
+     <li class="toc-h3 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#response-variables">
+       Response Variables
+      </a>
+     </li>
+    </ul>
+   </li>
+   <li class="toc-h2 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#model-details">
+     Model details
+    </a>
+    <ul class="nav section-nav flex-column">
+     <li class="toc-h3 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#linear-models-based-on-queueing-approximations">
+       Linear models based on queueing approximations
+      </a>
+     </li>
+     <li class="toc-h3 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#other-modeling-techniques">
+       Other modeling techniques
+      </a>
+      <ul class="nav section-nav flex-column">
+       <li class="toc-h4 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#occmean-pp-rf1-mean-occupancy-using-random-forest-no-queueing-terms">
+         occmean_pp_rf1: Mean occupancy using random forest, no queueing terms
+        </a>
+       </li>
+       <li class="toc-h4 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#occmean-pp-rf2-mean-occupancy-using-random-forest-queueing-terms">
+         occmean_pp_rf2: Mean occupancy using random forest, queueing terms
+        </a>
+       </li>
+      </ul>
+     </li>
+    </ul>
+   </li>
+   <li class="toc-h2 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#results">
+     Results
+    </a>
+    <ul class="nav section-nav flex-column">
+     <li class="toc-h3 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#comparison-of-load1-to-queuing-unaware-models">
+       Comparison of
+       <strong>
+        load1
+       </strong>
+       to queuing unaware models
+      </a>
+     </li>
+     <li class="toc-h3 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#comparison-of-load1-to-queueing-aware-models">
+       Comparison of
+       <strong>
+        load1
+       </strong>
+       to queueing aware models
+      </a>
+     </li>
+     <li class="toc-h3 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#model-interpretability-and-stability">
+       Model interpretability and stability
+      </a>
+     </li>
+    </ul>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h1 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#references">
+   References
+  </a>
+ </li>
+</ul>
+
+</nav>
+              </div>
+              
+              <div class="toc-item">
+                
+              </div>
+              
+            
+          </div>
+          
+
+          
+          
+            
+          
+          <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+              
+              <div>
+                 <section id="exploration-of-metamodels-for-simulation-models-of-patient-flow-systems-part-1">
+<h1>Exploration of metamodels for simulation models of patient flow systems (Part 1)<a class="headerlink" href="#exploration-of-metamodels-for-simulation-models-of-patient-flow-systems-part-1" title="Permalink to this headline">#</a></h1>
+<p>Simulation metamodeling involves building predictive models based on outputs of designed simulation experiments. In this series of posts we’ll share our experience with using the R package <code class="docutils literal notranslate"><span class="pre">caret</span></code> for building and comparing several predictive modeling based metamodels including linear models, neural networks, random forests, k-nearest neighbor, and cubic splines.</p>
+<section id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">#</a></h2>
+<p>A typical configuration of hospital units which provide care for women about to
+give birth might include an observation unit, a labor, delivery and recovery
+unit (LDR) and a postpartum (PP) unit. Matching the capacity of these units to
+demand placed on them is important for maintaining smooth patient flow. For
+example, there should be sufficient capacity in a PP unit so that there is a
+relatively small probability that a post-delivery patient is <em>blocked</em> in the
+LDR due to lack of a bed in PP. Of course, complicating the capacity planning
+process is the fact that there are numerous sources of uncertainty in
+obstetrical patient care processes. These include the number and timing of
+patient arrivals, whether or not the patient requires a C-section and the length
+of stay in each of the three units.</p>
+<p><img alt="OB flow diagram" src="../../_images/obflow.png" /></p>
+<p>I’m working on a research project involving capacity planning models for these
+systems. One phase involves building what are known as <em>simulation metamodels</em>.
+The main components are:</p>
+<ul class="simple">
+<li><p>built a discrete event simulation model of a simplified queueing network model
+of a typical obstetrical patient flow system.</p></li>
+<li><p>designed and ran a set of simulation experiments involving a range patient
+volumes, percentages of patients requiring c-section, and unit sizes (numbers of
+beds). There were 150 scenarios simulated.</p></li>
+<li><p>post-processed the output using both R and Python
+(https://github.com/misken/hillmaker) to compute several performance measures
+related to unit occupancy and patient delays.</p></li>
+<li><p>now working on building and comparing a number of different
+statistical/machine learning techniques for predicting occupancy and delay
+related peformance measures using the experimental inputs (volume, % c-section,
+unit sizes).</p></li>
+</ul>
+<p>In the simulation world, this last step is known as <em>simulation metamodeling</em>.
+It has a long history. See any good discrete event simulation text such as
+<em>Simulation modeling and analysis by Law and Kelton</em> [&#64;Law2000] for an overview.
+There’s also a nice overview done by R. Barton and available as a <a class="reference external" href="http://www.informs-sim.org/wsc15papers/185.pdf">free pdf</a> from
+the Proceedings of the 2015 Winter Simulation
+Conference [&#64;Barton2015]. Any
+predictive modeling technique capable of producing real valued output such as
+neural networks, regression trees, k-nearest neighbor or any number of advanced
+regression techniques are viable candidates for building simulation metamodels.</p>
+<p>As this was my first significant project using <a class="reference external" href="http://topepo.github.io/caret/index.html">caret</a>, I thought it would be
+helpful to write up some of the challenges faced and share some of the
+techniques I used to make it easier to compare different models. This resulted
+in three blog posts:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://misken.github.io/blog/obsim_caret_part1/">Comparing predictive models for obstetrical unit occupancy using caret - Part 1</a></p></li>
+<li><p><a class="reference external" href="https://misken.github.io/blog/obsim_caret_part2/">Comparing predictive model performance using caret - Part 2: A simple caret automation function</a></p></li>
+<li><p><a class="reference external" href="https://misken.github.io/blog/obsim_caret_part3/">Comparing predictive model performance using caret - Part 3: Automate</a></p></li>
+</ul>
+</section>
+<section id="analysis-of-patient-flow-networks">
+<h2>Analysis of patient flow networks<a class="headerlink" href="#analysis-of-patient-flow-networks" title="Permalink to this headline">#</a></h2>
+<p>In analyzing tandem flow systems with blocking, such as this one,
+a common and pragmatic approach is to:</p>
+<ul class="simple">
+<li><p>decompose the system into a set of models, one for each unit,</p></li>
+<li><p>intelligently modify key system parameters such as arrival rates and
+service rates for each unit to heuristically account for blocking and
+other interunit phenomena,</p></li>
+<li><p>start by analyzing the last unit in the system since no departures from that
+unit will be blocked,</p></li>
+<li><p>work your way backwards using the results from downstream units as needed,</p></li>
+<li><p>perhaps use iteration to converge upon a final solution.</p></li>
+</ul>
+<p>Decomposition based approaches for approximate analysis of queueing networks has
+a long history. For special kinds of networks known as <em>Jackson networks</em>,
+decomposition and analysis of each node (unit in our case) in isolation can be
+used to exactly analyze the network. Our OB system is definitely not a Jackson
+network:</p>
+<ul class="simple">
+<li><p>non-exponential service times for finite capacity units</p></li>
+<li><p>Patients enter the LDR for the labor and birth process after leaving the
+observation (OBS) unit. After delivery and recovery, patients are transferred to
+the postpartum (PP) unit. Occupancy levels in the LDR are impacted not only by
+volume and length of stay for the LDR phase but also by congestion levels in the
+PP unit. If a bed in PP is not available when requested, that patient will
+simply remain in the LDR until a bed becomes available.</p></li>
+</ul>
+<p>Since we need approximate approaches (and/or simulation), let’s get back to the
+simulation metamodeling problem at hand. We’ll start with the postpartum unit as
+it is the last unit visited before the patient leaves the hospital.</p>
+</section>
+<section id="objectives">
+<h2>Objectives<a class="headerlink" href="#objectives" title="Permalink to this headline">#</a></h2>
+<p>Our primary obectives for this first experiment were to:</p>
+<ul class="simple">
+<li><p>Compare the ability of popular predictive modeling techniques to accurately
+predict performance measures of queueing type systems arising in healthcare
+capacity planning problems,</p></li>
+<li><p>Assess the value of queueing system domain knowledge embedded in predictive
+models on model accuracy,</p></li>
+<li><p>Explore the impact of hyperparameters such as relative size of training and
+test datasets on model accuracy and model stability.</p></li>
+</ul>
+<p>It is well known that good <em>feature engineering</em> is often important for creating
+good predictive models. Knowledge of queueing dynamics that we can capture in
+new predictor variables seems like it has the potential for creating better
+predictive models. In this first experiment, relatively basic queueing knowledge
+will be used. Variables based on the concepts of <em>offered load</em> and <em>traffic
+intensity</em> will be considered. In addition, when predicting percentiles of
+occupancy, the well known <em>square root law</em> for capacity planning of queueing
+systems will also be used to engineer new model terms.</p>
+</section>
+<section id="experimental-design">
+<h2>Experimental design<a class="headerlink" href="#experimental-design" title="Permalink to this headline">#</a></h2>
+<section id="patient-flow-input-variables">
+<h3>Patient Flow Input Variables<a class="headerlink" href="#patient-flow-input-variables" title="Permalink to this headline">#</a></h3>
+<p>Key inputs include the patient arrival rate, average length of stay, and capacity
+of the postpartum unit.</p>
+<table class="colwidths-auto docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p><strong>Name</strong></p></th>
+<th class="head"><p><strong>Math</strong></p></th>
+<th class="head"><p><strong>Description</strong></p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">lam_pp</span></code></p></td>
+<td><p>$\lambda_P$</p></td>
+<td><p>Arrival rate of patients to postpartum (PP) unit</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">alos_pp</span></code></p></td>
+<td><p>$B_P$</p></td>
+<td><p>Average length of stay in PP</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">cap_pp</span></code></p></td>
+<td><p>$c_P$</p></td>
+<td><p>Number of beds in PP</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">load_pp</span></code></p></td>
+<td><p>$\lambda_P B_P$</p></td>
+<td><p>Arrival rate times average length of stay; a measure of workload submitted to the PP</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">rho_pp</span></code></p></td>
+<td><p>$\rho_P=\lambda_P B_P/c_P$</p></td>
+<td><p>Traffic intensity; a measure of congestion of PP</p></td>
+</tr>
+</tbody>
+</table>
+<br/>
+<p>If you’ve studied queueing systems, you know that the
+interarrival and service time distributions also matter. In the simulation
+model, patient arrivals were modeled with a Poisson process which means
+that the interarrival times are exponentially distributed. The postpartum
+service times were modeled with two simple discrete distributions - one
+for patients requiring a c-section and one for those with a regular delivery.
+For this first set of models, only the mean arrival rate (<code class="docutils literal notranslate"><span class="pre">lam_pp</span></code>)
+and the mean service time (<code class="docutils literal notranslate"><span class="pre">alos_pp</span></code>) were used. Distributional information
+is used in later models.</p>
+</section>
+<section id="statistical-modeling-input-variables">
+<h3>Statistical Modeling Input Variables<a class="headerlink" href="#statistical-modeling-input-variables" title="Permalink to this headline">#</a></h3>
+<p>The process of model fitting and validation is characterized by a number of <em>hyperparameters</em> or <em>tuning parameters</em>. It isn’t clear (at least to me) how
+to pick good values for some of these or how sensitive predictive accuracy
+and/or model stability is to them. We focused on a few of these in this experiment.</p>
+<table class="colwidths-auto docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p><strong>Name</strong></p></th>
+<th class="head"><p><strong>Description</strong></p></th>
+<th class="head"><p><strong>Levels</strong></p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">pct_train_val</span></code></p></td>
+<td><p>Percent of cases allocated to training set</p></td>
+<td><p>0.5, 0.6, 0.7, 0.8, 0.9</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">partition.times</span></code></p></td>
+<td><p>Number of train/test partitions to do and use in entire partition, train, predict, summarize cycle</p></td>
+<td><p>10, 20</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">kfold_number</span></code></p></td>
+<td><p>Number of folds in crossfold validation</p></td>
+<td><p>5, 10</p></td>
+</tr>
+</tbody>
+</table>
+<br/>
+<p>For now we’ll focus on the results for <code class="docutils literal notranslate"><span class="pre">partition.times=20</span></code> and
+<code class="docutils literal notranslate"><span class="pre">kfold_number=5</span></code>. The <code class="docutils literal notranslate"><span class="pre">pct_train_val</span></code> parameter controlled the percentage of
+cases allocated between the training and test datasets. Models were built using
+only training data, with k-crossfold validation used to pick the best model.
+The number of repititions of the entire process for each model was
+controlled by the parameter <code class="docutils literal notranslate"><span class="pre">partition.times</span></code>. The final models were then
+used to make predictions on the test set and several error metrics computed.</p>
+</section>
+<section id="error-metrics">
+<h3>Error metrics<a class="headerlink" href="#error-metrics" title="Permalink to this headline">#</a></h3>
+<p>For each model fit instance, we computed root mean square error (RMSE),
+mean absolute error (MAE), and mean absolute percent error (MAPE) using
+predictions on the . Since
+we are just focusing on <code class="docutils literal notranslate"><span class="pre">partition.times=20</span></code> for each
+value of <code class="docutils literal notranslate"><span class="pre">pct_train_val</span></code>, the percentage of cases allocated to the training set,
+we get 20 observations of each error metric and can look at the distribution
+of the error metrics in addition to overall means.</p>
+<p>Since many of the models end up fitting quite well and have errors less
+than one, we’ll focus on the MAE metric (so as not to square numbers &lt; 1).</p>
+</section>
+<section id="model-families">
+<h3>Model families<a class="headerlink" href="#model-families" title="Permalink to this headline">#</a></h3>
+<p>We used a few different models that are widely used and seem applicable to the
+general regression type problem at hand. In parentheses are the abbreviations
+used for each of the modeling families.</p>
+<ul class="simple">
+<li><p>Linear models based on queueing approximations (<strong>load</strong>)</p></li>
+<li><p>Random forests (<strong>rf</strong>)</p></li>
+<li><p>Neural networks (<strong>nnet</strong>)</p></li>
+<li><p>Cubic splines (<strong>spline</strong>)</p></li>
+<li><p>k-nearest neighbor (<strong>knn</strong>)</p></li>
+<li><p>Polynomial regression (<strong>poly</strong>)</p></li>
+<li><p>Stepwise regression (<strong>lmstep</strong>)</p></li>
+</ul>
+<p>Each of these is discussed in more detail below, including information about
+specific R packages used and algorithm parameter settings.</p>
+</section>
+<section id="process-physics-knowledge">
+<h3>Process physics knowledge<a class="headerlink" href="#process-physics-knowledge" title="Permalink to this headline">#</a></h3>
+<p>For all of the modeling families except the linear models with queueing terms,
+we considered two different sets of input variables. One set represented a
+somewhat “queueing unaware”” modeler who did <strong>not</strong> used the two engineered
+features, <code class="docutils literal notranslate"><span class="pre">load_pp</span></code> and <code class="docutils literal notranslate"><span class="pre">rho_pp</span></code>, in their models. Only <code class="docutils literal notranslate"><span class="pre">lam_pp</span></code>, <code class="docutils literal notranslate"><span class="pre">alos_pp</span></code>,
+and <code class="docutils literal notranslate"><span class="pre">cap_pp</span></code> were used. In the other set, representing a modeler
+with some queueing knowledge, both <code class="docutils literal notranslate"><span class="pre">load_pp</span></code> and <code class="docutils literal notranslate"><span class="pre">rho_pp</span></code> were included as
+predictor variables. For example, <strong>knn1</strong> is a k-nearest neighbor model which
+did not include <code class="docutils literal notranslate"><span class="pre">load_pp</span></code> and <code class="docutils literal notranslate"><span class="pre">rho_pp</span></code>, whereas <strong>knn2</strong> does include these
+additional input variables.</p>
+</section>
+<section id="response-variables">
+<h3>Response Variables<a class="headerlink" href="#response-variables" title="Permalink to this headline">#</a></h3>
+<p>To begin we just focused on mean and percentiles of postpartum occupancy.</p>
+<table class="colwidths-auto docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p><strong>Name</strong></p></th>
+<th class="head"><p><strong>Description</strong></p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">occmean_pp</span></code></p></td>
+<td><p>Mean occupancy (number of patients) in PP unit</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">occp75_pp</span></code></p></td>
+<td><p>75th percentile of occupancy in PP unit</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">occp95_pp</span></code></p></td>
+<td><p>95th percentile of occupancy in PP unit</p></td>
+</tr>
+</tbody>
+</table>
+<br/>
+<p>There are other important response variables such as the probability that a
+patient gets blocked in the LDR due to the PP unit being full and the amount of
+time (mean, percentiles) that such blocked patients wait for a PP bed to become
+available. We’ll explore those variables in subsequent articles.</p>
+</section>
+</section>
+<section id="model-details">
+<h2>Model details<a class="headerlink" href="#model-details" title="Permalink to this headline">#</a></h2>
+<p>All models were fit using the caret package. Details of the mechanics can
+be found in the three blog posts mentioned above.</p>
+<section id="linear-models-based-on-queueing-approximations">
+<h3>Linear models based on queueing approximations<a class="headerlink" href="#linear-models-based-on-queueing-approximations" title="Permalink to this headline">#</a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">lm()</span></code> function was used to fit a multiple linear regression model for
+each of the response variables.</p>
+<p>For mean occupancy, the <code class="docutils literal notranslate"><span class="pre">load_pp</span></code> variable should be sufficient since
+this is an exact relationship for $G/G/m$ queues.</p>
+<p><code class="docutils literal notranslate"><span class="pre">occmean_pp</span> <span class="pre">~</span> <span class="pre">load_pp</span></code></p>
+<p>For the percentiles, we’ll use an infinite capacity approximation based on
+the $M/G/\infty$ queue. For such systems, occupancy is Poisson distributed
+with mean equal to the load placed on the system (arrival rate * average
+service time). For large values of load we can use a normal approximation
+to the Poisson to approximate occupancy percentiles. Even for loads as small
+as 10, the approximation is reasonably accurate assuming a continuity
+correction is done. For example, to approximate the $95$th percentile of
+occupancy in a system with load $L$, the normal approximation to the Poisson is:</p>
+<p>$$
+O_{0.95} \approx L + 0.5 + 1.645\sqrt{L}
+$$</p>
+<p>So, we will fit a simple linear model using <code class="docutils literal notranslate"><span class="pre">lm()</span></code>.</p>
+<p><code class="docutils literal notranslate"><span class="pre">occp95_pp</span> <span class="pre">~</span>&#160; <span class="pre">load_pp</span> <span class="pre">+</span> <span class="pre">I(load_pp</span> <span class="pre">^</span> <span class="pre">0.5)</span></code></p>
+<p>The arrivals to the post-partum aren’t technically Poisson but analysis of the
+simulation output revealed that they are quite close to Poisson. So, it wouldn’t
+be surprising if the estimates of the y-intercept is close to 0.5 and the
+slopes are near 1.0 and 1.645 for systems which are not too heavily congested.</p>
+</section>
+<section id="other-modeling-techniques">
+<h3>Other modeling techniques<a class="headerlink" href="#other-modeling-techniques" title="Permalink to this headline">#</a></h3>
+<p>For random forests and all the other techniques,  we fit six models - one
+“queueing physics unaware” and one “queueing physics aware” for each of the
+three occupancy related response variables. For example,</p>
+<section id="occmean-pp-rf1-mean-occupancy-using-random-forest-no-queueing-terms">
+<h4>occmean_pp_rf1: Mean occupancy using random forest, no queueing terms<a class="headerlink" href="#occmean-pp-rf1-mean-occupancy-using-random-forest-no-queueing-terms" title="Permalink to this headline">#</a></h4>
+<p><code class="docutils literal notranslate"><span class="pre">occmean_pp</span> <span class="pre">~</span>&#160; <span class="pre">lam_pp</span> <span class="pre">+</span> <span class="pre">lam_pp</span> <span class="pre">+</span> <span class="pre">cap_pp</span></code></p>
+</section>
+<section id="occmean-pp-rf2-mean-occupancy-using-random-forest-queueing-terms">
+<h4>occmean_pp_rf2: Mean occupancy using random forest, queueing terms<a class="headerlink" href="#occmean-pp-rf2-mean-occupancy-using-random-forest-queueing-terms" title="Permalink to this headline">#</a></h4>
+<p><code class="docutils literal notranslate"><span class="pre">occmean_pp</span> <span class="pre">~</span>&#160; <span class="pre">lam_pp</span> <span class="pre">+</span> <span class="pre">lam_pp</span> <span class="pre">+</span> <span class="pre">cap_pp</span> <span class="pre">+</span> <span class="pre">load_pp</span> <span class="pre">+</span> <span class="pre">rho_pp</span></code></p>
+<p>The same predictors were used to fit models for <code class="docutils literal notranslate"><span class="pre">occp75_pp</span></code> and <code class="docutils literal notranslate"><span class="pre">occp95_pp</span></code>.</p>
+<p>The <a class="reference external" href="https://cran.r-project.org/web/packages/randomForest/randomForest.pdf">randomForest</a> package was used to fit the models. Default
+values for parameters were used in the <code class="docutils literal notranslate"><span class="pre">randomForest()</span></code> function calls.</p>
+<p>The <a class="reference external" href="https://cran.r-project.org/web/packages/nnet/index.html">nnet</a> package was used to fit the neural network models. Default
+values for all parameters except <code class="docutils literal notranslate"><span class="pre">linout</span></code> were used in the <code class="docutils literal notranslate"><span class="pre">nnet()</span></code> function calls.
+To get regression predictions (instead of classes) we set <code class="docutils literal notranslate"><span class="pre">linout=TRUE</span></code>.</p>
+<p>The <a class="reference external" href="https://cran.r-project.org/web/packages/gam/gam.pdf">gam</a> package was used to fit the cubic spline models. Default
+values for parameters were used in the function calls.</p>
+<p>The <a class="reference external" href="https://stat.ethz.ch/R-manual/R-devel/library/class/html/knn.html"><code class="docutils literal notranslate"><span class="pre">knn</span></code> function from the class package</a> was used to fit the cubic spline models. A preprocessing step was used to center and scale the data. Default
+values for parameters were used in the function calls.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">stepAIC</span></code> function from the <a class="reference external" href="https://cran.r-project.org/web/packages/MASS/MASS.pdf">MASS</a> package was used to fit stepwise regression models. Default
+values for parameters were used in the function calls.</p>
+<p>For the polynomial regression models, <code class="docutils literal notranslate"><span class="pre">lm</span></code> was used, and linear and quadratic
+terms were included.</p>
+</section>
+</section>
+</section>
+<section id="results">
+<h2>Results<a class="headerlink" href="#results" title="Permalink to this headline">#</a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">## </span>
+<span class="c1">## Attaching package: &#39;dplyr&#39;</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">## The following objects are masked from &#39;package:stats&#39;:</span>
+<span class="c1">## </span>
+<span class="c1">##     filter, lag</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">## The following objects are masked from &#39;package:base&#39;:</span>
+<span class="c1">## </span>
+<span class="c1">##     intersect, setdiff, setequal, union</span>
+</pre></div>
+</div>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="c1">## Read results data</span>
+
+<span class="n">ptps_results_pp_occ_mean_df</span> <span class="o">&lt;-</span> <span class="nf">read.csv</span><span class="p">(</span><span class="s">&quot;data/mmout/pp_occ_mean.csv&quot;</span><span class="p">)</span>
+<span class="n">ptps_results_pp_occ_p75_df</span> <span class="o">&lt;-</span> <span class="nf">read.csv</span><span class="p">(</span><span class="s">&quot;data/mmout/pp_occ_p75.csv&quot;</span><span class="p">)</span>
+<span class="n">ptps_results_pp_occ_p95_df</span> <span class="o">&lt;-</span> <span class="nf">read.csv</span><span class="p">(</span><span class="s">&quot;data/mmout/pp_occ_p95.csv&quot;</span><span class="p">)</span>
+
+<span class="n">ptps_results_pp_occ_df</span> <span class="o">&lt;-</span> <span class="nf">rbind</span><span class="p">(</span><span class="n">ptps_results_pp_occ_mean_df</span><span class="p">,</span>
+                                <span class="n">ptps_results_pp_occ_p75_df</span><span class="p">,</span>
+                                <span class="n">ptps_results_pp_occ_p95_df</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>To make things concrete, here are the 20 rows associated with the following
+model fit and test instance:</p>
+<ul class="simple">
+<li><p>Model = <code class="docutils literal notranslate"><span class="pre">knn1</span></code></p></li>
+<li><p>Pct of cases allocated to training set = 0.7</p></li>
+<li><p>Performance measure = mean occupancy</p></li>
+</ul>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="n">ptps_results_pp_occ_df</span> <span class="o">%&gt;%</span>
+  <span class="nf">filter</span><span class="p">(</span><span class="n">model</span><span class="o">==</span><span class="s">&#39;knn1&#39;</span> <span class="o">&amp;</span> <span class="n">ptrain</span><span class="o">==</span><span class="m">0.7</span> <span class="o">&amp;</span> <span class="n">perf_measure</span><span class="o">==</span><span class="s">&#39;occmean&#39;</span><span class="p">)</span> <span class="o">%&gt;%</span>
+  <span class="nf">select</span><span class="p">(</span><span class="m">1</span><span class="o">:</span><span class="m">3</span><span class="p">,</span> <span class="n">rmse_test</span><span class="p">,</span> <span class="n">mae_test</span><span class="p">,</span> <span class="n">mape_test</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">##    pm_unit_model_id ptrain sample rmse_test  mae_test   mape_test</span>
+<span class="c1">## 1   occmean_pp_knn1    0.7      1 1.0052279 0.2145379 0.007545913</span>
+<span class="c1">## 2   occmean_pp_knn1    0.7      2 2.0627406 0.5897758 0.016124523</span>
+<span class="c1">## 3   occmean_pp_knn1    0.7      3 3.4692304 1.0973854 0.024377439</span>
+<span class="c1">## 4   occmean_pp_knn1    0.7      4 2.7514137 0.8739269 0.022656215</span>
+<span class="c1">## 5   occmean_pp_knn1    0.7      5 0.3008833 0.0722353 0.002003952</span>
+<span class="c1">## 6   occmean_pp_knn1    0.7      6 1.8100720 0.4052148 0.009430376</span>
+<span class="c1">## 7   occmean_pp_knn1    0.7      7 3.5187415 1.6827260 0.051162870</span>
+<span class="c1">## 8   occmean_pp_knn1    0.7      8 3.0495487 0.9335612 0.020722189</span>
+<span class="c1">## 9   occmean_pp_knn1    0.7      9 0.8945858 0.3518124 0.011725163</span>
+<span class="c1">## 10  occmean_pp_knn1    0.7     10 2.4575233 0.6836743 0.017971330</span>
+<span class="c1">## 11  occmean_pp_knn1    0.7     11 3.4595388 1.0887717 0.025021145</span>
+<span class="c1">## 12  occmean_pp_knn1    0.7     12 2.0926021 0.5347662 0.016196254</span>
+<span class="c1">## 13  occmean_pp_knn1    0.7     13 2.9919025 0.9974762 0.025276314</span>
+<span class="c1">## 14  occmean_pp_knn1    0.7     14 2.3613384 0.8347072 0.020721143</span>
+<span class="c1">## 15  occmean_pp_knn1    0.7     15 3.1262837 1.2469138 0.027042326</span>
+<span class="c1">## 16  occmean_pp_knn1    0.7     16 2.8826036 1.0613012 0.025373251</span>
+<span class="c1">## 17  occmean_pp_knn1    0.7     17 3.0209032 1.1946814 0.035235445</span>
+<span class="c1">## 18  occmean_pp_knn1    0.7     18 2.4898844 0.6559066 0.014181538</span>
+<span class="c1">## 19  occmean_pp_knn1    0.7     19 4.1696193 2.1009985 0.062670714</span>
+<span class="c1">## 20  occmean_pp_knn1    0.7     20 2.9599517 1.4845715 0.074980965</span>
+</pre></div>
+</div>
+<section id="comparison-of-load1-to-queuing-unaware-models">
+<h3>Comparison of <strong>load1</strong> to queuing unaware models<a class="headerlink" href="#comparison-of-load1-to-queuing-unaware-models" title="Permalink to this headline">#</a></h3>
+<p>For mean occupancy, we would expect <strong>load1</strong> to outperform the queueing
+unaware versions of the competing models since <strong>load1</strong> is based on a
+queueing relationship that holds for $G/G/m$ models. It does. Let’s see
+how it does on the occupancy percentiles.</p>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="n">df</span> <span class="o">&lt;-</span> <span class="n">ptps_results_pp_occ_df</span> <span class="o">%&gt;%</span> 
+   <span class="nf">filter</span><span class="p">(</span><span class="n">kfold_number</span><span class="o">==</span><span class="m">5</span> <span class="o">&amp;</span> <span class="n">partition.times</span><span class="o">==</span><span class="m">20</span><span class="p">)</span> <span class="o">%&gt;%</span>
+  <span class="nf">filter</span><span class="p">(</span><span class="nf">grepl</span><span class="p">(</span><span class="s">&#39;load1|spline1|lmstep1|nnet1|rf1|poly1|knn1&#39;</span><span class="p">,</span> <span class="n">model</span><span class="p">))</span>
+
+<span class="n">ggp</span> <span class="o">&lt;-</span> <span class="nf">ggplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">df</span><span class="p">)</span> <span class="o">+</span> 
+  <span class="nf">geom_boxplot</span><span class="p">(</span><span class="nf">aes</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="nf">as.factor</span><span class="p">(</span><span class="n">ptrain</span><span class="p">),</span> <span class="n">y</span><span class="o">=</span><span class="n">mae_test</span><span class="p">),</span> <span class="n">colour</span><span class="o">=</span><span class="s">&quot;tan2&quot;</span><span class="p">)</span> <span class="o">+</span>
+  <span class="nf">facet_grid</span><span class="p">(</span><span class="n">perf_measure</span><span class="o">~</span><span class="n">model</span><span class="p">)</span> <span class="o">+</span> 
+  <span class="nf">labs</span><span class="p">(</span><span class="n">title</span> <span class="o">=</span> <span class="s">&quot;PP occupancy - MAE for models and performance measures&quot;</span><span class="p">,</span>
+       <span class="n">subtitle</span> <span class="o">=</span> <span class="s">&quot;Queueing unaware&quot;</span><span class="p">,</span>
+       <span class="n">x</span> <span class="o">=</span> <span class="s">&quot;Pct of cases in training set&quot;</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="s">&quot;MAE&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="n">ggp</span>
+</pre></div>
+</div>
+<p><img alt="center" src="../../_images/boxplots1-1.png" /></p>
+<p>Clearly, <strong>knn1</strong> is not competitive. Let’s drop it and replot so that we can
+compress the y-axis a bit.</p>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="n">df</span> <span class="o">&lt;-</span> <span class="n">ptps_results_pp_occ_df</span> <span class="o">%&gt;%</span> 
+   <span class="nf">filter</span><span class="p">(</span><span class="n">kfold_number</span><span class="o">==</span><span class="m">5</span> <span class="o">&amp;</span> <span class="n">partition.times</span><span class="o">==</span><span class="m">20</span><span class="p">)</span> <span class="o">%&gt;%</span>
+  <span class="nf">filter</span><span class="p">(</span><span class="nf">grepl</span><span class="p">(</span><span class="s">&#39;load1|spline1|lmstep1|nnet1|rf1|poly1&#39;</span><span class="p">,</span> <span class="n">model</span><span class="p">))</span>
+
+<span class="n">ggp</span> <span class="o">&lt;-</span> <span class="nf">ggplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">df</span><span class="p">)</span> <span class="o">+</span> 
+  <span class="nf">geom_boxplot</span><span class="p">(</span><span class="nf">aes</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="nf">as.factor</span><span class="p">(</span><span class="n">ptrain</span><span class="p">),</span> <span class="n">y</span><span class="o">=</span><span class="n">mae_test</span><span class="p">),</span> <span class="n">colour</span><span class="o">=</span><span class="s">&quot;tan2&quot;</span><span class="p">)</span> <span class="o">+</span>
+  <span class="nf">facet_grid</span><span class="p">(</span><span class="n">perf_measure</span><span class="o">~</span><span class="n">model</span><span class="p">)</span> <span class="o">+</span> 
+  <span class="nf">labs</span><span class="p">(</span><span class="n">title</span> <span class="o">=</span> <span class="s">&quot;PP occupancy - MAE for models and performance measures&quot;</span><span class="p">,</span>
+       <span class="n">subtitle</span> <span class="o">=</span> <span class="s">&quot;Queueing unaware&quot;</span><span class="p">,</span>
+       <span class="n">x</span> <span class="o">=</span> <span class="s">&quot;Pct of cases in training set&quot;</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="s">&quot;MAE&quot;</span><span class="p">)</span> 
+  
+  
+<span class="n">ggp</span>
+</pre></div>
+</div>
+<p><img alt="center" src="../../_images/occpctiles2-1.png" /></p>
+<p>A few things pop out immediately:</p>
+<ul class="simple">
+<li><p>the queueing approximation based models, <strong>load1</strong>, have both low overall
+MAE as well as low variability in MAE</p></li>
+<li><p>the neural networks and random forests don’t fare well. They have both high
+overall value and high variability in MAE This is somewhat surprising since
+these techniques are often well suited to capturing nonlinear relationships.</p></li>
+<li><p>The random forest models seem most sensitive to the train-test partitioning.</p></li>
+</ul>
+<p>Let’s drop the <strong>nnet1</strong> and <strong>rf1</strong> models to make it easier to compare the
+various linear models.</p>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="n">df</span> <span class="o">&lt;-</span> <span class="n">ptps_results_pp_occ_df</span> <span class="o">%&gt;%</span> 
+   <span class="nf">filter</span><span class="p">(</span><span class="n">kfold_number</span><span class="o">==</span><span class="m">5</span> <span class="o">&amp;</span> <span class="n">partition.times</span><span class="o">==</span><span class="m">20</span><span class="p">)</span> <span class="o">%&gt;%</span>
+  <span class="nf">filter</span><span class="p">(</span><span class="nf">grepl</span><span class="p">(</span><span class="s">&#39;load1|spline1|lmstep1|poly1&#39;</span><span class="p">,</span> <span class="n">model</span><span class="p">))</span>
+
+<span class="n">ggp</span> <span class="o">&lt;-</span> <span class="nf">ggplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">df</span><span class="p">)</span> <span class="o">+</span> 
+  <span class="nf">geom_boxplot</span><span class="p">(</span><span class="nf">aes</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="nf">as.factor</span><span class="p">(</span><span class="n">ptrain</span><span class="p">),</span> <span class="n">y</span><span class="o">=</span><span class="n">mae_test</span><span class="p">),</span> <span class="n">colour</span><span class="o">=</span><span class="s">&quot;tan2&quot;</span><span class="p">)</span> <span class="o">+</span>
+  <span class="nf">facet_grid</span><span class="p">(</span><span class="n">perf_measure</span><span class="o">~</span><span class="n">model</span><span class="p">)</span> <span class="o">+</span> 
+  <span class="nf">labs</span><span class="p">(</span><span class="n">title</span> <span class="o">=</span> <span class="s">&quot;PP occupancy - MAE for models and performance measures&quot;</span><span class="p">,</span>
+       <span class="n">subtitle</span> <span class="o">=</span> <span class="s">&quot;Queueing unaware&quot;</span><span class="p">,</span>
+       <span class="n">x</span> <span class="o">=</span> <span class="s">&quot;Pct of cases in training set&quot;</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="s">&quot;MAE&quot;</span><span class="p">)</span> 
+  
+<span class="n">ggp</span>
+</pre></div>
+</div>
+<p><img alt="center" src="../../_images/occpctiles3-1.png" /></p>
+<p>A few observations:</p>
+<ul class="simple">
+<li><p>the <strong>load1</strong> model again has lower and more stable MAE values across the
+samples.</p></li>
+<li><p>a higher percentage of cases in the training set tends to lead to higher
+variability in MAE across all the linear models.</p></li>
+<li><p>commonly used metamodeling techniques such as polynomial regression and
+cubic splines performed reasonably well.</p></li>
+</ul>
+</section>
+<section id="comparison-of-load1-to-queueing-aware-models">
+<h3>Comparison of <strong>load1</strong> to queueing aware models<a class="headerlink" href="#comparison-of-load1-to-queueing-aware-models" title="Permalink to this headline">#</a></h3>
+<p>Now let’s repeat the above comparisons but use the queueing aware models - i.e.
+those that include <code class="docutils literal notranslate"><span class="pre">load_pp</span></code> and <code class="docutils literal notranslate"><span class="pre">rho_pp</span></code> as predictors.</p>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="n">df</span> <span class="o">&lt;-</span> <span class="n">ptps_results_pp_occ_df</span> <span class="o">%&gt;%</span> 
+   <span class="nf">filter</span><span class="p">(</span><span class="n">kfold_number</span><span class="o">==</span><span class="m">5</span> <span class="o">&amp;</span> <span class="n">partition.times</span><span class="o">==</span><span class="m">20</span><span class="p">)</span> <span class="o">%&gt;%</span>
+  <span class="nf">filter</span><span class="p">(</span><span class="nf">grepl</span><span class="p">(</span><span class="s">&#39;load1|spline2|lmstep2|nnet2|rf2|poly2&#39;</span><span class="p">,</span> <span class="n">model</span><span class="p">))</span>
+
+<span class="n">ggp</span> <span class="o">&lt;-</span> <span class="nf">ggplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">df</span><span class="p">)</span> <span class="o">+</span> 
+  <span class="nf">geom_boxplot</span><span class="p">(</span><span class="nf">aes</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="nf">as.factor</span><span class="p">(</span><span class="n">ptrain</span><span class="p">),</span> <span class="n">y</span><span class="o">=</span><span class="n">mae_test</span><span class="p">),</span> <span class="n">colour</span><span class="o">=</span><span class="s">&quot;blue2&quot;</span><span class="p">)</span> <span class="o">+</span>
+  <span class="nf">facet_grid</span><span class="p">(</span><span class="n">perf_measure</span><span class="o">~</span><span class="n">model</span><span class="p">)</span> <span class="o">+</span> 
+  <span class="nf">labs</span><span class="p">(</span><span class="n">title</span> <span class="o">=</span> <span class="s">&quot;PP occupancy - MAE for models and performance measures&quot;</span><span class="p">,</span>
+       <span class="n">subtitle</span> <span class="o">=</span> <span class="s">&quot;Queueing aware&quot;</span><span class="p">,</span>
+       <span class="n">x</span> <span class="o">=</span> <span class="s">&quot;Pct of cases in training set&quot;</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="s">&quot;MAE&quot;</span><span class="p">)</span> 
+  
+<span class="n">ggp</span>
+</pre></div>
+</div>
+<p><img alt="center" src="../../_images/occpctiles4-1.png" /></p>
+<p>Clearly the queueing related inputs, <code class="docutils literal notranslate"><span class="pre">load_pp</span></code> and <code class="docutils literal notranslate"><span class="pre">rho_pp</span></code>, lead to improved
+performance for the competing models. Remember, <strong>load1</strong> is already a
+queueing approximation based model but one which uses <code class="docutils literal notranslate"><span class="pre">load_pp</span></code> in a queueing
+theory driven way. The other models are simply using queueing model
+related inputs in addition to the original volume and capacity related inputs.</p>
+<p>While the neural net and random forest models have improved, they still
+appear to be outperformed by the linear models. Let’s look closer at the
+polynomial, spline and queueing approximation models.</p>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="n">df</span> <span class="o">&lt;-</span> <span class="n">ptps_results_pp_occ_df</span> <span class="o">%&gt;%</span> 
+   <span class="nf">filter</span><span class="p">(</span><span class="n">kfold_number</span><span class="o">==</span><span class="m">5</span> <span class="o">&amp;</span> <span class="n">partition.times</span><span class="o">==</span><span class="m">20</span><span class="p">)</span> <span class="o">%&gt;%</span>
+  <span class="nf">filter</span><span class="p">(</span><span class="nf">grepl</span><span class="p">(</span><span class="s">&#39;load1|spline2|poly2&#39;</span><span class="p">,</span> <span class="n">model</span><span class="p">))</span>
+
+<span class="n">ggp</span> <span class="o">&lt;-</span> <span class="nf">ggplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">df</span><span class="p">)</span> <span class="o">+</span> 
+  <span class="nf">geom_boxplot</span><span class="p">(</span><span class="nf">aes</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="nf">as.factor</span><span class="p">(</span><span class="n">ptrain</span><span class="p">),</span> <span class="n">y</span><span class="o">=</span><span class="n">mae_test</span><span class="p">),</span> <span class="n">colour</span><span class="o">=</span><span class="s">&quot;blue2&quot;</span><span class="p">)</span> <span class="o">+</span>
+  <span class="nf">facet_grid</span><span class="p">(</span><span class="n">perf_measure</span><span class="o">~</span><span class="n">model</span><span class="p">)</span> <span class="o">+</span> 
+  <span class="nf">labs</span><span class="p">(</span><span class="n">title</span> <span class="o">=</span> <span class="s">&quot;PP occupancy - MAE for models and performance measures&quot;</span><span class="p">,</span>
+       <span class="n">subtitle</span> <span class="o">=</span> <span class="s">&quot;Queueing aware&quot;</span><span class="p">,</span>
+       <span class="n">x</span> <span class="o">=</span> <span class="s">&quot;Pct of cases in training set&quot;</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="s">&quot;MAE&quot;</span><span class="p">)</span> 
+  
+<span class="n">ggp</span>
+</pre></div>
+</div>
+<p><img alt="center" src="../../_images/occpctiles5-1.png" /></p>
+<p>For the mean and 75th percentile of occupancy, the three models perform
+similarly. For the 95th percentile, <strong>load1</strong> and <strong>spline1</strong> slightly
+outperforms the polynomical regression model.</p>
+</section>
+<section id="model-interpretability-and-stability">
+<h3>Model interpretability and stability<a class="headerlink" href="#model-interpretability-and-stability" title="Permalink to this headline">#</a></h3>
+<p>Let’s explore the coefficients of the fitted models for <strong>load1</strong> and <strong>poly1</strong>.
+The trained models created by caret were stored in a rather complex list. So, I
+wrote an R script to gather all the fitted model coefficients into a data frame.
+This data frame has 100 rows since there were 5 values of <code class="docutils literal notranslate"><span class="pre">ptrain</span></code> and
+<code class="docutils literal notranslate"><span class="pre">partition.times</span></code> was equal to 20.</p>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="c1"># queuing based model - load1 coefficients</span>
+<span class="n">load1_mean_coeffs</span> <span class="o">&lt;-</span> <span class="nf">read.csv</span><span class="p">(</span><span class="s">&quot;data/mmcoeffs/pp_occ_mean_load1_coeffs.csv&quot;</span><span class="p">)</span>
+<span class="n">load1_p75_coeffs</span> <span class="o">&lt;-</span> <span class="nf">read.csv</span><span class="p">(</span><span class="s">&quot;data/mmcoeffs/pp_occ_p75_load1_coeffs.csv&quot;</span><span class="p">)</span>
+<span class="n">load1_p95_coeffs</span> <span class="o">&lt;-</span> <span class="nf">read.csv</span><span class="p">(</span><span class="s">&quot;data/mmcoeffs/pp_occ_p95_load1_coeffs.csv&quot;</span><span class="p">)</span>
+
+<span class="n">load1_mean_coeffs</span><span class="o">$</span><span class="n">ptrain</span> <span class="o">&lt;-</span> <span class="nf">as.factor</span><span class="p">(</span><span class="n">load1_mean_coeffs</span><span class="o">$</span><span class="n">ptrain</span><span class="p">)</span>
+<span class="n">load1_p75_coeffs</span><span class="o">$</span><span class="n">ptrain</span> <span class="o">&lt;-</span> <span class="nf">as.factor</span><span class="p">(</span><span class="n">load1_p75_coeffs</span><span class="o">$</span><span class="n">ptrain</span><span class="p">)</span>
+<span class="n">load1_p95_coeffs</span><span class="o">$</span><span class="n">ptrain</span> <span class="o">&lt;-</span> <span class="nf">as.factor</span><span class="p">(</span><span class="n">load1_p95_coeffs</span><span class="o">$</span><span class="n">ptrain</span><span class="p">)</span>
+
+<span class="c1"># polynomial regression model - poly1 coefficients</span>
+<span class="n">poly1_mean_coeffs</span> <span class="o">&lt;-</span> <span class="nf">read.csv</span><span class="p">(</span><span class="s">&quot;data/mmcoeffs/pp_occ_mean_poly1_coeffs.csv&quot;</span><span class="p">)</span>
+<span class="n">poly1_p75_coeffs</span> <span class="o">&lt;-</span> <span class="nf">read.csv</span><span class="p">(</span><span class="s">&quot;data/mmcoeffs/pp_occ_p75_poly1_coeffs.csv&quot;</span><span class="p">)</span>
+<span class="n">poly1_p95_coeffs</span> <span class="o">&lt;-</span> <span class="nf">read.csv</span><span class="p">(</span><span class="s">&quot;data/mmcoeffs/pp_occ_p95_poly1_coeffs.csv&quot;</span><span class="p">)</span>
+
+<span class="n">poly1_mean_coeffs</span><span class="o">$</span><span class="n">ptrain</span> <span class="o">&lt;-</span> <span class="nf">as.factor</span><span class="p">(</span><span class="n">poly1_mean_coeffs</span><span class="o">$</span><span class="n">ptrain</span><span class="p">)</span>
+<span class="n">poly1_p75_coeffs</span><span class="o">$</span><span class="n">ptrain</span> <span class="o">&lt;-</span> <span class="nf">as.factor</span><span class="p">(</span><span class="n">poly1_p75_coeffs</span><span class="o">$</span><span class="n">ptrain</span><span class="p">)</span>
+<span class="n">poly1_p95_coeffs</span><span class="o">$</span><span class="n">ptrain</span> <span class="o">&lt;-</span> <span class="nf">as.factor</span><span class="p">(</span><span class="n">poly1_p95_coeffs</span><span class="o">$</span><span class="n">ptrain</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Let’s look at the models for the 75th percentile of occupancy for <code class="docutils literal notranslate"><span class="pre">ptrain=0.7</span></code>.</p>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="n">load1_p75_coeffs</span> <span class="o">%&gt;%</span>
+  <span class="nf">filter</span><span class="p">(</span><span class="n">ptrain</span> <span class="o">==</span> <span class="m">0.7</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">##    pm_unit_model_id ptrain sample intercept slope_load slope_sqrt_load</span>
+<span class="c1">## 1   occp75_pp_load1    0.7      1 0.2889593   1.008352       0.5903721</span>
+<span class="c1">## 2   occp75_pp_load1    0.7      2 0.3258063   1.008224       0.5840773</span>
+<span class="c1">## 3   occp75_pp_load1    0.7      3 0.3116994   1.008871       0.5836862</span>
+<span class="c1">## 4   occp75_pp_load1    0.7      4 0.3360193   1.010452       0.5690141</span>
+<span class="c1">## 5   occp75_pp_load1    0.7      5 0.3498063   1.011646       0.5590474</span>
+<span class="c1">## 6   occp75_pp_load1    0.7      6 0.3155310   1.009692       0.5765139</span>
+<span class="c1">## 7   occp75_pp_load1    0.7      7 0.2959349   1.009102       0.5832487</span>
+<span class="c1">## 8   occp75_pp_load1    0.7      8 0.2860954   1.009727       0.5818735</span>
+<span class="c1">## 9   occp75_pp_load1    0.7      9 0.2693956   1.008493       0.5914415</span>
+<span class="c1">## 10  occp75_pp_load1    0.7     10 0.2628473   1.007700       0.5968104</span>
+<span class="c1">## 11  occp75_pp_load1    0.7     11 0.3387758   1.010829       0.5662158</span>
+<span class="c1">## 12  occp75_pp_load1    0.7     12 0.2447432   1.007460       0.6011716</span>
+<span class="c1">## 13  occp75_pp_load1    0.7     13 0.3362630   1.009187       0.5783160</span>
+<span class="c1">## 14  occp75_pp_load1    0.7     14 0.3094409   1.009444       0.5788988</span>
+<span class="c1">## 15  occp75_pp_load1    0.7     15 0.2132483   1.004000       0.6312151</span>
+<span class="c1">## 16  occp75_pp_load1    0.7     16 0.3302913   1.009689       0.5753801</span>
+<span class="c1">## 17  occp75_pp_load1    0.7     17 0.2325615   1.007789       0.6029448</span>
+<span class="c1">## 18  occp75_pp_load1    0.7     18 0.2929132   1.010284       0.5773439</span>
+<span class="c1">## 19  occp75_pp_load1    0.7     19 0.3360432   1.010810       0.5667083</span>
+<span class="c1">## 20  occp75_pp_load1    0.7     20 0.2571813   1.006646       0.6051993</span>
+</pre></div>
+</div>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="n">poly1_p75_coeffs</span> <span class="o">%&gt;%</span>
+  <span class="nf">filter</span><span class="p">(</span><span class="n">ptrain</span> <span class="o">==</span> <span class="m">0.7</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">##     pm_unit_model_id ptrain sample X.Intercept.   lam_pp     alos_pp</span>
+<span class="c1">## 1  occp75_pp_lmpoly1    0.7      1   -87.688291 2.579820   65.099967</span>
+<span class="c1">## 2  occp75_pp_lmpoly1    0.7      2   -12.162427 2.555547   -2.455481</span>
+<span class="c1">## 3  occp75_pp_lmpoly1    0.7      3   -73.491714 2.603787   52.874226</span>
+<span class="c1">## 4  occp75_pp_lmpoly1    0.7      4     3.628048 2.528600  -16.498736</span>
+<span class="c1">## 5  occp75_pp_lmpoly1    0.7      5    41.462226 2.583363  -49.236971</span>
+<span class="c1">## 6  occp75_pp_lmpoly1    0.7      6    81.222038 2.522743  -84.228856</span>
+<span class="c1">## 7  occp75_pp_lmpoly1    0.7      7  -137.371576 2.577796  109.616369</span>
+<span class="c1">## 8  occp75_pp_lmpoly1    0.7      8   -28.576602 2.568045   12.404693</span>
+<span class="c1">## 9  occp75_pp_lmpoly1    0.7      9   -21.623492 2.577156    6.089589</span>
+<span class="c1">## 10 occp75_pp_lmpoly1    0.7     10    67.083738 2.477220  -72.630074</span>
+<span class="c1">## 11 occp75_pp_lmpoly1    0.7     11    -9.864239 2.531038   -3.316826</span>
+<span class="c1">## 12 occp75_pp_lmpoly1    0.7     12  -163.789360 2.543246  132.946595</span>
+<span class="c1">## 13 occp75_pp_lmpoly1    0.7     13    42.064209 2.529504  -49.988497</span>
+<span class="c1">## 14 occp75_pp_lmpoly1    0.7     14    24.170231 2.590286  -33.514514</span>
+<span class="c1">## 15 occp75_pp_lmpoly1    0.7     15     6.779503 2.504883  -18.593471</span>
+<span class="c1">## 16 occp75_pp_lmpoly1    0.7     16   122.976439 2.565841 -121.259978</span>
+<span class="c1">## 17 occp75_pp_lmpoly1    0.7     17  -118.970123 2.633574   93.266116</span>
+<span class="c1">## 18 occp75_pp_lmpoly1    0.7     18   -73.219030 2.579481   52.423174</span>
+<span class="c1">## 19 occp75_pp_lmpoly1    0.7     19    26.355554 2.543214  -36.138816</span>
+<span class="c1">## 20 occp75_pp_lmpoly1    0.7     20    73.223459 2.528021  -77.390740</span>
+<span class="c1">##          cap_pp X.I.lam_pp.2.. X.I.alos_pp.2.. X.I.cap_pp.2..</span>
+<span class="c1">## 1  -0.030845067   -0.005741691     -11.3619065   2.601597e-04</span>
+<span class="c1">## 2  -0.025632428   -0.005083089       3.7516415   2.162221e-04</span>
+<span class="c1">## 3  -0.040246820   -0.006668308      -8.7096608   3.411388e-04</span>
+<span class="c1">## 4  -0.018205549   -0.004385510       6.8711698   1.697167e-04</span>
+<span class="c1">## 5  -0.035890961   -0.005740894      13.9490820   3.077558e-04</span>
+<span class="c1">## 6  -0.017799964   -0.004654535      21.6469987   2.124188e-04</span>
+<span class="c1">## 7  -0.026538028   -0.006007476     -21.3407036   2.315027e-04</span>
+<span class="c1">## 8  -0.024935909   -0.005265262       0.3673775   1.987442e-04</span>
+<span class="c1">## 9  -0.025219731   -0.005449551       1.7967066   1.800406e-04</span>
+<span class="c1">## 10  0.001003787   -0.003249230      19.2592239   3.971013e-05</span>
+<span class="c1">## 11 -0.018766936   -0.004841127       3.6881823   1.926407e-04</span>
+<span class="c1">## 12 -0.014468823   -0.005145656     -26.5043317   1.491973e-04</span>
+<span class="c1">## 13 -0.021212189   -0.004545079      14.1846651   1.954244e-04</span>
+<span class="c1">## 14 -0.043465930   -0.006606853      10.4005853   4.455661e-04</span>
+<span class="c1">## 15 -0.008669886   -0.003341825       7.1719121   5.156785e-05</span>
+<span class="c1">## 16 -0.033838814   -0.005887669      29.8724299   3.518421e-04</span>
+<span class="c1">## 17 -0.045338648   -0.007583201     -17.7135740   4.237847e-04</span>
+<span class="c1">## 18 -0.025372856   -0.005866851      -8.6069308   2.151193e-04</span>
+<span class="c1">## 19 -0.024621035   -0.004343342      11.1175351   1.843272e-04</span>
+<span class="c1">## 20 -0.015682715   -0.004378092      20.1781025   1.405878e-04</span>
+</pre></div>
+</div>
+<p>A quick perusal of the two data frames suggests that the coefficients in
+the polynomial regression model, especially those related to average length
+of stay, vary widely from sample to sample. The <strong>load1</strong> model coefficients
+are very stable across the samples. This stability is desirable from the
+perspective of interpreting and explaining the model to others as well giving
+the modeler some confidence that the model is in some sense capturing the
+essence of the underlyng process physics.</p>
+<p>Exploring this question of
+model stability and interpretability will be the subject of the next post. I’m
+not exactly sure how to quantify these measures for modeling techniques such
+as random forests or neural networks. One idea for random forest models would
+be to look at how consistent the <em>variable importance</em> values are across the
+20 different train-test partitions.</p>
+</section>
+</section>
+</section>
+<section id="references">
+<h1>References<a class="headerlink" href="#references" title="Permalink to this headline">#</a></h1>
+</section>
+
+<div class="section">
+    
+
+<div class="section">
+  <span style="float: left">
+     Previous:
+    
+    <a href="../simpy-first-oo-patflow-model/">
+       An object oriented SimPy patient flow simulation model
+    </a>
+    
+  </span>
+  <span>&nbsp;</span>
+  <span style="float: right">
+     Next: 
+    <a href="../blogging_pelican_rmd/">
+      Blogging with Pelican and R Markdown 
+    </a>
+    
+  </span>
+</div>
+  
+</div>
+
+              </div>
+              
+              
+              <!-- Previous / next buttons -->
+<div class='prev-next-area'>
+</div>
+              
+          </main>
+          
+
       </div>
-      <div class="clearer"></div>
     </div>
-    <div class="footer">
-      &copy;2022, misken.
-      
-      |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.3.2</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
-      
-      |
-      <a href="../../_sources/blog/post_metamods_pp_1.md.txt"
-          rel="nofollow">Page source</a>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
+<footer class="footer mt-5 mt-md-0">
+  <div class="container">
+    
+    <div class="footer-item">
+      <p class="copyright">
+    &copy; Copyright 2022, misken.<br>
+</p>
     </div>
-
     
-
+    <div class="footer-item">
+      <p class="sphinx-version">
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.3.2.<br>
+</p>
+    </div>
     
+  </div>
+</footer>
   </body>
 </html>

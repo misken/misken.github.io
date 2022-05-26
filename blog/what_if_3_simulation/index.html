@@ -7,24 +7,42 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
     <title>Excel “what if?” analysis with Python - Part 3: Simulation &#8212; misken 0,1,0 documentation</title>
+    
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+
+    
+  <link rel="stylesheet"
+    href="../../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/design-style.b7bb847fb20b106c3d81b95245e65545.min.css" />
+    
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
+
     <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
     <script src="../../_static/jquery.js"></script>
     <script src="../../_static/underscore.js"></script>
     <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/design-tabs.js"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <link rel="author" title="About these documents" href="../../about/" />
     <link rel="index" title="Index" href="../../genindex/" />
     <link rel="search" title="Search" href="../../search/" /> 
-   
-  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
-  
-  
-  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
- 
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="en">
+    
+
+    <!-- Google Analytics -->
+     
 <link
   rel="alternate"
   type="application/atom+xml"
@@ -57,16 +75,457 @@
   }
 </style>
 
-  </head><body>
-  
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
+    
+    <div class="container-fluid" id="banner"></div>
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
+    
+    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main"><div class="container-xl">
+
+  <div id="navbar-start">
+    
+    
+<a class="navbar-brand" href="../../">
+<p class="title">misken</p>
+</a>
+
+    
+  </div>
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapsible" aria-controls="navbar-collapsible" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  
+  <div id="navbar-collapsible" class="col-lg-9 collapse navbar-collapse">
+    <div id="navbar-center" class="mr-auto">
+      
+      <div class="navbar-center-item">
+        <ul id="navbar-main-elements" class="navbar-nav">
+    <li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../about/">
+  About misken
+ </a>
+</li>
+
+    
+</ul>
+      </div>
+      
+    </div>
+
+    <div id="navbar-end">
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+      </ul>
+      </div>
+      
+    </div>
+  </div>
+</div>
+    </nav>
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+            
+            <!-- Only show if we have sidebars configured, else just a small margin  -->
+            <div class="col-12 col-md-3 bd-sidebar">
+              <div class="sidebar-start-items">  
+<h2>
+   
+  21 February 2021 
+</h2>
+
+<ul>
+   
+<li id="author">
+  <span
+    >Author:</span
+  >
+   
+  <a href="../author/misken/">misken</a>  
+</li>
+    
+<li id="tags">
+  <span
+    >Tags: </span
+  >
+   
+  <a href="../tag/python/">python</a>   
+  <a href="../tag/excel/">excel</a>  
+</li>
+ 
+</ul>
+
+<h3>
+  <a href="../">Recent Posts</a>
+</h3>
+<ul>
+   
+  <li>
+    <a href="../hillmaker_030_released/"
+      >19 May - numpy speeds up hillmaker dramatically</a
+    >
+  </li>
+  
+  <li>
+    <a href="../simpy_vaccine_clinic_improvements/"
+      >11 April - Using SimPy to simulate a vaccine clinic - Part 2: model improvements</a
+    >
+  </li>
+  
+  <li>
+    <a href="../simpy_getting_started_vaccine_clinic/"
+      >04 April - Using SimPy to simulate a vaccine clinic - Part 1: an introductory tutorial</a
+    >
+  </li>
+  
+  <li>
+    <a href="../use_jupyter_conda_envs/"
+      >03 April - Using different conda environments with Jupyter Lab</a
+    >
+  </li>
+  
+  <li>
+    <a href="../hello_world/"
+      >02 April - Hello world from ablog blogging with JupyterLab</a
+    >
+  </li>
+  
+</ul>
+
+<h3><a href="../tag/">Tags</a></h3>
+<style type="text/css">
+  ul.ablog-cloud {
+    list-style: none;
+    overflow: auto;
+  }
+  ul.ablog-cloud li {
+    float: left;
+    height: 20pt;
+    line-height: 18pt;
+    margin-right: 5px;
+  }
+  ul.ablog-cloud a {
+    text-decoration: none;
+    vertical-align: middle;
+  }
+  li.ablog-cloud-1 {
+    font-size: 80%;
+  }
+  li.ablog-cloud-2 {
+    font-size: 95%;
+  }
+  li.ablog-cloud-3 {
+    font-size: 110%;
+  }
+  li.ablog-cloud-4 {
+    font-size: 125%;
+  }
+  li.ablog-cloud-5 {
+    font-size: 140%;
+  }
+</style>
+<ul class="ablog-cloud">
+   
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/github/">GitHub</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-3">
+    <a href="../tag/r/">R</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/ablog/">ablog</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/analytics/">analytics</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/bikeshare/">bikeshare</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/birding/">birding</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/blogging/">blogging</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/caret/">caret</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/conda/">conda</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/datetime/">datetime</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/dplyr/">dplyr</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/ebird/">ebird</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/ecology/">ecology</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/excel/">excel</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/ggmap/">ggmap</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/ggplot2/">ggplot2</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/gis/">gis</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/git/">git</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/gps/">gps</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/healthcare/">healthcare</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/hiking/">hiking</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/hillmaker/">hillmaker</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/jupyter/">jupyter</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/matplotlib/">matplotlib</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/metamodeling/">metamodeling</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-2">
+    <a href="../tag/occupancy-analysis/">occupancy analysis</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/pandas/">pandas</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/patient-flow/">patient flow</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/plyr/">plyr</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-5">
+    <a href="../tag/python/">python</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/shiny/">shiny</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/simpy/">simpy</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/simulation/">simulation</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/sphinx/">sphinx</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/statistics/">statistics</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/teaching/">teaching</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/text/">text</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/xml/">xml</a>
+  </li>
+   
+</ul>
+
+<h3>
+  <a href="../archive/">Archives</a>
+</h3>
+<ul>
+   
+  <li>
+    <a href="../2022/">2022 (7)</a>
+  </li>
+    
+  <li>
+    <a href="../2021/">2021 (4)</a>
+  </li>
+    
+  <li>
+    <a href="../2020/">2020 (2)</a>
+  </li>
+    
+  <li>
+    <a href="../2019/">2019 (7)</a>
+  </li>
+    
+  <li>
+    <a href="../2018/">2018 (5)</a>
+  </li>
+    
+  <li>
+    <a href="../2017/">2017 (2)</a>
+  </li>
+    
+  <li>
+    <a href="../2016/">2016 (6)</a>
+  </li>
+    
+  <li>
+    <a href="../2014/">2014 (6)</a>
+  </li>
+    
+  <li>
+    <a href="../2013/">2013 (7)</a>
+  </li>
+   
+</ul>
+
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search/" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+              </div>
+              <div class="sidebar-end-items">
+              </div>
+            </div>
+            
           
 
-          <div class="body" role="main">
-             
+          
+          <div class="d-none d-xl-block col-xl-2 bd-toc">
+            
+              
+              <div class="toc-item">
+                
+<div class="tocsection onthispage mt-5 pt-1 pb-3">
+    <i class="fas fa-list"></i> On this page
+</div>
+
+<nav id="bd-toc-nav">
+    <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#Bookstore-model">
+   Bookstore model
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#A-non-OO-approach-to-Monte-Carlo-simulation">
+   A non-OO approach to Monte-Carlo simulation
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#Generating-random-demand-values">
+     Generating random demand values
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#Running-the-simulation">
+     Running the simulation
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#Analyzing-the-simulation-results">
+     Analyzing the simulation results
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#Multiple-Uncertain-Inputs">
+     Multiple Uncertain Inputs
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#Multiple-scenarios:-profit-vs-order-quantity">
+     Multiple scenarios: profit vs order quantity
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#Repeat-simulation-using-OO-approach">
+   Repeat simulation using OO approach
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#Wrap-up-and-next-steps">
+   Wrap up and next steps
+  </a>
+ </li>
+</ul>
+
+</nav>
+              </div>
+              
+              <div class="toc-item">
+                
+              </div>
+              
+            
+          </div>
+          
+
+          
+          
+            
+          
+          <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+              
+              <div>
+                 
 <style>
 /* CSS for nbsphinx extension */
 
@@ -315,7 +774,7 @@ div.rendered_html tbody tr:hover {
 }
 </style>
 <section id="Excel-“what-if?”-analysis-with-Python---Part-3:-Simulation">
-<h1>Excel “what if?” analysis with Python - Part 3: Simulation<a class="headerlink" href="#Excel-“what-if?”-analysis-with-Python---Part-3:-Simulation" title="Permalink to this headline">¶</a></h1>
+<h1>Excel “what if?” analysis with Python - Part 3: Simulation<a class="headerlink" href="#Excel-“what-if?”-analysis-with-Python---Part-3:-Simulation" title="Permalink to this headline">#</a></h1>
 <p>In the <a class="reference external" href="http://hselab.org/excel-to-python-1-models-datatables.html">first part of this series</a>, I introduced the general idea of exploring using Python for typical spreadsheet modeling activities. We built both object-oriented (OO) and non-OO versions of a basic business model (the Bookstore Model - it’s repeated below for convenience) and learned a few things about doing OOP in Python. Then we designed and created a <code class="docutils literal notranslate"><span class="pre">data_table</span></code> function to do sensitivity analysis much like Excel’s Data
 Table tool (though our Python version can handle an arbitrary number of both input and output variables). In <a class="reference external" href="http://hselab.org/excel-to-python-2-goalseek.html">part 2 we created a goal_seek function</a> that is reminiscent of Excel’s Goal Seek tool.</p>
 <p>Now it’s time to add Monte-Carlo simulation capabilities to our little library of functions. We’ll stick with the same example. We are getting to the point where it would be convenient to package up our <code class="docutils literal notranslate"><span class="pre">BookstoreModel</span></code> class along with the <code class="docutils literal notranslate"><span class="pre">data_table</span></code> and <code class="docutils literal notranslate"><span class="pre">goal_seek</span></code> functions so that we could import them and use them here. I’ll hold off on that until the next installment. For now, I’ve just included the code. In the spirit of consistency with the first two posts, we’ll once again look
@@ -343,7 +802,7 @@ at both OO and non-OO approaches to this problem.</p>
 </div>
 </div>
 <section id="Bookstore-model">
-<h2>Bookstore model<a class="headerlink" href="#Bookstore-model" title="Permalink to this headline">¶</a></h2>
+<h2>Bookstore model<a class="headerlink" href="#Bookstore-model" title="Permalink to this headline">#</a></h2>
 <p>This example is based on one in the <a class="reference external" href="https://host.kelley.iu.edu/albrightbooks/">spreadsheet modeling textbook(s) I’ve used in my classes since 2001</a>. I started out using Practical Management Science by Winston and Albright and switched to their Business Analytics: Data Analysis and Decision Making (Albright and Winston) around 2013ish. In both books, they introduce the “Walton Bookstore” problem in the chapter on Monte-Carlo simulation. Here’s the basic problem (with a few modifications):</p>
 <ul class="simple">
 <li><p>we have to place an order for a perishable product (e.g. a calendar),</p></li>
@@ -355,7 +814,7 @@ at both OO and non-OO approaches to this problem.</p>
 </ul>
 </section>
 <section id="A-non-OO-approach-to-Monte-Carlo-simulation">
-<h2>A non-OO approach to Monte-Carlo simulation<a class="headerlink" href="#A-non-OO-approach-to-Monte-Carlo-simulation" title="Permalink to this headline">¶</a></h2>
+<h2>A non-OO approach to Monte-Carlo simulation<a class="headerlink" href="#A-non-OO-approach-to-Monte-Carlo-simulation" title="Permalink to this headline">#</a></h2>
 <p>Let’s start by repeating our basic non-OO model code for setting inputs and computing profit.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
@@ -386,7 +845,7 @@ at both OO and non-OO approaches to this problem.</p>
 </div>
 </div>
 <section id="Generating-random-demand-values">
-<h3>Generating random demand values<a class="headerlink" href="#Generating-random-demand-values" title="Permalink to this headline">¶</a></h3>
+<h3>Generating random demand values<a class="headerlink" href="#Generating-random-demand-values" title="Permalink to this headline">#</a></h3>
 <p>Assume we’ve used historical data to estimate the mean and standard deviation of demand. Furthermore, let’s pretend that a histogram revealed a relatively normal looking distribution.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
@@ -586,7 +1045,7 @@ Mean demand = 192.056, Std dev demand = 40.170
 </div>
 </section>
 <section id="Running-the-simulation">
-<h3>Running the simulation<a class="headerlink" href="#Running-the-simulation" title="Permalink to this headline">¶</a></h3>
+<h3>Running the simulation<a class="headerlink" href="#Running-the-simulation" title="Permalink to this headline">#</a></h3>
 <p>Now that we can generate random demands, we can simulate by simply passing in the vector of random demands to the <code class="docutils literal notranslate"><span class="pre">compute_profit</span></code> function - all the other model inputs are held fixed at their current values. Let’s remind ourselves of these values.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
@@ -626,7 +1085,7 @@ Let’s wrap the resulting list with the pandas <code class="docutils literal no
 </div>
 </section>
 <section id="Analyzing-the-simulation-results">
-<h3>Analyzing the simulation results<a class="headerlink" href="#Analyzing-the-simulation-results" title="Permalink to this headline">¶</a></h3>
+<h3>Analyzing the simulation results<a class="headerlink" href="#Analyzing-the-simulation-results" title="Permalink to this headline">#</a></h3>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
 </pre></div>
@@ -790,7 +1249,7 @@ Simulation profit = 347.8325
 </div>
 </section>
 <section id="Multiple-Uncertain-Inputs">
-<h3>Multiple Uncertain Inputs<a class="headerlink" href="#Multiple-Uncertain-Inputs" title="Permalink to this headline">¶</a></h3>
+<h3>Multiple Uncertain Inputs<a class="headerlink" href="#Multiple-Uncertain-Inputs" title="Permalink to this headline">#</a></h3>
 <p>Again, note how we used a list comprehension to evaluate profit for each demand realization. If we have multiple random inputs we <strong>cannot</strong> use multiple <code class="docutils literal notranslate"><span class="pre">for</span></code> statements as we don’t want the cross product of the random number vectors. Instead we’d need to <code class="docutils literal notranslate"><span class="pre">zip</span></code> them up into tuples. Here’s a simple example of tuple zipping.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[27]:
@@ -893,7 +1352,7 @@ Simulation profit = 347.8325
 <p>The additional uncertainty has made the distribution somewhat less extreme in the right tail (it’s still highly skewed).</p>
 </section>
 <section id="Multiple-scenarios:-profit-vs-order-quantity">
-<h3>Multiple scenarios: profit vs order quantity<a class="headerlink" href="#Multiple-scenarios:-profit-vs-order-quantity" title="Permalink to this headline">¶</a></h3>
+<h3>Multiple scenarios: profit vs order quantity<a class="headerlink" href="#Multiple-scenarios:-profit-vs-order-quantity" title="Permalink to this headline">#</a></h3>
 <p>In addition to random inputs, we often have other inputs we want to vary over a defined range - i.e. scenarios. Just as we did Part 1 of this series with data tables, we can use a list comprehension to iterate over the scenarios.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[33]:
@@ -941,7 +1400,7 @@ Simulation profit = 347.8325
 </section>
 </section>
 <section id="Repeat-simulation-using-OO-approach">
-<h2>Repeat simulation using OO approach<a class="headerlink" href="#Repeat-simulation-using-OO-approach" title="Permalink to this headline">¶</a></h2>
+<h2>Repeat simulation using OO approach<a class="headerlink" href="#Repeat-simulation-using-OO-approach" title="Permalink to this headline">#</a></h2>
 <p>Just as we leveraged our non-OO data table approach for simulation, let’s do the same for the OO version. We should be able to use scikit-learn’s <code class="docutils literal notranslate"><span class="pre">ParameterGrid</span></code> function for optional scenario generation (think RiskSimTable if you’ve used &#64;Risk). We don’t want to use <code class="docutils literal notranslate"><span class="pre">ParameterGrid</span></code> for the random inputs as we don’t want all combinations of them - we just want to evaluate one replication per row. We’ll use the same random vectors that we created above. The basic initial design of our
 <code class="docutils literal notranslate"><span class="pre">simulate</span></code> function will be based on the following:</p>
 <ul class="simple">
@@ -1563,7 +2022,7 @@ dict_keys([&#39;scenario_base_vals&#39;, &#39;scenario_num&#39;, &#39;scenario_v
 <p>Lot’s more to do, but let’s stop here for this post. The basic design seems ok and we can build on this in future installments.</p>
 </section>
 <section id="Wrap-up-and-next-steps">
-<h2>Wrap up and next steps<a class="headerlink" href="#Wrap-up-and-next-steps" title="Permalink to this headline">¶</a></h2>
+<h2>Wrap up and next steps<a class="headerlink" href="#Wrap-up-and-next-steps" title="Permalink to this headline">#</a></h2>
 <p>We have added a basic <code class="docutils literal notranslate"><span class="pre">simulate</span></code> function to our <code class="docutils literal notranslate"><span class="pre">data_table</span></code> and <code class="docutils literal notranslate"><span class="pre">goal_seek</span></code> functions. Python is proving to be quite nice for doing Excel-style “what if?” analysis.</p>
 <p>In Part 4 of this series, we’ll make some improvements and do some clean-up on our classes and functions. We’ll move everything into a single <strong>whatif.py</strong> module and learn how to create a Python package to make it easy to use and share our new functions. We’ll try out our package on a new model and sketch out some ideas for future enhancements to the package. It’s important we also start creating some basic documentation and a user guide.</p>
 <div class="nbinput nblast docutils container">
@@ -1601,349 +2060,37 @@ dict_keys([&#39;scenario_base_vals&#39;, &#39;scenario_num&#39;, &#39;scenario_v
   
 </div>
 
-          </div>
-          
-        </div>
-      </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-<h1 class="logo"><a href="../../">misken</a></h1>
-
-
-
-
-
-
-
-
-  
-<h2>
-   
-  21 February 2021 
-</h2>
-
-<ul>
-   
-<li id="author">
-  <span
-    >Author:</span
-  >
-   
-  <a href="../author/misken/">misken</a>  
-</li>
-    
-<li id="tags">
-  <span
-    >Tags: </span
-  >
-   
-  <a href="../tag/python/">python</a>   
-  <a href="../tag/excel/">excel</a>  
-</li>
- 
-</ul>
-<h3>Navigation</h3>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../../about/">About misken</a></li>
-</ul>
-
-
-<h3>
-  <a href="../">Recent Posts</a>
-</h3>
-<ul>
-   
-  <li>
-    <a href="../hillmaker_030_released/"
-      >19 May - numpy speeds up hillmaker dramatically</a
-    >
-  </li>
-  
-  <li>
-    <a href="../simpy_vaccine_clinic_improvements/"
-      >11 April - Using SimPy to simulate a vaccine clinic - Part 2: model improvements</a
-    >
-  </li>
-  
-  <li>
-    <a href="../simpy_getting_started_vaccine_clinic/"
-      >04 April - Using SimPy to simulate a vaccine clinic - Part 1: an introductory tutorial</a
-    >
-  </li>
-  
-  <li>
-    <a href="../use_jupyter_conda_envs/"
-      >03 April - Using different conda environments with Jupyter Lab</a
-    >
-  </li>
-  
-  <li>
-    <a href="../hello_world/"
-      >02 April - Hello world from ablog blogging with JupyterLab</a
-    >
-  </li>
-  
-</ul>
-
-<h3><a href="../tag/">Tags</a></h3>
-<style type="text/css">
-  ul.ablog-cloud {
-    list-style: none;
-    overflow: auto;
-  }
-  ul.ablog-cloud li {
-    float: left;
-    height: 20pt;
-    line-height: 18pt;
-    margin-right: 5px;
-  }
-  ul.ablog-cloud a {
-    text-decoration: none;
-    vertical-align: middle;
-  }
-  li.ablog-cloud-1 {
-    font-size: 80%;
-  }
-  li.ablog-cloud-2 {
-    font-size: 95%;
-  }
-  li.ablog-cloud-3 {
-    font-size: 110%;
-  }
-  li.ablog-cloud-4 {
-    font-size: 125%;
-  }
-  li.ablog-cloud-5 {
-    font-size: 140%;
-  }
-</style>
-<ul class="ablog-cloud">
-   
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/github/">GitHub</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-3">
-    <a href="../tag/r/">R</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/ablog/">ablog</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/analytics/">analytics</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/bikeshare/">bikeshare</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/birding/">birding</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/blogging/">blogging</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/caret/">caret</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/conda/">conda</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/datetime/">datetime</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/dplyr/">dplyr</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/ebird/">ebird</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/ecology/">ecology</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/excel/">excel</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/ggmap/">ggmap</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/ggplot2/">ggplot2</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/gis/">gis</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/git/">git</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/gps/">gps</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/healthcare/">healthcare</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/hiking/">hiking</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/hillmaker/">hillmaker</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/jupyter/">jupyter</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/matplotlib/">matplotlib</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/metamodeling/">metamodeling</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-2">
-    <a href="../tag/occupancy-analysis/">occupancy analysis</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/pandas/">pandas</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/patient-flow/">patient flow</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/plyr/">plyr</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-5">
-    <a href="../tag/python/">python</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/shiny/">shiny</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/simpy/">simpy</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/simulation/">simulation</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/sphinx/">sphinx</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/statistics/">statistics</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/teaching/">teaching</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/text/">text</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/xml/">xml</a>
-  </li>
-   
-</ul>
-
-<h3>
-  <a href="../archive/">Archives</a>
-</h3>
-<ul>
-   
-  <li>
-    <a href="../2022/">2022 (7)</a>
-  </li>
-    
-  <li>
-    <a href="../2021/">2021 (4)</a>
-  </li>
-    
-  <li>
-    <a href="../2020/">2020 (2)</a>
-  </li>
-    
-  <li>
-    <a href="../2019/">2019 (7)</a>
-  </li>
-    
-  <li>
-    <a href="../2018/">2018 (5)</a>
-  </li>
-    
-  <li>
-    <a href="../2017/">2017 (2)</a>
-  </li>
-    
-  <li>
-    <a href="../2016/">2016 (6)</a>
-  </li>
-    
-  <li>
-    <a href="../2014/">2014 (6)</a>
-  </li>
-    
-  <li>
-    <a href="../2013/">2013 (7)</a>
-  </li>
-   
-</ul>
-
-<div id="searchbox" style="display: none" role="search">
-  <h3 id="searchlabel">Quick search</h3>
-    <div class="searchformwrapper">
-    <form class="search" action="../../search/" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
-      <input type="submit" value="Go" />
-    </form>
-    </div>
+              </div>
+              
+              
+              <!-- Previous / next buttons -->
+<div class='prev-next-area'>
 </div>
-<script>$('#searchbox').show(0);</script>
-        </div>
+              
+          </main>
+          
+
       </div>
-      <div class="clearer"></div>
     </div>
-    <div class="footer">
-      &copy;2022, misken.
-      
-      |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.3.2</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
-      
-      |
-      <a href="../../_sources/blog/what_if_3_simulation.ipynb.txt"
-          rel="nofollow">Page source</a>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
+<footer class="footer mt-5 mt-md-0">
+  <div class="container">
+    
+    <div class="footer-item">
+      <p class="copyright">
+    &copy; Copyright 2022, misken.<br>
+</p>
     </div>
-
     
-
+    <div class="footer-item">
+      <p class="sphinx-version">
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.3.2.<br>
+</p>
+    </div>
     
+  </div>
+</footer>
   </body>
 </html>

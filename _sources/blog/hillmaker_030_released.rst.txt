@@ -36,8 +36,7 @@ to write some more documentation first. In addition to the speedup, I also:
 * added a CLI
 * added flow conservation checks (to make sure occupancy is conserved and all entities are counted)
 * added logging using `logger` module
-* deprecated use of multiple category fields and reverted to previous functionality of a single (optional)
- category field. Multiple categories are best handled with composite keys.
+* deprecated use of multiple category fields and reverted to previous functionality of a single (optional) category field. Multiple categories are best handled with composite keys.
 
 A few things haven't changed:
 

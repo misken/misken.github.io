@@ -7,24 +7,42 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
     <title>Excel “what if?” analysis with Python - Part 2: Goal seek &#8212; misken 0,1,0 documentation</title>
+    
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+
+    
+  <link rel="stylesheet"
+    href="../../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/design-style.b7bb847fb20b106c3d81b95245e65545.min.css" />
+    
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
+
     <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
     <script src="../../_static/jquery.js"></script>
     <script src="../../_static/underscore.js"></script>
     <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/design-tabs.js"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <link rel="author" title="About these documents" href="../../about/" />
     <link rel="index" title="Index" href="../../genindex/" />
     <link rel="search" title="Search" href="../../search/" /> 
-   
-  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
-  
-  
-  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
- 
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="en">
+    
+
+    <!-- Google Analytics -->
+     
 <link
   rel="alternate"
   type="application/atom+xml"
@@ -57,16 +75,467 @@
   }
 </style>
 
-  </head><body>
-  
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
+    
+    <div class="container-fluid" id="banner"></div>
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
+    
+    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main"><div class="container-xl">
+
+  <div id="navbar-start">
+    
+    
+<a class="navbar-brand" href="../../">
+<p class="title">misken</p>
+</a>
+
+    
+  </div>
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapsible" aria-controls="navbar-collapsible" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  
+  <div id="navbar-collapsible" class="col-lg-9 collapse navbar-collapse">
+    <div id="navbar-center" class="mr-auto">
+      
+      <div class="navbar-center-item">
+        <ul id="navbar-main-elements" class="navbar-nav">
+    <li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../about/">
+  About misken
+ </a>
+</li>
+
+    
+</ul>
+      </div>
+      
+    </div>
+
+    <div id="navbar-end">
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+      </ul>
+      </div>
+      
+    </div>
+  </div>
+</div>
+    </nav>
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+            
+            <!-- Only show if we have sidebars configured, else just a small margin  -->
+            <div class="col-12 col-md-3 bd-sidebar">
+              <div class="sidebar-start-items">  
+<h2>
+   
+  13 February 2021 
+</h2>
+
+<ul>
+   
+<li id="author">
+  <span
+    >Author:</span
+  >
+   
+  <a href="../author/misken/">misken</a>  
+</li>
+    
+<li id="tags">
+  <span
+    >Tags: </span
+  >
+   
+  <a href="../tag/python/">python</a>   
+  <a href="../tag/excel/">excel</a>  
+</li>
+ 
+</ul>
+
+<h3>
+  <a href="../">Recent Posts</a>
+</h3>
+<ul>
+   
+  <li>
+    <a href="../hillmaker_030_released/"
+      >19 May - numpy speeds up hillmaker dramatically</a
+    >
+  </li>
+  
+  <li>
+    <a href="../simpy_vaccine_clinic_improvements/"
+      >11 April - Using SimPy to simulate a vaccine clinic - Part 2: model improvements</a
+    >
+  </li>
+  
+  <li>
+    <a href="../simpy_getting_started_vaccine_clinic/"
+      >04 April - Using SimPy to simulate a vaccine clinic - Part 1: an introductory tutorial</a
+    >
+  </li>
+  
+  <li>
+    <a href="../use_jupyter_conda_envs/"
+      >03 April - Using different conda environments with Jupyter Lab</a
+    >
+  </li>
+  
+  <li>
+    <a href="../hello_world/"
+      >02 April - Hello world from ablog blogging with JupyterLab</a
+    >
+  </li>
+  
+</ul>
+
+<h3><a href="../tag/">Tags</a></h3>
+<style type="text/css">
+  ul.ablog-cloud {
+    list-style: none;
+    overflow: auto;
+  }
+  ul.ablog-cloud li {
+    float: left;
+    height: 20pt;
+    line-height: 18pt;
+    margin-right: 5px;
+  }
+  ul.ablog-cloud a {
+    text-decoration: none;
+    vertical-align: middle;
+  }
+  li.ablog-cloud-1 {
+    font-size: 80%;
+  }
+  li.ablog-cloud-2 {
+    font-size: 95%;
+  }
+  li.ablog-cloud-3 {
+    font-size: 110%;
+  }
+  li.ablog-cloud-4 {
+    font-size: 125%;
+  }
+  li.ablog-cloud-5 {
+    font-size: 140%;
+  }
+</style>
+<ul class="ablog-cloud">
+   
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/github/">GitHub</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-3">
+    <a href="../tag/r/">R</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/ablog/">ablog</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/analytics/">analytics</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/bikeshare/">bikeshare</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/birding/">birding</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/blogging/">blogging</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/caret/">caret</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/conda/">conda</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/datetime/">datetime</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/dplyr/">dplyr</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/ebird/">ebird</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/ecology/">ecology</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/excel/">excel</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/ggmap/">ggmap</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/ggplot2/">ggplot2</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/gis/">gis</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/git/">git</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/gps/">gps</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/healthcare/">healthcare</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/hiking/">hiking</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/hillmaker/">hillmaker</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/jupyter/">jupyter</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/matplotlib/">matplotlib</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/metamodeling/">metamodeling</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-2">
+    <a href="../tag/occupancy-analysis/">occupancy analysis</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/pandas/">pandas</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/patient-flow/">patient flow</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/plyr/">plyr</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-5">
+    <a href="../tag/python/">python</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/shiny/">shiny</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/simpy/">simpy</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/simulation/">simulation</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/sphinx/">sphinx</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/statistics/">statistics</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/teaching/">teaching</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/text/">text</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/xml/">xml</a>
+  </li>
+   
+</ul>
+
+<h3>
+  <a href="../archive/">Archives</a>
+</h3>
+<ul>
+   
+  <li>
+    <a href="../2022/">2022 (7)</a>
+  </li>
+    
+  <li>
+    <a href="../2021/">2021 (4)</a>
+  </li>
+    
+  <li>
+    <a href="../2020/">2020 (2)</a>
+  </li>
+    
+  <li>
+    <a href="../2019/">2019 (7)</a>
+  </li>
+    
+  <li>
+    <a href="../2018/">2018 (5)</a>
+  </li>
+    
+  <li>
+    <a href="../2017/">2017 (2)</a>
+  </li>
+    
+  <li>
+    <a href="../2016/">2016 (6)</a>
+  </li>
+    
+  <li>
+    <a href="../2014/">2014 (6)</a>
+  </li>
+    
+  <li>
+    <a href="../2013/">2013 (7)</a>
+  </li>
+   
+</ul>
+
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search/" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+              </div>
+              <div class="sidebar-end-items">
+              </div>
+            </div>
+            
           
 
-          <div class="body" role="main">
-             
+          
+          <div class="d-none d-xl-block col-xl-2 bd-toc">
+            
+              
+              <div class="toc-item">
+                
+<div class="tocsection onthispage mt-5 pt-1 pb-3">
+    <i class="fas fa-list"></i> On this page
+</div>
+
+<nav id="bd-toc-nav">
+    <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#Bookstore-model">
+   Bookstore model
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#Goal-Seek">
+   Goal Seek
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#Attempt-at-non-OO-version-of-Goal-Seek">
+     Attempt at non-OO version of Goal Seek
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#A-bit-about-root-finding-using-a-simpler-example">
+   A bit about root finding using a simpler example
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#Back-to-the-Bookstore-Model-and-partial-functions">
+   Back to the Bookstore Model and partial functions
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#And-down-the-rabbit-hole-we-go?">
+     And down the rabbit hole we go?
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#Goal-Seeking-with-the-OO-BookstoreModel">
+     Goal Seeking with the OO BookstoreModel
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#Adding-a-goal_seek-function">
+   Adding a
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     goal_seek
+    </span>
+   </code>
+   function
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#Wrap-up-and-next-steps">
+     Wrap up and next steps
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+
+</nav>
+              </div>
+              
+              <div class="toc-item">
+                
+              </div>
+              
+            
+          </div>
+          
+
+          
+          
+            
+          
+          <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+              
+              <div>
+                 
 <style>
 /* CSS for nbsphinx extension */
 
@@ -315,7 +784,7 @@ div.rendered_html tbody tr:hover {
 }
 </style>
 <section id="Excel-“what-if?”-analysis-with-Python---Part-2:-Goal-seek">
-<h1>Excel “what if?” analysis with Python - Part 2: Goal seek<a class="headerlink" href="#Excel-“what-if?”-analysis-with-Python---Part-2:-Goal-seek" title="Permalink to this headline">¶</a></h1>
+<h1>Excel “what if?” analysis with Python - Part 2: Goal seek<a class="headerlink" href="#Excel-“what-if?”-analysis-with-Python---Part-2:-Goal-seek" title="Permalink to this headline">#</a></h1>
 <p>This is the second installment of a multi-part series on using Python for typical Excel modeling tasks. In the <a class="reference external" href="http://hselab.org/excel-to-python-1-models-datatables.html">first part</a> we developed an object oriented version of a simple Excel model along with a <code class="docutils literal notranslate"><span class="pre">data_table</span></code> function for doing sensitivity analysis that is a generalization of Excel’s Data Table tool. The Python version allows an arbitrary number of input and output variables.</p>
 <p>In this second part, we design and implement a <code class="docutils literal notranslate"><span class="pre">goal_seek</span></code> function for doing things like break even analysis. Along the way we once again explore some of Python’s more advanced features. This entire series is aimed at those who might have a strong Excel based background but only a basic familiarity with Python programming and are looking to add to their Python knowledge.</p>
 <p>You can also read and download the <a class="reference external" href="https://github.com/misken/whatif_modeling_oo">notebook based tutorial from GitHub</a>.</p>
@@ -342,7 +811,7 @@ div.rendered_html tbody tr:hover {
 </div>
 </div>
 <section id="Bookstore-model">
-<h2>Bookstore model<a class="headerlink" href="#Bookstore-model" title="Permalink to this headline">¶</a></h2>
+<h2>Bookstore model<a class="headerlink" href="#Bookstore-model" title="Permalink to this headline">#</a></h2>
 <p>For convenience, I’ll describe the base model we are using throughout this series of Jupyter notebook based posts. This example is based on <a class="reference external" href="https://host.kelley.iu.edu/albrightbooks/">one in the spreadsheet modeling textbook(s) I’ve used in my classes since 2001</a>. I started out using Practical Management Science by Winston and Albright and switched to their Business Analytics: Data Analysis and Decision Making (Albright and Winston) around 2013ish. In both books, they introduce the “Walton
 Bookstore” problem in the chapter on Monte-Carlo simulation. Here’s the basic problem (with a few modifications):</p>
 <ul class="simple">
@@ -355,10 +824,10 @@ Bookstore” problem in the chapter on Monte-Carlo simulation. Here’s the basi
 </ul>
 </section>
 <section id="Goal-Seek">
-<h2>Goal Seek<a class="headerlink" href="#Goal-Seek" title="Permalink to this headline">¶</a></h2>
+<h2>Goal Seek<a class="headerlink" href="#Goal-Seek" title="Permalink to this headline">#</a></h2>
 <p>In addition to the type of sensitivity analysis enabled by the <code class="docutils literal notranslate"><span class="pre">data_table</span></code> function we created in the <a class="reference external" href="http://hselab.org/excel-to-python-1-models-datatables.html">first post in this series</a>, another typical Excel analytical task is to use Goal Seek to find, say, the break even level of demand. At its core, Goal Seek is just a root finder. So, in the Python world, it feels like the optimization routines in SciPy might be useful. Let’s start with the non-OO version of our Bookstore Model</p>
 <section id="Attempt-at-non-OO-version-of-Goal-Seek">
-<h3>Attempt at non-OO version of Goal Seek<a class="headerlink" href="#Attempt-at-non-OO-version-of-Goal-Seek" title="Permalink to this headline">¶</a></h3>
+<h3>Attempt at non-OO version of Goal Seek<a class="headerlink" href="#Attempt-at-non-OO-version-of-Goal-Seek" title="Permalink to this headline">#</a></h3>
 <p>This got tricky but led down all kinds of interesting side paths having to do with partial function freezing, lambda functions, currying, function signatures and more. Let’s initialize our base input values.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
@@ -413,7 +882,7 @@ Bookstore” problem in the chapter on Monte-Carlo simulation. Here’s the basi
 </section>
 </section>
 <section id="A-bit-about-root-finding-using-a-simpler-example">
-<h2>A bit about root finding using a simpler example<a class="headerlink" href="#A-bit-about-root-finding-using-a-simpler-example" title="Permalink to this headline">¶</a></h2>
+<h2>A bit about root finding using a simpler example<a class="headerlink" href="#A-bit-about-root-finding-using-a-simpler-example" title="Permalink to this headline">#</a></h2>
 <p>Now let’s try to find the break even value for demand; i.e. the level of demand that leads to a profit of zero. As mentioned above, this is a root finding problem - finding where the profit function crosses the x-axis. The <a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/optimize.html">SciPy package has various root finding and optimization functions</a>.</p>
 <p>Reading that page, we eventually get down to the root finding section and find the main function, <a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.root_scalar.html#scipy.optimize.root_scalar">root_scalar</a>. Before trying to use this this function for our bookstore model, let’s consider a simpler example - a quadratic function.</p>
 <div class="nbinput nblast docutils container">
@@ -697,7 +1166,7 @@ root</a>.</p>
 </div>
 </section>
 <section id="Back-to-the-Bookstore-Model-and-partial-functions">
-<h2>Back to the Bookstore Model and partial functions<a class="headerlink" href="#Back-to-the-Bookstore-Model-and-partial-functions" title="Permalink to this headline">¶</a></h2>
+<h2>Back to the Bookstore Model and partial functions<a class="headerlink" href="#Back-to-the-Bookstore-Model-and-partial-functions" title="Permalink to this headline">#</a></h2>
 <p>You may have already been wondering how exactly we might use SciPy’s root finding functions with our <code class="docutils literal notranslate"><span class="pre">bookstore_profit</span></code> function since it doesn’t just have one input argument, it’s got five. How do we tell <code class="docutils literal notranslate"><span class="pre">root_scalar</span></code> which one of the inputs (e.g. demand) is the one we want to search over and that we want all the other arguments to remain fixed at specific values? This is a job for something known as a <a class="reference external" href="https://www.learnpython.org/en/Partial_functions">partial function</a>. The idea is to
 create a new function object that is based on an existing function, but with some of the function’s inputs set to fixed values. To create partial functions, we need to use the <code class="docutils literal notranslate"><span class="pre">partial</span></code> function from the <code class="docutils literal notranslate"><span class="pre">functools</span></code> library. Unfortunately, while this initially seemed easy, we quickly ran into problems. Before describing those, let’s cheat and consider an easier case. Instead of <code class="docutils literal notranslate"><span class="pre">demand</span></code> being the input we want to vary (i.e. Goal Seek’s <em>changing cell</em>), let’s use <code class="docutils literal notranslate"><span class="pre">unit_cost</span></code>. You’ll
 notice that <code class="docutils literal notranslate"><span class="pre">unit_cost</span></code> is the first input argument to <code class="docutils literal notranslate"><span class="pre">bookstore_profit</span></code> and this might give you an idea of why things get difficult when we want to do this for <code class="docutils literal notranslate"><span class="pre">demand</span></code>.</p>
@@ -918,7 +1387,7 @@ our five input arguments the user might want to use for goal seeking. In essence
 <p>This StackOverflow question, solution and comment, hit the nail right on the head.</p>
 <p><a class="reference external" href="https://stackoverflow.com/questions/37052253/choose-which-variable-to-solve-for-python-root-finding-using-fsolve">https://stackoverflow.com/questions/37052253/choose-which-variable-to-solve-for-python-root-finding-using-fsolve</a></p>
 <section id="And-down-the-rabbit-hole-we-go?">
-<h3>And down the rabbit hole we go?<a class="headerlink" href="#And-down-the-rabbit-hole-we-go?" title="Permalink to this headline">¶</a></h3>
+<h3>And down the rabbit hole we go?<a class="headerlink" href="#And-down-the-rabbit-hole-we-go?" title="Permalink to this headline">#</a></h3>
 <p>Ok, for a given variable for which to goal seek, we can write a partial lambda function to pass into a root finding finding function such as <code class="docutils literal notranslate"><span class="pre">root_scalar</span></code>. But, how can we create a function that creates the partial lambda function and that takes as input the base <code class="docutils literal notranslate"><span class="pre">bookstore_profit</span></code> function and the name of the keyword argument representing the decision variable (the changing cell in Goal seek)? This led to an interesting journey through things like:</p>
 <ul class="simple">
 <li><p><a class="reference external" href="https://stackoverflow.com/questions/14261474/how-do-i-write-a-function-that-returns-another-function">https://stackoverflow.com/questions/14261474/how-do-i-write-a-function-that-returns-another-function</a></p></li>
@@ -933,7 +1402,7 @@ our five input arguments the user might want to use for goal seeking. In essence
 <p>However, ultimately, I gave up early since I was pretty much already sold on using an OO approach to this general Excel modeling in Python endeavor. Since, the <code class="docutils literal notranslate"><span class="pre">profit</span></code> method of our <code class="docutils literal notranslate"><span class="pre">BookstoreModel</span></code> class doesn’t require any inputs other than <code class="docutils literal notranslate"><span class="pre">self</span></code>, this problem goes away. I’m sure some Python wizard knows how to solve this problem, but for now, let’s go back to the OO approach. If I come up with something good on this lambda function creator, I’ll do a follow up post.</p>
 </section>
 <section id="Goal-Seeking-with-the-OO-BookstoreModel">
-<h3>Goal Seeking with the OO BookstoreModel<a class="headerlink" href="#Goal-Seeking-with-the-OO-BookstoreModel" title="Permalink to this headline">¶</a></h3>
+<h3>Goal Seeking with the OO BookstoreModel<a class="headerlink" href="#Goal-Seeking-with-the-OO-BookstoreModel" title="Permalink to this headline">#</a></h3>
 <p>Back in the first post of the series, we created a <code class="docutils literal notranslate"><span class="pre">BookstoreModel</span></code> class which contained methods for computing profit and other output measures, updating input parameters, and some other useful tasks. Here’s the class we ended up with:</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[32]:
@@ -1249,7 +1718,7 @@ our five input arguments the user might want to use for goal seeking. In essence
 </section>
 </section>
 <section id="Adding-a-goal_seek-function">
-<h2>Adding a <code class="docutils literal notranslate"><span class="pre">goal_seek</span></code> function<a class="headerlink" href="#Adding-a-goal_seek-function" title="Permalink to this headline">¶</a></h2>
+<h2>Adding a <code class="docutils literal notranslate"><span class="pre">goal_seek</span></code> function<a class="headerlink" href="#Adding-a-goal_seek-function" title="Permalink to this headline">#</a></h2>
 <p>As seen earlier in this notebook, there were a bunch of issues that popped up in trying to use SciPy’s root finding functions with the non-OO model. For the OO model, it felt like I’d end up with similar problems in trying to write some sort of generic wrapper that would create functions to pass into things like <code class="docutils literal notranslate"><span class="pre">root_scalar</span></code>. Instead, I decided to simply bypass SciPy and write my own root finder that I could tailor to our goal seeking problem. When I say “write”, I mean find a good
 implementation that someone has already done and tweak it.</p>
 <p>For example, <a class="reference external" href="https://github.com/patrickwalls/mathematical-python/">https://github.com/patrickwalls/mathematical-python/</a> has nice implementations of various root finding methods. It was a pretty simple matter to adapt the <a class="reference external" href="https://github.com/patrickwalls/mathematical-python/blob/master/roots-optimization/bisection.ipynb">bisection function he wrote in this notebook</a> to use in my <code class="docutils literal notranslate"><span class="pre">goal_seek</span></code> function.</p>
@@ -1527,7 +1996,7 @@ implementation that someone has already done and tweak it.</p>
 </div>
 </div>
 <section id="Wrap-up-and-next-steps">
-<h3>Wrap up and next steps<a class="headerlink" href="#Wrap-up-and-next-steps" title="Permalink to this headline">¶</a></h3>
+<h3>Wrap up and next steps<a class="headerlink" href="#Wrap-up-and-next-steps" title="Permalink to this headline">#</a></h3>
 <p>We have added a <code class="docutils literal notranslate"><span class="pre">goal_seek</span></code> function to our small but growing list of functions for doing Excelish things in Python. Yes, we can certainly improve our <code class="docutils literal notranslate"><span class="pre">goal_seek</span></code> implementation with better root finding algorithms, but this is good enough for now.</p>
 <p>Along the way, hopefully you learned some new Python things, I know I did.</p>
 <p>In the next installment of this series, we’ll take on Monte-Carlo simulation.</p>
@@ -1567,349 +2036,37 @@ implementation that someone has already done and tweak it.</p>
   
 </div>
 
-          </div>
-          
-        </div>
-      </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-<h1 class="logo"><a href="../../">misken</a></h1>
-
-
-
-
-
-
-
-
-  
-<h2>
-   
-  13 February 2021 
-</h2>
-
-<ul>
-   
-<li id="author">
-  <span
-    >Author:</span
-  >
-   
-  <a href="../author/misken/">misken</a>  
-</li>
-    
-<li id="tags">
-  <span
-    >Tags: </span
-  >
-   
-  <a href="../tag/python/">python</a>   
-  <a href="../tag/excel/">excel</a>  
-</li>
- 
-</ul>
-<h3>Navigation</h3>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../../about/">About misken</a></li>
-</ul>
-
-
-<h3>
-  <a href="../">Recent Posts</a>
-</h3>
-<ul>
-   
-  <li>
-    <a href="../hillmaker_030_released/"
-      >19 May - numpy speeds up hillmaker dramatically</a
-    >
-  </li>
-  
-  <li>
-    <a href="../simpy_vaccine_clinic_improvements/"
-      >11 April - Using SimPy to simulate a vaccine clinic - Part 2: model improvements</a
-    >
-  </li>
-  
-  <li>
-    <a href="../simpy_getting_started_vaccine_clinic/"
-      >04 April - Using SimPy to simulate a vaccine clinic - Part 1: an introductory tutorial</a
-    >
-  </li>
-  
-  <li>
-    <a href="../use_jupyter_conda_envs/"
-      >03 April - Using different conda environments with Jupyter Lab</a
-    >
-  </li>
-  
-  <li>
-    <a href="../hello_world/"
-      >02 April - Hello world from ablog blogging with JupyterLab</a
-    >
-  </li>
-  
-</ul>
-
-<h3><a href="../tag/">Tags</a></h3>
-<style type="text/css">
-  ul.ablog-cloud {
-    list-style: none;
-    overflow: auto;
-  }
-  ul.ablog-cloud li {
-    float: left;
-    height: 20pt;
-    line-height: 18pt;
-    margin-right: 5px;
-  }
-  ul.ablog-cloud a {
-    text-decoration: none;
-    vertical-align: middle;
-  }
-  li.ablog-cloud-1 {
-    font-size: 80%;
-  }
-  li.ablog-cloud-2 {
-    font-size: 95%;
-  }
-  li.ablog-cloud-3 {
-    font-size: 110%;
-  }
-  li.ablog-cloud-4 {
-    font-size: 125%;
-  }
-  li.ablog-cloud-5 {
-    font-size: 140%;
-  }
-</style>
-<ul class="ablog-cloud">
-   
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/github/">GitHub</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-3">
-    <a href="../tag/r/">R</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/ablog/">ablog</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/analytics/">analytics</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/bikeshare/">bikeshare</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/birding/">birding</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/blogging/">blogging</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/caret/">caret</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/conda/">conda</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/datetime/">datetime</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/dplyr/">dplyr</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/ebird/">ebird</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/ecology/">ecology</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/excel/">excel</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/ggmap/">ggmap</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/ggplot2/">ggplot2</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/gis/">gis</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/git/">git</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/gps/">gps</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/healthcare/">healthcare</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/hiking/">hiking</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/hillmaker/">hillmaker</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/jupyter/">jupyter</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/matplotlib/">matplotlib</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/metamodeling/">metamodeling</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-2">
-    <a href="../tag/occupancy-analysis/">occupancy analysis</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/pandas/">pandas</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/patient-flow/">patient flow</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/plyr/">plyr</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-5">
-    <a href="../tag/python/">python</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/shiny/">shiny</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/simpy/">simpy</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/simulation/">simulation</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/sphinx/">sphinx</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/statistics/">statistics</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/teaching/">teaching</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/text/">text</a>
-  </li>
-    
-  <li class="ablog-cloud ablog-cloud-1">
-    <a href="../tag/xml/">xml</a>
-  </li>
-   
-</ul>
-
-<h3>
-  <a href="../archive/">Archives</a>
-</h3>
-<ul>
-   
-  <li>
-    <a href="../2022/">2022 (7)</a>
-  </li>
-    
-  <li>
-    <a href="../2021/">2021 (4)</a>
-  </li>
-    
-  <li>
-    <a href="../2020/">2020 (2)</a>
-  </li>
-    
-  <li>
-    <a href="../2019/">2019 (7)</a>
-  </li>
-    
-  <li>
-    <a href="../2018/">2018 (5)</a>
-  </li>
-    
-  <li>
-    <a href="../2017/">2017 (2)</a>
-  </li>
-    
-  <li>
-    <a href="../2016/">2016 (6)</a>
-  </li>
-    
-  <li>
-    <a href="../2014/">2014 (6)</a>
-  </li>
-    
-  <li>
-    <a href="../2013/">2013 (7)</a>
-  </li>
-   
-</ul>
-
-<div id="searchbox" style="display: none" role="search">
-  <h3 id="searchlabel">Quick search</h3>
-    <div class="searchformwrapper">
-    <form class="search" action="../../search/" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
-      <input type="submit" value="Go" />
-    </form>
-    </div>
+              </div>
+              
+              
+              <!-- Previous / next buttons -->
+<div class='prev-next-area'>
 </div>
-<script>$('#searchbox').show(0);</script>
-        </div>
+              
+          </main>
+          
+
       </div>
-      <div class="clearer"></div>
     </div>
-    <div class="footer">
-      &copy;2022, misken.
-      
-      |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.3.2</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
-      
-      |
-      <a href="../../_sources/blog/what_if_2_goalseek.ipynb.txt"
-          rel="nofollow">Page source</a>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
+<footer class="footer mt-5 mt-md-0">
+  <div class="container">
+    
+    <div class="footer-item">
+      <p class="copyright">
+    &copy; Copyright 2022, misken.<br>
+</p>
     </div>
-
     
-
+    <div class="footer-item">
+      <p class="sphinx-version">
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.3.2.<br>
+</p>
+    </div>
     
+  </div>
+</footer>
   </body>
 </html>

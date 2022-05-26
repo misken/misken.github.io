@@ -7,22 +7,40 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
     <title>Using R to download and plot Great Lakes historical water level data &#8212; misken 0,1,0 documentation</title>
+    
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+
+    
+  <link rel="stylesheet"
+    href="../../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/design-style.b7bb847fb20b106c3d81b95245e65545.min.css" />
+    
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
+
     <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
     <script src="../../_static/jquery.js"></script>
     <script src="../../_static/underscore.js"></script>
     <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/design-tabs.js"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <link rel="author" title="About these documents" href="../../about/" />
     <link rel="index" title="Index" href="../../genindex/" />
     <link rel="search" title="Search" href="../../search/" /> 
-   
-  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
-  
-  
-  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
- 
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="en">
+    
+
+    <!-- Google Analytics -->
+     
 <link
   rel="alternate"
   type="application/atom+xml"
@@ -55,471 +73,66 @@
   }
 </style>
 
-  </head><body>
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
+    
+    <div class="container-fluid" id="banner"></div>
+
+    
+    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main"><div class="container-xl">
+
+  <div id="navbar-start">
+    
+    
+<a class="navbar-brand" href="../../">
+<p class="title">misken</p>
+</a>
+
+    
+  </div>
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapsible" aria-controls="navbar-collapsible" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
   
+  <div id="navbar-collapsible" class="col-lg-9 collapse navbar-collapse">
+    <div id="navbar-center" class="mr-auto">
+      
+      <div class="navbar-center-item">
+        <ul id="navbar-main-elements" class="navbar-nav">
+    <li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../about/">
+  About misken
+ </a>
+</li>
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          
-
-          <div class="body" role="main">
-             <section id="using-r-to-download-and-plot-great-lakes-historical-water-level-data">
-<h1>Using R to download and plot Great Lakes historical water level data<a class="headerlink" href="#using-r-to-download-and-plot-great-lakes-historical-water-level-data" title="Permalink to this headline">¶</a></h1>
-<p>This year we have seen record or near record high water levels in all of the Great Lakes. While plots of historical water levels are available on the web, I thought it would be interesting create my own plots using R. In this post I will summarize the steps for using R to:</p>
-<ul class="simple">
-<li><p>download raw historical water level data for the Great Lakes,</p></li>
-<li><p>process the raw data to get it into shape for time series plots,</p></li>
-<li><p>create time series plots of monthly water levels using <code class="docutils literal notranslate"><span class="pre">ggplot</span></code>.</p></li>
-</ul>
-<section id="web-resources-related-to-great-lakes-water-levels">
-<h2>Web resources related to Great Lakes water levels<a class="headerlink" href="#web-resources-related-to-great-lakes-water-levels" title="Permalink to this headline">¶</a></h2>
-<p>There are a number of good resources for learning about Great Lakes water level monitoring. A few that I’ve found useful as I’ve started to explore this topic include the following.</p>
-<section id="noaa-great-lakes-environmental-research-laboratory">
-<h3>NOAA - Great Lakes Environmental Research Laboratory<a class="headerlink" href="#noaa-great-lakes-environmental-research-laboratory" title="Permalink to this headline">¶</a></h3>
-<ul class="simple">
-<li><p>Main - <a class="reference external" href="https://www.glerl.noaa.gov/">https://www.glerl.noaa.gov/</a></p></li>
-<li><p>Water levels - <a class="reference external" href="https://www.glerl.noaa.gov/data/wlevels/levels.html#overview">https://www.glerl.noaa.gov/data/wlevels/levels.html#overview</a></p></li>
-<li><p>Monitoring: <a class="reference external" href="https://www.glerl.noaa.gov/data/wlevels/levels.html#monitoringNetwork">https://www.glerl.noaa.gov/data/wlevels/levels.html#monitoringNetwork</a></p></li>
-<li><p>Observations - <a class="reference external" href="https://www.glerl.noaa.gov/data/wlevels/levels.html#observations">https://www.glerl.noaa.gov/data/wlevels/levels.html#observations</a></p></li>
-<li><p>Forecasts - <a class="reference external" href="https://www.glerl.noaa.gov/data/wlevels/levels.html#modelsAndForecasts">https://www.glerl.noaa.gov/data/wlevels/levels.html#modelsAndForecasts</a></p></li>
-<li><p>Dashboard - <a class="reference external" href="https://www.glerl.noaa.gov/data/dashboard/GLD_HTML5.html">https://www.glerl.noaa.gov/data/dashboard/GLD_HTML5.html</a></p></li>
-<li><p>Data download - <a class="reference external" href="https://www.glerl.noaa.gov/data/dashboard/data/">https://www.glerl.noaa.gov/data/dashboard/data/</a></p></li>
-</ul>
-</section>
-<section id="other-resources">
-<h3>Other resources<a class="headerlink" href="#other-resources" title="Permalink to this headline">¶</a></h3>
-<p>US Army Corp of Engineers - Great Lakes Information</p>
-<ul class="simple">
-<li><p><a class="reference external" href="https://www.lre.usace.army.mil/Missions/Great-Lakes-Information/">https://www.lre.usace.army.mil/Missions/Great-Lakes-Information/</a></p></li>
-</ul>
-<p>Great Lakes Coordination Committee (US and CA)</p>
-<ul class="simple">
-<li><p><a class="reference external" href="http://www.greatlakescc.org/wp36/">http://www.greatlakescc.org/wp36/</a></p></li>
-</ul>
-<p>Fisheries and Oceans CA - observational data and forecasts</p>
-<ul class="simple">
-<li><p><a class="reference external" href="https://waterlevels.gc.ca/eng">https://waterlevels.gc.ca/eng</a></p></li>
-</ul>
-<p>Great Lakes Seasonal Hydrological Forecasting Products (Experimental)</p>
-<ul class="simple">
-<li><p><a class="reference external" href="https://www.glerl.noaa.gov/ahps/curfcst.html">https://www.glerl.noaa.gov/ahps/curfcst.html</a></p></li>
-<li><p><a class="reference external" href="https://www.lre.usace.army.mil/Missions/Great-Lakes-Information/Great-Lakes-Water-Levels/Water-Level-Forecast/Long-Term-Forecast/">https://www.lre.usace.army.mil/Missions/Great-Lakes-Information/Great-Lakes-Water-Levels/Water-Level-Forecast/Long-Term-Forecast/</a></p></li>
-</ul>
-<p>News</p>
-<ul class="simple">
-<li><p><a class="reference external" href="https://www.washingtonpost.com/weather/2019/06/06/great-lakes-are-overflowing-with-record-amounts-water/">https://www.washingtonpost.com/weather/2019/06/06/great-lakes-are-overflowing-with-record-amounts-water/</a></p></li>
-<li><p><a class="reference external" href="http://theconversation.com/climate-change-is-driving-rapid-shifts-between-high-and-low-water-levels-on-the-great-lakes-118095">http://theconversation.com/climate-change-is-driving-rapid-shifts-between-high-and-low-water-levels-on-the-great-lakes-118095</a></p></li>
-</ul>
-</section>
-</section>
-<section id="getting-monthly-water-level-data">
-<h2>Getting monthly water level data<a class="headerlink" href="#getting-monthly-water-level-data" title="Permalink to this headline">¶</a></h2>
-<p>We will need a few libraries.</p>
-<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="nf">library</span><span class="p">(</span><span class="n">readr</span><span class="p">)</span>
-<span class="nf">library</span><span class="p">(</span><span class="n">lubridate</span><span class="p">)</span>
-<span class="nf">library</span><span class="p">(</span><span class="n">stringr</span><span class="p">)</span>
-<span class="nf">library</span><span class="p">(</span><span class="n">tidyr</span><span class="p">)</span>
-<span class="nf">library</span><span class="p">(</span><span class="n">dplyr</span><span class="p">)</span>
-<span class="nf">library</span><span class="p">(</span><span class="n">ggplot2</span><span class="p">)</span>
-</pre></div>
-</div>
-<p>You can download csv files from NOAA containing monthly water levels for all of the Great Lakes at the following location:</p>
-<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="n">data_loc</span> <span class="o">&lt;-</span> <span class="s">&quot;https://www.glerl.noaa.gov/data/dashboard/data/levels/1918_PRES/&quot;</span>
-</pre></div>
-</div>
-<p>Here is what a little bit of the Lake Superior file, <code class="docutils literal notranslate"><span class="pre">superior1918.csv</span></code>, looks like.</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>Lake Superior:, Monthly Lake-Wide Average Water Levels (1918 - Present)
-Source:, NOAA/NOS; CHS
-year,jan,feb,mar,apr,may,jun,jul,aug,sep,oct,nov,dec
-1918,183.25,183.2,183.17,183.14,183.22,183.34,183.4,183.43,183.45,183.44,183.46,183.44
-1919,183.38,183.32,183.28,183.31,183.38,183.45,183.48,183.47,183.46,183.42,183.43,183.39
-1920,183.29,183.27,183.28,183.36,183.43,183.52,183.58,183.6,183.54,183.5,183.43,183.36
-</pre></div>
-</div>
-<p>A few things to note:</p>
-<ul class="simple">
-<li><p>The top two lines are metadata,</p></li>
-<li><p>Data goes back to 1918,</p></li>
-<li><p>Data is in <em>wide format</em> in that each month is in its own column.</p></li>
-</ul>
-<p>I used the <code class="docutils literal notranslate"><span class="pre">readr</span></code> package to read in the csv file for each lake. Notice that there is a single data file for Lakes Michigan and Huron as they are actually just one big lake that we divide at the Straits of Mackinac - see https://www.glerl.noaa.gov/res/straits/.</p>
-<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="n">miHuron1918</span> <span class="o">&lt;-</span> <span class="nf">read_csv</span><span class="p">(</span><span class="nf">str_c</span><span class="p">(</span><span class="n">data_loc</span><span class="p">,</span> <span class="s">&quot;miHuron1918.csv&quot;</span><span class="p">),</span> <span class="n">skip</span> <span class="o">=</span> <span class="m">2</span><span class="p">)</span>
-<span class="n">ontario1918</span> <span class="o">&lt;-</span> <span class="nf">read_csv</span><span class="p">(</span><span class="nf">str_c</span><span class="p">(</span><span class="n">data_loc</span><span class="p">,</span> <span class="s">&quot;ontario1918.csv&quot;</span><span class="p">),</span> <span class="n">skip</span> <span class="o">=</span> <span class="m">2</span><span class="p">)</span>
-<span class="n">erie1918</span> <span class="o">&lt;-</span> <span class="nf">read_csv</span><span class="p">(</span><span class="nf">str_c</span><span class="p">(</span><span class="n">data_loc</span><span class="p">,</span> <span class="s">&quot;erie1918.csv&quot;</span><span class="p">),</span> <span class="n">skip</span> <span class="o">=</span> <span class="m">2</span><span class="p">)</span>
-<span class="n">superior1918</span> <span class="o">&lt;-</span> <span class="nf">read_csv</span><span class="p">(</span><span class="nf">str_c</span><span class="p">(</span><span class="n">data_loc</span><span class="p">,</span> <span class="s">&quot;superior1918.csv&quot;</span><span class="p">),</span> <span class="n">skip</span> <span class="o">=</span> <span class="m">2</span><span class="p">)</span>
-<span class="n">clair1918</span> <span class="o">&lt;-</span> <span class="nf">read_csv</span><span class="p">(</span><span class="nf">str_c</span><span class="p">(</span><span class="n">data_loc</span><span class="p">,</span> <span class="s">&quot;ontario1918.csv&quot;</span><span class="p">),</span> <span class="n">skip</span> <span class="o">=</span> <span class="m">2</span><span class="p">)</span>
-</pre></div>
-</div>
-<p>Looking at the structure of one of these tables confirms that it is in
-wide format with the months as columns.</p>
-<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="nf">head</span><span class="p">(</span><span class="n">miHuron1918</span><span class="p">)</span>
-</pre></div>
-</div>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">## # A tibble: 6 x 13</span>
-<span class="c1">##    year   jan   feb   mar   apr   may   jun   jul   aug   sep   oct   nov</span>
-<span class="c1">##   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;</span>
-<span class="c1">## 1  1918  177.  177.  177.  177.  177.  177.  177.  177.  177.  177.  177.</span>
-<span class="c1">## 2  1919  177.  177.  177.  177.  177.  177.  177.  177.  177.  177.  177.</span>
-<span class="c1">## 3  1920  176.  176.  176.  177.  177.  177.  177.  177.  177.  177.  177.</span>
-<span class="c1">## 4  1921  176.  176.  176.  177.  177.  177.  177.  177.  176.  176.  176.</span>
-<span class="c1">## 5  1922  176.  176.  176.  176.  177.  177.  177.  177.  177.  176.  176.</span>
-<span class="c1">## 6  1923  176.  176.  176.  176.  176.  176.  176.  176.  176.  176.  176.</span>
-<span class="c1">## # ... with 1 more variable: dec &lt;dbl&gt;</span>
-</pre></div>
-</div>
-<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="nf">str</span><span class="p">(</span><span class="n">miHuron1918</span><span class="p">)</span>
-</pre></div>
-</div>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">## Classes &#39;spec_tbl_df&#39;, &#39;tbl_df&#39;, &#39;tbl&#39; and &#39;data.frame&#39;:	102 obs. of  13 variables:</span>
-<span class="c1">##  $ year: num  1918 1919 1920 1921 1922 ...</span>
-<span class="c1">##  $ jan : num  177 177 176 176 176 ...</span>
-<span class="c1">##  $ feb : num  177 177 176 176 176 ...</span>
-<span class="c1">##  $ mar : num  177 177 176 176 176 ...</span>
-<span class="c1">##  $ apr : num  177 177 177 177 176 ...</span>
-<span class="c1">##  $ may : num  177 177 177 177 177 ...</span>
-<span class="c1">##  $ jun : num  177 177 177 177 177 ...</span>
-<span class="c1">##  $ jul : num  177 177 177 177 177 ...</span>
-<span class="c1">##  $ aug : num  177 177 177 177 177 ...</span>
-<span class="c1">##  $ sep : num  177 177 177 176 177 ...</span>
-<span class="c1">##  $ oct : num  177 177 177 176 176 ...</span>
-<span class="c1">##  $ nov : num  177 177 177 176 176 ...</span>
-<span class="c1">##  $ dec : num  177 177 176 176 176 ...</span>
-<span class="c1">##  - attr(*, &quot;spec&quot;)=</span>
-<span class="c1">##   .. cols(</span>
-<span class="c1">##   ..   year = col_double(),</span>
-<span class="c1">##   ..   jan = col_double(),</span>
-<span class="c1">##   ..   feb = col_double(),</span>
-<span class="c1">##   ..   mar = col_double(),</span>
-<span class="c1">##   ..   apr = col_double(),</span>
-<span class="c1">##   ..   may = col_double(),</span>
-<span class="c1">##   ..   jun = col_double(),</span>
-<span class="c1">##   ..   jul = col_double(),</span>
-<span class="c1">##   ..   aug = col_double(),</span>
-<span class="c1">##   ..   sep = col_double(),</span>
-<span class="c1">##   ..   oct = col_double(),</span>
-<span class="c1">##   ..   nov = col_double(),</span>
-<span class="c1">##   ..   dec = col_double()</span>
-<span class="c1">##   .. )</span>
-</pre></div>
-</div>
-<p>In order to facilitate plotting with <code class="docutils literal notranslate"><span class="pre">ggplot2</span></code>, we are going to need to reshape this data into <em>long format</em>. Each row will be a single monthly reading and there will be a month column. This could be done with the <code class="docutils literal notranslate"><span class="pre">melt()</span></code> function from the <code class="docutils literal notranslate"><span class="pre">reshape2</span></code> package or <code class="docutils literal notranslate"><span class="pre">gather()</span></code> from the <code class="docutils literal notranslate"><span class="pre">tidyr</span></code> package. Let’s use the <code class="docutils literal notranslate"><span class="pre">tidyr::gather</span></code> function.</p>
-<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="n">miHuron1918_long</span> <span class="o">&lt;-</span> <span class="nf">gather</span><span class="p">(</span><span class="n">miHuron1918</span><span class="p">,</span> <span class="s">&quot;month&quot;</span><span class="p">,</span> <span class="s">&quot;mihuron&quot;</span><span class="p">,</span> <span class="m">2</span><span class="o">:</span><span class="m">13</span><span class="p">)</span>
-<span class="n">ontario1918_long</span> <span class="o">&lt;-</span> <span class="nf">gather</span><span class="p">(</span><span class="n">ontario1918</span><span class="p">,</span> <span class="s">&quot;month&quot;</span><span class="p">,</span> <span class="s">&quot;ontario&quot;</span><span class="p">,</span> <span class="m">2</span><span class="o">:</span><span class="m">13</span><span class="p">)</span>
-<span class="n">erie1918_long</span> <span class="o">&lt;-</span> <span class="nf">gather</span><span class="p">(</span><span class="n">erie1918</span><span class="p">,</span> <span class="s">&quot;month&quot;</span><span class="p">,</span> <span class="s">&quot;erie&quot;</span><span class="p">,</span> <span class="m">2</span><span class="o">:</span><span class="m">13</span><span class="p">)</span>
-<span class="n">superior1918_long</span> <span class="o">&lt;-</span> <span class="nf">gather</span><span class="p">(</span><span class="n">superior1918</span><span class="p">,</span> <span class="s">&quot;month&quot;</span><span class="p">,</span> <span class="s">&quot;superior&quot;</span><span class="p">,</span> <span class="m">2</span><span class="o">:</span><span class="m">13</span><span class="p">)</span>
-<span class="n">clair1918_long</span> <span class="o">&lt;-</span> <span class="nf">gather</span><span class="p">(</span><span class="n">clair1918</span><span class="p">,</span> <span class="s">&quot;month&quot;</span><span class="p">,</span> <span class="s">&quot;clair&quot;</span><span class="p">,</span> <span class="m">2</span><span class="o">:</span><span class="m">13</span><span class="p">)</span>
-</pre></div>
-</div>
-<p>Take a peek at the Lake Huron data in long format.</p>
-<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="nf">head</span><span class="p">(</span><span class="n">miHuron1918_long</span><span class="p">)</span>
-</pre></div>
-</div>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">## # A tibble: 6 x 3</span>
-<span class="c1">##    year month mihuron</span>
-<span class="c1">##   &lt;dbl&gt; &lt;chr&gt;   &lt;dbl&gt;</span>
-<span class="c1">## 1  1918 jan      177.</span>
-<span class="c1">## 2  1919 jan      177.</span>
-<span class="c1">## 3  1920 jan      176.</span>
-<span class="c1">## 4  1921 jan      176.</span>
-<span class="c1">## 5  1922 jan      176.</span>
-<span class="c1">## 6  1923 jan      176.</span>
-</pre></div>
-</div>
-<p>The months are three character strings. Let’s create a date column that we can
-use for joining the individual tables as well as proper sorting.</p>
-<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="n">miHuron1918_long</span><span class="o">$</span><span class="n">date</span> <span class="o">&lt;-</span> <span class="nf">as.POSIXct</span><span class="p">(</span><span class="nf">str_c</span><span class="p">(</span><span class="n">miHuron1918_long</span><span class="o">$</span><span class="n">month</span><span class="p">,</span> <span class="s">&quot; 1, &quot;</span><span class="p">,</span>
-                                                <span class="n">miHuron1918_long</span><span class="o">$</span><span class="n">year</span><span class="p">),</span>
-                                          <span class="n">format</span><span class="o">=</span><span class="s">&quot;%b %d, %Y&quot;</span><span class="p">)</span>
-
-<span class="n">ontario1918_long</span><span class="o">$</span><span class="n">date</span> <span class="o">&lt;-</span> <span class="nf">as.POSIXct</span><span class="p">(</span><span class="nf">str_c</span><span class="p">(</span><span class="n">ontario1918_long</span><span class="o">$</span><span class="n">month</span><span class="p">,</span> <span class="s">&quot; 1, &quot;</span><span class="p">,</span>
-                                                <span class="n">ontario1918_long</span><span class="o">$</span><span class="n">year</span><span class="p">),</span>
-                                          <span class="n">format</span><span class="o">=</span><span class="s">&quot;%b %d, %Y&quot;</span><span class="p">)</span>
-
-<span class="n">erie1918_long</span><span class="o">$</span><span class="n">date</span> <span class="o">&lt;-</span> <span class="nf">as.POSIXct</span><span class="p">(</span><span class="nf">str_c</span><span class="p">(</span><span class="n">erie1918_long</span><span class="o">$</span><span class="n">month</span><span class="p">,</span> <span class="s">&quot; 1, &quot;</span><span class="p">,</span>
-                                                <span class="n">erie1918_long</span><span class="o">$</span><span class="n">year</span><span class="p">),</span>
-                                          <span class="n">format</span><span class="o">=</span><span class="s">&quot;%b %d, %Y&quot;</span><span class="p">)</span>
-
-<span class="n">superior1918_long</span><span class="o">$</span><span class="n">date</span> <span class="o">&lt;-</span> <span class="nf">as.POSIXct</span><span class="p">(</span><span class="nf">str_c</span><span class="p">(</span><span class="n">superior1918_long</span><span class="o">$</span><span class="n">month</span><span class="p">,</span> <span class="s">&quot; 1, &quot;</span><span class="p">,</span>
-                                                <span class="n">superior1918_long</span><span class="o">$</span><span class="n">year</span><span class="p">),</span>
-                                          <span class="n">format</span><span class="o">=</span><span class="s">&quot;%b %d, %Y&quot;</span><span class="p">)</span>
-
-<span class="n">clair1918_long</span><span class="o">$</span><span class="n">date</span> <span class="o">&lt;-</span> <span class="nf">as.POSIXct</span><span class="p">(</span><span class="nf">str_c</span><span class="p">(</span><span class="n">clair1918_long</span><span class="o">$</span><span class="n">month</span><span class="p">,</span> <span class="s">&quot; 1, &quot;</span><span class="p">,</span>
-                                                <span class="n">clair1918_long</span><span class="o">$</span><span class="n">year</span><span class="p">),</span>
-                                          <span class="n">format</span><span class="o">=</span><span class="s">&quot;%b %d, %Y&quot;</span><span class="p">)</span>
-</pre></div>
-</div>
-<p>Check out our work.</p>
-<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="nf">head</span><span class="p">(</span><span class="n">miHuron1918_long</span><span class="p">)</span>
-</pre></div>
-</div>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">## # A tibble: 6 x 4</span>
-<span class="c1">##    year month mihuron date               </span>
-<span class="c1">##   &lt;dbl&gt; &lt;chr&gt;   &lt;dbl&gt; &lt;dttm&gt;             </span>
-<span class="c1">## 1  1918 jan      177. 1918-01-01 00:00:00</span>
-<span class="c1">## 2  1919 jan      177. 1919-01-01 00:00:00</span>
-<span class="c1">## 3  1920 jan      176. 1920-01-01 00:00:00</span>
-<span class="c1">## 4  1921 jan      176. 1921-01-01 00:00:00</span>
-<span class="c1">## 5  1922 jan      176. 1922-01-01 00:00:00</span>
-<span class="c1">## 6  1923 jan      176. 1923-01-01 00:00:00</span>
-</pre></div>
-</div>
-<p>Drop the year and month columns as they are no longer needed and move the
-date to the left most column.</p>
-<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="n">miHuron1918_long</span> <span class="o">&lt;-</span> <span class="n">miHuron1918_long</span><span class="p">[,</span> <span class="nf">c</span><span class="p">(</span><span class="m">4</span><span class="p">,</span><span class="m">3</span><span class="p">)]</span>
-<span class="n">ontario1918_long</span> <span class="o">&lt;-</span> <span class="n">ontario1918_long</span><span class="p">[,</span> <span class="nf">c</span><span class="p">(</span><span class="m">4</span><span class="p">,</span><span class="m">3</span><span class="p">)]</span>
-<span class="n">erie1918_long</span> <span class="o">&lt;-</span> <span class="n">erie1918_long</span><span class="p">[,</span> <span class="nf">c</span><span class="p">(</span><span class="m">4</span><span class="p">,</span><span class="m">3</span><span class="p">)]</span>
-<span class="n">superior1918_long</span> <span class="o">&lt;-</span> <span class="n">superior1918_long</span><span class="p">[,</span> <span class="nf">c</span><span class="p">(</span><span class="m">4</span><span class="p">,</span><span class="m">3</span><span class="p">)]</span>
-<span class="n">clair1918_long</span> <span class="o">&lt;-</span> <span class="n">clair1918_long</span><span class="p">[,</span> <span class="nf">c</span><span class="p">(</span><span class="m">4</span><span class="p">,</span><span class="m">3</span><span class="p">)]</span>
-</pre></div>
-</div>
-<p>Now we can join the long format tables together using the new date field.</p>
-<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="n">lakes_long</span> <span class="o">&lt;-</span> <span class="nf">merge</span><span class="p">(</span><span class="n">miHuron1918_long</span><span class="p">,</span> <span class="n">ontario1918_long</span><span class="p">,</span> <span class="n">by</span> <span class="o">=</span> <span class="s">&quot;date&quot;</span><span class="p">)</span>
-<span class="n">lakes_long</span> <span class="o">&lt;-</span> <span class="nf">merge</span><span class="p">(</span><span class="n">lakes_long</span><span class="p">,</span> <span class="n">erie1918_long</span><span class="p">,</span> <span class="n">by</span> <span class="o">=</span> <span class="s">&quot;date&quot;</span><span class="p">)</span>
-<span class="n">lakes_long</span> <span class="o">&lt;-</span> <span class="nf">merge</span><span class="p">(</span><span class="n">lakes_long</span><span class="p">,</span> <span class="n">superior1918_long</span><span class="p">,</span> <span class="n">by</span> <span class="o">=</span> <span class="s">&quot;date&quot;</span><span class="p">)</span>
-<span class="n">lakes_long</span> <span class="o">&lt;-</span> <span class="nf">merge</span><span class="p">(</span><span class="n">lakes_long</span><span class="p">,</span> <span class="n">clair1918_long</span><span class="p">,</span> <span class="n">by</span> <span class="o">=</span> <span class="s">&quot;date&quot;</span><span class="p">)</span>
-</pre></div>
-</div>
-<p>Take a peek.</p>
-<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="nf">head</span><span class="p">(</span><span class="n">lakes_long</span><span class="p">)</span>
-</pre></div>
-</div>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">##         date mihuron ontario   erie superior clair</span>
-<span class="c1">## 1 1918-01-01  176.71   74.74 173.90   183.25 74.74</span>
-<span class="c1">## 2 1918-02-01  176.73   74.72 173.82   183.20 74.72</span>
-<span class="c1">## 3 1918-03-01  176.80   74.92 174.01   183.17 74.92</span>
-<span class="c1">## 4 1918-04-01  176.89   75.10 174.02   183.14 75.10</span>
-<span class="c1">## 5 1918-05-01  176.99   75.09 173.98   183.22 75.09</span>
-<span class="c1">## 6 1918-06-01  177.07   75.06 174.10   183.34 75.06</span>
-</pre></div>
-</div>
-<p>Now let’s get our dataframe into “tidy” format by creating a <code class="docutils literal notranslate"><span class="pre">lake</span></code> field and gathering (melt) the lake fields.</p>
-<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="n">lake_level</span> <span class="o">&lt;-</span>  <span class="nf">gather</span><span class="p">(</span><span class="n">lakes_long</span><span class="p">,</span> <span class="m">2</span><span class="o">:</span><span class="m">6</span><span class="p">,</span> <span class="n">key</span> <span class="o">=</span> <span class="s">&quot;lake&quot;</span><span class="p">,</span> <span class="n">value</span> <span class="o">=</span> <span class="s">&quot;waterlevelm&quot;</span><span class="p">)</span>
-<span class="n">lake_level</span> <span class="o">&lt;-</span> <span class="n">lake_level</span> <span class="o">%&gt;%</span> 
-  <span class="nf">arrange</span><span class="p">(</span><span class="n">lake</span><span class="p">,</span> <span class="n">date</span><span class="p">)</span>
-<span class="nf">head</span><span class="p">(</span><span class="n">lake_level</span><span class="p">)</span>
-</pre></div>
-</div>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">##         date  lake waterlevelm</span>
-<span class="c1">## 1 1918-01-01 clair       74.74</span>
-<span class="c1">## 2 1918-02-01 clair       74.72</span>
-<span class="c1">## 3 1918-03-01 clair       74.92</span>
-<span class="c1">## 4 1918-04-01 clair       75.10</span>
-<span class="c1">## 5 1918-05-01 clair       75.09</span>
-<span class="c1">## 6 1918-06-01 clair       75.06</span>
-</pre></div>
-</div>
-<p>Clean up the workspace by getting rid of unneeded dataframes.</p>
-<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="nf">rm</span><span class="p">(</span><span class="n">miHuron1918</span><span class="p">,</span> <span class="n">ontario1918</span><span class="p">,</span> <span class="n">erie1918</span><span class="p">,</span> <span class="n">superior1918</span><span class="p">,</span> <span class="n">clair1918</span><span class="p">)</span>
-<span class="nf">rm</span><span class="p">(</span><span class="n">miHuron1918_long</span><span class="p">,</span> <span class="n">ontario1918_long</span><span class="p">,</span> 
-   <span class="n">erie1918_long</span><span class="p">,</span> <span class="n">superior1918_long</span><span class="p">,</span> <span class="n">clair1918_long</span><span class="p">)</span>
-<span class="nf">rm</span><span class="p">(</span><span class="n">lakes_long</span><span class="p">)</span>
-</pre></div>
-</div>
-<p>If we plot all the lake level time series on one plot, we can see the differences in levels between lakes but the intra-lake variation is hidden by the scale.</p>
-<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="nf">ggplot</span><span class="p">(</span><span class="n">lake_level</span><span class="p">)</span> <span class="o">+</span> <span class="nf">geom_line</span><span class="p">(</span><span class="nf">aes</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">date</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">waterlevelm</span><span class="p">,</span> <span class="n">colour</span> <span class="o">=</span> <span class="n">lake</span><span class="p">))</span> <span class="o">+</span>
-  <span class="nf">ylab</span><span class="p">(</span><span class="s">&quot;Water level (m)&quot;</span><span class="p">)</span>
-</pre></div>
-</div>
-<p><img alt="center" src="../../_images/ts1-1.png" /></p>
-<p>Where did Lake St. Clair go? Probably hidden under Lake Ontario.</p>
-<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="n">lake_level</span> <span class="o">%&gt;%</span> 
-  <span class="nf">filter</span><span class="p">(</span><span class="n">lake</span> <span class="o">==</span> <span class="s">&#39;clair&#39;</span> <span class="o">|</span> <span class="n">lake</span> <span class="o">==</span> <span class="s">&#39;ontario&#39;</span><span class="p">)</span> <span class="o">%&gt;%</span> 
-<span class="nf">ggplot</span><span class="p">()</span> <span class="o">+</span> <span class="nf">geom_line</span><span class="p">(</span><span class="nf">aes</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">date</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">waterlevelm</span><span class="p">,</span> <span class="n">colour</span> <span class="o">=</span> <span class="n">lake</span><span class="p">))</span> <span class="o">+</span>
-  <span class="nf">ylab</span><span class="p">(</span><span class="s">&quot;Water level (m)&quot;</span><span class="p">)</span>
-</pre></div>
-</div>
-<p><img alt="center" src="../../_images/ts1b-1.png" /></p>
-<p>Hmm, are the measurements identical for Lake St. Clair and Lake Ontario?</p>
-<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="nf">all</span><span class="p">(</span><span class="n">lake_level</span><span class="p">[</span><span class="n">lake_level</span><span class="o">$</span><span class="n">lake</span> <span class="o">==</span> <span class="s">&#39;ontario&#39;</span> <span class="o">&amp;</span> <span class="o">!</span><span class="nf">is.na</span><span class="p">(</span><span class="n">lake_level</span><span class="o">$</span><span class="n">waterlevelm</span><span class="p">),</span> <span class="m">3</span><span class="p">]</span> <span class="o">==</span> <span class="n">lake_level</span><span class="p">[</span><span class="n">lake_level</span><span class="o">$</span><span class="n">lake</span> <span class="o">==</span> <span class="s">&#39;clair&#39;</span> <span class="o">&amp;</span> <span class="o">!</span><span class="nf">is.na</span><span class="p">(</span><span class="n">lake_level</span><span class="o">$</span><span class="n">waterlevelm</span><span class="p">),</span> <span class="m">3</span><span class="p">])</span>
-</pre></div>
-</div>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">## [1] TRUE</span>
-</pre></div>
-</div>
-<p>Ok, let’s drop Lake St. Clair.</p>
-<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="n">lake_level</span> <span class="o">&lt;-</span> <span class="n">lake_level</span> <span class="o">%&gt;%</span> 
-  <span class="nf">filter</span><span class="p">(</span><span class="n">lake</span> <span class="o">!=</span> <span class="s">&#39;clair&#39;</span><span class="p">)</span>
-</pre></div>
-</div>
-<p>Let’s find the latest month for which we have data and save a version of this dataframe and tag it by the month.</p>
-<p>Here’s how we can do this with base R.</p>
-<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="n">last_month</span> <span class="o">&lt;-</span> <span class="nf">max</span><span class="p">(</span><span class="n">lake_level</span><span class="p">[</span><span class="o">!</span><span class="nf">is.na</span><span class="p">(</span><span class="n">lake_level</span><span class="o">$</span><span class="n">waterlevelm</span><span class="p">),</span><span class="s">&quot;date&quot;</span><span class="p">])</span>
-<span class="n">last_month</span>
-</pre></div>
-</div>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">## [1] &quot;2019-09-01 EDT&quot;</span>
-</pre></div>
-</div>
-<p>And, here’s a <code class="docutils literal notranslate"><span class="pre">dplyr</span></code> approach. Note the use of <code class="docutils literal notranslate"><span class="pre">pull()</span></code> to convert the the resulting 1x1 dataframe into a value.</p>
-<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="n">last_month_d</span> <span class="o">&lt;-</span> <span class="n">lake_level</span> <span class="o">%&gt;%</span> 
-  <span class="nf">filter</span><span class="p">(</span><span class="o">!</span><span class="nf">is.na</span><span class="p">(</span><span class="n">waterlevelm</span><span class="p">))</span> <span class="o">%&gt;%</span> 
-  <span class="nf">select</span><span class="p">(</span><span class="n">date</span><span class="p">)</span> <span class="o">%&gt;%</span> 
-  <span class="nf">summarize</span><span class="p">(</span><span class="n">whichmonth</span> <span class="o">=</span> <span class="nf">max</span><span class="p">(</span><span class="n">date</span><span class="p">))</span> <span class="o">%&gt;%</span> 
-  <span class="nf">pull</span><span class="p">()</span>
-
-<span class="n">last_month_d</span>
-</pre></div>
-</div>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">## [1] &quot;2019-09-01 EDT&quot;</span>
-</pre></div>
-</div>
-<p>Save as an rds file.</p>
-<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="n">rdsname</span> <span class="o">&lt;-</span> <span class="nf">paste0</span><span class="p">(</span><span class="s">&quot;data/lake_level_&quot;</span><span class="p">,</span> <span class="nf">year</span><span class="p">(</span><span class="n">last_month</span><span class="p">),</span> <span class="nf">strftime</span><span class="p">(</span><span class="n">last_month</span><span class="p">,</span><span class="s">&quot;%m&quot;</span><span class="p">),</span> <span class="s">&quot;.rds&quot;</span><span class="p">)</span>
-
-<span class="nf">saveRDS</span><span class="p">(</span><span class="n">lake_level</span><span class="p">,</span> <span class="n">rdsname</span><span class="p">)</span>
-</pre></div>
-</div>
-</section>
-<section id="plotting-monthly-water-level-data">
-<h2>Plotting monthly water level data<a class="headerlink" href="#plotting-monthly-water-level-data" title="Permalink to this headline">¶</a></h2>
-<p>For this first plot we will facet by lake and just plot the monthly water level values.</p>
-<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="n">ts_all</span> <span class="o">&lt;-</span> <span class="nf">ggplot</span><span class="p">(</span><span class="n">lake_level</span><span class="p">)</span> <span class="o">+</span> 
-  <span class="nf">geom_line</span><span class="p">(</span><span class="nf">aes</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">date</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">waterlevelm</span><span class="p">,</span> <span class="n">colour</span> <span class="o">=</span> <span class="n">lake</span><span class="p">))</span> <span class="o">+</span> 
-  <span class="nf">ylab</span><span class="p">(</span><span class="s">&quot;Water level (m)&quot;</span><span class="p">)</span> <span class="o">+</span>
-  <span class="nf">facet_grid</span><span class="p">(</span><span class="n">lake</span><span class="o">~</span><span class="n">.</span><span class="p">,</span> <span class="n">scales</span> <span class="o">=</span> <span class="s">&quot;free&quot;</span><span class="p">)</span> <span class="o">+</span>
-  <span class="nf">theme</span><span class="p">(</span><span class="n">strip.text.y</span> <span class="o">=</span> <span class="nf">element_text</span><span class="p">(</span><span class="n">size</span> <span class="o">=</span> <span class="m">18</span><span class="p">),</span>
-        <span class="n">axis.text.x</span> <span class="o">=</span> <span class="nf">element_text</span><span class="p">(</span><span class="n">size</span> <span class="o">=</span> <span class="m">14</span><span class="p">),</span>
-        <span class="n">axis.text.y</span> <span class="o">=</span> <span class="nf">element_text</span><span class="p">(</span><span class="n">size</span> <span class="o">=</span> <span class="m">14</span><span class="p">),</span>
-        <span class="n">axis.title.x</span> <span class="o">=</span> <span class="nf">element_text</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="m">18</span><span class="p">),</span>
-        <span class="n">axis.title.y</span> <span class="o">=</span> <span class="nf">element_text</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="m">18</span><span class="p">),</span>
-        <span class="n">legend.position</span> <span class="o">=</span> <span class="s">&quot;none&quot;</span><span class="p">)</span>
-
-<span class="n">ts_all</span>
-</pre></div>
-</div>
-<p><img alt="center" src="../../_images/first_plot-1.png" /></p>
-<p>Let’s compute a bunch of overall historical statistics and include a
-few as reference lines on the plots. I will use <code class="docutils literal notranslate"><span class="pre">dplyr</span></code> for the stats.</p>
-<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="n">lake_level_stats</span> <span class="o">&lt;-</span> <span class="n">lake_level</span> <span class="o">%&gt;%</span>
-  <span class="nf">group_by</span><span class="p">(</span><span class="n">lake</span><span class="p">)</span> <span class="o">%&gt;%</span>
-  <span class="nf">summarize</span><span class="p">(</span>
-    <span class="n">mean_level</span> <span class="o">=</span> <span class="nf">mean</span><span class="p">(</span><span class="n">waterlevelm</span><span class="p">,</span> <span class="n">na.rm</span> <span class="o">=</span> <span class="kc">TRUE</span><span class="p">),</span>
-    <span class="n">min_level</span> <span class="o">=</span> <span class="nf">min</span><span class="p">(</span><span class="n">waterlevelm</span><span class="p">,</span> <span class="n">na.rm</span> <span class="o">=</span> <span class="kc">TRUE</span><span class="p">),</span>
-    <span class="n">max_level</span> <span class="o">=</span> <span class="nf">max</span><span class="p">(</span><span class="n">waterlevelm</span><span class="p">,</span> <span class="n">na.rm</span> <span class="o">=</span> <span class="kc">TRUE</span><span class="p">),</span>
-    <span class="n">p05_level</span> <span class="o">=</span> <span class="nf">quantile</span><span class="p">(</span><span class="n">waterlevelm</span><span class="p">,</span> <span class="m">0.05</span><span class="p">,</span> <span class="n">na.rm</span> <span class="o">=</span> <span class="kc">TRUE</span><span class="p">),</span>
-    <span class="n">p95_level</span> <span class="o">=</span> <span class="nf">quantile</span><span class="p">(</span><span class="n">waterlevelm</span><span class="p">,</span> <span class="m">0.95</span><span class="p">,</span> <span class="n">na.rm</span> <span class="o">=</span> <span class="kc">TRUE</span><span class="p">),</span>
-    <span class="n">sd_level</span> <span class="o">=</span> <span class="nf">sd</span><span class="p">(</span><span class="n">waterlevelm</span><span class="p">,</span> <span class="n">na.rm</span> <span class="o">=</span> <span class="kc">TRUE</span><span class="p">),</span>
-    <span class="n">cv_level</span> <span class="o">=</span> <span class="n">sd_level</span> <span class="o">/</span> <span class="n">mean_level</span>
-  <span class="p">)</span>
-
-<span class="n">lake_level_stats</span>
-</pre></div>
-</div>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">## # A tibble: 4 x 8</span>
-<span class="c1">##   lake  mean_level min_level max_level p05_level p95_level sd_level</span>
-<span class="c1">##   &lt;chr&gt;      &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;</span>
-<span class="c1">## 1 erie       174.      173.      175.      174.      175.     0.362</span>
-<span class="c1">## 2 mihu…      176.      176.      178.      176.      177.     0.401</span>
-<span class="c1">## 3 onta…       74.8      73.7      75.9      74.2      75.3    0.346</span>
-<span class="c1">## 4 supe…      183.      183.      184.      183.      184.     0.202</span>
-<span class="c1">## # ... with 1 more variable: cv_level &lt;dbl&gt;</span>
-</pre></div>
-</div>
-<p>Let’s try to combine time series with lines from the stats dataframe just created. Start with
-just one lake and then we can try with faceted plot by lake.
-There are a few approaches to doing this. One way is to add <code class="docutils literal notranslate"><span class="pre">geom_hline</span></code> objects to the plot. Here’s how we could do that for Lake Huron.</p>
-<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="n">lake_level_huron</span> <span class="o">&lt;-</span> <span class="n">lake_level</span> <span class="o">%&gt;%</span>
-  <span class="nf">filter</span><span class="p">(</span><span class="n">lake</span> <span class="o">==</span> <span class="s">&#39;mihuron&#39;</span><span class="p">)</span>
-
-<span class="n">lake_level_stats_huron</span> <span class="o">&lt;-</span> <span class="n">lake_level_stats</span> <span class="o">%&gt;%</span>
-  <span class="nf">filter</span><span class="p">(</span><span class="n">lake</span> <span class="o">==</span> <span class="s">&#39;mihuron&#39;</span><span class="p">)</span>
-</pre></div>
-</div>
-<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="nf">ggplot</span><span class="p">(</span><span class="n">lake_level_huron</span><span class="p">,</span> <span class="nf">aes</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="n">date</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">waterlevelm</span><span class="p">))</span> <span class="o">+</span>
-  <span class="nf">geom_line</span><span class="p">()</span> <span class="o">+</span> <span class="nf">geom_hline</span><span class="p">(</span><span class="n">yintercept</span> <span class="o">=</span> <span class="n">lake_level_stats_huron</span><span class="o">$</span><span class="n">mean_level</span><span class="p">)</span>
-</pre></div>
-</div>
-<p><img alt="center" src="../../_images/tshuron-1.png" /></p>
-<p>Another approach is to add columns to original dataframe with repeated values or create dataframe by date with repeated valuesand then try to overlay on the original plot. I’m just going to create a merged dataframe containing the monthly data as well as the historical statistics.</p>
-<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="n">lake_level_ts_stats</span> <span class="o">&lt;-</span> <span class="nf">merge</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="n">lake_level</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">lake_level_stats</span><span class="p">)</span> <span class="o">%&gt;%</span>
-  <span class="nf">arrange</span><span class="p">(</span><span class="n">lake</span><span class="p">,</span> <span class="n">date</span><span class="p">)</span>
-
-<span class="nf">head</span><span class="p">(</span><span class="n">lake_level_ts_stats</span><span class="p">[</span><span class="n">lake_level_ts_stats</span><span class="o">$</span><span class="n">lake</span> <span class="o">==</span> <span class="s">&#39;mihuron&#39;</span><span class="p">,</span> <span class="m">1</span><span class="o">:</span><span class="m">8</span><span class="p">])</span>
-</pre></div>
-</div>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">##         lake       date waterlevelm mean_level min_level max_level</span>
-<span class="c1">## 1225 mihuron 1918-01-01      176.71   176.4323    175.57     177.5</span>
-<span class="c1">## 1226 mihuron 1918-02-01      176.73   176.4323    175.57     177.5</span>
-<span class="c1">## 1227 mihuron 1918-03-01      176.80   176.4323    175.57     177.5</span>
-<span class="c1">## 1228 mihuron 1918-04-01      176.89   176.4323    175.57     177.5</span>
-<span class="c1">## 1229 mihuron 1918-05-01      176.99   176.4323    175.57     177.5</span>
-<span class="c1">## 1230 mihuron 1918-06-01      177.07   176.4323    175.57     177.5</span>
-<span class="c1">##      p05_level p95_level</span>
-<span class="c1">## 1225     175.8    177.08</span>
-<span class="c1">## 1226     175.8    177.08</span>
-<span class="c1">## 1227     175.8    177.08</span>
-<span class="c1">## 1228     175.8    177.08</span>
-<span class="c1">## 1229     175.8    177.08</span>
-<span class="c1">## 1230     175.8    177.08</span>
-</pre></div>
-</div>
-<p>Now it’s easy to add overall mean and percentile bands to our plot</p>
-<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="nf">ggplot</span><span class="p">(</span><span class="n">lake_level_ts_stats</span><span class="p">,</span> <span class="nf">aes</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="n">date</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">waterlevelm</span><span class="p">,</span> <span class="n">colour</span> <span class="o">=</span> <span class="n">lake</span><span class="p">))</span> <span class="o">+</span>
-  <span class="nf">facet_grid</span><span class="p">(</span><span class="n">lake</span> <span class="o">~</span> <span class="n">.</span><span class="p">,</span> <span class="n">scales</span> <span class="o">=</span> <span class="s">&quot;free&quot;</span><span class="p">)</span> <span class="o">+</span>
-  <span class="nf">geom_line</span><span class="p">()</span> <span class="o">+</span> 
-  <span class="nf">geom_line</span><span class="p">(</span><span class="nf">aes</span><span class="p">(</span><span class="n">y</span> <span class="o">=</span> <span class="n">mean_level</span><span class="p">))</span> <span class="o">+</span> 
-  <span class="nf">geom_line</span><span class="p">(</span><span class="n">linetype</span> <span class="o">=</span> <span class="s">&quot;dashed&quot;</span><span class="p">,</span> <span class="nf">aes</span><span class="p">(</span><span class="n">y</span> <span class="o">=</span> <span class="n">p05_level</span><span class="p">))</span> <span class="o">+</span> 
-  <span class="nf">geom_line</span><span class="p">(</span><span class="n">linetype</span> <span class="o">=</span> <span class="s">&quot;dashed&quot;</span><span class="p">,</span> <span class="nf">aes</span><span class="p">(</span><span class="n">y</span> <span class="o">=</span> <span class="n">p95_level</span><span class="p">))</span> <span class="o">+</span>
-  <span class="nf">theme</span><span class="p">(</span><span class="n">strip.text.y</span> <span class="o">=</span> <span class="nf">element_text</span><span class="p">(</span><span class="n">size</span> <span class="o">=</span> <span class="m">18</span><span class="p">),</span>
-        <span class="n">axis.text.x</span> <span class="o">=</span> <span class="nf">element_text</span><span class="p">(</span><span class="n">size</span> <span class="o">=</span> <span class="m">14</span><span class="p">),</span>
-        <span class="n">axis.text.y</span> <span class="o">=</span> <span class="nf">element_text</span><span class="p">(</span><span class="n">size</span> <span class="o">=</span> <span class="m">14</span><span class="p">),</span>
-        <span class="n">axis.title.x</span> <span class="o">=</span> <span class="nf">element_text</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="m">18</span><span class="p">),</span>
-        <span class="n">axis.title.y</span> <span class="o">=</span> <span class="nf">element_text</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="m">18</span><span class="p">),</span>
-        <span class="n">legend.position</span> <span class="o">=</span> <span class="s">&quot;none&quot;</span><span class="p">)</span>
-</pre></div>
-</div>
-<p><img alt="center" src="../../_images/final_plot-1.png" /></p>
-<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="nf">ggsave</span><span class="p">(</span><span class="s">&quot;lake_levels.png&quot;</span><span class="p">)</span>
-</pre></div>
-</div>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">## Saving 16 x 15 in image</span>
-</pre></div>
-</div>
-<p>This seems like a good place to stop for this post. I hope to dig into this data a bit using R’s time series analysis capabilities and do some follow up posts. In the next post we’ll pull out the important bits of the work above and create an R function we can call to easily rerun the analysis each month when new data becomes available.</p>
-</section>
-</section>
-
-<div class="section">
     
-
-<div class="section">
-  <span style="float: left">
-     Previous:
-    
-    <a href="../hillmaker_r_sfcs/">
-       Using hillmaker from R with reticulate to analyze time of day patterns in bike share data
-    </a>
-    
-  </span>
-  <span>&nbsp;</span>
-  <span style="float: right">
-     Next: 
-    <a href="../hillmaker_020_released/">
-      Hillmaker updates 
-    </a>
-    
-  </span>
-</div>
-  
-</div>
-
-          </div>
-          
-        </div>
+</ul>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-<h1 class="logo"><a href="../../">misken</a></h1>
+      
+    </div>
 
+    <div id="navbar-end">
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+      </ul>
+      </div>
+      
+    </div>
+  </div>
+</div>
+    </nav>
+    
 
-
-
-
-
-
-
-  
+    <div class="container-xl">
+      <div class="row">
+          
+            
+            <!-- Only show if we have sidebars configured, else just a small margin  -->
+            <div class="col-12 col-md-3 bd-sidebar">
+              <div class="sidebar-start-items">  
 <h2>
    
   03 October 2019 
@@ -545,11 +158,6 @@ There are a few approaches to doing this. One way is to add <code class="docutil
 </li>
  
 </ul>
-<h3>Navigation</h3>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../../about/">About misken</a></li>
-</ul>
-
 
 <h3>
   <a href="../">Recent Posts</a>
@@ -829,24 +437,543 @@ There are a few approaches to doing this. One way is to add <code class="docutil
     </div>
 </div>
 <script>$('#searchbox').show(0);</script>
-        </div>
+              </div>
+              <div class="sidebar-end-items">
+              </div>
+            </div>
+            
+          
+
+          
+          <div class="d-none d-xl-block col-xl-2 bd-toc">
+            
+              
+              <div class="toc-item">
+                
+<div class="tocsection onthispage mt-5 pt-1 pb-3">
+    <i class="fas fa-list"></i> On this page
+</div>
+
+<nav id="bd-toc-nav">
+    <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#web-resources-related-to-great-lakes-water-levels">
+   Web resources related to Great Lakes water levels
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#noaa-great-lakes-environmental-research-laboratory">
+     NOAA - Great Lakes Environmental Research Laboratory
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#other-resources">
+     Other resources
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#getting-monthly-water-level-data">
+   Getting monthly water level data
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#plotting-monthly-water-level-data">
+   Plotting monthly water level data
+  </a>
+ </li>
+</ul>
+
+</nav>
+              </div>
+              
+              <div class="toc-item">
+                
+              </div>
+              
+            
+          </div>
+          
+
+          
+          
+            
+          
+          <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+              
+              <div>
+                 <section id="using-r-to-download-and-plot-great-lakes-historical-water-level-data">
+<h1>Using R to download and plot Great Lakes historical water level data<a class="headerlink" href="#using-r-to-download-and-plot-great-lakes-historical-water-level-data" title="Permalink to this headline">#</a></h1>
+<p>This year we have seen record or near record high water levels in all of the Great Lakes. While plots of historical water levels are available on the web, I thought it would be interesting create my own plots using R. In this post I will summarize the steps for using R to:</p>
+<ul class="simple">
+<li><p>download raw historical water level data for the Great Lakes,</p></li>
+<li><p>process the raw data to get it into shape for time series plots,</p></li>
+<li><p>create time series plots of monthly water levels using <code class="docutils literal notranslate"><span class="pre">ggplot</span></code>.</p></li>
+</ul>
+<section id="web-resources-related-to-great-lakes-water-levels">
+<h2>Web resources related to Great Lakes water levels<a class="headerlink" href="#web-resources-related-to-great-lakes-water-levels" title="Permalink to this headline">#</a></h2>
+<p>There are a number of good resources for learning about Great Lakes water level monitoring. A few that I’ve found useful as I’ve started to explore this topic include the following.</p>
+<section id="noaa-great-lakes-environmental-research-laboratory">
+<h3>NOAA - Great Lakes Environmental Research Laboratory<a class="headerlink" href="#noaa-great-lakes-environmental-research-laboratory" title="Permalink to this headline">#</a></h3>
+<ul class="simple">
+<li><p>Main - <a class="reference external" href="https://www.glerl.noaa.gov/">https://www.glerl.noaa.gov/</a></p></li>
+<li><p>Water levels - <a class="reference external" href="https://www.glerl.noaa.gov/data/wlevels/levels.html#overview">https://www.glerl.noaa.gov/data/wlevels/levels.html#overview</a></p></li>
+<li><p>Monitoring: <a class="reference external" href="https://www.glerl.noaa.gov/data/wlevels/levels.html#monitoringNetwork">https://www.glerl.noaa.gov/data/wlevels/levels.html#monitoringNetwork</a></p></li>
+<li><p>Observations - <a class="reference external" href="https://www.glerl.noaa.gov/data/wlevels/levels.html#observations">https://www.glerl.noaa.gov/data/wlevels/levels.html#observations</a></p></li>
+<li><p>Forecasts - <a class="reference external" href="https://www.glerl.noaa.gov/data/wlevels/levels.html#modelsAndForecasts">https://www.glerl.noaa.gov/data/wlevels/levels.html#modelsAndForecasts</a></p></li>
+<li><p>Dashboard - <a class="reference external" href="https://www.glerl.noaa.gov/data/dashboard/GLD_HTML5.html">https://www.glerl.noaa.gov/data/dashboard/GLD_HTML5.html</a></p></li>
+<li><p>Data download - <a class="reference external" href="https://www.glerl.noaa.gov/data/dashboard/data/">https://www.glerl.noaa.gov/data/dashboard/data/</a></p></li>
+</ul>
+</section>
+<section id="other-resources">
+<h3>Other resources<a class="headerlink" href="#other-resources" title="Permalink to this headline">#</a></h3>
+<p>US Army Corp of Engineers - Great Lakes Information</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://www.lre.usace.army.mil/Missions/Great-Lakes-Information/">https://www.lre.usace.army.mil/Missions/Great-Lakes-Information/</a></p></li>
+</ul>
+<p>Great Lakes Coordination Committee (US and CA)</p>
+<ul class="simple">
+<li><p><a class="reference external" href="http://www.greatlakescc.org/wp36/">http://www.greatlakescc.org/wp36/</a></p></li>
+</ul>
+<p>Fisheries and Oceans CA - observational data and forecasts</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://waterlevels.gc.ca/eng">https://waterlevels.gc.ca/eng</a></p></li>
+</ul>
+<p>Great Lakes Seasonal Hydrological Forecasting Products (Experimental)</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://www.glerl.noaa.gov/ahps/curfcst.html">https://www.glerl.noaa.gov/ahps/curfcst.html</a></p></li>
+<li><p><a class="reference external" href="https://www.lre.usace.army.mil/Missions/Great-Lakes-Information/Great-Lakes-Water-Levels/Water-Level-Forecast/Long-Term-Forecast/">https://www.lre.usace.army.mil/Missions/Great-Lakes-Information/Great-Lakes-Water-Levels/Water-Level-Forecast/Long-Term-Forecast/</a></p></li>
+</ul>
+<p>News</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://www.washingtonpost.com/weather/2019/06/06/great-lakes-are-overflowing-with-record-amounts-water/">https://www.washingtonpost.com/weather/2019/06/06/great-lakes-are-overflowing-with-record-amounts-water/</a></p></li>
+<li><p><a class="reference external" href="http://theconversation.com/climate-change-is-driving-rapid-shifts-between-high-and-low-water-levels-on-the-great-lakes-118095">http://theconversation.com/climate-change-is-driving-rapid-shifts-between-high-and-low-water-levels-on-the-great-lakes-118095</a></p></li>
+</ul>
+</section>
+</section>
+<section id="getting-monthly-water-level-data">
+<h2>Getting monthly water level data<a class="headerlink" href="#getting-monthly-water-level-data" title="Permalink to this headline">#</a></h2>
+<p>We will need a few libraries.</p>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="nf">library</span><span class="p">(</span><span class="n">readr</span><span class="p">)</span>
+<span class="nf">library</span><span class="p">(</span><span class="n">lubridate</span><span class="p">)</span>
+<span class="nf">library</span><span class="p">(</span><span class="n">stringr</span><span class="p">)</span>
+<span class="nf">library</span><span class="p">(</span><span class="n">tidyr</span><span class="p">)</span>
+<span class="nf">library</span><span class="p">(</span><span class="n">dplyr</span><span class="p">)</span>
+<span class="nf">library</span><span class="p">(</span><span class="n">ggplot2</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>You can download csv files from NOAA containing monthly water levels for all of the Great Lakes at the following location:</p>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="n">data_loc</span> <span class="o">&lt;-</span> <span class="s">&quot;https://www.glerl.noaa.gov/data/dashboard/data/levels/1918_PRES/&quot;</span>
+</pre></div>
+</div>
+<p>Here is what a little bit of the Lake Superior file, <code class="docutils literal notranslate"><span class="pre">superior1918.csv</span></code>, looks like.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>Lake Superior:, Monthly Lake-Wide Average Water Levels (1918 - Present)
+Source:, NOAA/NOS; CHS
+year,jan,feb,mar,apr,may,jun,jul,aug,sep,oct,nov,dec
+1918,183.25,183.2,183.17,183.14,183.22,183.34,183.4,183.43,183.45,183.44,183.46,183.44
+1919,183.38,183.32,183.28,183.31,183.38,183.45,183.48,183.47,183.46,183.42,183.43,183.39
+1920,183.29,183.27,183.28,183.36,183.43,183.52,183.58,183.6,183.54,183.5,183.43,183.36
+</pre></div>
+</div>
+<p>A few things to note:</p>
+<ul class="simple">
+<li><p>The top two lines are metadata,</p></li>
+<li><p>Data goes back to 1918,</p></li>
+<li><p>Data is in <em>wide format</em> in that each month is in its own column.</p></li>
+</ul>
+<p>I used the <code class="docutils literal notranslate"><span class="pre">readr</span></code> package to read in the csv file for each lake. Notice that there is a single data file for Lakes Michigan and Huron as they are actually just one big lake that we divide at the Straits of Mackinac - see https://www.glerl.noaa.gov/res/straits/.</p>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="n">miHuron1918</span> <span class="o">&lt;-</span> <span class="nf">read_csv</span><span class="p">(</span><span class="nf">str_c</span><span class="p">(</span><span class="n">data_loc</span><span class="p">,</span> <span class="s">&quot;miHuron1918.csv&quot;</span><span class="p">),</span> <span class="n">skip</span> <span class="o">=</span> <span class="m">2</span><span class="p">)</span>
+<span class="n">ontario1918</span> <span class="o">&lt;-</span> <span class="nf">read_csv</span><span class="p">(</span><span class="nf">str_c</span><span class="p">(</span><span class="n">data_loc</span><span class="p">,</span> <span class="s">&quot;ontario1918.csv&quot;</span><span class="p">),</span> <span class="n">skip</span> <span class="o">=</span> <span class="m">2</span><span class="p">)</span>
+<span class="n">erie1918</span> <span class="o">&lt;-</span> <span class="nf">read_csv</span><span class="p">(</span><span class="nf">str_c</span><span class="p">(</span><span class="n">data_loc</span><span class="p">,</span> <span class="s">&quot;erie1918.csv&quot;</span><span class="p">),</span> <span class="n">skip</span> <span class="o">=</span> <span class="m">2</span><span class="p">)</span>
+<span class="n">superior1918</span> <span class="o">&lt;-</span> <span class="nf">read_csv</span><span class="p">(</span><span class="nf">str_c</span><span class="p">(</span><span class="n">data_loc</span><span class="p">,</span> <span class="s">&quot;superior1918.csv&quot;</span><span class="p">),</span> <span class="n">skip</span> <span class="o">=</span> <span class="m">2</span><span class="p">)</span>
+<span class="n">clair1918</span> <span class="o">&lt;-</span> <span class="nf">read_csv</span><span class="p">(</span><span class="nf">str_c</span><span class="p">(</span><span class="n">data_loc</span><span class="p">,</span> <span class="s">&quot;ontario1918.csv&quot;</span><span class="p">),</span> <span class="n">skip</span> <span class="o">=</span> <span class="m">2</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Looking at the structure of one of these tables confirms that it is in
+wide format with the months as columns.</p>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="nf">head</span><span class="p">(</span><span class="n">miHuron1918</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">## # A tibble: 6 x 13</span>
+<span class="c1">##    year   jan   feb   mar   apr   may   jun   jul   aug   sep   oct   nov</span>
+<span class="c1">##   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;</span>
+<span class="c1">## 1  1918  177.  177.  177.  177.  177.  177.  177.  177.  177.  177.  177.</span>
+<span class="c1">## 2  1919  177.  177.  177.  177.  177.  177.  177.  177.  177.  177.  177.</span>
+<span class="c1">## 3  1920  176.  176.  176.  177.  177.  177.  177.  177.  177.  177.  177.</span>
+<span class="c1">## 4  1921  176.  176.  176.  177.  177.  177.  177.  177.  176.  176.  176.</span>
+<span class="c1">## 5  1922  176.  176.  176.  176.  177.  177.  177.  177.  177.  176.  176.</span>
+<span class="c1">## 6  1923  176.  176.  176.  176.  176.  176.  176.  176.  176.  176.  176.</span>
+<span class="c1">## # ... with 1 more variable: dec &lt;dbl&gt;</span>
+</pre></div>
+</div>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="nf">str</span><span class="p">(</span><span class="n">miHuron1918</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">## Classes &#39;spec_tbl_df&#39;, &#39;tbl_df&#39;, &#39;tbl&#39; and &#39;data.frame&#39;:	102 obs. of  13 variables:</span>
+<span class="c1">##  $ year: num  1918 1919 1920 1921 1922 ...</span>
+<span class="c1">##  $ jan : num  177 177 176 176 176 ...</span>
+<span class="c1">##  $ feb : num  177 177 176 176 176 ...</span>
+<span class="c1">##  $ mar : num  177 177 176 176 176 ...</span>
+<span class="c1">##  $ apr : num  177 177 177 177 176 ...</span>
+<span class="c1">##  $ may : num  177 177 177 177 177 ...</span>
+<span class="c1">##  $ jun : num  177 177 177 177 177 ...</span>
+<span class="c1">##  $ jul : num  177 177 177 177 177 ...</span>
+<span class="c1">##  $ aug : num  177 177 177 177 177 ...</span>
+<span class="c1">##  $ sep : num  177 177 177 176 177 ...</span>
+<span class="c1">##  $ oct : num  177 177 177 176 176 ...</span>
+<span class="c1">##  $ nov : num  177 177 177 176 176 ...</span>
+<span class="c1">##  $ dec : num  177 177 176 176 176 ...</span>
+<span class="c1">##  - attr(*, &quot;spec&quot;)=</span>
+<span class="c1">##   .. cols(</span>
+<span class="c1">##   ..   year = col_double(),</span>
+<span class="c1">##   ..   jan = col_double(),</span>
+<span class="c1">##   ..   feb = col_double(),</span>
+<span class="c1">##   ..   mar = col_double(),</span>
+<span class="c1">##   ..   apr = col_double(),</span>
+<span class="c1">##   ..   may = col_double(),</span>
+<span class="c1">##   ..   jun = col_double(),</span>
+<span class="c1">##   ..   jul = col_double(),</span>
+<span class="c1">##   ..   aug = col_double(),</span>
+<span class="c1">##   ..   sep = col_double(),</span>
+<span class="c1">##   ..   oct = col_double(),</span>
+<span class="c1">##   ..   nov = col_double(),</span>
+<span class="c1">##   ..   dec = col_double()</span>
+<span class="c1">##   .. )</span>
+</pre></div>
+</div>
+<p>In order to facilitate plotting with <code class="docutils literal notranslate"><span class="pre">ggplot2</span></code>, we are going to need to reshape this data into <em>long format</em>. Each row will be a single monthly reading and there will be a month column. This could be done with the <code class="docutils literal notranslate"><span class="pre">melt()</span></code> function from the <code class="docutils literal notranslate"><span class="pre">reshape2</span></code> package or <code class="docutils literal notranslate"><span class="pre">gather()</span></code> from the <code class="docutils literal notranslate"><span class="pre">tidyr</span></code> package. Let’s use the <code class="docutils literal notranslate"><span class="pre">tidyr::gather</span></code> function.</p>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="n">miHuron1918_long</span> <span class="o">&lt;-</span> <span class="nf">gather</span><span class="p">(</span><span class="n">miHuron1918</span><span class="p">,</span> <span class="s">&quot;month&quot;</span><span class="p">,</span> <span class="s">&quot;mihuron&quot;</span><span class="p">,</span> <span class="m">2</span><span class="o">:</span><span class="m">13</span><span class="p">)</span>
+<span class="n">ontario1918_long</span> <span class="o">&lt;-</span> <span class="nf">gather</span><span class="p">(</span><span class="n">ontario1918</span><span class="p">,</span> <span class="s">&quot;month&quot;</span><span class="p">,</span> <span class="s">&quot;ontario&quot;</span><span class="p">,</span> <span class="m">2</span><span class="o">:</span><span class="m">13</span><span class="p">)</span>
+<span class="n">erie1918_long</span> <span class="o">&lt;-</span> <span class="nf">gather</span><span class="p">(</span><span class="n">erie1918</span><span class="p">,</span> <span class="s">&quot;month&quot;</span><span class="p">,</span> <span class="s">&quot;erie&quot;</span><span class="p">,</span> <span class="m">2</span><span class="o">:</span><span class="m">13</span><span class="p">)</span>
+<span class="n">superior1918_long</span> <span class="o">&lt;-</span> <span class="nf">gather</span><span class="p">(</span><span class="n">superior1918</span><span class="p">,</span> <span class="s">&quot;month&quot;</span><span class="p">,</span> <span class="s">&quot;superior&quot;</span><span class="p">,</span> <span class="m">2</span><span class="o">:</span><span class="m">13</span><span class="p">)</span>
+<span class="n">clair1918_long</span> <span class="o">&lt;-</span> <span class="nf">gather</span><span class="p">(</span><span class="n">clair1918</span><span class="p">,</span> <span class="s">&quot;month&quot;</span><span class="p">,</span> <span class="s">&quot;clair&quot;</span><span class="p">,</span> <span class="m">2</span><span class="o">:</span><span class="m">13</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Take a peek at the Lake Huron data in long format.</p>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="nf">head</span><span class="p">(</span><span class="n">miHuron1918_long</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">## # A tibble: 6 x 3</span>
+<span class="c1">##    year month mihuron</span>
+<span class="c1">##   &lt;dbl&gt; &lt;chr&gt;   &lt;dbl&gt;</span>
+<span class="c1">## 1  1918 jan      177.</span>
+<span class="c1">## 2  1919 jan      177.</span>
+<span class="c1">## 3  1920 jan      176.</span>
+<span class="c1">## 4  1921 jan      176.</span>
+<span class="c1">## 5  1922 jan      176.</span>
+<span class="c1">## 6  1923 jan      176.</span>
+</pre></div>
+</div>
+<p>The months are three character strings. Let’s create a date column that we can
+use for joining the individual tables as well as proper sorting.</p>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="n">miHuron1918_long</span><span class="o">$</span><span class="n">date</span> <span class="o">&lt;-</span> <span class="nf">as.POSIXct</span><span class="p">(</span><span class="nf">str_c</span><span class="p">(</span><span class="n">miHuron1918_long</span><span class="o">$</span><span class="n">month</span><span class="p">,</span> <span class="s">&quot; 1, &quot;</span><span class="p">,</span>
+                                                <span class="n">miHuron1918_long</span><span class="o">$</span><span class="n">year</span><span class="p">),</span>
+                                          <span class="n">format</span><span class="o">=</span><span class="s">&quot;%b %d, %Y&quot;</span><span class="p">)</span>
+
+<span class="n">ontario1918_long</span><span class="o">$</span><span class="n">date</span> <span class="o">&lt;-</span> <span class="nf">as.POSIXct</span><span class="p">(</span><span class="nf">str_c</span><span class="p">(</span><span class="n">ontario1918_long</span><span class="o">$</span><span class="n">month</span><span class="p">,</span> <span class="s">&quot; 1, &quot;</span><span class="p">,</span>
+                                                <span class="n">ontario1918_long</span><span class="o">$</span><span class="n">year</span><span class="p">),</span>
+                                          <span class="n">format</span><span class="o">=</span><span class="s">&quot;%b %d, %Y&quot;</span><span class="p">)</span>
+
+<span class="n">erie1918_long</span><span class="o">$</span><span class="n">date</span> <span class="o">&lt;-</span> <span class="nf">as.POSIXct</span><span class="p">(</span><span class="nf">str_c</span><span class="p">(</span><span class="n">erie1918_long</span><span class="o">$</span><span class="n">month</span><span class="p">,</span> <span class="s">&quot; 1, &quot;</span><span class="p">,</span>
+                                                <span class="n">erie1918_long</span><span class="o">$</span><span class="n">year</span><span class="p">),</span>
+                                          <span class="n">format</span><span class="o">=</span><span class="s">&quot;%b %d, %Y&quot;</span><span class="p">)</span>
+
+<span class="n">superior1918_long</span><span class="o">$</span><span class="n">date</span> <span class="o">&lt;-</span> <span class="nf">as.POSIXct</span><span class="p">(</span><span class="nf">str_c</span><span class="p">(</span><span class="n">superior1918_long</span><span class="o">$</span><span class="n">month</span><span class="p">,</span> <span class="s">&quot; 1, &quot;</span><span class="p">,</span>
+                                                <span class="n">superior1918_long</span><span class="o">$</span><span class="n">year</span><span class="p">),</span>
+                                          <span class="n">format</span><span class="o">=</span><span class="s">&quot;%b %d, %Y&quot;</span><span class="p">)</span>
+
+<span class="n">clair1918_long</span><span class="o">$</span><span class="n">date</span> <span class="o">&lt;-</span> <span class="nf">as.POSIXct</span><span class="p">(</span><span class="nf">str_c</span><span class="p">(</span><span class="n">clair1918_long</span><span class="o">$</span><span class="n">month</span><span class="p">,</span> <span class="s">&quot; 1, &quot;</span><span class="p">,</span>
+                                                <span class="n">clair1918_long</span><span class="o">$</span><span class="n">year</span><span class="p">),</span>
+                                          <span class="n">format</span><span class="o">=</span><span class="s">&quot;%b %d, %Y&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Check out our work.</p>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="nf">head</span><span class="p">(</span><span class="n">miHuron1918_long</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">## # A tibble: 6 x 4</span>
+<span class="c1">##    year month mihuron date               </span>
+<span class="c1">##   &lt;dbl&gt; &lt;chr&gt;   &lt;dbl&gt; &lt;dttm&gt;             </span>
+<span class="c1">## 1  1918 jan      177. 1918-01-01 00:00:00</span>
+<span class="c1">## 2  1919 jan      177. 1919-01-01 00:00:00</span>
+<span class="c1">## 3  1920 jan      176. 1920-01-01 00:00:00</span>
+<span class="c1">## 4  1921 jan      176. 1921-01-01 00:00:00</span>
+<span class="c1">## 5  1922 jan      176. 1922-01-01 00:00:00</span>
+<span class="c1">## 6  1923 jan      176. 1923-01-01 00:00:00</span>
+</pre></div>
+</div>
+<p>Drop the year and month columns as they are no longer needed and move the
+date to the left most column.</p>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="n">miHuron1918_long</span> <span class="o">&lt;-</span> <span class="n">miHuron1918_long</span><span class="p">[,</span> <span class="nf">c</span><span class="p">(</span><span class="m">4</span><span class="p">,</span><span class="m">3</span><span class="p">)]</span>
+<span class="n">ontario1918_long</span> <span class="o">&lt;-</span> <span class="n">ontario1918_long</span><span class="p">[,</span> <span class="nf">c</span><span class="p">(</span><span class="m">4</span><span class="p">,</span><span class="m">3</span><span class="p">)]</span>
+<span class="n">erie1918_long</span> <span class="o">&lt;-</span> <span class="n">erie1918_long</span><span class="p">[,</span> <span class="nf">c</span><span class="p">(</span><span class="m">4</span><span class="p">,</span><span class="m">3</span><span class="p">)]</span>
+<span class="n">superior1918_long</span> <span class="o">&lt;-</span> <span class="n">superior1918_long</span><span class="p">[,</span> <span class="nf">c</span><span class="p">(</span><span class="m">4</span><span class="p">,</span><span class="m">3</span><span class="p">)]</span>
+<span class="n">clair1918_long</span> <span class="o">&lt;-</span> <span class="n">clair1918_long</span><span class="p">[,</span> <span class="nf">c</span><span class="p">(</span><span class="m">4</span><span class="p">,</span><span class="m">3</span><span class="p">)]</span>
+</pre></div>
+</div>
+<p>Now we can join the long format tables together using the new date field.</p>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="n">lakes_long</span> <span class="o">&lt;-</span> <span class="nf">merge</span><span class="p">(</span><span class="n">miHuron1918_long</span><span class="p">,</span> <span class="n">ontario1918_long</span><span class="p">,</span> <span class="n">by</span> <span class="o">=</span> <span class="s">&quot;date&quot;</span><span class="p">)</span>
+<span class="n">lakes_long</span> <span class="o">&lt;-</span> <span class="nf">merge</span><span class="p">(</span><span class="n">lakes_long</span><span class="p">,</span> <span class="n">erie1918_long</span><span class="p">,</span> <span class="n">by</span> <span class="o">=</span> <span class="s">&quot;date&quot;</span><span class="p">)</span>
+<span class="n">lakes_long</span> <span class="o">&lt;-</span> <span class="nf">merge</span><span class="p">(</span><span class="n">lakes_long</span><span class="p">,</span> <span class="n">superior1918_long</span><span class="p">,</span> <span class="n">by</span> <span class="o">=</span> <span class="s">&quot;date&quot;</span><span class="p">)</span>
+<span class="n">lakes_long</span> <span class="o">&lt;-</span> <span class="nf">merge</span><span class="p">(</span><span class="n">lakes_long</span><span class="p">,</span> <span class="n">clair1918_long</span><span class="p">,</span> <span class="n">by</span> <span class="o">=</span> <span class="s">&quot;date&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Take a peek.</p>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="nf">head</span><span class="p">(</span><span class="n">lakes_long</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">##         date mihuron ontario   erie superior clair</span>
+<span class="c1">## 1 1918-01-01  176.71   74.74 173.90   183.25 74.74</span>
+<span class="c1">## 2 1918-02-01  176.73   74.72 173.82   183.20 74.72</span>
+<span class="c1">## 3 1918-03-01  176.80   74.92 174.01   183.17 74.92</span>
+<span class="c1">## 4 1918-04-01  176.89   75.10 174.02   183.14 75.10</span>
+<span class="c1">## 5 1918-05-01  176.99   75.09 173.98   183.22 75.09</span>
+<span class="c1">## 6 1918-06-01  177.07   75.06 174.10   183.34 75.06</span>
+</pre></div>
+</div>
+<p>Now let’s get our dataframe into “tidy” format by creating a <code class="docutils literal notranslate"><span class="pre">lake</span></code> field and gathering (melt) the lake fields.</p>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="n">lake_level</span> <span class="o">&lt;-</span>  <span class="nf">gather</span><span class="p">(</span><span class="n">lakes_long</span><span class="p">,</span> <span class="m">2</span><span class="o">:</span><span class="m">6</span><span class="p">,</span> <span class="n">key</span> <span class="o">=</span> <span class="s">&quot;lake&quot;</span><span class="p">,</span> <span class="n">value</span> <span class="o">=</span> <span class="s">&quot;waterlevelm&quot;</span><span class="p">)</span>
+<span class="n">lake_level</span> <span class="o">&lt;-</span> <span class="n">lake_level</span> <span class="o">%&gt;%</span> 
+  <span class="nf">arrange</span><span class="p">(</span><span class="n">lake</span><span class="p">,</span> <span class="n">date</span><span class="p">)</span>
+<span class="nf">head</span><span class="p">(</span><span class="n">lake_level</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">##         date  lake waterlevelm</span>
+<span class="c1">## 1 1918-01-01 clair       74.74</span>
+<span class="c1">## 2 1918-02-01 clair       74.72</span>
+<span class="c1">## 3 1918-03-01 clair       74.92</span>
+<span class="c1">## 4 1918-04-01 clair       75.10</span>
+<span class="c1">## 5 1918-05-01 clair       75.09</span>
+<span class="c1">## 6 1918-06-01 clair       75.06</span>
+</pre></div>
+</div>
+<p>Clean up the workspace by getting rid of unneeded dataframes.</p>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="nf">rm</span><span class="p">(</span><span class="n">miHuron1918</span><span class="p">,</span> <span class="n">ontario1918</span><span class="p">,</span> <span class="n">erie1918</span><span class="p">,</span> <span class="n">superior1918</span><span class="p">,</span> <span class="n">clair1918</span><span class="p">)</span>
+<span class="nf">rm</span><span class="p">(</span><span class="n">miHuron1918_long</span><span class="p">,</span> <span class="n">ontario1918_long</span><span class="p">,</span> 
+   <span class="n">erie1918_long</span><span class="p">,</span> <span class="n">superior1918_long</span><span class="p">,</span> <span class="n">clair1918_long</span><span class="p">)</span>
+<span class="nf">rm</span><span class="p">(</span><span class="n">lakes_long</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>If we plot all the lake level time series on one plot, we can see the differences in levels between lakes but the intra-lake variation is hidden by the scale.</p>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="nf">ggplot</span><span class="p">(</span><span class="n">lake_level</span><span class="p">)</span> <span class="o">+</span> <span class="nf">geom_line</span><span class="p">(</span><span class="nf">aes</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">date</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">waterlevelm</span><span class="p">,</span> <span class="n">colour</span> <span class="o">=</span> <span class="n">lake</span><span class="p">))</span> <span class="o">+</span>
+  <span class="nf">ylab</span><span class="p">(</span><span class="s">&quot;Water level (m)&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><img alt="center" src="../../_images/ts1-1.png" /></p>
+<p>Where did Lake St. Clair go? Probably hidden under Lake Ontario.</p>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="n">lake_level</span> <span class="o">%&gt;%</span> 
+  <span class="nf">filter</span><span class="p">(</span><span class="n">lake</span> <span class="o">==</span> <span class="s">&#39;clair&#39;</span> <span class="o">|</span> <span class="n">lake</span> <span class="o">==</span> <span class="s">&#39;ontario&#39;</span><span class="p">)</span> <span class="o">%&gt;%</span> 
+<span class="nf">ggplot</span><span class="p">()</span> <span class="o">+</span> <span class="nf">geom_line</span><span class="p">(</span><span class="nf">aes</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">date</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">waterlevelm</span><span class="p">,</span> <span class="n">colour</span> <span class="o">=</span> <span class="n">lake</span><span class="p">))</span> <span class="o">+</span>
+  <span class="nf">ylab</span><span class="p">(</span><span class="s">&quot;Water level (m)&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><img alt="center" src="../../_images/ts1b-1.png" /></p>
+<p>Hmm, are the measurements identical for Lake St. Clair and Lake Ontario?</p>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="nf">all</span><span class="p">(</span><span class="n">lake_level</span><span class="p">[</span><span class="n">lake_level</span><span class="o">$</span><span class="n">lake</span> <span class="o">==</span> <span class="s">&#39;ontario&#39;</span> <span class="o">&amp;</span> <span class="o">!</span><span class="nf">is.na</span><span class="p">(</span><span class="n">lake_level</span><span class="o">$</span><span class="n">waterlevelm</span><span class="p">),</span> <span class="m">3</span><span class="p">]</span> <span class="o">==</span> <span class="n">lake_level</span><span class="p">[</span><span class="n">lake_level</span><span class="o">$</span><span class="n">lake</span> <span class="o">==</span> <span class="s">&#39;clair&#39;</span> <span class="o">&amp;</span> <span class="o">!</span><span class="nf">is.na</span><span class="p">(</span><span class="n">lake_level</span><span class="o">$</span><span class="n">waterlevelm</span><span class="p">),</span> <span class="m">3</span><span class="p">])</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">## [1] TRUE</span>
+</pre></div>
+</div>
+<p>Ok, let’s drop Lake St. Clair.</p>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="n">lake_level</span> <span class="o">&lt;-</span> <span class="n">lake_level</span> <span class="o">%&gt;%</span> 
+  <span class="nf">filter</span><span class="p">(</span><span class="n">lake</span> <span class="o">!=</span> <span class="s">&#39;clair&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Let’s find the latest month for which we have data and save a version of this dataframe and tag it by the month.</p>
+<p>Here’s how we can do this with base R.</p>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="n">last_month</span> <span class="o">&lt;-</span> <span class="nf">max</span><span class="p">(</span><span class="n">lake_level</span><span class="p">[</span><span class="o">!</span><span class="nf">is.na</span><span class="p">(</span><span class="n">lake_level</span><span class="o">$</span><span class="n">waterlevelm</span><span class="p">),</span><span class="s">&quot;date&quot;</span><span class="p">])</span>
+<span class="n">last_month</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">## [1] &quot;2019-09-01 EDT&quot;</span>
+</pre></div>
+</div>
+<p>And, here’s a <code class="docutils literal notranslate"><span class="pre">dplyr</span></code> approach. Note the use of <code class="docutils literal notranslate"><span class="pre">pull()</span></code> to convert the the resulting 1x1 dataframe into a value.</p>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="n">last_month_d</span> <span class="o">&lt;-</span> <span class="n">lake_level</span> <span class="o">%&gt;%</span> 
+  <span class="nf">filter</span><span class="p">(</span><span class="o">!</span><span class="nf">is.na</span><span class="p">(</span><span class="n">waterlevelm</span><span class="p">))</span> <span class="o">%&gt;%</span> 
+  <span class="nf">select</span><span class="p">(</span><span class="n">date</span><span class="p">)</span> <span class="o">%&gt;%</span> 
+  <span class="nf">summarize</span><span class="p">(</span><span class="n">whichmonth</span> <span class="o">=</span> <span class="nf">max</span><span class="p">(</span><span class="n">date</span><span class="p">))</span> <span class="o">%&gt;%</span> 
+  <span class="nf">pull</span><span class="p">()</span>
+
+<span class="n">last_month_d</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">## [1] &quot;2019-09-01 EDT&quot;</span>
+</pre></div>
+</div>
+<p>Save as an rds file.</p>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="n">rdsname</span> <span class="o">&lt;-</span> <span class="nf">paste0</span><span class="p">(</span><span class="s">&quot;data/lake_level_&quot;</span><span class="p">,</span> <span class="nf">year</span><span class="p">(</span><span class="n">last_month</span><span class="p">),</span> <span class="nf">strftime</span><span class="p">(</span><span class="n">last_month</span><span class="p">,</span><span class="s">&quot;%m&quot;</span><span class="p">),</span> <span class="s">&quot;.rds&quot;</span><span class="p">)</span>
+
+<span class="nf">saveRDS</span><span class="p">(</span><span class="n">lake_level</span><span class="p">,</span> <span class="n">rdsname</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="plotting-monthly-water-level-data">
+<h2>Plotting monthly water level data<a class="headerlink" href="#plotting-monthly-water-level-data" title="Permalink to this headline">#</a></h2>
+<p>For this first plot we will facet by lake and just plot the monthly water level values.</p>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="n">ts_all</span> <span class="o">&lt;-</span> <span class="nf">ggplot</span><span class="p">(</span><span class="n">lake_level</span><span class="p">)</span> <span class="o">+</span> 
+  <span class="nf">geom_line</span><span class="p">(</span><span class="nf">aes</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">date</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">waterlevelm</span><span class="p">,</span> <span class="n">colour</span> <span class="o">=</span> <span class="n">lake</span><span class="p">))</span> <span class="o">+</span> 
+  <span class="nf">ylab</span><span class="p">(</span><span class="s">&quot;Water level (m)&quot;</span><span class="p">)</span> <span class="o">+</span>
+  <span class="nf">facet_grid</span><span class="p">(</span><span class="n">lake</span><span class="o">~</span><span class="n">.</span><span class="p">,</span> <span class="n">scales</span> <span class="o">=</span> <span class="s">&quot;free&quot;</span><span class="p">)</span> <span class="o">+</span>
+  <span class="nf">theme</span><span class="p">(</span><span class="n">strip.text.y</span> <span class="o">=</span> <span class="nf">element_text</span><span class="p">(</span><span class="n">size</span> <span class="o">=</span> <span class="m">18</span><span class="p">),</span>
+        <span class="n">axis.text.x</span> <span class="o">=</span> <span class="nf">element_text</span><span class="p">(</span><span class="n">size</span> <span class="o">=</span> <span class="m">14</span><span class="p">),</span>
+        <span class="n">axis.text.y</span> <span class="o">=</span> <span class="nf">element_text</span><span class="p">(</span><span class="n">size</span> <span class="o">=</span> <span class="m">14</span><span class="p">),</span>
+        <span class="n">axis.title.x</span> <span class="o">=</span> <span class="nf">element_text</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="m">18</span><span class="p">),</span>
+        <span class="n">axis.title.y</span> <span class="o">=</span> <span class="nf">element_text</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="m">18</span><span class="p">),</span>
+        <span class="n">legend.position</span> <span class="o">=</span> <span class="s">&quot;none&quot;</span><span class="p">)</span>
+
+<span class="n">ts_all</span>
+</pre></div>
+</div>
+<p><img alt="center" src="../../_images/first_plot-1.png" /></p>
+<p>Let’s compute a bunch of overall historical statistics and include a
+few as reference lines on the plots. I will use <code class="docutils literal notranslate"><span class="pre">dplyr</span></code> for the stats.</p>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="n">lake_level_stats</span> <span class="o">&lt;-</span> <span class="n">lake_level</span> <span class="o">%&gt;%</span>
+  <span class="nf">group_by</span><span class="p">(</span><span class="n">lake</span><span class="p">)</span> <span class="o">%&gt;%</span>
+  <span class="nf">summarize</span><span class="p">(</span>
+    <span class="n">mean_level</span> <span class="o">=</span> <span class="nf">mean</span><span class="p">(</span><span class="n">waterlevelm</span><span class="p">,</span> <span class="n">na.rm</span> <span class="o">=</span> <span class="kc">TRUE</span><span class="p">),</span>
+    <span class="n">min_level</span> <span class="o">=</span> <span class="nf">min</span><span class="p">(</span><span class="n">waterlevelm</span><span class="p">,</span> <span class="n">na.rm</span> <span class="o">=</span> <span class="kc">TRUE</span><span class="p">),</span>
+    <span class="n">max_level</span> <span class="o">=</span> <span class="nf">max</span><span class="p">(</span><span class="n">waterlevelm</span><span class="p">,</span> <span class="n">na.rm</span> <span class="o">=</span> <span class="kc">TRUE</span><span class="p">),</span>
+    <span class="n">p05_level</span> <span class="o">=</span> <span class="nf">quantile</span><span class="p">(</span><span class="n">waterlevelm</span><span class="p">,</span> <span class="m">0.05</span><span class="p">,</span> <span class="n">na.rm</span> <span class="o">=</span> <span class="kc">TRUE</span><span class="p">),</span>
+    <span class="n">p95_level</span> <span class="o">=</span> <span class="nf">quantile</span><span class="p">(</span><span class="n">waterlevelm</span><span class="p">,</span> <span class="m">0.95</span><span class="p">,</span> <span class="n">na.rm</span> <span class="o">=</span> <span class="kc">TRUE</span><span class="p">),</span>
+    <span class="n">sd_level</span> <span class="o">=</span> <span class="nf">sd</span><span class="p">(</span><span class="n">waterlevelm</span><span class="p">,</span> <span class="n">na.rm</span> <span class="o">=</span> <span class="kc">TRUE</span><span class="p">),</span>
+    <span class="n">cv_level</span> <span class="o">=</span> <span class="n">sd_level</span> <span class="o">/</span> <span class="n">mean_level</span>
+  <span class="p">)</span>
+
+<span class="n">lake_level_stats</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">## # A tibble: 4 x 8</span>
+<span class="c1">##   lake  mean_level min_level max_level p05_level p95_level sd_level</span>
+<span class="c1">##   &lt;chr&gt;      &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;</span>
+<span class="c1">## 1 erie       174.      173.      175.      174.      175.     0.362</span>
+<span class="c1">## 2 mihu…      176.      176.      178.      176.      177.     0.401</span>
+<span class="c1">## 3 onta…       74.8      73.7      75.9      74.2      75.3    0.346</span>
+<span class="c1">## 4 supe…      183.      183.      184.      183.      184.     0.202</span>
+<span class="c1">## # ... with 1 more variable: cv_level &lt;dbl&gt;</span>
+</pre></div>
+</div>
+<p>Let’s try to combine time series with lines from the stats dataframe just created. Start with
+just one lake and then we can try with faceted plot by lake.
+There are a few approaches to doing this. One way is to add <code class="docutils literal notranslate"><span class="pre">geom_hline</span></code> objects to the plot. Here’s how we could do that for Lake Huron.</p>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="n">lake_level_huron</span> <span class="o">&lt;-</span> <span class="n">lake_level</span> <span class="o">%&gt;%</span>
+  <span class="nf">filter</span><span class="p">(</span><span class="n">lake</span> <span class="o">==</span> <span class="s">&#39;mihuron&#39;</span><span class="p">)</span>
+
+<span class="n">lake_level_stats_huron</span> <span class="o">&lt;-</span> <span class="n">lake_level_stats</span> <span class="o">%&gt;%</span>
+  <span class="nf">filter</span><span class="p">(</span><span class="n">lake</span> <span class="o">==</span> <span class="s">&#39;mihuron&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="nf">ggplot</span><span class="p">(</span><span class="n">lake_level_huron</span><span class="p">,</span> <span class="nf">aes</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="n">date</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">waterlevelm</span><span class="p">))</span> <span class="o">+</span>
+  <span class="nf">geom_line</span><span class="p">()</span> <span class="o">+</span> <span class="nf">geom_hline</span><span class="p">(</span><span class="n">yintercept</span> <span class="o">=</span> <span class="n">lake_level_stats_huron</span><span class="o">$</span><span class="n">mean_level</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><img alt="center" src="../../_images/tshuron-1.png" /></p>
+<p>Another approach is to add columns to original dataframe with repeated values or create dataframe by date with repeated valuesand then try to overlay on the original plot. I’m just going to create a merged dataframe containing the monthly data as well as the historical statistics.</p>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="n">lake_level_ts_stats</span> <span class="o">&lt;-</span> <span class="nf">merge</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="n">lake_level</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">lake_level_stats</span><span class="p">)</span> <span class="o">%&gt;%</span>
+  <span class="nf">arrange</span><span class="p">(</span><span class="n">lake</span><span class="p">,</span> <span class="n">date</span><span class="p">)</span>
+
+<span class="nf">head</span><span class="p">(</span><span class="n">lake_level_ts_stats</span><span class="p">[</span><span class="n">lake_level_ts_stats</span><span class="o">$</span><span class="n">lake</span> <span class="o">==</span> <span class="s">&#39;mihuron&#39;</span><span class="p">,</span> <span class="m">1</span><span class="o">:</span><span class="m">8</span><span class="p">])</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">##         lake       date waterlevelm mean_level min_level max_level</span>
+<span class="c1">## 1225 mihuron 1918-01-01      176.71   176.4323    175.57     177.5</span>
+<span class="c1">## 1226 mihuron 1918-02-01      176.73   176.4323    175.57     177.5</span>
+<span class="c1">## 1227 mihuron 1918-03-01      176.80   176.4323    175.57     177.5</span>
+<span class="c1">## 1228 mihuron 1918-04-01      176.89   176.4323    175.57     177.5</span>
+<span class="c1">## 1229 mihuron 1918-05-01      176.99   176.4323    175.57     177.5</span>
+<span class="c1">## 1230 mihuron 1918-06-01      177.07   176.4323    175.57     177.5</span>
+<span class="c1">##      p05_level p95_level</span>
+<span class="c1">## 1225     175.8    177.08</span>
+<span class="c1">## 1226     175.8    177.08</span>
+<span class="c1">## 1227     175.8    177.08</span>
+<span class="c1">## 1228     175.8    177.08</span>
+<span class="c1">## 1229     175.8    177.08</span>
+<span class="c1">## 1230     175.8    177.08</span>
+</pre></div>
+</div>
+<p>Now it’s easy to add overall mean and percentile bands to our plot</p>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="nf">ggplot</span><span class="p">(</span><span class="n">lake_level_ts_stats</span><span class="p">,</span> <span class="nf">aes</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="n">date</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">waterlevelm</span><span class="p">,</span> <span class="n">colour</span> <span class="o">=</span> <span class="n">lake</span><span class="p">))</span> <span class="o">+</span>
+  <span class="nf">facet_grid</span><span class="p">(</span><span class="n">lake</span> <span class="o">~</span> <span class="n">.</span><span class="p">,</span> <span class="n">scales</span> <span class="o">=</span> <span class="s">&quot;free&quot;</span><span class="p">)</span> <span class="o">+</span>
+  <span class="nf">geom_line</span><span class="p">()</span> <span class="o">+</span> 
+  <span class="nf">geom_line</span><span class="p">(</span><span class="nf">aes</span><span class="p">(</span><span class="n">y</span> <span class="o">=</span> <span class="n">mean_level</span><span class="p">))</span> <span class="o">+</span> 
+  <span class="nf">geom_line</span><span class="p">(</span><span class="n">linetype</span> <span class="o">=</span> <span class="s">&quot;dashed&quot;</span><span class="p">,</span> <span class="nf">aes</span><span class="p">(</span><span class="n">y</span> <span class="o">=</span> <span class="n">p05_level</span><span class="p">))</span> <span class="o">+</span> 
+  <span class="nf">geom_line</span><span class="p">(</span><span class="n">linetype</span> <span class="o">=</span> <span class="s">&quot;dashed&quot;</span><span class="p">,</span> <span class="nf">aes</span><span class="p">(</span><span class="n">y</span> <span class="o">=</span> <span class="n">p95_level</span><span class="p">))</span> <span class="o">+</span>
+  <span class="nf">theme</span><span class="p">(</span><span class="n">strip.text.y</span> <span class="o">=</span> <span class="nf">element_text</span><span class="p">(</span><span class="n">size</span> <span class="o">=</span> <span class="m">18</span><span class="p">),</span>
+        <span class="n">axis.text.x</span> <span class="o">=</span> <span class="nf">element_text</span><span class="p">(</span><span class="n">size</span> <span class="o">=</span> <span class="m">14</span><span class="p">),</span>
+        <span class="n">axis.text.y</span> <span class="o">=</span> <span class="nf">element_text</span><span class="p">(</span><span class="n">size</span> <span class="o">=</span> <span class="m">14</span><span class="p">),</span>
+        <span class="n">axis.title.x</span> <span class="o">=</span> <span class="nf">element_text</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="m">18</span><span class="p">),</span>
+        <span class="n">axis.title.y</span> <span class="o">=</span> <span class="nf">element_text</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="m">18</span><span class="p">),</span>
+        <span class="n">legend.position</span> <span class="o">=</span> <span class="s">&quot;none&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><img alt="center" src="../../_images/final_plot-1.png" /></p>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="nf">ggsave</span><span class="p">(</span><span class="s">&quot;lake_levels.png&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">## Saving 16 x 15 in image</span>
+</pre></div>
+</div>
+<p>This seems like a good place to stop for this post. I hope to dig into this data a bit using R’s time series analysis capabilities and do some follow up posts. In the next post we’ll pull out the important bits of the work above and create an R function we can call to easily rerun the analysis each month when new data becomes available.</p>
+</section>
+</section>
+
+<div class="section">
+    
+
+<div class="section">
+  <span style="float: left">
+     Previous:
+    
+    <a href="../hillmaker_r_sfcs/">
+       Using hillmaker from R with reticulate to analyze time of day patterns in bike share data
+    </a>
+    
+  </span>
+  <span>&nbsp;</span>
+  <span style="float: right">
+     Next: 
+    <a href="../hillmaker_020_released/">
+      Hillmaker updates 
+    </a>
+    
+  </span>
+</div>
+  
+</div>
+
+              </div>
+              
+              
+              <!-- Previous / next buttons -->
+<div class='prev-next-area'>
+</div>
+              
+          </main>
+          
+
       </div>
-      <div class="clearer"></div>
     </div>
-    <div class="footer">
-      &copy;2022, misken.
-      
-      |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.3.2</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
-      
-      |
-      <a href="../../_sources/blog/getandplot_gl_water_levels.md.txt"
-          rel="nofollow">Page source</a>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
+<footer class="footer mt-5 mt-md-0">
+  <div class="container">
+    
+    <div class="footer-item">
+      <p class="copyright">
+    &copy; Copyright 2022, misken.<br>
+</p>
     </div>
-
     
-
+    <div class="footer-item">
+      <p class="sphinx-version">
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.3.2.<br>
+</p>
+    </div>
     
+  </div>
+</footer>
   </body>
 </html>
