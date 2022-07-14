@@ -5,7 +5,7 @@
    "id": "50243ce8-fb04-4e74-bc47-115be8661b71",
    "metadata": {},
    "source": [
-    "# Plotting occupancy statistics with Python - a basic matplotlib recipe"
+    "# Plotting occupancy statistics with Python - Part 3 of 3"
    ]
   },
   {

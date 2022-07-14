@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>Plotting occupancy statistics with Python - a basic matplotlib recipe &#8212; misken 0,1,0 documentation</title>
+    <title>Plotting occupancy statistics with Python - Part 3 of 3 &#8212; misken 0,1,0 documentation</title>
     
   <!-- Loaded before other Sphinx assets -->
   <link href="../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
@@ -761,8 +761,8 @@ div.rendered_html tbody tr:hover {
   background: rgba(66, 165, 245, 0.2);
 }
 </style>
-<section id="Plotting-occupancy-statistics-with-Python---a-basic-matplotlib-recipe">
-<h1>Plotting occupancy statistics with Python - a basic matplotlib recipe<a class="headerlink" href="#Plotting-occupancy-statistics-with-Python---a-basic-matplotlib-recipe" title="Permalink to this headline">#</a></h1>
+<section id="Plotting-occupancy-statistics-with-Python---Part-3-of-3">
+<h1>Plotting occupancy statistics with Python - Part 3 of 3<a class="headerlink" href="#Plotting-occupancy-statistics-with-Python---Part-3-of-3" title="Permalink to this headline">#</a></h1>
 <p>In earlier posts, Python and pandas were used to compute occupancy statistics. Now we will use Python to create plots based on summary occupancy statistics (such as means and percentiles) by time of day, day of week, and patient category (recall that this example is from a hospital short stay unit - <a class="reference external" href="https://misken.github.io/blog/hillpy_bydate_demo/">go back to Part 1</a> for all of the background info). In this first installment, we will use matplotlib to create the plots. I’ve used matplotlib
 a bit but also use R and its awesome <code class="docutils literal notranslate"><span class="pre">ggplot2</span></code> package. With both packages, I feel like I’m constantly going back to square one and relearning how to do things. Of course there are tons of great galleries and examples and Q&amp;A on StackOverflow and I use them all. However, I thought it might be useful to create a few examples of doing occupancy plots that I (and others) might find useful as a template of sorts for creating similar plots. In this first matplotlib recipe I want to create a typical
 graph which includes a mixture of bars and lines plotted, axis labels and some slightly complicated tick placement and labeling.</p>
