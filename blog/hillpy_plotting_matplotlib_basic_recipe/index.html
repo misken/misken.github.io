@@ -1,0 +1,2195 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>Plotting occupancy statistics with Python - a basic matplotlib recipe &#8212; misken 0,1,0 documentation</title>
+    
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+
+    
+  <link rel="stylesheet"
+    href="../../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/design-style.b7bb847fb20b106c3d81b95245e65545.min.css" />
+    
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
+
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/design-tabs.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <link rel="author" title="About these documents" href="../../about/" />
+    <link rel="index" title="Index" href="../../genindex/" />
+    <link rel="search" title="Search" href="../../search/" /> 
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="en">
+    
+
+    <!-- Google Analytics -->
+    
+<script async="" src="https://www.googletagmanager.com/gtag/js?id=G-J4FJ8W6Y2K"></script>
+<script>
+                    window.dataLayer = window.dataLayer || [];
+                    function gtag(){ dataLayer.push(arguments); }
+                    gtag('js', new Date());
+                    gtag('config', 'G-J4FJ8W6Y2K');
+                </script>
+ 
+<link
+  rel="alternate"
+  type="application/atom+xml"
+  href="../../blog/atom.xml"
+  title="Bits of analytics"
+/>
+ 
+<style type="text/css">
+  ul.ablog-archive {
+    list-style: none;
+    overflow: auto;
+    margin-left: 0px;
+  }
+  ul.ablog-archive li {
+    float: left;
+    margin-right: 5px;
+    font-size: 80%;
+  }
+  ul.postlist a {
+    font-style: italic;
+  }
+  ul.postlist-style-disc {
+    list-style-type: disc;
+  }
+  ul.postlist-style-none {
+    list-style-type: none;
+  }
+  ul.postlist-style-circle {
+    list-style-type: circle;
+  }
+</style>
+
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
+    
+    <div class="container-fluid" id="banner"></div>
+
+    
+    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main"><div class="container-xl">
+
+  <div id="navbar-start">
+    
+    
+<a class="navbar-brand" href="../../">
+<p class="title">misken</p>
+</a>
+
+    
+  </div>
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapsible" aria-controls="navbar-collapsible" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  
+  <div id="navbar-collapsible" class="col-lg-9 collapse navbar-collapse">
+    <div id="navbar-center" class="mr-auto">
+      
+      <div class="navbar-center-item">
+        <ul id="navbar-main-elements" class="navbar-nav">
+    <li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../about/">
+  About misken
+ </a>
+</li>
+
+    
+</ul>
+      </div>
+      
+    </div>
+
+    <div id="navbar-end">
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+      </ul>
+      </div>
+      
+    </div>
+  </div>
+</div>
+    </nav>
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+            
+            <!-- Only show if we have sidebars configured, else just a small margin  -->
+            <div class="col-12 col-md-3 bd-sidebar">
+              <div class="sidebar-start-items">  
+<h2>
+   
+  01 January 2015 
+</h2>
+
+<ul>
+   
+<li id="author">
+  <span
+    >Author:</span
+  >
+   
+  <a href="../author/misken/">misken</a>  
+</li>
+    
+<li id="tags">
+  <span
+    >Tags: </span
+  >
+   
+  <a href="../tag/python/">python</a>   
+  <a href="../tag/hillmaker/">hillmaker</a>   
+  <a href="../tag/occupancy-analysis/">occupancy analysis</a>   
+  <a href="../tag/pandas/">pandas</a>   
+  <a href="../tag/matplotlib/">matplotlib</a>  
+</li>
+ 
+</ul>
+
+<h3>
+  <a href="../">Recent Posts</a>
+</h3>
+<ul>
+   
+  <li>
+    <a href="../hillmaker_030_released/"
+      >19 May - numpy speeds up hillmaker dramatically</a
+    >
+  </li>
+  
+  <li>
+    <a href="../simpy_vaccine_clinic_improvements/"
+      >11 April - Using SimPy to simulate a vaccine clinic - Part 2: model improvements</a
+    >
+  </li>
+  
+  <li>
+    <a href="../simpy_getting_started_vaccine_clinic/"
+      >04 April - Using SimPy to simulate a vaccine clinic - Part 1: an introductory tutorial</a
+    >
+  </li>
+  
+  <li>
+    <a href="../use_jupyter_conda_envs/"
+      >03 April - Using different conda environments with Jupyter Lab</a
+    >
+  </li>
+  
+  <li>
+    <a href="../hello_world/"
+      >02 April - Hello world from ablog blogging with JupyterLab</a
+    >
+  </li>
+  
+</ul>
+
+<h3><a href="../tag/">Tags</a></h3>
+<style type="text/css">
+  ul.ablog-cloud {
+    list-style: none;
+    overflow: auto;
+  }
+  ul.ablog-cloud li {
+    float: left;
+    height: 20pt;
+    line-height: 18pt;
+    margin-right: 5px;
+  }
+  ul.ablog-cloud a {
+    text-decoration: none;
+    vertical-align: middle;
+  }
+  li.ablog-cloud-1 {
+    font-size: 80%;
+  }
+  li.ablog-cloud-2 {
+    font-size: 95%;
+  }
+  li.ablog-cloud-3 {
+    font-size: 110%;
+  }
+  li.ablog-cloud-4 {
+    font-size: 125%;
+  }
+  li.ablog-cloud-5 {
+    font-size: 140%;
+  }
+</style>
+<ul class="ablog-cloud">
+   
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/github/">GitHub</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-3">
+    <a href="../tag/r/">R</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/ablog/">ablog</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/analytics/">analytics</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/bikeshare/">bikeshare</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/birding/">birding</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/blogging/">blogging</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/caret/">caret</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/conda/">conda</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/datetime/">datetime</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/dplyr/">dplyr</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/ebird/">ebird</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/ecology/">ecology</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/excel/">excel</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/ggmap/">ggmap</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/ggplot2/">ggplot2</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/gis/">gis</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/git/">git</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/gps/">gps</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/healthcare/">healthcare</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/hiking/">hiking</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/hillmaker/">hillmaker</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/jupyter/">jupyter</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/matplotlib/">matplotlib</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/metamodeling/">metamodeling</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-2">
+    <a href="../tag/occupancy-analysis/">occupancy analysis</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-2">
+    <a href="../tag/pandas/">pandas</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/patient-flow/">patient flow</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/plyr/">plyr</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-5">
+    <a href="../tag/python/">python</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/shiny/">shiny</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/simpy/">simpy</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/simulation/">simulation</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/sphinx/">sphinx</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/statistics/">statistics</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/teaching/">teaching</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/text/">text</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/xml/">xml</a>
+  </li>
+   
+</ul>
+
+<h3>
+  <a href="../archive/">Archives</a>
+</h3>
+<ul>
+   
+  <li>
+    <a href="../2022/">2022 (7)</a>
+  </li>
+    
+  <li>
+    <a href="../2021/">2021 (4)</a>
+  </li>
+    
+  <li>
+    <a href="../2020/">2020 (2)</a>
+  </li>
+    
+  <li>
+    <a href="../2019/">2019 (7)</a>
+  </li>
+    
+  <li>
+    <a href="../2018/">2018 (5)</a>
+  </li>
+    
+  <li>
+    <a href="../2017/">2017 (2)</a>
+  </li>
+    
+  <li>
+    <a href="../2016/">2016 (6)</a>
+  </li>
+    
+  <li>
+    <a href="../2015/">2015 (1)</a>
+  </li>
+    
+  <li>
+    <a href="../2014/">2014 (6)</a>
+  </li>
+    
+  <li>
+    <a href="../2013/">2013 (8)</a>
+  </li>
+   
+</ul>
+
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search/" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+              </div>
+              <div class="sidebar-end-items">
+              </div>
+            </div>
+            
+          
+
+          
+          <div class="d-none d-xl-block col-xl-2 bd-toc">
+            
+              
+              <div class="toc-item">
+                
+<div class="tocsection onthispage mt-5 pt-1 pb-3">
+    <i class="fas fa-list"></i> On this page
+</div>
+
+<nav id="bd-toc-nav">
+    <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#Data-Preliminaries">
+   Data Preliminaries
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#Plotting-preliminaries">
+   Plotting preliminaries
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#Occupancy-graph-patterns">
+   Occupancy graph patterns
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#Using-matplotlib-stylesheets">
+   Using matplotlib stylesheets
+  </a>
+ </li>
+</ul>
+
+</nav>
+              </div>
+              
+              <div class="toc-item">
+                
+              </div>
+              
+            
+          </div>
+          
+
+          
+          
+            
+          
+          <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+              
+              <div>
+                 
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt *,
+div.nbinput.container div.input_area pre,
+div.nboutput.container div.output_area pre,
+div.nbinput.container div.input_area .highlight,
+div.nboutput.container div.output_area .highlight {
+    border: none;
+    padding: 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+div.nbinput.container > div[class*=highlight],
+div.nboutput.container > div[class*=highlight] {
+    margin: 0;
+}
+
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt * {
+    background: none;
+}
+
+div.nboutput.container div.output_area .highlight,
+div.nboutput.container div.output_area pre {
+    background: unset;
+}
+
+div.nboutput.container div.output_area div.highlight {
+    color: unset;  /* override Pygments text color */
+}
+
+/* avoid gaps between output lines */
+div.nboutput.container div[class*=highlight] pre {
+    line-height: normal;
+}
+
+/* input/output containers */
+div.nbinput.container,
+div.nboutput.container {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+    width: 100%;
+}
+@media (max-width: 540px) {
+    div.nbinput.container,
+    div.nboutput.container {
+        flex-direction: column;
+    }
+}
+
+/* input container */
+div.nbinput.container {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast.container {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput.container div.prompt pre {
+    color: #307FC1;
+}
+
+/* output prompt */
+div.nboutput.container div.prompt pre {
+    color: #BF5B3D;
+}
+
+/* all prompts */
+div.nbinput.container div.prompt,
+div.nboutput.container div.prompt {
+    width: 4.5ex;
+    padding-top: 5px;
+    position: relative;
+    user-select: none;
+}
+
+div.nbinput.container div.prompt > div,
+div.nboutput.container div.prompt > div {
+    position: absolute;
+    right: 0;
+    margin-right: 0.3ex;
+}
+
+@media (max-width: 540px) {
+    div.nbinput.container div.prompt,
+    div.nboutput.container div.prompt {
+        width: unset;
+        text-align: left;
+        padding: 0.4em;
+    }
+    div.nboutput.container div.prompt.empty {
+        padding: 0;
+    }
+
+    div.nbinput.container div.prompt > div,
+    div.nboutput.container div.prompt > div {
+        position: unset;
+    }
+}
+
+/* disable scrollbars on prompts */
+div.nbinput.container div.prompt pre,
+div.nboutput.container div.prompt pre {
+    overflow: hidden;
+}
+
+/* input/output area */
+div.nbinput.container div.input_area,
+div.nboutput.container div.output_area {
+    -webkit-flex: 1;
+    flex: 1;
+    overflow: auto;
+}
+@media (max-width: 540px) {
+    div.nbinput.container div.input_area,
+    div.nboutput.container div.output_area {
+        width: 100%;
+    }
+}
+
+/* input area */
+div.nbinput.container div.input_area {
+    border: 1px solid #e0e0e0;
+    border-radius: 2px;
+    /*background: #f5f5f5;*/
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput.container div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.imgmath center alignment in output cells */
+div.nboutput.container div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput.container div.output_area.stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-default-inverse-fg { color: #FFFFFF; }
+.ansi-default-inverse-bg { background-color: #000000; }
+
+.ansi-bold { font-weight: bold; }
+.ansi-underline { text-decoration: underline; }
+
+
+div.nbinput.container div.input_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight].math,
+div.nboutput.container div.output_area.rendered_html,
+div.nboutput.container div.output_area > div.output_javascript,
+div.nboutput.container div.output_area:not(.rendered_html) > img{
+    padding: 5px;
+    margin: 0;
+}
+
+/* fix copybtn overflow problem in chromium (needed for 'sphinx_copybutton') */
+div.nbinput.container div.input_area > div[class^='highlight'],
+div.nboutput.container div.output_area > div[class^='highlight']{
+    overflow-y: hidden;
+}
+
+/* hide copybtn icon on prompts (needed for 'sphinx_copybutton') */
+.prompt .copybtn {
+    display: none;
+}
+
+/* Some additional styling taken form the Jupyter notebook CSS */
+div.rendered_html table {
+  border: none;
+  border-collapse: collapse;
+  border-spacing: 0;
+  color: black;
+  font-size: 12px;
+  table-layout: fixed;
+}
+div.rendered_html thead {
+  border-bottom: 1px solid black;
+  vertical-align: bottom;
+}
+div.rendered_html tr,
+div.rendered_html th,
+div.rendered_html td {
+  text-align: right;
+  vertical-align: middle;
+  padding: 0.5em 0.5em;
+  line-height: normal;
+  white-space: normal;
+  max-width: none;
+  border: none;
+}
+div.rendered_html th {
+  font-weight: bold;
+}
+div.rendered_html tbody tr:nth-child(odd) {
+  background: #f5f5f5;
+}
+div.rendered_html tbody tr:hover {
+  background: rgba(66, 165, 245, 0.2);
+}
+</style>
+<section id="Plotting-occupancy-statistics-with-Python---a-basic-matplotlib-recipe">
+<h1>Plotting occupancy statistics with Python - a basic matplotlib recipe<a class="headerlink" href="#Plotting-occupancy-statistics-with-Python---a-basic-matplotlib-recipe" title="Permalink to this headline">#</a></h1>
+<p>In earlier posts, Python and pandas were used to compute occupancy statistics. Now we will use Python to create plots based on summary occupancy statistics (such as means and percentiles) by time of day, day of week, and patient category (recall that this example is from a hospital short stay unit - <a class="reference external" href="https://misken.github.io/blog/hillpy_bydate_demo/">go back to Part 1</a> for all of the background info). In this first installment, we will use matplotlib to create the plots. I’ve used matplotlib
+a bit but also use R and its awesome <code class="docutils literal notranslate"><span class="pre">ggplot2</span></code> package. With both packages, I feel like I’m constantly going back to square one and relearning how to do things. Of course there are tons of great galleries and examples and Q&amp;A on StackOverflow and I use them all. However, I thought it might be useful to create a few examples of doing occupancy plots that I (and others) might find useful as a template of sorts for creating similar plots. In this first matplotlib recipe I want to create a typical
+graph which includes a mixture of bars and lines plotted, axis labels and some slightly complicated tick placement and labeling.</p>
+<p>You can find the data and the <code class="docutils literal notranslate"><span class="pre">.ipynb</span></code> file in my <a class="reference external" href="https://github.com/misken/hselab-tutorials">hselab-tutorials</a> github repo. Clone or download a zip.</p>
+<p>Here’s the plot we are going to create:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">IPython.display</span> <span class="kn">import</span> <span class="n">Image</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">i</span> <span class="o">=</span> <span class="n">Image</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="s1">&#39;images/occ_fig2.png&#39;</span><span class="p">)</span>
+<span class="n">i</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/blog_hillpy_plotting_matplotlib_basic_recipe_4_0.png" src="../../_images/blog_hillpy_plotting_matplotlib_basic_recipe_4_0.png" />
+</div>
+</div>
+<section id="Data-Preliminaries">
+<h2>Data Preliminaries<a class="headerlink" href="#Data-Preliminaries" title="Permalink to this headline">#</a></h2>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+</pre></div>
+</div>
+</div>
+<p>At the end of Part 2 of this tutorial series, we ended up with a csv file called <strong>occ_stats_summary.csv</strong>. Let’s read it in and take a look at it.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">## Read sample data set and convert string dates to datetimes</span>
+<span class="n">occ_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;data/occ_stats_summary.csv&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>Let’s subset the dataframe to pull out just the rows corresponding to total occupancy. In this example, each day was divided into 48 half-hour bins (for a total of 336 bins per week).</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">total_df</span> <span class="o">=</span> <span class="n">occ_df</span><span class="p">[</span><span class="n">occ_df</span><span class="o">.</span><span class="n">category</span> <span class="o">==</span> <span class="s1">&#39;Total&#39;</span><span class="p">][:]</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">total_df</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>category</th>
+      <th>dayofweek</th>
+      <th>binofday</th>
+      <th>count</th>
+      <th>max</th>
+      <th>mean</th>
+      <th>min</th>
+      <th>p50</th>
+      <th>p55</th>
+      <th>p60</th>
+      <th>p65</th>
+      <th>p70</th>
+      <th>p75</th>
+      <th>p80</th>
+      <th>p85</th>
+      <th>p90</th>
+      <th>p95</th>
+      <th>p975</th>
+      <th>p99</th>
+      <th>stdev</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>1680</th>
+      <td>Total</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>36.0</td>
+      <td>2.533333</td>
+      <td>0.525000</td>
+      <td>0.0</td>
+      <td>0.100000</td>
+      <td>0.350000</td>
+      <td>0.500000</td>
+      <td>0.525000</td>
+      <td>0.650000</td>
+      <td>0.850000</td>
+      <td>1.000000</td>
+      <td>1.216667</td>
+      <td>1.666667</td>
+      <td>2.033333</td>
+      <td>2.183333</td>
+      <td>2.393333</td>
+      <td>0.720069</td>
+    </tr>
+    <tr>
+      <th>1681</th>
+      <td>Total</td>
+      <td>0.0</td>
+      <td>1.0</td>
+      <td>36.0</td>
+      <td>4.000000</td>
+      <td>0.952778</td>
+      <td>0.0</td>
+      <td>0.166667</td>
+      <td>0.683333</td>
+      <td>0.833333</td>
+      <td>1.000000</td>
+      <td>1.166667</td>
+      <td>1.516667</td>
+      <td>2.000000</td>
+      <td>2.000000</td>
+      <td>3.133333</td>
+      <td>4.000000</td>
+      <td>4.000000</td>
+      <td>4.000000</td>
+      <td>1.293166</td>
+    </tr>
+    <tr>
+      <th>1682</th>
+      <td>Total</td>
+      <td>0.0</td>
+      <td>2.0</td>
+      <td>36.0</td>
+      <td>7.866667</td>
+      <td>0.900926</td>
+      <td>0.0</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.333333</td>
+      <td>0.583333</td>
+      <td>0.833333</td>
+      <td>1.083333</td>
+      <td>1.333333</td>
+      <td>1.991667</td>
+      <td>2.966667</td>
+      <td>4.000000</td>
+      <td>4.483333</td>
+      <td>6.513333</td>
+      <td>1.679030</td>
+    </tr>
+    <tr>
+      <th>1683</th>
+      <td>Total</td>
+      <td>0.0</td>
+      <td>3.0</td>
+      <td>36.0</td>
+      <td>4.000000</td>
+      <td>0.414815</td>
+      <td>0.0</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.041667</td>
+      <td>0.333333</td>
+      <td>0.891667</td>
+      <td>1.466667</td>
+      <td>2.466667</td>
+      <td>3.883333</td>
+      <td>3.953333</td>
+      <td>1.000173</td>
+    </tr>
+    <tr>
+      <th>1684</th>
+      <td>Total</td>
+      <td>0.0</td>
+      <td>4.0</td>
+      <td>36.0</td>
+      <td>4.666667</td>
+      <td>1.088889</td>
+      <td>0.0</td>
+      <td>0.316667</td>
+      <td>0.850000</td>
+      <td>1.000000</td>
+      <td>1.125000</td>
+      <td>1.433333</td>
+      <td>2.000000</td>
+      <td>2.000000</td>
+      <td>2.483333</td>
+      <td>3.600000</td>
+      <td>4.000000</td>
+      <td>4.083333</td>
+      <td>4.433333</td>
+      <td>1.421892</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">total_df</span><span class="o">.</span><span class="n">tail</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>category</th>
+      <th>dayofweek</th>
+      <th>binofday</th>
+      <th>count</th>
+      <th>max</th>
+      <th>mean</th>
+      <th>min</th>
+      <th>p50</th>
+      <th>p55</th>
+      <th>p60</th>
+      <th>p65</th>
+      <th>p70</th>
+      <th>p75</th>
+      <th>p80</th>
+      <th>p85</th>
+      <th>p90</th>
+      <th>p95</th>
+      <th>p975</th>
+      <th>p99</th>
+      <th>stdev</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>2011</th>
+      <td>Total</td>
+      <td>6.0</td>
+      <td>43.0</td>
+      <td>39.0</td>
+      <td>4.0</td>
+      <td>0.837607</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.45</td>
+      <td>0.66</td>
+      <td>0.960000</td>
+      <td>1.00</td>
+      <td>1.300000</td>
+      <td>1.840000</td>
+      <td>2.000000</td>
+      <td>2.560000</td>
+      <td>3.520000</td>
+      <td>4.000000</td>
+      <td>4.000000</td>
+      <td>1.185640</td>
+    </tr>
+    <tr>
+      <th>2012</th>
+      <td>Total</td>
+      <td>6.0</td>
+      <td>44.0</td>
+      <td>39.0</td>
+      <td>8.0</td>
+      <td>0.652137</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.000000</td>
+      <td>0.00</td>
+      <td>0.000000</td>
+      <td>0.813333</td>
+      <td>1.620000</td>
+      <td>2.240000</td>
+      <td>3.400000</td>
+      <td>4.200000</td>
+      <td>6.480000</td>
+      <td>1.584774</td>
+    </tr>
+    <tr>
+      <th>2013</th>
+      <td>Total</td>
+      <td>6.0</td>
+      <td>45.0</td>
+      <td>39.0</td>
+      <td>4.0</td>
+      <td>0.682051</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.27</td>
+      <td>0.56</td>
+      <td>0.646667</td>
+      <td>0.82</td>
+      <td>1.100000</td>
+      <td>1.253333</td>
+      <td>1.620000</td>
+      <td>2.080000</td>
+      <td>2.733333</td>
+      <td>3.366667</td>
+      <td>3.746667</td>
+      <td>1.020631</td>
+    </tr>
+    <tr>
+      <th>2014</th>
+      <td>Total</td>
+      <td>6.0</td>
+      <td>46.0</td>
+      <td>39.0</td>
+      <td>4.0</td>
+      <td>0.831624</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.15</td>
+      <td>0.44</td>
+      <td>0.853333</td>
+      <td>1.00</td>
+      <td>1.000000</td>
+      <td>1.920000</td>
+      <td>2.000000</td>
+      <td>2.400000</td>
+      <td>4.000000</td>
+      <td>4.000000</td>
+      <td>4.000000</td>
+      <td>1.279230</td>
+    </tr>
+    <tr>
+      <th>2015</th>
+      <td>Total</td>
+      <td>6.0</td>
+      <td>47.0</td>
+      <td>39.0</td>
+      <td>4.0</td>
+      <td>0.412821</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.166667</td>
+      <td>0.32</td>
+      <td>0.466667</td>
+      <td>0.666667</td>
+      <td>0.766667</td>
+      <td>1.226667</td>
+      <td>2.066667</td>
+      <td>2.733333</td>
+      <td>3.493333</td>
+      <td>0.838915</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<p>Notice that the integer index starts at 1680 and ends at 2015. Let’s reset the index in place so that we’ve got an index running from 0 to 335.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">total_df</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">total_df</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>index</th>
+      <th>category</th>
+      <th>dayofweek</th>
+      <th>binofday</th>
+      <th>count</th>
+      <th>max</th>
+      <th>mean</th>
+      <th>min</th>
+      <th>p50</th>
+      <th>p55</th>
+      <th>...</th>
+      <th>p65</th>
+      <th>p70</th>
+      <th>p75</th>
+      <th>p80</th>
+      <th>p85</th>
+      <th>p90</th>
+      <th>p95</th>
+      <th>p975</th>
+      <th>p99</th>
+      <th>stdev</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>1680</td>
+      <td>Total</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>36.0</td>
+      <td>2.533333</td>
+      <td>0.525000</td>
+      <td>0.0</td>
+      <td>0.100000</td>
+      <td>0.350000</td>
+      <td>...</td>
+      <td>0.525000</td>
+      <td>0.650000</td>
+      <td>0.850000</td>
+      <td>1.000000</td>
+      <td>1.216667</td>
+      <td>1.666667</td>
+      <td>2.033333</td>
+      <td>2.183333</td>
+      <td>2.393333</td>
+      <td>0.720069</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>1681</td>
+      <td>Total</td>
+      <td>0.0</td>
+      <td>1.0</td>
+      <td>36.0</td>
+      <td>4.000000</td>
+      <td>0.952778</td>
+      <td>0.0</td>
+      <td>0.166667</td>
+      <td>0.683333</td>
+      <td>...</td>
+      <td>1.000000</td>
+      <td>1.166667</td>
+      <td>1.516667</td>
+      <td>2.000000</td>
+      <td>2.000000</td>
+      <td>3.133333</td>
+      <td>4.000000</td>
+      <td>4.000000</td>
+      <td>4.000000</td>
+      <td>1.293166</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>1682</td>
+      <td>Total</td>
+      <td>0.0</td>
+      <td>2.0</td>
+      <td>36.0</td>
+      <td>7.866667</td>
+      <td>0.900926</td>
+      <td>0.0</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>...</td>
+      <td>0.583333</td>
+      <td>0.833333</td>
+      <td>1.083333</td>
+      <td>1.333333</td>
+      <td>1.991667</td>
+      <td>2.966667</td>
+      <td>4.000000</td>
+      <td>4.483333</td>
+      <td>6.513333</td>
+      <td>1.679030</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>1683</td>
+      <td>Total</td>
+      <td>0.0</td>
+      <td>3.0</td>
+      <td>36.0</td>
+      <td>4.000000</td>
+      <td>0.414815</td>
+      <td>0.0</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>...</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.041667</td>
+      <td>0.333333</td>
+      <td>0.891667</td>
+      <td>1.466667</td>
+      <td>2.466667</td>
+      <td>3.883333</td>
+      <td>3.953333</td>
+      <td>1.000173</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>1684</td>
+      <td>Total</td>
+      <td>0.0</td>
+      <td>4.0</td>
+      <td>36.0</td>
+      <td>4.666667</td>
+      <td>1.088889</td>
+      <td>0.0</td>
+      <td>0.316667</td>
+      <td>0.850000</td>
+      <td>...</td>
+      <td>1.125000</td>
+      <td>1.433333</td>
+      <td>2.000000</td>
+      <td>2.000000</td>
+      <td>2.483333</td>
+      <td>3.600000</td>
+      <td>4.000000</td>
+      <td>4.083333</td>
+      <td>4.433333</td>
+      <td>1.421892</td>
+    </tr>
+  </tbody>
+</table>
+<p>5 rows × 21 columns</p>
+</div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">total_df</span><span class="o">.</span><span class="n">tail</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>index</th>
+      <th>category</th>
+      <th>dayofweek</th>
+      <th>binofday</th>
+      <th>count</th>
+      <th>max</th>
+      <th>mean</th>
+      <th>min</th>
+      <th>p50</th>
+      <th>p55</th>
+      <th>...</th>
+      <th>p65</th>
+      <th>p70</th>
+      <th>p75</th>
+      <th>p80</th>
+      <th>p85</th>
+      <th>p90</th>
+      <th>p95</th>
+      <th>p975</th>
+      <th>p99</th>
+      <th>stdev</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>331</th>
+      <td>2011</td>
+      <td>Total</td>
+      <td>6.0</td>
+      <td>43.0</td>
+      <td>39.0</td>
+      <td>4.0</td>
+      <td>0.837607</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.45</td>
+      <td>...</td>
+      <td>0.960000</td>
+      <td>1.00</td>
+      <td>1.300000</td>
+      <td>1.840000</td>
+      <td>2.000000</td>
+      <td>2.560000</td>
+      <td>3.520000</td>
+      <td>4.000000</td>
+      <td>4.000000</td>
+      <td>1.185640</td>
+    </tr>
+    <tr>
+      <th>332</th>
+      <td>2012</td>
+      <td>Total</td>
+      <td>6.0</td>
+      <td>44.0</td>
+      <td>39.0</td>
+      <td>8.0</td>
+      <td>0.652137</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.00</td>
+      <td>...</td>
+      <td>0.000000</td>
+      <td>0.00</td>
+      <td>0.000000</td>
+      <td>0.813333</td>
+      <td>1.620000</td>
+      <td>2.240000</td>
+      <td>3.400000</td>
+      <td>4.200000</td>
+      <td>6.480000</td>
+      <td>1.584774</td>
+    </tr>
+    <tr>
+      <th>333</th>
+      <td>2013</td>
+      <td>Total</td>
+      <td>6.0</td>
+      <td>45.0</td>
+      <td>39.0</td>
+      <td>4.0</td>
+      <td>0.682051</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.27</td>
+      <td>...</td>
+      <td>0.646667</td>
+      <td>0.82</td>
+      <td>1.100000</td>
+      <td>1.253333</td>
+      <td>1.620000</td>
+      <td>2.080000</td>
+      <td>2.733333</td>
+      <td>3.366667</td>
+      <td>3.746667</td>
+      <td>1.020631</td>
+    </tr>
+    <tr>
+      <th>334</th>
+      <td>2014</td>
+      <td>Total</td>
+      <td>6.0</td>
+      <td>46.0</td>
+      <td>39.0</td>
+      <td>4.0</td>
+      <td>0.831624</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.15</td>
+      <td>...</td>
+      <td>0.853333</td>
+      <td>1.00</td>
+      <td>1.000000</td>
+      <td>1.920000</td>
+      <td>2.000000</td>
+      <td>2.400000</td>
+      <td>4.000000</td>
+      <td>4.000000</td>
+      <td>4.000000</td>
+      <td>1.279230</td>
+    </tr>
+    <tr>
+      <th>335</th>
+      <td>2015</td>
+      <td>Total</td>
+      <td>6.0</td>
+      <td>47.0</td>
+      <td>39.0</td>
+      <td>4.0</td>
+      <td>0.412821</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.00</td>
+      <td>...</td>
+      <td>0.166667</td>
+      <td>0.32</td>
+      <td>0.466667</td>
+      <td>0.666667</td>
+      <td>0.766667</td>
+      <td>1.226667</td>
+      <td>2.066667</td>
+      <td>2.733333</td>
+      <td>3.493333</td>
+      <td>0.838915</td>
+    </tr>
+  </tbody>
+</table>
+<p>5 rows × 21 columns</p>
+</div></div>
+</div>
+</section>
+<section id="Plotting-preliminaries">
+<h2>Plotting preliminaries<a class="headerlink" href="#Plotting-preliminaries" title="Permalink to this headline">#</a></h2>
+<p>Now, lets make some plots. We’ll use matplotlib first and then try the recent port of ggplot2 to Python.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[23]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib</span> <span class="k">as</span> <span class="nn">mpl</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">matplotlib.dates</span> <span class="kn">import</span> <span class="n">DateFormatter</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[24]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Store the matplotlib style defaults so we can easily get them back. For inline work, we do this:</span>
+<span class="n">inline_rc</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">mpl</span><span class="o">.</span><span class="n">rcParams</span><span class="p">)</span>
+
+<span class="c1"># For non-inline work we can do</span>
+<span class="c1"># plt.rcdefaults()</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Occupancy-graph-patterns">
+<h2>Occupancy graph patterns<a class="headerlink" href="#Occupancy-graph-patterns" title="Permalink to this headline">#</a></h2>
+<p>Let’s make some plots. We will create some common patterns using matplotlib and ggplot. To start, our X-axis will just be sequence of integers from 0 to 335. Later we will modify this to use more informative day of week and time of day options.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[25]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create a Figure and Axes object</span>
+<span class="c1">#--------------------------------</span>
+<span class="n">fig1</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+<span class="n">ax1</span> <span class="o">=</span> <span class="n">fig1</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="c1"># Create a list to use as the X-axis values</span>
+<span class="c1">#-------------------------------------------</span>
+<span class="n">time_bins</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">337</span><span class="p">)</span>
+
+<span class="c1"># Specify the mean occupancy and percentile values</span>
+<span class="c1">#-----------------------------------------------------------</span>
+<span class="n">mean_occ</span> <span class="o">=</span> <span class="n">total_df</span><span class="p">[</span><span class="s1">&#39;mean&#39;</span><span class="p">]</span>
+<span class="n">pctile_occ</span> <span class="o">=</span> <span class="n">total_df</span><span class="p">[</span><span class="s1">&#39;p95&#39;</span><span class="p">]</span>
+
+<span class="c1"># Styling of bars, lines, plot area</span>
+<span class="c1">#-----------------------------------</span>
+
+<span class="c1"># Style the bars for mean occupancy</span>
+<span class="n">bar_color</span> <span class="o">=</span> <span class="s1">&#39;green&#39;</span>
+<span class="n">bar_opacity</span> <span class="o">=</span> <span class="mf">0.8</span>
+
+<span class="c1"># Style the line for the occupancy percentile</span>
+<span class="n">pctile_line_style</span> <span class="o">=</span> <span class="s1">&#39;-&#39;</span>
+<span class="n">pctile_color</span> <span class="o">=</span> <span class="s1">&#39;black&#39;</span>
+<span class="n">pctile_line_width</span> <span class="o">=</span> <span class="mi">1</span>
+
+
+<span class="c1"># Set the background color of the plot. Argument is a string float in</span>
+<span class="c1"># (0,1) representing greyscale (0=black, 1=white)</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">patch</span><span class="o">.</span><span class="n">set_facecolor</span><span class="p">(</span><span class="s1">&#39;0.95&#39;</span><span class="p">)</span>
+
+<span class="c1"># Can also use color names or hex color codes</span>
+<span class="c1"># ax1.patch.set_facecolor(&#39;yellow&#39;)</span>
+<span class="c1"># ax1.patch.set_facecolor(&#39;#FFFFAD&#39;)</span>
+
+
+<span class="c1"># Add data to the plot</span>
+<span class="c1">#--------------------------</span>
+
+<span class="c1"># Mean occupancy as bars</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="n">time_bins</span><span class="p">,</span><span class="n">mean_occ</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">bar_color</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="n">bar_opacity</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Mean Occ&#39;</span><span class="p">)</span>
+
+<span class="c1"># Some percentile aas a line</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">time_bins</span><span class="p">,</span><span class="n">pctile_occ</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="n">pctile_line_style</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="n">pctile_line_width</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">pctile_color</span><span class="p">,</span> \
+         <span class="n">label</span><span class="o">=</span><span class="s1">&#39;95th </span><span class="si">%i</span><span class="s1">le Occ&#39;</span><span class="p">)</span>
+
+<span class="c1"># Set x-axis limits</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">335</span><span class="p">])</span>
+
+<span class="c1"># Set y-axis limits</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">225</span><span class="p">])</span>
+
+<span class="c1"># Add other chart elements</span>
+<span class="c1">#-------------------------</span>
+
+<span class="c1"># Set plot and axis titles</span>
+<span class="n">fig1</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s1">&#39;Occupancy analysis of SSU&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">,</span> <span class="n">fontweight</span><span class="o">=</span><span class="s1">&#39;bold&#39;</span><span class="p">)</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;All patient types&#39;</span><span class="p">)</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Time Bin of Week&#39;</span><span class="p">)</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Occupancy&#39;</span><span class="p">)</span>
+
+<span class="c1"># Gridlines</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">)</span>
+
+<span class="c1"># Legend</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s1">&#39;best&#39;</span><span class="p">)</span>
+
+<span class="c1"># Plot size</span>
+<span class="n">fig1</span><span class="o">.</span><span class="n">set_size_inches</span><span class="p">(</span><span class="mi">16</span><span class="p">,</span><span class="mi">12</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/blog_hillpy_plotting_matplotlib_basic_recipe_21_0.png" src="../../_images/blog_hillpy_plotting_matplotlib_basic_recipe_21_0.png" />
+</div>
+</div>
+<p>Let’s add a capacity line at 170. One way to do this is to add another data series to the plot consisting of y-values of 170.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[26]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Add a constant valued column to the dataframe</span>
+<span class="n">total_df</span><span class="p">[</span><span class="s1">&#39;Capacity&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">170</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[27]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">capacity_line_style</span> <span class="o">=</span> <span class="s1">&#39;-&#39;</span>
+<span class="n">capacity_color</span> <span class="o">=</span> <span class="s1">&#39;black&#39;</span>
+<span class="n">capacity_line_width</span> <span class="o">=</span> <span class="mi">2</span>
+
+<span class="n">ax1</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">time_bins</span><span class="p">,</span><span class="n">total_df</span><span class="p">[</span><span class="s1">&#39;Capacity&#39;</span><span class="p">],</span><span class="n">linestyle</span><span class="o">=</span><span class="n">capacity_line_style</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="n">capacity_line_width</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">capacity_color</span><span class="p">)</span>
+<span class="n">display</span><span class="p">(</span><span class="n">fig1</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/blog_hillpy_plotting_matplotlib_basic_recipe_24_0.png" src="../../_images/blog_hillpy_plotting_matplotlib_basic_recipe_24_0.png" />
+</div>
+</div>
+<p>Now let’s work on relabling the X-axis with days of the week and times. I struggled with this but along the way learned a few things. I’ll share some of my fumbling.</p>
+<p>One approach might be to create a week of timestamps at the correct frequency and then use formatting to control how they display as axis labels. Pandas has a convenience function called <a class="reference external" href="http://pandas.pydata.org/pandas-docs/stable/generated/pandas.date_range.html">date_range</a> that makes it easy to create an object consisting of a bunch of datetime values of any frequency desired.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[28]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># 336 half hours starting with midnight Dec 14, 2014</span>
+<span class="n">timestamps</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">date_range</span><span class="p">(</span><span class="s1">&#39;12/15/2014&#39;</span><span class="p">,</span> <span class="n">periods</span><span class="o">=</span><span class="mi">336</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="s1">&#39;30Min&#39;</span><span class="p">)</span>
+
+<span class="c1"># What is this timestamps object we&#39;ve created?</span>
+<span class="n">timestamps</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[28]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+DatetimeIndex([&#39;2014-12-15 00:00:00&#39;, &#39;2014-12-15 00:30:00&#39;,
+               &#39;2014-12-15 01:00:00&#39;, &#39;2014-12-15 01:30:00&#39;,
+               &#39;2014-12-15 02:00:00&#39;, &#39;2014-12-15 02:30:00&#39;,
+               &#39;2014-12-15 03:00:00&#39;, &#39;2014-12-15 03:30:00&#39;,
+               &#39;2014-12-15 04:00:00&#39;, &#39;2014-12-15 04:30:00&#39;,
+               ...
+               &#39;2014-12-21 19:00:00&#39;, &#39;2014-12-21 19:30:00&#39;,
+               &#39;2014-12-21 20:00:00&#39;, &#39;2014-12-21 20:30:00&#39;,
+               &#39;2014-12-21 21:00:00&#39;, &#39;2014-12-21 21:30:00&#39;,
+               &#39;2014-12-21 22:00:00&#39;, &#39;2014-12-21 22:30:00&#39;,
+               &#39;2014-12-21 23:00:00&#39;, &#39;2014-12-21 23:30:00&#39;],
+              dtype=&#39;datetime64[ns]&#39;, length=336, freq=&#39;30T&#39;)
+</pre></div></div>
+</div>
+<p>It’s a pandas index. Hmmm, I wonder if we can use this directly for our X-axis values and/or tick labels? If not, we can always convert it to a list or a pandas <code class="docutils literal notranslate"><span class="pre">Series</span></code> object. At least one of these things should work.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[29]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># First 10 elements of a list version of timestamps</span>
+<span class="n">timestamps</span><span class="o">.</span><span class="n">tolist</span><span class="p">()[</span><span class="mi">0</span><span class="p">:</span><span class="mi">10</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[29]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[Timestamp(&#39;2014-12-15 00:00:00&#39;, freq=&#39;30T&#39;),
+ Timestamp(&#39;2014-12-15 00:30:00&#39;, freq=&#39;30T&#39;),
+ Timestamp(&#39;2014-12-15 01:00:00&#39;, freq=&#39;30T&#39;),
+ Timestamp(&#39;2014-12-15 01:30:00&#39;, freq=&#39;30T&#39;),
+ Timestamp(&#39;2014-12-15 02:00:00&#39;, freq=&#39;30T&#39;),
+ Timestamp(&#39;2014-12-15 02:30:00&#39;, freq=&#39;30T&#39;),
+ Timestamp(&#39;2014-12-15 03:00:00&#39;, freq=&#39;30T&#39;),
+ Timestamp(&#39;2014-12-15 03:30:00&#39;, freq=&#39;30T&#39;),
+ Timestamp(&#39;2014-12-15 04:00:00&#39;, freq=&#39;30T&#39;),
+ Timestamp(&#39;2014-12-15 04:30:00&#39;, freq=&#39;30T&#39;)]
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[30]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Pandas series version of timestamps</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">timestamps</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[30]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+0     2014-12-15 00:00:00
+1     2014-12-15 00:30:00
+2     2014-12-15 01:00:00
+3     2014-12-15 01:30:00
+4     2014-12-15 02:00:00
+              ...
+331   2014-12-21 21:30:00
+332   2014-12-21 22:00:00
+333   2014-12-21 22:30:00
+334   2014-12-21 23:00:00
+335   2014-12-21 23:30:00
+Length: 336, dtype: datetime64[ns]
+</pre></div></div>
+</div>
+<p>Obviously we can’t label every half hour with a datetime stamp. What we can do is create lists of datetimes to use as the locations of major and minor tick labels. Again, we can take advantage of some pandas functionality.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[31]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">major_tick_locations</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">date_range</span><span class="p">(</span><span class="s1">&#39;12/15/2014 12:00:00&#39;</span><span class="p">,</span> <span class="n">periods</span><span class="o">=</span><span class="mi">7</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="s1">&#39;24H&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+<span class="n">minor_tick_locations</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">date_range</span><span class="p">(</span><span class="s1">&#39;12/15/2014 06:00:00&#39;</span><span class="p">,</span> <span class="n">periods</span><span class="o">=</span><span class="mi">28</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="s1">&#39;6H&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[32]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">major_tick_locations</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[32]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[Timestamp(&#39;2014-12-15 12:00:00&#39;, freq=&#39;24H&#39;),
+ Timestamp(&#39;2014-12-16 12:00:00&#39;, freq=&#39;24H&#39;),
+ Timestamp(&#39;2014-12-17 12:00:00&#39;, freq=&#39;24H&#39;),
+ Timestamp(&#39;2014-12-18 12:00:00&#39;, freq=&#39;24H&#39;),
+ Timestamp(&#39;2014-12-19 12:00:00&#39;, freq=&#39;24H&#39;),
+ Timestamp(&#39;2014-12-20 12:00:00&#39;, freq=&#39;24H&#39;),
+ Timestamp(&#39;2014-12-21 12:00:00&#39;, freq=&#39;24H&#39;)]
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[33]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">minor_tick_locations</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[33]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[Timestamp(&#39;2014-12-15 06:00:00&#39;, freq=&#39;6H&#39;),
+ Timestamp(&#39;2014-12-15 12:00:00&#39;, freq=&#39;6H&#39;),
+ Timestamp(&#39;2014-12-15 18:00:00&#39;, freq=&#39;6H&#39;),
+ Timestamp(&#39;2014-12-16 00:00:00&#39;, freq=&#39;6H&#39;),
+ Timestamp(&#39;2014-12-16 06:00:00&#39;, freq=&#39;6H&#39;),
+ Timestamp(&#39;2014-12-16 12:00:00&#39;, freq=&#39;6H&#39;),
+ Timestamp(&#39;2014-12-16 18:00:00&#39;, freq=&#39;6H&#39;),
+ Timestamp(&#39;2014-12-17 00:00:00&#39;, freq=&#39;6H&#39;),
+ Timestamp(&#39;2014-12-17 06:00:00&#39;, freq=&#39;6H&#39;),
+ Timestamp(&#39;2014-12-17 12:00:00&#39;, freq=&#39;6H&#39;),
+ Timestamp(&#39;2014-12-17 18:00:00&#39;, freq=&#39;6H&#39;),
+ Timestamp(&#39;2014-12-18 00:00:00&#39;, freq=&#39;6H&#39;),
+ Timestamp(&#39;2014-12-18 06:00:00&#39;, freq=&#39;6H&#39;),
+ Timestamp(&#39;2014-12-18 12:00:00&#39;, freq=&#39;6H&#39;),
+ Timestamp(&#39;2014-12-18 18:00:00&#39;, freq=&#39;6H&#39;),
+ Timestamp(&#39;2014-12-19 00:00:00&#39;, freq=&#39;6H&#39;),
+ Timestamp(&#39;2014-12-19 06:00:00&#39;, freq=&#39;6H&#39;),
+ Timestamp(&#39;2014-12-19 12:00:00&#39;, freq=&#39;6H&#39;),
+ Timestamp(&#39;2014-12-19 18:00:00&#39;, freq=&#39;6H&#39;),
+ Timestamp(&#39;2014-12-20 00:00:00&#39;, freq=&#39;6H&#39;),
+ Timestamp(&#39;2014-12-20 06:00:00&#39;, freq=&#39;6H&#39;),
+ Timestamp(&#39;2014-12-20 12:00:00&#39;, freq=&#39;6H&#39;),
+ Timestamp(&#39;2014-12-20 18:00:00&#39;, freq=&#39;6H&#39;),
+ Timestamp(&#39;2014-12-21 00:00:00&#39;, freq=&#39;6H&#39;),
+ Timestamp(&#39;2014-12-21 06:00:00&#39;, freq=&#39;6H&#39;),
+ Timestamp(&#39;2014-12-21 12:00:00&#39;, freq=&#39;6H&#39;),
+ Timestamp(&#39;2014-12-21 18:00:00&#39;, freq=&#39;6H&#39;),
+ Timestamp(&#39;2014-12-22 00:00:00&#39;, freq=&#39;6H&#39;)]
+</pre></div></div>
+</div>
+<p>Now that we can set the locations of major and minor tick labels, we can use matplotlib’s <a class="reference external" href="http://matplotlib.org/api/dates_api.html#date-formatters">DateFormatter</a> function to control how the labels look. DateFormatter uses <code class="docutils literal notranslate"><span class="pre">strftime()</span></code> format strings - see <a class="reference external" href="http://strftime.org/">http://strftime.org/</a>. We aren’t using the date part other than to get at the day of week.</p>
+<p>The other formatting related thing we want to do is to have the days of the week labels appear underneath the hour of day labels. As you’ll see below, we can pull this off using <code class="docutils literal notranslate"><span class="pre">pad</span></code> argument of the <code class="docutils literal notranslate"><span class="pre">tick_params()</span></code> function. A useful reference for this is <a class="reference external" href="http://stackoverflow.com/questions/14800973/matplotlib-tick-labels-position-relative-to-axes">http://stackoverflow.com/questions/14800973/matplotlib-tick-labels-position-relative-to-axes</a>.</p>
+<p>Now that the X-axis values are datetimes, another evil “gotcha” rears its ugly head. By default, the width of the bars representing mean occupancy will be equal to 1. Hmm, 1 what? 1 unit on the X-axis. I figured that would be one half-hour bin. Nope. It’s 1 day (since time durations less than one day are simply fractions of the day). So, by default you get bars that are huge (one day wide) and they obscure each other. Solution, use the <code class="docutils literal notranslate"><span class="pre">width</span></code> option to set the bar width to 1/(number of bins
+in the day). In our case, we set <code class="docutils literal notranslate"><span class="pre">width</span> <span class="pre">=</span> <span class="pre">1/48</span></code>. If you want to see what things look like if you don’t do this, just edit the appropriate line and set <code class="docutils literal notranslate"><span class="pre">width</span> <span class="pre">=</span> <span class="pre">1</span></code>.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[34]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create a Figure and Axes object</span>
+<span class="c1">#--------------------------------</span>
+<span class="n">fig2</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+<span class="n">ax2</span> <span class="o">=</span> <span class="n">fig2</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="c1"># Create a list to use as the X-axis values</span>
+<span class="c1">#-------------------------------------------</span>
+<span class="c1"># 336 half hours starting with midnight Dec 14, 2014</span>
+<span class="n">timestamps</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">date_range</span><span class="p">(</span><span class="s1">&#39;12/15/2014&#39;</span><span class="p">,</span> <span class="n">periods</span><span class="o">=</span><span class="mi">336</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="s1">&#39;30Min&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+
+
+
+<span class="c1"># Styling of bars, lines, plot area</span>
+<span class="c1">#-----------------------------------</span>
+
+<span class="c1"># Style the bars for mean occupancy</span>
+<span class="n">bar_color</span> <span class="o">=</span> <span class="s1">&#39;grey&#39;</span>
+<span class="n">bar_opacity</span> <span class="o">=</span> <span class="mf">0.8</span>
+
+<span class="c1"># Style the line for the occupancy percentile and capacity</span>
+<span class="n">pctile_line_style</span> <span class="o">=</span> <span class="s1">&#39;-&#39;</span>
+<span class="n">pctile_color</span> <span class="o">=</span> <span class="s1">&#39;black&#39;</span>
+<span class="n">pctile_line_width</span> <span class="o">=</span> <span class="mi">1</span>
+
+<span class="n">capacity_line_style</span> <span class="o">=</span> <span class="s1">&#39;-&#39;</span>
+<span class="n">capacity_color</span> <span class="o">=</span> <span class="s1">&#39;black&#39;</span>
+<span class="n">capacity_line_width</span> <span class="o">=</span> <span class="mi">2</span>
+
+
+<span class="c1"># Set the background color of the plot. Argument is a string float in</span>
+<span class="c1"># (0,1) representing greyscale (0=black, 1=white)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">patch</span><span class="o">.</span><span class="n">set_facecolor</span><span class="p">(</span><span class="s1">&#39;0.95&#39;</span><span class="p">)</span>
+
+<span class="c1"># Can also use color names or hex color codes</span>
+<span class="c1"># ax2.patch.set_facecolor(&#39;yellow&#39;)</span>
+<span class="c1"># ax2.patch.set_facecolor(&#39;#FFFFAD&#39;)</span>
+
+
+<span class="c1"># Add data to the plot</span>
+<span class="c1">#--------------------------</span>
+
+<span class="c1"># Mean occupancy as bars - here&#39;s the GOTCHA involving the bar width</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="n">timestamps</span><span class="p">,</span><span class="n">mean_occ</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">bar_color</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="n">bar_opacity</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Mean Occ&#39;</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">1</span><span class="o">/</span><span class="mi">48</span><span class="p">)</span>
+
+<span class="c1"># Some percentile aas a line</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">timestamps</span><span class="p">,</span><span class="n">pctile_occ</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="n">pctile_line_style</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="n">pctile_line_width</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">pctile_color</span><span class="p">,</span> \
+         <span class="n">label</span><span class="o">=</span><span class="s1">&#39;95th </span><span class="si">%i</span><span class="s1">le Occ&#39;</span><span class="p">)</span>
+
+<span class="n">ax2</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">timestamps</span><span class="p">,</span><span class="n">total_df</span><span class="p">[</span><span class="s1">&#39;Capacity&#39;</span><span class="p">],</span><span class="n">linestyle</span><span class="o">=</span><span class="n">capacity_line_style</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="n">capacity_line_width</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">capacity_color</span><span class="p">)</span>
+
+
+<span class="c1"># Create formatter variables</span>
+<span class="n">dayofweek_formatter</span> <span class="o">=</span> <span class="n">DateFormatter</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%a</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="n">qtrday_formatter</span> <span class="o">=</span> <span class="n">DateFormatter</span><span class="p">(</span><span class="s1">&#39;%H&#39;</span><span class="p">)</span>
+
+<span class="c1"># Set the tick locations for the axes object</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">(</span><span class="n">major_tick_locations</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">(</span><span class="n">minor_tick_locations</span><span class="p">,</span> <span class="n">minor</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="c1"># Format the tick labels</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">set_major_formatter</span><span class="p">(</span><span class="n">dayofweek_formatter</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">set_minor_formatter</span><span class="p">(</span><span class="n">qtrday_formatter</span><span class="p">)</span>
+
+<span class="c1"># Slide the major tick labels underneath the default location by 20 points</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">which</span><span class="o">=</span><span class="s1">&#39;major&#39;</span><span class="p">,</span> <span class="n">pad</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+
+<span class="c1"># Add other chart elements</span>
+<span class="c1">#-------------------------</span>
+
+<span class="c1"># Set plot and axis titles</span>
+<span class="n">fig2</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s1">&#39;Occupancy analysis of SSU&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">28</span><span class="p">,</span> <span class="n">fontweight</span><span class="o">=</span><span class="s1">&#39;bold&#39;</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;All patient types&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">24</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Time Bin of Week&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Occupancy&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">)</span>
+
+<span class="c1"># Gridlines</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">)</span>
+
+<span class="c1"># Legend</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s1">&#39;best&#39;</span><span class="p">)</span>
+
+<span class="c1"># Plot size</span>
+<span class="n">fig2</span><span class="o">.</span><span class="n">set_size_inches</span><span class="p">(</span><span class="mi">16</span><span class="p">,</span><span class="mi">12</span><span class="p">)</span>
+<br/></pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/blog_hillpy_plotting_matplotlib_basic_recipe_35_0.png" src="../../_images/blog_hillpy_plotting_matplotlib_basic_recipe_35_0.png" />
+</div>
+</div>
+</section>
+<section id="Using-matplotlib-stylesheets">
+<h2>Using matplotlib stylesheets<a class="headerlink" href="#Using-matplotlib-stylesheets" title="Permalink to this headline">#</a></h2>
+<p>Matplotlib has a package called <code class="docutils literal notranslate"><span class="pre">style</span></code> that makes it easy to switch between predefined styles for your graphs. There are a few built-in styles. For example, you can make your plots look like the default plots you get with the R package <code class="docutils literal notranslate"><span class="pre">ggplot2</span></code> or like those found on Nate Silver’s 538 blog. You can create your own stylesheets, too.</p>
+<p>Get all the details at <a class="reference external" href="http://matplotlib.org/users/style_sheets.html">http://matplotlib.org/users/style_sheets.html</a>.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[35]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#Let&#39;s check out the built-in style sheets</span>
+<span class="nb">print</span> <span class="p">(</span><span class="n">plt</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">available</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[&#39;Solarize_Light2&#39;, &#39;_classic_test_patch&#39;, &#39;_mpl-gallery&#39;, &#39;_mpl-gallery-nogrid&#39;, &#39;bmh&#39;, &#39;classic&#39;, &#39;dark_background&#39;, &#39;fast&#39;, &#39;fivethirtyeight&#39;, &#39;ggplot&#39;, &#39;grayscale&#39;, &#39;seaborn&#39;, &#39;seaborn-bright&#39;, &#39;seaborn-colorblind&#39;, &#39;seaborn-dark&#39;, &#39;seaborn-dark-palette&#39;, &#39;seaborn-darkgrid&#39;, &#39;seaborn-deep&#39;, &#39;seaborn-muted&#39;, &#39;seaborn-notebook&#39;, &#39;seaborn-paper&#39;, &#39;seaborn-pastel&#39;, &#39;seaborn-poster&#39;, &#39;seaborn-talk&#39;, &#39;seaborn-ticks&#39;, &#39;seaborn-white&#39;, &#39;seaborn-whitegrid&#39;, &#39;tableau-colorblind10&#39;]
+</pre></div></div>
+</div>
+<p>Let’s start with the ggplot style.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[36]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">use</span><span class="p">(</span><span class="s1">&#39;ggplot&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[37]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create a Figure and Axes object</span>
+<span class="c1">#--------------------------------</span>
+<span class="n">fig3</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+<span class="n">ax3</span> <span class="o">=</span> <span class="n">fig3</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="c1"># Create a list to use as the X-axis values</span>
+<span class="c1">#-------------------------------------------</span>
+<span class="c1"># 336 half hours starting with midnight Dec 14, 2014</span>
+<span class="n">timestamps</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">date_range</span><span class="p">(</span><span class="s1">&#39;12/15/2014&#39;</span><span class="p">,</span> <span class="n">periods</span><span class="o">=</span><span class="mi">336</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="s1">&#39;30Min&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+
+
+<span class="c1"># Add data to the plot</span>
+<span class="c1">#--------------------------</span>
+
+
+<span class="n">ax3</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="n">timestamps</span><span class="p">,</span><span class="n">mean_occ</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">1</span><span class="o">/</span><span class="mi">48</span><span class="p">)</span>
+<span class="n">ax3</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">timestamps</span><span class="p">,</span><span class="n">pctile_occ</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;95th </span><span class="si">%i</span><span class="s1">le Occ&#39;</span><span class="p">)</span>
+<span class="n">ax3</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">timestamps</span><span class="p">,</span><span class="n">total_df</span><span class="p">[</span><span class="s1">&#39;Capacity&#39;</span><span class="p">])</span>
+
+
+<span class="c1"># Create formatter variables</span>
+<span class="n">dayofweek_formatter</span> <span class="o">=</span> <span class="n">DateFormatter</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%a</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="n">qtrday_formatter</span> <span class="o">=</span> <span class="n">DateFormatter</span><span class="p">(</span><span class="s1">&#39;%H&#39;</span><span class="p">)</span>
+
+<span class="c1"># Set the tick locations for the axes object</span>
+<span class="n">ax3</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">(</span><span class="n">major_tick_locations</span><span class="p">)</span>
+<span class="n">ax3</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">(</span><span class="n">minor_tick_locations</span><span class="p">,</span> <span class="n">minor</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="c1"># Format the tick labels</span>
+<span class="n">ax3</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">set_major_formatter</span><span class="p">(</span><span class="n">dayofweek_formatter</span><span class="p">)</span>
+<span class="n">ax3</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">set_minor_formatter</span><span class="p">(</span><span class="n">qtrday_formatter</span><span class="p">)</span>
+
+<span class="c1"># Slide the major tick labels underneath the default location by 20 points</span>
+<span class="n">ax3</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">which</span><span class="o">=</span><span class="s1">&#39;major&#39;</span><span class="p">,</span> <span class="n">pad</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+
+<span class="c1"># Add other chart elements</span>
+<span class="c1">#-------------------------</span>
+
+<span class="c1"># Set plot and axis titles</span>
+<span class="n">fig3</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s1">&#39;Occupancy analysis of SSU&#39;</span><span class="p">)</span>
+<span class="n">ax3</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;All patient types&#39;</span><span class="p">)</span>
+<span class="n">ax3</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Time Bin of Week&#39;</span><span class="p">)</span>
+<span class="n">ax3</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Occupancy&#39;</span><span class="p">)</span>
+
+
+<span class="c1"># Plot size</span>
+<span class="n">fig3</span><span class="o">.</span><span class="n">set_size_inches</span><span class="p">(</span><span class="mi">16</span><span class="p">,</span><span class="mi">12</span><span class="p">)</span>
+<br/></pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/blog_hillpy_plotting_matplotlib_basic_recipe_40_0.png" src="../../_images/blog_hillpy_plotting_matplotlib_basic_recipe_40_0.png" />
+</div>
+</div>
+<p>Before trying out a different style, it’s a good idea to reset the matplotlib settings to their defaults. That’s why we saved the default settings in a variable called <code class="docutils literal notranslate"><span class="pre">inline_rc</span></code> which is simply a dictionary of settings and their values. I haven’t had much luck with trying to use <code class="docutils literal notranslate"><span class="pre">plt.style.use</span></code> for a second time unless I do a reset of the plot setting. Here’s how to do that.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[39]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Reset plot settings to defaults</span>
+<span class="n">mpl</span><span class="o">.</span><span class="n">rcParams</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">inline_rc</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[40]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Try out a different built-in style</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">use</span><span class="p">(</span><span class="s1">&#39;fivethirtyeight&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[41]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create a Figure and Axes object</span>
+<span class="c1">#--------------------------------</span>
+<span class="n">fig3</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+<span class="n">ax3</span> <span class="o">=</span> <span class="n">fig3</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="c1"># Create a list to use as the X-axis values</span>
+<span class="c1">#-------------------------------------------</span>
+<span class="c1"># 336 half hours starting with midnight Dec 14, 2014</span>
+<span class="n">timestamps</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">date_range</span><span class="p">(</span><span class="s1">&#39;12/15/2014&#39;</span><span class="p">,</span> <span class="n">periods</span><span class="o">=</span><span class="mi">336</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="s1">&#39;30Min&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+
+
+<span class="c1"># Add data to the plot</span>
+<span class="c1">#--------------------------</span>
+
+
+<span class="n">ax3</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="n">timestamps</span><span class="p">,</span><span class="n">mean_occ</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">1</span><span class="o">/</span><span class="mi">48</span><span class="p">)</span>
+<span class="n">ax3</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">timestamps</span><span class="p">,</span><span class="n">pctile_occ</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;95th </span><span class="si">%i</span><span class="s1">le Occ&#39;</span><span class="p">)</span>
+<span class="n">ax3</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">timestamps</span><span class="p">,</span><span class="n">total_df</span><span class="p">[</span><span class="s1">&#39;Capacity&#39;</span><span class="p">])</span>
+
+
+<span class="c1"># Create formatter variables</span>
+<span class="n">dayofweek_formatter</span> <span class="o">=</span> <span class="n">DateFormatter</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%a</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="n">qtrday_formatter</span> <span class="o">=</span> <span class="n">DateFormatter</span><span class="p">(</span><span class="s1">&#39;%H&#39;</span><span class="p">)</span>
+
+<span class="c1"># Set the tick locations for the axes object</span>
+<span class="n">ax3</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">(</span><span class="n">major_tick_locations</span><span class="p">)</span>
+<span class="n">ax3</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">(</span><span class="n">minor_tick_locations</span><span class="p">,</span> <span class="n">minor</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="c1"># Format the tick labels</span>
+<span class="n">ax3</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">set_major_formatter</span><span class="p">(</span><span class="n">dayofweek_formatter</span><span class="p">)</span>
+<span class="n">ax3</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">set_minor_formatter</span><span class="p">(</span><span class="n">qtrday_formatter</span><span class="p">)</span>
+
+<span class="c1"># Slide the major tick labels underneath the default location by 20 points</span>
+<span class="n">ax3</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">which</span><span class="o">=</span><span class="s1">&#39;major&#39;</span><span class="p">,</span> <span class="n">pad</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+
+<span class="c1"># Add other chart elements</span>
+<span class="c1">#-------------------------</span>
+
+<span class="c1"># Set plot and axis titles</span>
+<span class="n">fig3</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s1">&#39;Occupancy analysis of SSU&#39;</span><span class="p">)</span>
+<span class="n">ax3</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;All patient types&#39;</span><span class="p">)</span>
+<span class="n">ax3</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Time Bin of Week&#39;</span><span class="p">)</span>
+<span class="n">ax3</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Occupancy&#39;</span><span class="p">)</span>
+
+
+<span class="c1"># Plot size</span>
+<span class="n">fig3</span><span class="o">.</span><span class="n">set_size_inches</span><span class="p">(</span><span class="mi">16</span><span class="p">,</span><span class="mi">12</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/blog_hillpy_plotting_matplotlib_basic_recipe_44_0.png" src="../../_images/blog_hillpy_plotting_matplotlib_basic_recipe_44_0.png" />
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[42]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Save one of the images to a file</span>
+<span class="n">fig2</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s1">&#39;occ_fig2.png&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>In a future post, we’ll rebuild these plots using <code class="docutils literal notranslate"><span class="pre">ggplot2</span></code>.</p>
+</section>
+</section>
+
+<div class="section">
+    
+
+<div class="section">
+  <span style="float: left">
+     Previous:
+    
+    <a href="../first-shiny-app/">
+       First R Shiny app: Rejection region plots for hypothesis tests
+    </a>
+    
+  </span>
+  <span>&nbsp;</span>
+  <span style="float: right">
+     Next: 
+    <a href="../hillmaker-python-released/">
+      New version of hillmaker (finally) released - and it’s Python 
+    </a>
+    
+  </span>
+</div>
+  
+</div>
+
+              </div>
+              
+              
+              <!-- Previous / next buttons -->
+<div class='prev-next-area'>
+</div>
+              
+          </main>
+          
+
+      </div>
+    </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
+<footer class="footer mt-5 mt-md-0">
+  <div class="container">
+    
+    <div class="footer-item">
+      <p class="copyright">
+    &copy; Copyright 2022, misken.<br>
+</p>
+    </div>
+    
+    <div class="footer-item">
+      <p class="sphinx-version">
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.3.2.<br>
+</p>
+    </div>
+    
+  </div>
+</footer>
+  </body>
+</html>

@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en">
   <id>https://misken.github.io/</id>
   <title>Bits of analytics</title>
-  <updated>2022-06-29T19:46:45.095230+00:00</updated>
+  <updated>2022-07-14T20:04:13.626537+00:00</updated>
   <link href="https://misken.github.io/"/>
   <link href="https://misken.github.io/blog/atom.xml" rel="self"/>
   <generator uri="https://ablog.readthedocs.org/" version="0.10.23">ABlog</generator>
@@ -72,7 +72,23 @@
     <category term="python" label="python"/>
     <category term="hillmaker" label="hillmaker"/>
     <category term="occupancyanalysis" label="occupancy analysis"/>
+    <category term="pandas" label="pandas"/>
     <published>2013-03-25T00:00:00-04:00</published>
+  </entry>
+  <entry>
+    <id>https://misken.github.io/blog/hillpy_occstats_demo/</id>
+    <title>Computing occupancy statistics with Python - Part 2 of 3</title>
+    <updated>2013-04-08T00:00:00-04:00</updated>
+    <author>
+      <name>misken</name>
+    </author>
+    <link href="https://misken.github.io/blog/hillpy_occstats_demo/" rel="alternate"/>
+    <summary>Computing summary occupancy statistics by time of day and day of week</summary>
+    <category term="python" label="python"/>
+    <category term="hillmaker" label="hillmaker"/>
+    <category term="occupancyanalysis" label="occupancy analysis"/>
+    <category term="pandas" label="pandas"/>
+    <published>2013-04-08T00:00:00-04:00</published>
   </entry>
   <entry>
     <id>https://misken.github.io/blog/ggplot-coming-to-python/</id>
@@ -182,6 +198,22 @@
     <category term="teaching" label="teaching"/>
     <category term="statistics" label="statistics"/>
     <published>2014-11-30T00:00:00-05:00</published>
+  </entry>
+  <entry>
+    <id>https://misken.github.io/blog/hillpy_plotting_matplotlib_basic_recipe/</id>
+    <title>Plotting occupancy statistics with Python - a basic matplotlib recipe</title>
+    <updated>2015-01-01T00:00:00-05:00</updated>
+    <author>
+      <name>misken</name>
+    </author>
+    <link href="https://misken.github.io/blog/hillpy_plotting_matplotlib_basic_recipe/" rel="alternate"/>
+    <summary>Making occupancy plots with matplotlib</summary>
+    <category term="python" label="python"/>
+    <category term="hillmaker" label="hillmaker"/>
+    <category term="occupancyanalysis" label="occupancy analysis"/>
+    <category term="pandas" label="pandas"/>
+    <category term="matplotlib" label="matplotlib"/>
+    <published>2015-01-01T00:00:00-05:00</published>
   </entry>
   <entry>
     <id>https://misken.github.io/blog/hillmaker-python-released/</id>
@@ -390,6 +422,8 @@ easily automate a number of partition, train, predict, summarize cycles with car
     <category term="python" label="python"/>
     <category term="hillmaker" label="hillmaker"/>
     <category term="occupancyanalysis" label="occupancy analysis"/>
+    <category term="pandas" label="pandas"/>
+    <category term="matplotlib" label="matplotlib"/>
     <published>2019-01-01T00:00:00-05:00</published>
   </entry>
   <entry>

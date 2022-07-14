@@ -1,0 +1,2585 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>Computing occupancy statistics with Python - Part 2 of 3 &#8212; misken 0,1,0 documentation</title>
+    
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+
+    
+  <link rel="stylesheet"
+    href="../../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/design-style.b7bb847fb20b106c3d81b95245e65545.min.css" />
+    
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
+
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/design-tabs.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <link rel="author" title="About these documents" href="../../about/" />
+    <link rel="index" title="Index" href="../../genindex/" />
+    <link rel="search" title="Search" href="../../search/" /> 
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="en">
+    
+
+    <!-- Google Analytics -->
+    
+<script async="" src="https://www.googletagmanager.com/gtag/js?id=G-J4FJ8W6Y2K"></script>
+<script>
+                    window.dataLayer = window.dataLayer || [];
+                    function gtag(){ dataLayer.push(arguments); }
+                    gtag('js', new Date());
+                    gtag('config', 'G-J4FJ8W6Y2K');
+                </script>
+ 
+<link
+  rel="alternate"
+  type="application/atom+xml"
+  href="../../blog/atom.xml"
+  title="Bits of analytics"
+/>
+ 
+<style type="text/css">
+  ul.ablog-archive {
+    list-style: none;
+    overflow: auto;
+    margin-left: 0px;
+  }
+  ul.ablog-archive li {
+    float: left;
+    margin-right: 5px;
+    font-size: 80%;
+  }
+  ul.postlist a {
+    font-style: italic;
+  }
+  ul.postlist-style-disc {
+    list-style-type: disc;
+  }
+  ul.postlist-style-none {
+    list-style-type: none;
+  }
+  ul.postlist-style-circle {
+    list-style-type: circle;
+  }
+</style>
+
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
+    
+    <div class="container-fluid" id="banner"></div>
+
+    
+    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main"><div class="container-xl">
+
+  <div id="navbar-start">
+    
+    
+<a class="navbar-brand" href="../../">
+<p class="title">misken</p>
+</a>
+
+    
+  </div>
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapsible" aria-controls="navbar-collapsible" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  
+  <div id="navbar-collapsible" class="col-lg-9 collapse navbar-collapse">
+    <div id="navbar-center" class="mr-auto">
+      
+      <div class="navbar-center-item">
+        <ul id="navbar-main-elements" class="navbar-nav">
+    <li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../about/">
+  About misken
+ </a>
+</li>
+
+    
+</ul>
+      </div>
+      
+    </div>
+
+    <div id="navbar-end">
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+      </ul>
+      </div>
+      
+    </div>
+  </div>
+</div>
+    </nav>
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+            
+            <!-- Only show if we have sidebars configured, else just a small margin  -->
+            <div class="col-12 col-md-3 bd-sidebar">
+              <div class="sidebar-start-items">  
+<h2>
+   
+  08 April 2013 
+</h2>
+
+<ul>
+   
+<li id="author">
+  <span
+    >Author:</span
+  >
+   
+  <a href="../author/misken/">misken</a>  
+</li>
+    
+<li id="tags">
+  <span
+    >Tags: </span
+  >
+   
+  <a href="../tag/python/">python</a>   
+  <a href="../tag/hillmaker/">hillmaker</a>   
+  <a href="../tag/occupancy-analysis/">occupancy analysis</a>   
+  <a href="../tag/pandas/">pandas</a>  
+</li>
+ 
+</ul>
+
+<h3>
+  <a href="../">Recent Posts</a>
+</h3>
+<ul>
+   
+  <li>
+    <a href="../hillmaker_030_released/"
+      >19 May - numpy speeds up hillmaker dramatically</a
+    >
+  </li>
+  
+  <li>
+    <a href="../simpy_vaccine_clinic_improvements/"
+      >11 April - Using SimPy to simulate a vaccine clinic - Part 2: model improvements</a
+    >
+  </li>
+  
+  <li>
+    <a href="../simpy_getting_started_vaccine_clinic/"
+      >04 April - Using SimPy to simulate a vaccine clinic - Part 1: an introductory tutorial</a
+    >
+  </li>
+  
+  <li>
+    <a href="../use_jupyter_conda_envs/"
+      >03 April - Using different conda environments with Jupyter Lab</a
+    >
+  </li>
+  
+  <li>
+    <a href="../hello_world/"
+      >02 April - Hello world from ablog blogging with JupyterLab</a
+    >
+  </li>
+  
+</ul>
+
+<h3><a href="../tag/">Tags</a></h3>
+<style type="text/css">
+  ul.ablog-cloud {
+    list-style: none;
+    overflow: auto;
+  }
+  ul.ablog-cloud li {
+    float: left;
+    height: 20pt;
+    line-height: 18pt;
+    margin-right: 5px;
+  }
+  ul.ablog-cloud a {
+    text-decoration: none;
+    vertical-align: middle;
+  }
+  li.ablog-cloud-1 {
+    font-size: 80%;
+  }
+  li.ablog-cloud-2 {
+    font-size: 95%;
+  }
+  li.ablog-cloud-3 {
+    font-size: 110%;
+  }
+  li.ablog-cloud-4 {
+    font-size: 125%;
+  }
+  li.ablog-cloud-5 {
+    font-size: 140%;
+  }
+</style>
+<ul class="ablog-cloud">
+   
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/github/">GitHub</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-3">
+    <a href="../tag/r/">R</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/ablog/">ablog</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/analytics/">analytics</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/bikeshare/">bikeshare</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/birding/">birding</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/blogging/">blogging</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/caret/">caret</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/conda/">conda</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/datetime/">datetime</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/dplyr/">dplyr</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/ebird/">ebird</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/ecology/">ecology</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/excel/">excel</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/ggmap/">ggmap</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/ggplot2/">ggplot2</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/gis/">gis</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/git/">git</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/gps/">gps</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/healthcare/">healthcare</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/hiking/">hiking</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/hillmaker/">hillmaker</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/jupyter/">jupyter</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/matplotlib/">matplotlib</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/metamodeling/">metamodeling</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-2">
+    <a href="../tag/occupancy-analysis/">occupancy analysis</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-2">
+    <a href="../tag/pandas/">pandas</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/patient-flow/">patient flow</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/plyr/">plyr</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-5">
+    <a href="../tag/python/">python</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/shiny/">shiny</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/simpy/">simpy</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/simulation/">simulation</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/sphinx/">sphinx</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/statistics/">statistics</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/teaching/">teaching</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/text/">text</a>
+  </li>
+    
+  <li class="ablog-cloud ablog-cloud-1">
+    <a href="../tag/xml/">xml</a>
+  </li>
+   
+</ul>
+
+<h3>
+  <a href="../archive/">Archives</a>
+</h3>
+<ul>
+   
+  <li>
+    <a href="../2022/">2022 (7)</a>
+  </li>
+    
+  <li>
+    <a href="../2021/">2021 (4)</a>
+  </li>
+    
+  <li>
+    <a href="../2020/">2020 (2)</a>
+  </li>
+    
+  <li>
+    <a href="../2019/">2019 (7)</a>
+  </li>
+    
+  <li>
+    <a href="../2018/">2018 (5)</a>
+  </li>
+    
+  <li>
+    <a href="../2017/">2017 (2)</a>
+  </li>
+    
+  <li>
+    <a href="../2016/">2016 (6)</a>
+  </li>
+    
+  <li>
+    <a href="../2015/">2015 (1)</a>
+  </li>
+    
+  <li>
+    <a href="../2014/">2014 (6)</a>
+  </li>
+    
+  <li>
+    <a href="../2013/">2013 (8)</a>
+  </li>
+   
+</ul>
+
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search/" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+              </div>
+              <div class="sidebar-end-items">
+              </div>
+            </div>
+            
+          
+
+          
+          <div class="d-none d-xl-block col-xl-2 bd-toc">
+            
+              
+              <div class="toc-item">
+                
+<div class="tocsection onthispage mt-5 pt-1 pb-3">
+    <i class="fas fa-list"></i> On this page
+</div>
+
+<nav id="bd-toc-nav">
+    <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#Preliminaries">
+   Preliminaries
+  </a>
+ </li>
+</ul>
+
+</nav>
+              </div>
+              
+              <div class="toc-item">
+                
+              </div>
+              
+            
+          </div>
+          
+
+          
+          
+            
+          
+          <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+              
+              <div>
+                 
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt *,
+div.nbinput.container div.input_area pre,
+div.nboutput.container div.output_area pre,
+div.nbinput.container div.input_area .highlight,
+div.nboutput.container div.output_area .highlight {
+    border: none;
+    padding: 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+div.nbinput.container > div[class*=highlight],
+div.nboutput.container > div[class*=highlight] {
+    margin: 0;
+}
+
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt * {
+    background: none;
+}
+
+div.nboutput.container div.output_area .highlight,
+div.nboutput.container div.output_area pre {
+    background: unset;
+}
+
+div.nboutput.container div.output_area div.highlight {
+    color: unset;  /* override Pygments text color */
+}
+
+/* avoid gaps between output lines */
+div.nboutput.container div[class*=highlight] pre {
+    line-height: normal;
+}
+
+/* input/output containers */
+div.nbinput.container,
+div.nboutput.container {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+    width: 100%;
+}
+@media (max-width: 540px) {
+    div.nbinput.container,
+    div.nboutput.container {
+        flex-direction: column;
+    }
+}
+
+/* input container */
+div.nbinput.container {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast.container {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput.container div.prompt pre {
+    color: #307FC1;
+}
+
+/* output prompt */
+div.nboutput.container div.prompt pre {
+    color: #BF5B3D;
+}
+
+/* all prompts */
+div.nbinput.container div.prompt,
+div.nboutput.container div.prompt {
+    width: 4.5ex;
+    padding-top: 5px;
+    position: relative;
+    user-select: none;
+}
+
+div.nbinput.container div.prompt > div,
+div.nboutput.container div.prompt > div {
+    position: absolute;
+    right: 0;
+    margin-right: 0.3ex;
+}
+
+@media (max-width: 540px) {
+    div.nbinput.container div.prompt,
+    div.nboutput.container div.prompt {
+        width: unset;
+        text-align: left;
+        padding: 0.4em;
+    }
+    div.nboutput.container div.prompt.empty {
+        padding: 0;
+    }
+
+    div.nbinput.container div.prompt > div,
+    div.nboutput.container div.prompt > div {
+        position: unset;
+    }
+}
+
+/* disable scrollbars on prompts */
+div.nbinput.container div.prompt pre,
+div.nboutput.container div.prompt pre {
+    overflow: hidden;
+}
+
+/* input/output area */
+div.nbinput.container div.input_area,
+div.nboutput.container div.output_area {
+    -webkit-flex: 1;
+    flex: 1;
+    overflow: auto;
+}
+@media (max-width: 540px) {
+    div.nbinput.container div.input_area,
+    div.nboutput.container div.output_area {
+        width: 100%;
+    }
+}
+
+/* input area */
+div.nbinput.container div.input_area {
+    border: 1px solid #e0e0e0;
+    border-radius: 2px;
+    /*background: #f5f5f5;*/
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput.container div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.imgmath center alignment in output cells */
+div.nboutput.container div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput.container div.output_area.stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-default-inverse-fg { color: #FFFFFF; }
+.ansi-default-inverse-bg { background-color: #000000; }
+
+.ansi-bold { font-weight: bold; }
+.ansi-underline { text-decoration: underline; }
+
+
+div.nbinput.container div.input_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight].math,
+div.nboutput.container div.output_area.rendered_html,
+div.nboutput.container div.output_area > div.output_javascript,
+div.nboutput.container div.output_area:not(.rendered_html) > img{
+    padding: 5px;
+    margin: 0;
+}
+
+/* fix copybtn overflow problem in chromium (needed for 'sphinx_copybutton') */
+div.nbinput.container div.input_area > div[class^='highlight'],
+div.nboutput.container div.output_area > div[class^='highlight']{
+    overflow-y: hidden;
+}
+
+/* hide copybtn icon on prompts (needed for 'sphinx_copybutton') */
+.prompt .copybtn {
+    display: none;
+}
+
+/* Some additional styling taken form the Jupyter notebook CSS */
+div.rendered_html table {
+  border: none;
+  border-collapse: collapse;
+  border-spacing: 0;
+  color: black;
+  font-size: 12px;
+  table-layout: fixed;
+}
+div.rendered_html thead {
+  border-bottom: 1px solid black;
+  vertical-align: bottom;
+}
+div.rendered_html tr,
+div.rendered_html th,
+div.rendered_html td {
+  text-align: right;
+  vertical-align: middle;
+  padding: 0.5em 0.5em;
+  line-height: normal;
+  white-space: normal;
+  max-width: none;
+  border: none;
+}
+div.rendered_html th {
+  font-weight: bold;
+}
+div.rendered_html tbody tr:nth-child(odd) {
+  background: #f5f5f5;
+}
+div.rendered_html tbody tr:hover {
+  background: rgba(66, 165, 245, 0.2);
+}
+</style>
+<section id="Computing-occupancy-statistics-with-Python---Part-2-of-3">
+<h1>Computing occupancy statistics with Python - Part 2 of 3<a class="headerlink" href="#Computing-occupancy-statistics-with-Python---Part-2-of-3" title="Permalink to this headline">#</a></h1>
+<p>In the second part of this series, we will use Python to compute summary occupancy statistics (such as means and percentiles) by time of day, day of week, and patient category (recall that this example is from a hospital short stay unit - go back to Part 1 for all of the background info). Computation of percentiles by one or more grouping fields is a pain using tools like Excel, Access and SQL Server. With Python+pandas it’s easy.</p>
+<p>You can find the data and the <code class="docutils literal notranslate"><span class="pre">.ipynb</span></code> file in my <a class="reference external" href="https://github.com/misken/hselab-tutorials">hselab-tutorials</a> github repo. Clone or download a zip.</p>
+<section id="Preliminaries">
+<h2>Preliminaries<a class="headerlink" href="#Preliminaries" title="Permalink to this headline">#</a></h2>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+</pre></div>
+</div>
+</div>
+<p>At the end of Part 1 of this tutorial series, we ended up with a csv file called bydate_shortstay_csv.csv. Let’s read it in and take a look at it.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">## Read sample data set and convert string dates to datetimes</span>
+<span class="n">bydate_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;data/bydate_shortstay_csv.csv&#39;</span><span class="p">,</span><span class="n">parse_dates</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;datetime&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">bydate_df</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>category</th>
+      <th>datetime</th>
+      <th>arrivals</th>
+      <th>binofday</th>
+      <th>binofweek</th>
+      <th>dayofweek</th>
+      <th>departures</th>
+      <th>occupancy</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>IVT</td>
+      <td>1996-01-02 00:00:00</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>48.0</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>IVT</td>
+      <td>1996-01-02 00:30:00</td>
+      <td>0.0</td>
+      <td>1.0</td>
+      <td>49.0</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>IVT</td>
+      <td>1996-01-02 01:00:00</td>
+      <td>0.0</td>
+      <td>2.0</td>
+      <td>50.0</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>IVT</td>
+      <td>1996-01-02 01:30:00</td>
+      <td>0.0</td>
+      <td>3.0</td>
+      <td>51.0</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>IVT</td>
+      <td>1996-01-02 02:00:00</td>
+      <td>0.0</td>
+      <td>4.0</td>
+      <td>52.0</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">bydate_df</span><span class="p">[</span><span class="mi">1320</span><span class="p">:</span><span class="mi">1350</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>category</th>
+      <th>datetime</th>
+      <th>arrivals</th>
+      <th>binofday</th>
+      <th>binofweek</th>
+      <th>dayofweek</th>
+      <th>departures</th>
+      <th>occupancy</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>1320</th>
+      <td>IVT</td>
+      <td>1996-01-29 12:00:00</td>
+      <td>9.0</td>
+      <td>24.0</td>
+      <td>24.0</td>
+      <td>0.0</td>
+      <td>9.0</td>
+      <td>21.266667</td>
+    </tr>
+    <tr>
+      <th>1321</th>
+      <td>IVT</td>
+      <td>1996-01-29 12:30:00</td>
+      <td>9.0</td>
+      <td>25.0</td>
+      <td>25.0</td>
+      <td>0.0</td>
+      <td>6.0</td>
+      <td>22.333333</td>
+    </tr>
+    <tr>
+      <th>1322</th>
+      <td>IVT</td>
+      <td>1996-01-29 13:00:00</td>
+      <td>12.0</td>
+      <td>26.0</td>
+      <td>26.0</td>
+      <td>0.0</td>
+      <td>12.0</td>
+      <td>22.266667</td>
+    </tr>
+    <tr>
+      <th>1323</th>
+      <td>IVT</td>
+      <td>1996-01-29 13:30:00</td>
+      <td>8.0</td>
+      <td>27.0</td>
+      <td>27.0</td>
+      <td>0.0</td>
+      <td>9.0</td>
+      <td>23.100000</td>
+    </tr>
+    <tr>
+      <th>1324</th>
+      <td>IVT</td>
+      <td>1996-01-29 14:00:00</td>
+      <td>8.0</td>
+      <td>28.0</td>
+      <td>28.0</td>
+      <td>0.0</td>
+      <td>6.0</td>
+      <td>22.933333</td>
+    </tr>
+    <tr>
+      <th>1325</th>
+      <td>IVT</td>
+      <td>1996-01-29 14:30:00</td>
+      <td>9.0</td>
+      <td>29.0</td>
+      <td>29.0</td>
+      <td>0.0</td>
+      <td>11.0</td>
+      <td>22.300000</td>
+    </tr>
+    <tr>
+      <th>1326</th>
+      <td>IVT</td>
+      <td>1996-01-29 15:00:00</td>
+      <td>7.0</td>
+      <td>30.0</td>
+      <td>30.0</td>
+      <td>0.0</td>
+      <td>6.0</td>
+      <td>23.900000</td>
+    </tr>
+    <tr>
+      <th>1327</th>
+      <td>IVT</td>
+      <td>1996-01-29 15:30:00</td>
+      <td>6.0</td>
+      <td>31.0</td>
+      <td>31.0</td>
+      <td>0.0</td>
+      <td>9.0</td>
+      <td>22.600000</td>
+    </tr>
+    <tr>
+      <th>1328</th>
+      <td>IVT</td>
+      <td>1996-01-29 16:00:00</td>
+      <td>9.0</td>
+      <td>32.0</td>
+      <td>32.0</td>
+      <td>0.0</td>
+      <td>11.0</td>
+      <td>19.700000</td>
+    </tr>
+    <tr>
+      <th>1329</th>
+      <td>IVT</td>
+      <td>1996-01-29 16:30:00</td>
+      <td>7.0</td>
+      <td>33.0</td>
+      <td>33.0</td>
+      <td>0.0</td>
+      <td>4.0</td>
+      <td>19.533333</td>
+    </tr>
+    <tr>
+      <th>1330</th>
+      <td>IVT</td>
+      <td>1996-01-29 17:00:00</td>
+      <td>5.0</td>
+      <td>34.0</td>
+      <td>34.0</td>
+      <td>0.0</td>
+      <td>9.0</td>
+      <td>18.033333</td>
+    </tr>
+    <tr>
+      <th>1331</th>
+      <td>IVT</td>
+      <td>1996-01-29 17:30:00</td>
+      <td>2.0</td>
+      <td>35.0</td>
+      <td>35.0</td>
+      <td>0.0</td>
+      <td>9.0</td>
+      <td>13.600000</td>
+    </tr>
+    <tr>
+      <th>1332</th>
+      <td>IVT</td>
+      <td>1996-01-29 18:00:00</td>
+      <td>3.0</td>
+      <td>36.0</td>
+      <td>36.0</td>
+      <td>0.0</td>
+      <td>5.0</td>
+      <td>9.566667</td>
+    </tr>
+    <tr>
+      <th>1333</th>
+      <td>IVT</td>
+      <td>1996-01-29 18:30:00</td>
+      <td>2.0</td>
+      <td>37.0</td>
+      <td>37.0</td>
+      <td>0.0</td>
+      <td>4.0</td>
+      <td>7.166667</td>
+    </tr>
+    <tr>
+      <th>1334</th>
+      <td>IVT</td>
+      <td>1996-01-29 19:00:00</td>
+      <td>1.0</td>
+      <td>38.0</td>
+      <td>38.0</td>
+      <td>0.0</td>
+      <td>3.0</td>
+      <td>5.833333</td>
+    </tr>
+    <tr>
+      <th>1335</th>
+      <td>IVT</td>
+      <td>1996-01-29 19:30:00</td>
+      <td>3.0</td>
+      <td>39.0</td>
+      <td>39.0</td>
+      <td>0.0</td>
+      <td>2.0</td>
+      <td>6.366667</td>
+    </tr>
+    <tr>
+      <th>1336</th>
+      <td>IVT</td>
+      <td>1996-01-29 20:00:00</td>
+      <td>0.0</td>
+      <td>40.0</td>
+      <td>40.0</td>
+      <td>0.0</td>
+      <td>3.0</td>
+      <td>4.833333</td>
+    </tr>
+    <tr>
+      <th>1337</th>
+      <td>IVT</td>
+      <td>1996-01-29 20:30:00</td>
+      <td>0.0</td>
+      <td>41.0</td>
+      <td>41.0</td>
+      <td>0.0</td>
+      <td>3.0</td>
+      <td>1.000000</td>
+    </tr>
+    <tr>
+      <th>1338</th>
+      <td>IVT</td>
+      <td>1996-01-29 21:00:00</td>
+      <td>0.0</td>
+      <td>42.0</td>
+      <td>42.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.000000</td>
+    </tr>
+    <tr>
+      <th>1339</th>
+      <td>IVT</td>
+      <td>1996-01-29 21:30:00</td>
+      <td>0.0</td>
+      <td>43.0</td>
+      <td>43.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.000000</td>
+    </tr>
+    <tr>
+      <th>1340</th>
+      <td>IVT</td>
+      <td>1996-01-29 22:00:00</td>
+      <td>0.0</td>
+      <td>44.0</td>
+      <td>44.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.000000</td>
+    </tr>
+    <tr>
+      <th>1341</th>
+      <td>IVT</td>
+      <td>1996-01-29 22:30:00</td>
+      <td>0.0</td>
+      <td>45.0</td>
+      <td>45.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.000000</td>
+    </tr>
+    <tr>
+      <th>1342</th>
+      <td>IVT</td>
+      <td>1996-01-29 23:00:00</td>
+      <td>0.0</td>
+      <td>46.0</td>
+      <td>46.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.000000</td>
+    </tr>
+    <tr>
+      <th>1343</th>
+      <td>IVT</td>
+      <td>1996-01-29 23:30:00</td>
+      <td>0.0</td>
+      <td>47.0</td>
+      <td>47.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.000000</td>
+    </tr>
+    <tr>
+      <th>1344</th>
+      <td>IVT</td>
+      <td>1996-01-30 00:00:00</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>48.0</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>0.000000</td>
+    </tr>
+    <tr>
+      <th>1345</th>
+      <td>IVT</td>
+      <td>1996-01-30 00:30:00</td>
+      <td>0.0</td>
+      <td>1.0</td>
+      <td>49.0</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>0.000000</td>
+    </tr>
+    <tr>
+      <th>1346</th>
+      <td>IVT</td>
+      <td>1996-01-30 01:00:00</td>
+      <td>0.0</td>
+      <td>2.0</td>
+      <td>50.0</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>0.000000</td>
+    </tr>
+    <tr>
+      <th>1347</th>
+      <td>IVT</td>
+      <td>1996-01-30 01:30:00</td>
+      <td>0.0</td>
+      <td>3.0</td>
+      <td>51.0</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>0.000000</td>
+    </tr>
+    <tr>
+      <th>1348</th>
+      <td>IVT</td>
+      <td>1996-01-30 02:00:00</td>
+      <td>0.0</td>
+      <td>4.0</td>
+      <td>52.0</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>0.000000</td>
+    </tr>
+    <tr>
+      <th>1349</th>
+      <td>IVT</td>
+      <td>1996-01-30 02:30:00</td>
+      <td>0.0</td>
+      <td>5.0</td>
+      <td>53.0</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>0.000000</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<p>With this data frame we can compute all kinds of interesting summary statistics by category, by day of week and time of day. To facilitate this type of “group by” analysis, <strong>pandas</strong> takes what is known as the Split-Apply-Combine approach. The <a class="reference external" href="http://pandas.pydata.org/pandas-docs/dev/groupby.html">pandas documentation has a nice discussion</a> of this. To really understand split-apply-combine, <a class="reference external" href="http://www.jstatsoft.org/v40/i01">check out the article</a> by <a class="reference external" href="http://had.co.nz/">Hadley
+Wickham</a> who created the <strong>plyr</strong> package for <a class="reference external" href="http://www.r-project.org/">R</a>. I also created a tutorial on <a class="reference external" href="http://hselab.org/machinery/content/getting-started-python-pandas-and-matplotlib-group-analysis">Getting started with Python (with pandas and matplotlib) for group by analysis</a> that covers some of the basics. A <a class="reference external" href="http://hselab.org/machinery/content/getting-started-r-plyr-and-ggplot2-group-analysis">companion tutorial shows how to do the same analysis using R</a>
+instead of Python.</p>
+<p>Pandas provides a <code class="docutils literal notranslate"><span class="pre">GroupBy</span></code> object to facilitate computing aggregate statistics by grouping fields.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create a GroupBy object for the summary stats</span>
+<span class="n">bydate_dfgrp1</span> <span class="o">=</span> <span class="n">bydate_df</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s1">&#39;category&#39;</span><span class="p">,</span><span class="s1">&#39;binofweek&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Having a group by object makes it easy to compute statistics such as the mean of all of the fields other than the grouping fields.</span>
+<span class="c1"># You&#39;ll see that the result is simply another DataFrame.</span>
+<span class="n">bydate_dfgrp1</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th></th>
+      <th>arrivals</th>
+      <th>binofday</th>
+      <th>dayofweek</th>
+      <th>departures</th>
+      <th>occupancy</th>
+    </tr>
+    <tr>
+      <th>category</th>
+      <th>binofweek</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th rowspan="5" valign="top">ART</th>
+      <th>0.0</th>
+      <td>0.000000</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+    </tr>
+    <tr>
+      <th>1.0</th>
+      <td>0.000000</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+    </tr>
+    <tr>
+      <th>2.0</th>
+      <td>0.000000</td>
+      <td>2.0</td>
+      <td>0.0</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+    </tr>
+    <tr>
+      <th>3.0</th>
+      <td>0.000000</td>
+      <td>3.0</td>
+      <td>0.0</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+    </tr>
+    <tr>
+      <th>4.0</th>
+      <td>0.000000</td>
+      <td>4.0</td>
+      <td>0.0</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th rowspan="5" valign="top">Total</th>
+      <th>331.0</th>
+      <td>0.717949</td>
+      <td>43.0</td>
+      <td>6.0</td>
+      <td>0.538462</td>
+      <td>0.837607</td>
+    </tr>
+    <tr>
+      <th>332.0</th>
+      <td>0.179487</td>
+      <td>44.0</td>
+      <td>6.0</td>
+      <td>0.538462</td>
+      <td>0.652137</td>
+    </tr>
+    <tr>
+      <th>333.0</th>
+      <td>0.717949</td>
+      <td>45.0</td>
+      <td>6.0</td>
+      <td>0.358974</td>
+      <td>0.682051</td>
+    </tr>
+    <tr>
+      <th>334.0</th>
+      <td>0.179487</td>
+      <td>46.0</td>
+      <td>6.0</td>
+      <td>0.179487</td>
+      <td>0.831624</td>
+    </tr>
+    <tr>
+      <th>335.0</th>
+      <td>0.179487</td>
+      <td>47.0</td>
+      <td>6.0</td>
+      <td>0.717949</td>
+      <td>0.412821</td>
+    </tr>
+  </tbody>
+</table>
+<p>2016 rows × 5 columns</p>
+</div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Let&#39;s explore some of the means.</span>
+<span class="n">bydate_dfgrp1</span><span class="o">.</span><span class="n">mean</span><span class="p">()[</span><span class="mi">100</span><span class="p">:</span><span class="mi">120</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th></th>
+      <th>arrivals</th>
+      <th>binofday</th>
+      <th>dayofweek</th>
+      <th>departures</th>
+      <th>occupancy</th>
+    </tr>
+    <tr>
+      <th>category</th>
+      <th>binofweek</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th rowspan="20" valign="top">ART</th>
+      <th>100.0</th>
+      <td>0.000000</td>
+      <td>4.0</td>
+      <td>2.0</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+    </tr>
+    <tr>
+      <th>101.0</th>
+      <td>0.000000</td>
+      <td>5.0</td>
+      <td>2.0</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+    </tr>
+    <tr>
+      <th>102.0</th>
+      <td>0.000000</td>
+      <td>6.0</td>
+      <td>2.0</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+    </tr>
+    <tr>
+      <th>103.0</th>
+      <td>0.000000</td>
+      <td>7.0</td>
+      <td>2.0</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+    </tr>
+    <tr>
+      <th>104.0</th>
+      <td>0.000000</td>
+      <td>8.0</td>
+      <td>2.0</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+    </tr>
+    <tr>
+      <th>105.0</th>
+      <td>0.000000</td>
+      <td>9.0</td>
+      <td>2.0</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+    </tr>
+    <tr>
+      <th>106.0</th>
+      <td>0.000000</td>
+      <td>10.0</td>
+      <td>2.0</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+    </tr>
+    <tr>
+      <th>107.0</th>
+      <td>1.538462</td>
+      <td>11.0</td>
+      <td>2.0</td>
+      <td>0.000000</td>
+      <td>0.782051</td>
+    </tr>
+    <tr>
+      <th>108.0</th>
+      <td>1.769231</td>
+      <td>12.0</td>
+      <td>2.0</td>
+      <td>0.000000</td>
+      <td>2.361538</td>
+    </tr>
+    <tr>
+      <th>109.0</th>
+      <td>3.384615</td>
+      <td>13.0</td>
+      <td>2.0</td>
+      <td>0.000000</td>
+      <td>5.058974</td>
+    </tr>
+    <tr>
+      <th>110.0</th>
+      <td>1.769231</td>
+      <td>14.0</td>
+      <td>2.0</td>
+      <td>0.000000</td>
+      <td>7.674359</td>
+    </tr>
+    <tr>
+      <th>111.0</th>
+      <td>1.538462</td>
+      <td>15.0</td>
+      <td>2.0</td>
+      <td>3.076923</td>
+      <td>7.584615</td>
+    </tr>
+    <tr>
+      <th>112.0</th>
+      <td>1.692308</td>
+      <td>16.0</td>
+      <td>2.0</td>
+      <td>3.384615</td>
+      <td>5.225641</td>
+    </tr>
+    <tr>
+      <th>113.0</th>
+      <td>1.692308</td>
+      <td>17.0</td>
+      <td>2.0</td>
+      <td>1.538462</td>
+      <td>5.300000</td>
+    </tr>
+    <tr>
+      <th>114.0</th>
+      <td>2.153846</td>
+      <td>18.0</td>
+      <td>2.0</td>
+      <td>1.923077</td>
+      <td>5.282051</td>
+    </tr>
+    <tr>
+      <th>115.0</th>
+      <td>1.846154</td>
+      <td>19.0</td>
+      <td>2.0</td>
+      <td>1.923077</td>
+      <td>5.412821</td>
+    </tr>
+    <tr>
+      <th>116.0</th>
+      <td>1.153846</td>
+      <td>20.0</td>
+      <td>2.0</td>
+      <td>1.923077</td>
+      <td>5.228205</td>
+    </tr>
+    <tr>
+      <th>117.0</th>
+      <td>1.461538</td>
+      <td>21.0</td>
+      <td>2.0</td>
+      <td>1.230769</td>
+      <td>4.800000</td>
+    </tr>
+    <tr>
+      <th>118.0</th>
+      <td>1.692308</td>
+      <td>22.0</td>
+      <td>2.0</td>
+      <td>2.000000</td>
+      <td>4.764103</td>
+    </tr>
+    <tr>
+      <th>119.0</th>
+      <td>2.153846</td>
+      <td>23.0</td>
+      <td>2.0</td>
+      <td>1.461538</td>
+      <td>5.064103</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<p>Now that we’ve seen how the a <code class="docutils literal notranslate"><span class="pre">GroupBy</span></code> object works, let’s see how we can compute a whole bunch of summary statistics at once. Specifically we want to compute the mean, standard deviation, min, max and several percentiles. First let’s create a slightly different <code class="docutils literal notranslate"><span class="pre">GroupBy</span></code> object.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">bydate_dfgrp2</span> <span class="o">=</span> <span class="n">bydate_df</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s1">&#39;category&#39;</span><span class="p">,</span><span class="s1">&#39;dayofweek&#39;</span><span class="p">,</span><span class="s1">&#39;binofday&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<p>Now let’s define a function that will return a bunch of statistics in a dictionary for a column of data.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">get_occstats</span><span class="p">(</span><span class="n">group</span><span class="p">,</span> <span class="n">stub</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">{</span><span class="n">stub</span><span class="o">+</span><span class="s1">&#39;count&#39;</span><span class="p">:</span> <span class="n">group</span><span class="o">.</span><span class="n">count</span><span class="p">(),</span> <span class="n">stub</span><span class="o">+</span><span class="s1">&#39;mean&#39;</span><span class="p">:</span> <span class="n">group</span><span class="o">.</span><span class="n">mean</span><span class="p">(),</span>
+            <span class="n">stub</span><span class="o">+</span><span class="s1">&#39;min&#39;</span><span class="p">:</span> <span class="n">group</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span>
+            <span class="n">stub</span><span class="o">+</span><span class="s1">&#39;max&#39;</span><span class="p">:</span> <span class="n">group</span><span class="o">.</span><span class="n">max</span><span class="p">(),</span> <span class="s1">&#39;stdev&#39;</span><span class="p">:</span> <span class="n">group</span><span class="o">.</span><span class="n">std</span><span class="p">(),</span>
+            <span class="n">stub</span><span class="o">+</span><span class="s1">&#39;p50&#39;</span><span class="p">:</span> <span class="n">group</span><span class="o">.</span><span class="n">quantile</span><span class="p">(</span><span class="mf">0.5</span><span class="p">),</span> <span class="n">stub</span><span class="o">+</span><span class="s1">&#39;p55&#39;</span><span class="p">:</span> <span class="n">group</span><span class="o">.</span><span class="n">quantile</span><span class="p">(</span><span class="mf">0.55</span><span class="p">),</span>
+            <span class="n">stub</span><span class="o">+</span><span class="s1">&#39;p60&#39;</span><span class="p">:</span> <span class="n">group</span><span class="o">.</span><span class="n">quantile</span><span class="p">(</span><span class="mf">0.6</span><span class="p">),</span> <span class="n">stub</span><span class="o">+</span><span class="s1">&#39;p65&#39;</span><span class="p">:</span> <span class="n">group</span><span class="o">.</span><span class="n">quantile</span><span class="p">(</span><span class="mf">0.65</span><span class="p">),</span>
+            <span class="n">stub</span><span class="o">+</span><span class="s1">&#39;p70&#39;</span><span class="p">:</span> <span class="n">group</span><span class="o">.</span><span class="n">quantile</span><span class="p">(</span><span class="mf">0.7</span><span class="p">),</span> <span class="n">stub</span><span class="o">+</span><span class="s1">&#39;p75&#39;</span><span class="p">:</span> <span class="n">group</span><span class="o">.</span><span class="n">quantile</span><span class="p">(</span><span class="mf">0.75</span><span class="p">),</span>
+            <span class="n">stub</span><span class="o">+</span><span class="s1">&#39;p80&#39;</span><span class="p">:</span> <span class="n">group</span><span class="o">.</span><span class="n">quantile</span><span class="p">(</span><span class="mf">0.8</span><span class="p">),</span> <span class="n">stub</span><span class="o">+</span><span class="s1">&#39;p85&#39;</span><span class="p">:</span> <span class="n">group</span><span class="o">.</span><span class="n">quantile</span><span class="p">(</span><span class="mf">0.85</span><span class="p">),</span>
+            <span class="n">stub</span><span class="o">+</span><span class="s1">&#39;p90&#39;</span><span class="p">:</span> <span class="n">group</span><span class="o">.</span><span class="n">quantile</span><span class="p">(</span><span class="mf">0.9</span><span class="p">),</span> <span class="n">stub</span><span class="o">+</span><span class="s1">&#39;p95&#39;</span><span class="p">:</span> <span class="n">group</span><span class="o">.</span><span class="n">quantile</span><span class="p">(</span><span class="mf">0.95</span><span class="p">),</span>
+            <span class="n">stub</span><span class="o">+</span><span class="s1">&#39;p975&#39;</span><span class="p">:</span> <span class="n">group</span><span class="o">.</span><span class="n">quantile</span><span class="p">(</span><span class="mf">0.975</span><span class="p">),</span>
+            <span class="n">stub</span><span class="o">+</span><span class="s1">&#39;p99&#39;</span><span class="p">:</span> <span class="n">group</span><span class="o">.</span><span class="n">quantile</span><span class="p">(</span><span class="mf">0.99</span><span class="p">)}</span>
+</pre></div>
+</div>
+</div>
+<p>Now we can use the <code class="docutils literal notranslate"><span class="pre">apply</span></code> function to apply the <code class="docutils literal notranslate"><span class="pre">get_occstats()</span></code> function to a data series. We’ll create separate output data series for occupancy, arrivals and departures.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">occ_stats</span> <span class="o">=</span> <span class="n">bydate_dfgrp2</span><span class="p">[</span><span class="s1">&#39;occupancy&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">get_occstats</span><span class="p">)</span>
+<span class="n">arr_stats</span> <span class="o">=</span> <span class="n">bydate_dfgrp2</span><span class="p">[</span><span class="s1">&#39;arrivals&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">get_occstats</span><span class="p">)</span>
+<span class="n">dep_stats</span> <span class="o">=</span> <span class="n">bydate_dfgrp2</span><span class="p">[</span><span class="s1">&#39;departures&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">get_occstats</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>So, what is <code class="docutils literal notranslate"><span class="pre">occ_stats</span></code>?</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">type</span><span class="p">(</span><span class="n">occ_stats</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+pandas.core.series.Series
+</pre></div></div>
+</div>
+<p>It’s a pandas <code class="docutils literal notranslate"><span class="pre">Series</span></code> object. What does its index look like?</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">occ_stats</span><span class="o">.</span><span class="n">index</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+MultiIndex([(  &#39;ART&#39;, 0.0,  0.0, &#39;count&#39;),
+            (  &#39;ART&#39;, 0.0,  0.0,  &#39;mean&#39;),
+            (  &#39;ART&#39;, 0.0,  0.0,   &#39;min&#39;),
+            (  &#39;ART&#39;, 0.0,  0.0,   &#39;max&#39;),
+            (  &#39;ART&#39;, 0.0,  0.0, &#39;stdev&#39;),
+            (  &#39;ART&#39;, 0.0,  0.0,   &#39;p50&#39;),
+            (  &#39;ART&#39;, 0.0,  0.0,   &#39;p55&#39;),
+            (  &#39;ART&#39;, 0.0,  0.0,   &#39;p60&#39;),
+            (  &#39;ART&#39;, 0.0,  0.0,   &#39;p65&#39;),
+            (  &#39;ART&#39;, 0.0,  0.0,   &#39;p70&#39;),
+            ...
+            (&#39;Total&#39;, 6.0, 47.0,   &#39;p60&#39;),
+            (&#39;Total&#39;, 6.0, 47.0,   &#39;p65&#39;),
+            (&#39;Total&#39;, 6.0, 47.0,   &#39;p70&#39;),
+            (&#39;Total&#39;, 6.0, 47.0,   &#39;p75&#39;),
+            (&#39;Total&#39;, 6.0, 47.0,   &#39;p80&#39;),
+            (&#39;Total&#39;, 6.0, 47.0,   &#39;p85&#39;),
+            (&#39;Total&#39;, 6.0, 47.0,   &#39;p90&#39;),
+            (&#39;Total&#39;, 6.0, 47.0,   &#39;p95&#39;),
+            (&#39;Total&#39;, 6.0, 47.0,  &#39;p975&#39;),
+            (&#39;Total&#39;, 6.0, 47.0,   &#39;p99&#39;)],
+           names=[&#39;category&#39;, &#39;dayofweek&#39;, &#39;binofday&#39;, None], length=34272)
+</pre></div></div>
+</div>
+<p>Notice it’s a <code class="docutils literal notranslate"><span class="pre">MultiIndex</span></code> with 4 levels: category, dayofweek, binofday, statistic. It would be nice to “un-pivot” the statistic from the index and have it correspond to a set of columns. That’s what <code class="docutils literal notranslate"><span class="pre">unstack()</span></code> will do. It will leave us with a <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code> with all of the statistics as columns and a 3 level multi-index of category, dayofweek and binofday. Perfect for plotting.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">occ_stats</span><span class="o">.</span><span class="n">unstack</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th></th>
+      <th></th>
+      <th>count</th>
+      <th>mean</th>
+      <th>min</th>
+      <th>max</th>
+      <th>stdev</th>
+      <th>p50</th>
+      <th>p55</th>
+      <th>p60</th>
+      <th>p65</th>
+      <th>p70</th>
+      <th>p75</th>
+      <th>p80</th>
+      <th>p85</th>
+      <th>p90</th>
+      <th>p95</th>
+      <th>p975</th>
+      <th>p99</th>
+    </tr>
+    <tr>
+      <th>category</th>
+      <th>dayofweek</th>
+      <th>binofday</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th rowspan="5" valign="top">ART</th>
+      <th rowspan="5" valign="top">0.0</th>
+      <th>0.0</th>
+      <td>12.0</td>
+      <td>0.000000</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.000000</td>
+      <td>0.0</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.000000</td>
+      <td>0.00</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+    </tr>
+    <tr>
+      <th>1.0</th>
+      <td>12.0</td>
+      <td>0.000000</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.000000</td>
+      <td>0.0</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.000000</td>
+      <td>0.00</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+    </tr>
+    <tr>
+      <th>2.0</th>
+      <td>12.0</td>
+      <td>0.000000</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.000000</td>
+      <td>0.0</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.000000</td>
+      <td>0.00</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+    </tr>
+    <tr>
+      <th>3.0</th>
+      <td>12.0</td>
+      <td>0.000000</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.000000</td>
+      <td>0.0</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.000000</td>
+      <td>0.00</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+    </tr>
+    <tr>
+      <th>4.0</th>
+      <td>12.0</td>
+      <td>0.000000</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.000000</td>
+      <td>0.0</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.000000</td>
+      <td>0.00</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <th>...</th>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th rowspan="5" valign="top">Total</th>
+      <th rowspan="5" valign="top">6.0</th>
+      <th>43.0</th>
+      <td>39.0</td>
+      <td>0.837607</td>
+      <td>0.0</td>
+      <td>4.0</td>
+      <td>1.185640</td>
+      <td>0.0</td>
+      <td>0.45</td>
+      <td>0.66</td>
+      <td>0.960000</td>
+      <td>1.00</td>
+      <td>1.300000</td>
+      <td>1.840000</td>
+      <td>2.000000</td>
+      <td>2.560000</td>
+      <td>3.520000</td>
+      <td>4.000000</td>
+      <td>4.000000</td>
+    </tr>
+    <tr>
+      <th>44.0</th>
+      <td>39.0</td>
+      <td>0.652137</td>
+      <td>0.0</td>
+      <td>8.0</td>
+      <td>1.584774</td>
+      <td>0.0</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.000000</td>
+      <td>0.00</td>
+      <td>0.000000</td>
+      <td>0.813333</td>
+      <td>1.620000</td>
+      <td>2.240000</td>
+      <td>3.400000</td>
+      <td>4.200000</td>
+      <td>6.480000</td>
+    </tr>
+    <tr>
+      <th>45.0</th>
+      <td>39.0</td>
+      <td>0.682051</td>
+      <td>0.0</td>
+      <td>4.0</td>
+      <td>1.020631</td>
+      <td>0.0</td>
+      <td>0.27</td>
+      <td>0.56</td>
+      <td>0.646667</td>
+      <td>0.82</td>
+      <td>1.100000</td>
+      <td>1.253333</td>
+      <td>1.620000</td>
+      <td>2.080000</td>
+      <td>2.733333</td>
+      <td>3.366667</td>
+      <td>3.746667</td>
+    </tr>
+    <tr>
+      <th>46.0</th>
+      <td>39.0</td>
+      <td>0.831624</td>
+      <td>0.0</td>
+      <td>4.0</td>
+      <td>1.279230</td>
+      <td>0.0</td>
+      <td>0.15</td>
+      <td>0.44</td>
+      <td>0.853333</td>
+      <td>1.00</td>
+      <td>1.000000</td>
+      <td>1.920000</td>
+      <td>2.000000</td>
+      <td>2.400000</td>
+      <td>4.000000</td>
+      <td>4.000000</td>
+      <td>4.000000</td>
+    </tr>
+    <tr>
+      <th>47.0</th>
+      <td>39.0</td>
+      <td>0.412821</td>
+      <td>0.0</td>
+      <td>4.0</td>
+      <td>0.838915</td>
+      <td>0.0</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.166667</td>
+      <td>0.32</td>
+      <td>0.466667</td>
+      <td>0.666667</td>
+      <td>0.766667</td>
+      <td>1.226667</td>
+      <td>2.066667</td>
+      <td>2.733333</td>
+      <td>3.493333</td>
+    </tr>
+  </tbody>
+</table>
+<p>2016 rows × 17 columns</p>
+</div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">occ_stats_summary</span> <span class="o">=</span> <span class="n">occ_stats</span><span class="o">.</span><span class="n">unstack</span><span class="p">()</span>
+<span class="n">arr_stats_summary</span> <span class="o">=</span> <span class="n">arr_stats</span><span class="o">.</span><span class="n">unstack</span><span class="p">()</span>
+<span class="n">dep_stats_summary</span> <span class="o">=</span> <span class="n">dep_stats</span><span class="o">.</span><span class="n">unstack</span><span class="p">()</span>
+
+<span class="n">occ_stats_summary</span><span class="p">[</span><span class="mi">200</span><span class="p">:</span><span class="mi">220</span><span class="p">]</span> <span class="c1"># Let&#39;s peek into the middle of the table.</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th></th>
+      <th></th>
+      <th>count</th>
+      <th>mean</th>
+      <th>min</th>
+      <th>max</th>
+      <th>stdev</th>
+      <th>p50</th>
+      <th>p55</th>
+      <th>p60</th>
+      <th>p65</th>
+      <th>p70</th>
+      <th>p75</th>
+      <th>p80</th>
+      <th>p85</th>
+      <th>p90</th>
+      <th>p95</th>
+      <th>p975</th>
+      <th>p99</th>
+    </tr>
+    <tr>
+      <th>category</th>
+      <th>dayofweek</th>
+      <th>binofday</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th rowspan="20" valign="top">ART</th>
+      <th rowspan="20" valign="top">4.0</th>
+      <th>8.0</th>
+      <td>13.0</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+    </tr>
+    <tr>
+      <th>9.0</th>
+      <td>13.0</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+    </tr>
+    <tr>
+      <th>10.0</th>
+      <td>13.0</td>
+      <td>0.010256</td>
+      <td>0.000000</td>
+      <td>0.133333</td>
+      <td>0.036980</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.053333</td>
+      <td>0.093333</td>
+      <td>0.117333</td>
+    </tr>
+    <tr>
+      <th>11.0</th>
+      <td>13.0</td>
+      <td>0.325641</td>
+      <td>0.000000</td>
+      <td>1.600000</td>
+      <td>0.485179</td>
+      <td>0.000000</td>
+      <td>0.060000</td>
+      <td>0.180000</td>
+      <td>0.420000</td>
+      <td>0.553333</td>
+      <td>0.633333</td>
+      <td>0.653333</td>
+      <td>0.680000</td>
+      <td>0.720000</td>
+      <td>1.080000</td>
+      <td>1.340000</td>
+      <td>1.496000</td>
+    </tr>
+    <tr>
+      <th>12.0</th>
+      <td>13.0</td>
+      <td>1.800000</td>
+      <td>0.000000</td>
+      <td>4.500000</td>
+      <td>1.290923</td>
+      <td>1.966667</td>
+      <td>2.026667</td>
+      <td>2.146667</td>
+      <td>2.386667</td>
+      <td>2.493333</td>
+      <td>2.533333</td>
+      <td>2.713333</td>
+      <td>2.886667</td>
+      <td>3.046667</td>
+      <td>3.660000</td>
+      <td>4.080000</td>
+      <td>4.332000</td>
+    </tr>
+    <tr>
+      <th>13.0</th>
+      <td>13.0</td>
+      <td>5.143590</td>
+      <td>2.266667</td>
+      <td>7.966667</td>
+      <td>1.619007</td>
+      <td>4.933333</td>
+      <td>5.073333</td>
+      <td>5.226667</td>
+      <td>5.406667</td>
+      <td>5.840000</td>
+      <td>6.400000</td>
+      <td>6.480000</td>
+      <td>6.740000</td>
+      <td>7.360000</td>
+      <td>7.726667</td>
+      <td>7.846667</td>
+      <td>7.918667</td>
+    </tr>
+    <tr>
+      <th>14.0</th>
+      <td>13.0</td>
+      <td>8.497436</td>
+      <td>6.266667</td>
+      <td>11.166667</td>
+      <td>1.368661</td>
+      <td>7.966667</td>
+      <td>8.366667</td>
+      <td>8.733333</td>
+      <td>9.033333</td>
+      <td>9.226667</td>
+      <td>9.366667</td>
+      <td>9.466667</td>
+      <td>9.700000</td>
+      <td>10.200000</td>
+      <td>10.686667</td>
+      <td>10.926667</td>
+      <td>11.070667</td>
+    </tr>
+    <tr>
+      <th>15.0</th>
+      <td>13.0</td>
+      <td>8.707692</td>
+      <td>5.166667</td>
+      <td>10.733333</td>
+      <td>1.572987</td>
+      <td>9.200000</td>
+      <td>9.480000</td>
+      <td>9.666667</td>
+      <td>9.666667</td>
+      <td>9.680000</td>
+      <td>9.700000</td>
+      <td>9.860000</td>
+      <td>10.040000</td>
+      <td>10.260000</td>
+      <td>10.493333</td>
+      <td>10.613333</td>
+      <td>10.685333</td>
+    </tr>
+    <tr>
+      <th>16.0</th>
+      <td>13.0</td>
+      <td>6.046154</td>
+      <td>2.833333</td>
+      <td>8.666667</td>
+      <td>1.833815</td>
+      <td>6.533333</td>
+      <td>6.613333</td>
+      <td>6.680000</td>
+      <td>6.720000</td>
+      <td>6.880000</td>
+      <td>7.100000</td>
+      <td>7.480000</td>
+      <td>7.866667</td>
+      <td>8.266667</td>
+      <td>8.506667</td>
+      <td>8.586667</td>
+      <td>8.634667</td>
+    </tr>
+    <tr>
+      <th>17.0</th>
+      <td>13.0</td>
+      <td>6.279487</td>
+      <td>3.500000</td>
+      <td>9.066667</td>
+      <td>1.587074</td>
+      <td>6.333333</td>
+      <td>6.353333</td>
+      <td>6.480000</td>
+      <td>6.820000</td>
+      <td>6.960000</td>
+      <td>7.000000</td>
+      <td>7.060000</td>
+      <td>7.473333</td>
+      <td>8.593333</td>
+      <td>9.006667</td>
+      <td>9.036667</td>
+      <td>9.054667</td>
+    </tr>
+    <tr>
+      <th>18.0</th>
+      <td>13.0</td>
+      <td>6.310256</td>
+      <td>4.000000</td>
+      <td>8.800000</td>
+      <td>1.491729</td>
+      <td>6.500000</td>
+      <td>6.760000</td>
+      <td>6.966667</td>
+      <td>7.066667</td>
+      <td>7.220000</td>
+      <td>7.400000</td>
+      <td>7.620000</td>
+      <td>7.800000</td>
+      <td>7.900000</td>
+      <td>8.280000</td>
+      <td>8.540000</td>
+      <td>8.696000</td>
+    </tr>
+    <tr>
+      <th>19.0</th>
+      <td>13.0</td>
+      <td>6.074359</td>
+      <td>3.833333</td>
+      <td>7.566667</td>
+      <td>1.215955</td>
+      <td>5.966667</td>
+      <td>6.466667</td>
+      <td>6.840000</td>
+      <td>6.960000</td>
+      <td>7.053333</td>
+      <td>7.133333</td>
+      <td>7.193333</td>
+      <td>7.280000</td>
+      <td>7.420000</td>
+      <td>7.506667</td>
+      <td>7.536667</td>
+      <td>7.554667</td>
+    </tr>
+    <tr>
+      <th>20.0</th>
+      <td>13.0</td>
+      <td>5.784615</td>
+      <td>2.533333</td>
+      <td>9.500000</td>
+      <td>1.736142</td>
+      <td>5.533333</td>
+      <td>5.873333</td>
+      <td>6.153333</td>
+      <td>6.313333</td>
+      <td>6.473333</td>
+      <td>6.633333</td>
+      <td>6.753333</td>
+      <td>7.013333</td>
+      <td>7.553333</td>
+      <td>8.440000</td>
+      <td>8.970000</td>
+      <td>9.288000</td>
+    </tr>
+    <tr>
+      <th>21.0</th>
+      <td>13.0</td>
+      <td>6.271795</td>
+      <td>3.833333</td>
+      <td>9.900000</td>
+      <td>1.718303</td>
+      <td>5.700000</td>
+      <td>5.780000</td>
+      <td>5.860000</td>
+      <td>5.940000</td>
+      <td>6.566667</td>
+      <td>7.466667</td>
+      <td>7.646667</td>
+      <td>7.946667</td>
+      <td>8.486667</td>
+      <td>9.160000</td>
+      <td>9.530000</td>
+      <td>9.752000</td>
+    </tr>
+    <tr>
+      <th>22.0</th>
+      <td>13.0</td>
+      <td>6.343590</td>
+      <td>2.633333</td>
+      <td>9.000000</td>
+      <td>1.634092</td>
+      <td>6.633333</td>
+      <td>6.673333</td>
+      <td>6.793333</td>
+      <td>7.073333</td>
+      <td>7.246667</td>
+      <td>7.366667</td>
+      <td>7.526667</td>
+      <td>7.646667</td>
+      <td>7.686667</td>
+      <td>8.220000</td>
+      <td>8.610000</td>
+      <td>8.844000</td>
+    </tr>
+    <tr>
+      <th>23.0</th>
+      <td>13.0</td>
+      <td>5.692308</td>
+      <td>3.533333</td>
+      <td>9.100000</td>
+      <td>1.697337</td>
+      <td>5.100000</td>
+      <td>5.440000</td>
+      <td>5.806667</td>
+      <td>6.226667</td>
+      <td>6.660000</td>
+      <td>7.100000</td>
+      <td>7.300000</td>
+      <td>7.446667</td>
+      <td>7.486667</td>
+      <td>8.140000</td>
+      <td>8.620000</td>
+      <td>8.908000</td>
+    </tr>
+    <tr>
+      <th>24.0</th>
+      <td>13.0</td>
+      <td>5.592308</td>
+      <td>2.800000</td>
+      <td>8.900000</td>
+      <td>1.593921</td>
+      <td>5.433333</td>
+      <td>5.453333</td>
+      <td>5.566667</td>
+      <td>5.866667</td>
+      <td>6.113333</td>
+      <td>6.333333</td>
+      <td>6.633333</td>
+      <td>6.993333</td>
+      <td>7.473333</td>
+      <td>8.140000</td>
+      <td>8.520000</td>
+      <td>8.748000</td>
+    </tr>
+    <tr>
+      <th>25.0</th>
+      <td>13.0</td>
+      <td>5.282051</td>
+      <td>3.000000</td>
+      <td>8.566667</td>
+      <td>1.492674</td>
+      <td>5.166667</td>
+      <td>5.226667</td>
+      <td>5.340000</td>
+      <td>5.560000</td>
+      <td>5.753333</td>
+      <td>5.933333</td>
+      <td>6.173333</td>
+      <td>6.486667</td>
+      <td>6.946667</td>
+      <td>7.686667</td>
+      <td>8.126667</td>
+      <td>8.390667</td>
+    </tr>
+    <tr>
+      <th>26.0</th>
+      <td>13.0</td>
+      <td>4.779487</td>
+      <td>2.300000</td>
+      <td>8.333333</td>
+      <td>1.769627</td>
+      <td>4.800000</td>
+      <td>4.920000</td>
+      <td>5.106667</td>
+      <td>5.426667</td>
+      <td>5.533333</td>
+      <td>5.533333</td>
+      <td>6.013333</td>
+      <td>6.400000</td>
+      <td>6.600000</td>
+      <td>7.333333</td>
+      <td>7.833333</td>
+      <td>8.133333</td>
+    </tr>
+    <tr>
+      <th>27.0</th>
+      <td>13.0</td>
+      <td>4.817949</td>
+      <td>2.266667</td>
+      <td>8.066667</td>
+      <td>1.493295</td>
+      <td>4.833333</td>
+      <td>4.933333</td>
+      <td>5.073333</td>
+      <td>5.293333</td>
+      <td>5.393333</td>
+      <td>5.433333</td>
+      <td>5.653333</td>
+      <td>5.906667</td>
+      <td>6.226667</td>
+      <td>7.026667</td>
+      <td>7.546667</td>
+      <td>7.858667</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<p>Wouldn’t it be nice if Excel Pivot Tables could produce the output above? Why can’t they? Because they can’t do things like percentiles (or other custom aggregate functions). I love spreadsheets. I teach spreadsheet modeling. However, I find myself using either Python+pandas+matplotlib or R+plyr+ggplot2 more and more frequently for things I used to do in Excel.</p>
+<p>Let’s fire these guys out to csv files so we can check them out and maybe play with them in spreadsheet.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">occ_stats_summary</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="s1">&#39;occ_stats_summary.csv&#39;</span><span class="p">)</span>
+<span class="n">arr_stats_summary</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="s1">&#39;arr_stats_summary.csv&#39;</span><span class="p">)</span>
+<span class="n">dep_stats_summary</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="s1">&#39;dep_stats_summary.csv&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>The real reason I exported them to csv was to make it easy to read these results back in for Part 3 of this series of tutorials. In Part 3, we’ll create some plots using matplotlib based on these summary statistics.</p>
+</section>
+</section>
+
+<div class="section">
+    
+
+<div class="section">
+  <span style="float: left">
+     Previous:
+    
+    <a href="../hillpy_bydate_demo/">
+       Computing occupancy statistics with Python - Part 1 of 3
+    </a>
+    
+  </span>
+  <span>&nbsp;</span>
+  <span style="float: right">
+     Next: 
+    <a href="../ggplot-coming-to-python/">
+      ggplot coming to Python? 
+    </a>
+    
+  </span>
+</div>
+  
+</div>
+
+              </div>
+              
+              
+              <!-- Previous / next buttons -->
+<div class='prev-next-area'>
+</div>
+              
+          </main>
+          
+
+      </div>
+    </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
+<footer class="footer mt-5 mt-md-0">
+  <div class="container">
+    
+    <div class="footer-item">
+      <p class="copyright">
+    &copy; Copyright 2022, misken.<br>
+</p>
+    </div>
+    
+    <div class="footer-item">
+      <p class="sphinx-version">
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.3.2.<br>
+</p>
+    </div>
+    
+  </div>
+</footer>
+  </body>
+</html>
