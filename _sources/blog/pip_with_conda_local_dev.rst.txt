@@ -8,6 +8,11 @@
 Using pip with conda for local development projects
 ====================================================
 
+**UPDATE: 2022-07-19** While working on my `hillmaker <https://github.com/misken/hillmaker>`_ project,
+I made another finding on this issue and have updated the blog post accordingly. You can see this
+new method in the context of hillmaker by checking out the `basic usage notebook (html version) <https://misken.github.io/hillmaker-examples/basic_usage_shortstay_unit_043.html>`_ and
+scrolling down to the part about installing hillmaker using pip.
+
 I've wasted so much time on this issue over the last few years that I finally decided to better
 document a process for doing it correctly.
 
@@ -191,7 +196,21 @@ BTW, this same issue of the system ``pip`` getting used by default (even if run 
 also applies to running python (i.e. which ``python.exe`` file gets used) from the command line! I need to do /home/user/anaconda3/envs/analytics/bin/python if 
 I want to get an IDLE prompt within the active conda environment.
 
-Supposedly the Anaconda folks are working on this general issue. For now, this seems to work.
+As I mention at the start of this post, I have an update on this very issue.
+
+UPDATE 2022-07-19
+------------------
+
+My hillmaker package has both a CLI and is importable. By following the steps above, I was able
+to make it importable from within my conda virtual environment, but the runnable `hillmaker` script
+kept getting installed into the base conda environment. More digging led to the following solution.
+
+.. code-block:: console
+
+	$ ~/anaconda3/envs/<conda venv name>/bin/python -m pip install hillmaker
+
+
+The reason for the more convoluted install command when using conda virtual environments is that it turns out to be rather tricky to properly pip install something into a conda virtual environment. This is the source of much confusion and much discussion on StackOverflow. It boils down to making sure that you are using the `pip` executable **in your conda virtual environment** and **NOT** in your base conda environment. This [SO post](https://stackoverflow.com/questions/41060382/using-pip-to-install-packages-to-anaconda-environment/56889729#56889729) explains how the use of the `-m` flag helps in this regard. However, this post doesn't appear to mention that the same issue applies to the `python` executable itself. Again, you **MUST** make sure you are using the `python` executable in your conda virtual environment and not in your conda base environment. 
 
 
 PS - Notes about non-editable local installs and eggs

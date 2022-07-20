@@ -484,6 +484,11 @@
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#update-2022-07-19">
+   UPDATE 2022-07-19
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#ps-notes-about-non-editable-local-installs-and-eggs">
    PS - Notes about non-editable local installs and eggs
   </a>
@@ -510,6 +515,10 @@
               <div>
                  <section id="using-pip-with-conda-for-local-development-projects">
 <h1>Using pip with conda for local development projects<a class="headerlink" href="#using-pip-with-conda-for-local-development-projects" title="Permalink to this headline">#</a></h1>
+<p><strong>UPDATE: 2022-07-19</strong> While working on my <a class="reference external" href="https://github.com/misken/hillmaker">hillmaker</a> project,
+I made another finding on this issue and have updated the blog post accordingly. You can see this
+new method in the context of hillmaker by checking out the <a class="reference external" href="https://misken.github.io/hillmaker-examples/basic_usage_shortstay_unit_043.html">basic usage notebook (html version)</a> and
+scrolling down to the part about installing hillmaker using pip.</p>
 <p>I’ve wasted so much time on this issue over the last few years that I finally decided to better
 document a process for doing it correctly.</p>
 <p><strong>tldr:</strong> How to use pip to install your own local Python modules in a conda virtual environment:</p>
@@ -660,7 +669,17 @@ env is activated, then <code class="docutils literal notranslate"><span class="p
 <p>BTW, this same issue of the system <code class="docutils literal notranslate"><span class="pre">pip</span></code> getting used by default (even if run from an active conda environment prompt)
 also applies to running python (i.e. which <code class="docutils literal notranslate"><span class="pre">python.exe</span></code> file gets used) from the command line! I need to do /home/user/anaconda3/envs/analytics/bin/python if
 I want to get an IDLE prompt within the active conda environment.</p>
-<p>Supposedly the Anaconda folks are working on this general issue. For now, this seems to work.</p>
+<p>As I mention at the start of this post, I have an update on this very issue.</p>
+</section>
+<section id="update-2022-07-19">
+<h2>UPDATE 2022-07-19<a class="headerlink" href="#update-2022-07-19" title="Permalink to this headline">#</a></h2>
+<p>My hillmaker package has both a CLI and is importable. By following the steps above, I was able
+to make it importable from within my conda virtual environment, but the runnable <cite>hillmaker</cite> script
+kept getting installed into the base conda environment. More digging led to the following solution.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>~/anaconda3/envs/&lt;conda venv name&gt;/bin/python -m pip install hillmaker
+</pre></div>
+</div>
+<p>The reason for the more convoluted install command when using conda virtual environments is that it turns out to be rather tricky to properly pip install something into a conda virtual environment. This is the source of much confusion and much discussion on StackOverflow. It boils down to making sure that you are using the <cite>pip</cite> executable <strong>in your conda virtual environment</strong> and <strong>NOT</strong> in your base conda environment. This [SO post](<a class="reference external" href="https://stackoverflow.com/questions/41060382/using-pip-to-install-packages-to-anaconda-environment/56889729#56889729">https://stackoverflow.com/questions/41060382/using-pip-to-install-packages-to-anaconda-environment/56889729#56889729</a>) explains how the use of the <cite>-m</cite> flag helps in this regard. However, this post doesn’t appear to mention that the same issue applies to the <cite>python</cite> executable itself. Again, you <strong>MUST</strong> make sure you are using the <cite>python</cite> executable in your conda virtual environment and not in your conda base environment.</p>
 </section>
 <section id="ps-notes-about-non-editable-local-installs-and-eggs">
 <h2>PS - Notes about non-editable local installs and eggs<a class="headerlink" href="#ps-notes-about-non-editable-local-installs-and-eggs" title="Permalink to this headline">#</a></h2>
